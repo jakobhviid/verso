@@ -109,6 +109,26 @@ pub async fn store(server: &str, credential: &Credential) -> Result<(), KeyringE
         .map_err(classify)
 }
 
+/// Whether Verso runs in a Flatpak's sandbox. There `oo7::Keyring` keeps the credential in a keyring file of the app's
+/// own, locked with the Secret portal's secret, and the host's Secret Service is out of the sandbox's sight: the
+/// credential is read, looked for and removed through that keyring, where `store` put it.
+fn sandboxed() -> bool {
+    std::path::Path::new("/.flatpak-info").exists()
+}
+
+/// The items in the sandbox's own keyring that match `attributes`.
+async fn sandbox_items(attributes: &[(&str, &str)]) -> Result<Vec<oo7::Item>, KeyringError> {
+    let keyring = oo7::Keyring::new().await.map_err(classify)?;
+    keyring.unlock().await.map_err(classify)?;
+    keyring.search_items(&attributes).await.map_err(classify)
+}
+
+/// A stored item's secret as a credential.
+fn credential_of(secret: &[u8]) -> Result<Credential, KeyringError> {
+    parse_credential(&String::from_utf8_lossy(secret))
+        .ok_or_else(|| KeyringError::Failed("the stored credential cannot be read".to_owned()))
+}
+
 /// The items stored that match `attributes`, in the keyrings that already exist. Never the default
 /// collection by alias: asking for it creates a keyring when there is none, with a prompt, which only storing a
 /// credential should ever do.
@@ -130,6 +150,14 @@ pub async fn load(server: &str) -> Result<Option<Credential>, KeyringError> {
 
 /// The credential `product` stored for `server`: Verso reads Immich Mount's to take its account over.
 pub async fn load_of(product: &'static Product, server: &str) -> Result<Option<Credential>, KeyringError> {
+    if sandboxed() {
+        let items = sandbox_items(&attributes_of(product, server)).await?;
+        let Some(item) = items.first() else {
+            return Ok(None);
+        };
+        let secret = item.secret().await.map_err(classify)?;
+        return credential_of(secret.as_bytes()).map(Some);
+    }
     let dbus_error = |error: oo7::dbus::Error| classify(oo7::Error::DBus(error));
     let items = existing_items(&attributes_of(product, server)).await?;
     let Some(item) = items.first() else {
@@ -139,13 +167,18 @@ pub async fn load_of(product: &'static Product, server: &str) -> Result<Option<C
         item.unlock(None).await.map_err(dbus_error)?;
     }
     let secret = item.secret().await.map_err(dbus_error)?;
-    let text = String::from_utf8_lossy(secret.as_bytes());
-    parse_credential(&text).map(Some).ok_or_else(|| KeyringError::Failed("the stored credential cannot be read".to_owned()))
+    credential_of(secret.as_bytes()).map(Some)
 }
 
 /// Remove every credential Verso stored, for any server. Nothing stored is not an error, and no keyring is
 /// created or unlocked unless there is something to remove.
 pub async fn remove_all() -> Result<(), KeyringError> {
+    if sandboxed() {
+        for item in sandbox_items(&[("application", product::current().id)]).await? {
+            item.delete().await.map_err(classify)?;
+        }
+        return Ok(());
+    }
     for item in existing_items(&[("application", product::current().id)]).await? {
         item.delete(None).await.map_err(|error| classify(oo7::Error::DBus(error)))?;
     }
@@ -154,6 +187,12 @@ pub async fn remove_all() -> Result<(), KeyringError> {
 
 /// Remove the credential stored for `server`. Nothing stored is not an error.
 pub async fn remove(server: &str) -> Result<(), KeyringError> {
+    if sandboxed() {
+        for item in sandbox_items(&attributes(server)).await? {
+            item.delete().await.map_err(classify)?;
+        }
+        return Ok(());
+    }
     for item in existing_items(&attributes(server)).await? {
         item.delete(None).await.map_err(|error| classify(oo7::Error::DBus(error)))?;
     }
@@ -168,6 +207,9 @@ pub async fn is_stored(server: &str) -> bool {
 
 /// Whether `product` has a credential stored for `server`, looked for as [`is_stored`] does.
 pub async fn is_stored_by(product: &'static Product, server: &str) -> bool {
+    if sandboxed() {
+        return sandbox_items(&attributes_of(product, server)).await.is_ok_and(|items| !items.is_empty());
+    }
     existing_items(&attributes_of(product, server)).await.is_ok_and(|items| !items.is_empty())
 }
 

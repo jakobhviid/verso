@@ -1773,7 +1773,8 @@ dropped in), the account's and server's settings, and the top bar icon.
 - **Signing in** with the browser comes back through the exported entry's `x-scheme-handler/app.immich`; the window
   does not try to make itself the default handler, which a sandbox cannot.
 - **The keyring** is `oo7`'s, which in a sandbox keeps the credential through the Secret portal, apart from the host's
-  keyring (a Flatpak signs in afresh).
+  keyring (a Flatpak signs in afresh), and reads, looks for and removes it there too: the host's Secret Service is out
+  of the sandbox's sight.
 
 **What the manifest grants** (`finish-args`): `--share=network`, `--share=ipc`, `--socket=wayland`,
 `--socket=fallback-x11`, `--device=dri`, `--talk-name=org.kde.StatusNotifierWatcher` (the tray),
