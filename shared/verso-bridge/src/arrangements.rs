@@ -1,10 +1,12 @@
 //! How the gallery arranges what it shows, worked out in the core for the Mac and the iPhone as for Linux's window
 //! (ARCHITECTURE.md, "Verso on the Mac"): the Library's Years and Months (`verso_core::overview`), the map's clusters
 //! (`verso_core::map`), the Duplicates page's order (`verso_core::duplicates`), which shared links show
-//! (`verso_core::shared_links`) and People's filter (`verso_core::people`). The Swift side names a timeline's months by
-//! their bucket (`2025-03-01`), as its grid does, and gets them back the same way; a choice kept in its settings goes
-//! by its code, the same on Linux, and a list it sorts or filters comes back as the places of its items.
+//! (`verso_core::shared_links`), People's filter (`verso_core::people`) and Places' groups and order
+//! (`verso_core::places`). The Swift side names a timeline's months by their bucket (`2025-03-01`), as its grid does,
+//! and gets them back the same way; a choice kept in its settings goes by its code, the same on Linux, and a list it
+//! sorts or filters comes back as the places of its items.
 
+use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::time::SystemTime;
 
@@ -14,7 +16,7 @@ use immich_api::timeline::YearMonth;
 use immich_api::{ServerVersion, SharedLink, SharedLinkKind};
 use verso_core::duplicates::{self, Measure, SortBy};
 use verso_core::shared_links::{self, Arrangement, Filter};
-use verso_core::{map, overview, people};
+use verso_core::{map, overview, people, places};
 
 use crate::gallery::GalleryVersion;
 
@@ -252,6 +254,94 @@ pub fn people_shown(options: PeopleOptions, people: Vec<PeoplePerson>) -> Vec<u3
         .collect()
 }
 
+/// A city of Places, as their groups and order read it.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+pub struct PlacesCity {
+    pub name: String,
+    /// Its country; none, or blank, where Immich knows none.
+    pub country: Option<String>,
+    /// When it was last visited, the date of its newest photo (the wall clock where it was taken, written as UTC, as
+    /// the timeline's dates are); none when not known.
+    pub visit: Option<SystemTime>,
+}
+
+/// Places' view options, by the codes the settings keep them by: cities alone (`None`) or grouped by `Country`, and
+/// sorted by `RecentVisit`, `OldestVisit` or `Name`. A code the core does not know is the first of each.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+pub struct PlacesOptions {
+    pub group_by: String,
+    pub sort_by: String,
+}
+
+/// A group's heading: a country, or the places without one.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Enum)]
+pub enum PlacesHeader {
+    Country { name: String },
+    UnknownCountry,
+}
+
+/// A group of Places' cities.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+pub struct PlacesSection {
+    /// Stable across reads: `places`, `country-<name>` or `country-unknown`.
+    pub id: String,
+    /// None for the cities ungrouped.
+    pub header: Option<PlacesHeader>,
+    /// Its cities, by their places in the list given, in the order chosen.
+    pub cities: Vec<u32>,
+}
+
+fn places_of(cities: Vec<PlacesCity>) -> Vec<places::Place> {
+    cities
+        .into_iter()
+        .map(|city| places::Place { city: city.name, country: city.country, visit: city.visit.map(|visit| DateTime::<Utc>::from(visit).naive_utc()) })
+        .collect()
+}
+
+/// Names in the order `names` gives them: each name by its place in the person's language's order, names alike there
+/// sharing one. A name it does not hold goes after those it does, by its lower-case letters.
+fn named(names: &HashMap<String, u32>) -> impl Fn(&str, &str) -> Ordering + '_ {
+    move |first, second| match (names.get(first), names.get(second)) {
+        (Some(first), Some(second)) => first.cmp(second),
+        (Some(_), None) => Ordering::Less,
+        (None, Some(_)) => Ordering::Greater,
+        (None, None) => places::caseless(first, second),
+    }
+}
+
+/// Places' cities (given in the server's order) grouped and sorted with the options (`verso_core::places`): all of
+/// them in one group without a header, or a group for each country, ordered by its visit or by name, the cities
+/// without a country last. `names` holds each city's and country's name by its place in the order of the person's
+/// language, names alike there sharing one, an order only the platform knows.
+#[uniffi::export]
+pub fn places_sections(cities: Vec<PlacesCity>, options: PlacesOptions, names: HashMap<String, u32>) -> Vec<PlacesSection> {
+    let arrangement = places::Arrangement {
+        group_by: places::GroupBy::from_code(&options.group_by).unwrap_or_default(),
+        sort_by: places::SortBy::from_code(&options.sort_by).unwrap_or_default(),
+    };
+    arrangement
+        .groups(&places_of(cities), named(&names))
+        .into_iter()
+        .map(|group| PlacesSection {
+            id: group.id,
+            header: group.header.map(|header| match header {
+                places::Header::Country(name) => PlacesHeader::Country { name },
+                places::Header::UnknownCountry => PlacesHeader::UnknownCountry,
+            }),
+            cities: group.places.into_iter().map(|place| place as u32).collect(),
+        })
+        .collect()
+}
+
+/// The places of the cities (given in the server's order) sorted by the code given (`RecentVisit`, also for a code it
+/// does not know, `OldestVisit` or `Name`): a city whose visit is not known goes last, and cities alike keep the
+/// server's order. `names` is as for `places_sections`.
+#[uniffi::export]
+pub fn places_sorted(cities: Vec<PlacesCity>, sort_by: String, names: HashMap<String, u32>) -> Vec<u32> {
+    let arrangement = places::Arrangement { sort_by: places::SortBy::from_code(&sort_by).unwrap_or_default(), ..places::Arrangement::default() };
+    arrangement.sorted(&places_of(cities), named(&names)).into_iter().map(|place| place as u32).collect()
+}
+
 #[cfg(test)]
 mod tests {
     use std::time::Duration;
@@ -414,5 +504,65 @@ mod tests {
         assert_eq!(filter("Favorites", version(3, 2)), PeopleFilter { is_filtered: true, with_hidden: false, favorites_only: false, hidden_only: false });
         assert!(!filter("Hidden", None).hidden_only);
         assert!(people_filter(options("All", true), None).with_hidden);
+    }
+
+    /// Places' cities as the server sends them, by name, with the days after a first each was last visited.
+    fn cities() -> Vec<PlacesCity> {
+        let first = 1_700_000_000; // 2023-11-14T22:13:20Z
+        let city = |name: &str, country: Option<&str>, days: Option<u64>| PlacesCity {
+            name: name.to_owned(),
+            country: country.map(str::to_owned),
+            visit: days.map(|days| SystemTime::UNIX_EPOCH + Duration::from_secs(first + days * 86_400)),
+        };
+        vec![
+            city("Aarhus", Some("Denmark"), Some(1)),
+            city("Atlantis", None, None),
+            city("Bologna", Some("Italy"), Some(9)),
+            city("Copenhagen", Some("Denmark"), Some(5)),
+            city("Ys", Some(""), Some(3)),
+            city("Århus", Some("australia"), Some(7)),
+        ]
+    }
+
+    /// The names' order as a language gives it, names alike sharing a place.
+    fn ranked(names: &[&[&str]]) -> HashMap<String, u32> {
+        names.iter().enumerate().flat_map(|(place, alike)| alike.iter().map(move |name| ((*name).to_owned(), place as u32))).collect()
+    }
+
+    fn places_options(group_by: &str, sort_by: &str) -> PlacesOptions {
+        PlacesOptions { group_by: group_by.to_owned(), sort_by: sort_by.to_owned() }
+    }
+
+    #[test]
+    fn places_group_by_country_and_follow_their_most_recent_city() {
+        let names = ranked(&[&["Aarhus"], &["Atlantis"], &["australia"], &["Bologna"], &["Copenhagen"], &["Denmark"], &["Italy"], &["Ys"], &["Århus"]]);
+        let sections = |group_by: &str, sort_by: &str| places_sections(cities(), places_options(group_by, sort_by), names.clone());
+        let country = |name: &str| Some(PlacesHeader::Country { name: name.to_owned() });
+        let recent = sections("Country", "RecentVisit");
+        let headers: Vec<_> = recent.iter().map(|section| section.header.clone()).collect();
+        assert_eq!(headers, [country("Italy"), country("australia"), country("Denmark"), Some(PlacesHeader::UnknownCountry)]);
+        assert_eq!(recent[2].cities, [3, 0]);
+        assert_eq!(recent[3].cities, [4, 1], "an empty country is none, and a visit not known goes last");
+        let ids: Vec<String> = sections("Country", "Name").into_iter().map(|section| section.id).collect();
+        assert_eq!(ids, ["country-australia", "country-Denmark", "country-Italy", "country-unknown"]);
+        let all = sections("None", "RecentVisit");
+        assert_eq!(all, [PlacesSection { id: "places".to_owned(), header: None, cities: vec![2, 5, 3, 4, 0, 1] }]);
+        assert_eq!(sections("Continent", "Distance"), all, "codes it does not know are the first of each");
+        assert!(places_sections(Vec::new(), places_options("Country", "Name"), names.clone()).is_empty());
+    }
+
+    #[test]
+    fn places_sort_by_visit_or_by_name_in_the_order_the_language_gives() {
+        let danish = ranked(&[&["Aarhus"], &["Atlantis"], &["Bologna"], &["Copenhagen"], &["Ys"], &["Århus"]]);
+        let english = ranked(&[&["Aarhus"], &["Århus"], &["Atlantis"], &["Bologna"], &["Copenhagen"], &["Ys"]]);
+        assert_eq!(places_sorted(cities(), "OldestVisit".to_owned(), danish.clone()), [0, 4, 3, 5, 2, 1]);
+        assert_eq!(places_sorted(cities(), "Name".to_owned(), danish.clone()), [0, 1, 2, 3, 4, 5], "Å after Z in Danish");
+        assert_eq!(places_sorted(cities(), "Name".to_owned(), english), [0, 5, 1, 2, 3, 4], "Å beside A in English");
+        let mut reversed = cities();
+        reversed.reverse();
+        assert_eq!(places_sorted(reversed, "Name".to_owned(), danish), [5, 4, 3, 2, 1, 0]);
+        let twins = vec![cities()[0].clone(), PlacesCity { name: "AARHUS".to_owned(), ..cities()[0].clone() }];
+        assert_eq!(places_sorted(twins.clone(), "Name".to_owned(), ranked(&[&["Aarhus", "AARHUS"]])), [0, 1], "names alike keep the server's order");
+        assert_eq!(places_sorted(twins, "Name".to_owned(), HashMap::new()), [0, 1], "names it is not given go by their lower-case letters");
     }
 }

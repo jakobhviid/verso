@@ -102,8 +102,9 @@ the import panel, Change Password and the profile picture.
    `xdg-desktop-portal`), a sign-in by single sign-on (the `app.immich` redirect, which Verso and Immich Mount's app
    both claim), drag and drop to and from Files, and how the grid scrolls through a large library.
 2. **What Immich Gallery has on the Mac and Verso lacks:** tabs (several accounts are left out on both: Verso
-   signs in to one). Check `edited=true` on thumbnails against Immich v3.2.0, the floor (the spec check,
-   `tests/contract_spec.rs`).
+   signs in to one), and Places sorted by when each city was last visited, as the core sorts them for the Mac
+   (`verso_core::places`; the window reads no visits yet). Check `edited=true` on thumbnails against Immich v3.2.0,
+   the floor (the spec check, `tests/contract_spec.rs`).
 3. **A native KDE frontend,** parked (below).
 4. **Partners' photos** show in the Library (`withPartners` on the gallery's own scope, so the drive's stays as it
    is); a partner's photo there is theirs, and changing it is refused by Immich, not yet kept from the menus.
@@ -309,21 +310,20 @@ Immich Crosslink, the protocol between apps, and the takeover of Immich Mount's 
    the bridge's tests.
    - Done: the Library's Years and Months (`verso_core::overview`), the map's clusters (`verso_core::map`),
      duplicates' order and shared links' filter (`verso_core::duplicates`, `verso_core::shared_links`), people's
-     filter (`verso_core::people`) and the date scroller (`verso_core::rail`; ARCHITECTURE.md, "The date scroller").
-     Left: the Mac's rail and Linux's scrubber, tried by hand.
+     filter (`verso_core::people`), Places' groups and order (`verso_core::places`) and the date scroller
+     (`verso_core::rail`; ARCHITECTURE.md, "The date scroller"). Left: the Mac's rail and Linux's scrubber, tried by
+     hand.
    - Next, in this order, the easiest and most shared first (the Swift files in `mac/Verso/Verso/App/`):
-     1. Places: `PlacesArrangement.swift` (by country or not, by visit or name) and `places.rs` (by country only):
-        the sorting by visit joins the core.
-     2. A photo page's view options: `GridArrangement.swift` and `arrangement.rs`, into the timeline's query.
-     3. The albums' view settings: `AlbumsArrangement.swift` and `CollapsedGroups.swift` against `albums.rs`.
-     4. The sidebar's layout: `SidebarLayout.swift` (the Mac's sidebar and the iPhone's Collections) and
+     1. A photo page's view options: `GridArrangement.swift` and `arrangement.rs`, into the timeline's query.
+     2. The albums' view settings: `AlbumsArrangement.swift` and `CollapsedGroups.swift` against `albums.rs`.
+     3. The sidebar's layout: `SidebarLayout.swift` (the Mac's sidebar and the iPhone's Collections) and
         `sidebar.rs`, which remember it differently, so the move carries the layouts kept.
-     5. Recent searches and Verso's own notifications: `SearchHistory.swift` and `VersoNotifications.swift` against
+     4. Recent searches and Verso's own notifications: `SearchHistory.swift` and `VersoNotifications.swift` against
         `search.rs` and `notifications.rs`, with what they keep per account.
-     6. How far an album or a link reaches: the Mac's `SharingReach.swift` (its links' expiry in Swift, checked by
+     5. How far an album or a link reaches: the Mac's `SharingReach.swift` (its links' expiry in Swift, checked by
         `check.py`) and the iPhone's `AlbumsShareReach`, against the window's `sharing.rs` (`Audience`).
-     7. Imports: `UploadQueue.swift` and `uploads.rs`, the largest, around each platform's file access.
-     8. The Immich client's calls: the typed calls (ARCHITECTURE.md, "Typed calls") bring immich-api's models, and
+     6. Imports: `UploadQueue.swift` and `uploads.rs`, the largest, around each platform's file access.
+     7. The Immich client's calls: the typed calls (ARCHITECTURE.md, "Typed calls") bring immich-api's models, and
         the Swift models and `ImmichClient` go as the views take the bridge's records.
 
 **Releases are cut by a tag** (AGENTS.md, "Versioning", has how; ARCHITECTURE, "Verso's releases", why). Not built

@@ -89,7 +89,7 @@ targets:
       - ../mac/Verso/Verso/App/ExploreMapFit.swift
       - ../mac/Verso/Verso/App/LibraryMode.swift
       - ../mac/Verso/Verso/App/PeopleShow.swift
-      - ../mac/Verso/Verso/App/PlacesArrangement.swift
+      - ../mac/Verso/Verso/App/PlacesOptions.swift
       - ../mac/Verso/Verso/App/SearchHistory.swift
       - ../mac/Verso/Verso/App/SharedLinksFilter.swift
       - ../mac/Verso/Verso/App/SidebarLayout.swift

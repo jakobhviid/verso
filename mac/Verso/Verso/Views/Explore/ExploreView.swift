@@ -1,4 +1,5 @@
 import SwiftUI
+import VersoCore
 
 enum ExplorePage: String, CaseIterable, Hashable {
     case map = "Map", places = "Places", memories = "Memories", tags = "Tags", folders = "Folders", locked = "Locked Folder"
@@ -52,7 +53,7 @@ struct ExplorePlacesView: View {
     @AppStorage(CardSize.key) private var cardSize = 0
     @State private var cardZoom = CardZoom()
 
-    private var arrangement: PlacesArrangement { PlacesArrangement(groupBy: groupBy, sortBy: sortBy) }
+    private var options: PlacesOptions { PlacesOptions(groupBy: groupBy, sortBy: sortBy) }
 
     /// The cards at each size: countries' or cities'.
     private var cards: CardLayout { CardLayout(widths: groupBy == .country ? ExploreCountryCard.widths : ExplorePlaceCell.widths) }
@@ -69,7 +70,7 @@ struct ExplorePlacesView: View {
 
     var body: some View {
         let visits = visits
-        let groups = arrangement.groups(cities, visits: visits)
+        let groups = options.groups(cities, visits: visits)
         ScrollView {
             LazyVGrid(columns: cards.columns(cardSize), spacing: 20) {
                 if groupBy == .country {
@@ -93,7 +94,7 @@ struct ExplorePlacesView: View {
         }
         .cardZoom($cardSize, cardZoom)
         .navigationDestination(for: PlacesCountryRoute.self) { route in
-            ExplorePlacesCountryView(title: route.title, places: arrangement.sorted(cities.filter { route.ids.contains($0.id) }, visits: visits))
+            ExplorePlacesCountryView(title: route.title, places: options.sorted(cities.filter { route.ids.contains($0.id) }, visits: visits))
         }
         .cardSizeCommands($cardSize, zoom: cardZoom)
         .pageToolbar("places") {

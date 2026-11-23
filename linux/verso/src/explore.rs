@@ -10,8 +10,9 @@ use immich_api::search::AssetQuery;
 use verso_desktop::images::Kind as ImageKind;
 use verso_desktop::library::Source;
 use verso_desktop::arrangement::GridPage;
-use verso_desktop::{places, settings};
+use verso_desktop::settings;
 use verso_core::links::ImmichItem;
+use verso_core::places::{self, GroupBy, Header, SortBy};
 use verso_linux::i18n::tr;
 
 use crate::collections::{add_card, card_page, item_actions};
@@ -24,20 +25,51 @@ use crate::window::Window;
 
 // --- Places ---
 
+/// A place: its city and country, and the photo that shows it.
+#[derive(Debug, Clone)]
+struct Place {
+    city: String,
+    country: String,
+    photo_id: String,
+}
+
+/// A country and its places; `None` for places without a country.
+struct Country {
+    name: Option<String>,
+    places: Vec<Place>,
+}
+
+/// The places by name, all of them or grouped by country, the places without one last (`verso_core::places`, which
+/// arranges them for the Mac and the iPhone too, where they can also go by when each was last visited).
+fn arranged(shown: &[Place], group_by: GroupBy) -> Vec<Country> {
+    let read: Vec<places::Place> = shown.iter().map(|place| places::Place { city: place.city.clone(), country: Some(place.country.clone()), visit: None }).collect();
+    places::Arrangement { group_by, sort_by: SortBy::Name }
+        .groups(&read, places::caseless)
+        .into_iter()
+        .map(|group| Country {
+            name: match group.header {
+                Some(Header::Country(name)) => Some(name),
+                Some(Header::UnknownCountry) | None => None,
+            },
+            places: group.places.into_iter().map(|index| shown[index].clone()).collect(),
+        })
+        .collect()
+}
+
 pub fn places_page(window: &Window) -> adw::NavigationPage {
     let cards = card_page(tr("Places"), tr("No Places"), "mark-location-symbolic");
     cards.page.add_css_class("verso-card-page");
     cards.header.pack_start(&crate::cards::zoom_buttons());
     // Cities, or countries, each opening its cities (the Mac gallery's and Immich's grouping), remembered.
     let modes = adw::ToggleGroup::new();
-    modes.add(adw::Toggle::builder().name("None").label(tr("Cities")).build());
-    modes.add(adw::Toggle::builder().name("Country").label(tr("Countries")).build());
-    let by_country = settings::shared().get("places.groupBy").as_deref() == Some("Country");
-    modes.set_active_name(Some(if by_country { "Country" } else { "None" }));
+    modes.add(adw::Toggle::builder().name(GroupBy::None.code()).label(tr("Cities")).build());
+    modes.add(adw::Toggle::builder().name(GroupBy::Country.code()).label(tr("Countries")).build());
+    let group_by = settings::shared().get("places.groupBy").and_then(|code| GroupBy::from_code(&code)).unwrap_or_default();
+    modes.set_active_name(Some(group_by.code()));
     cards.header.set_title_widget(Some(&modes));
     let Some(session) = window.session() else { return cards.page };
     let client = session.connection.client.clone();
-    let places: Rc<RefCell<Vec<places::Place>>> = Rc::default();
+    let places: Rc<RefCell<Vec<Place>>> = Rc::default();
     let render = {
         let (weak_window, flow, stack, places, weak_modes) = (window.downgrade(), cards.flow.clone(), cards.stack.clone(), places.clone(), modes.downgrade());
         Rc::new(move || {
@@ -48,25 +80,25 @@ pub fn places_page(window: &Window) -> adw::NavigationPage {
             let places = places.borrow();
             stack.set_visible_child_name(if places.is_empty() { "empty" } else { "cards" });
             // Countries as cards; cities, often many, as square tiles, as People's faces.
-            let by_country = modes.active_name().as_deref() == Some("Country");
-            if by_country {
+            let group_by = modes.active_name().and_then(|code| GroupBy::from_code(&code)).unwrap_or_default();
+            if group_by == GroupBy::Country {
                 flow.set_max_children_per_line(5);
                 flow.remove_css_class("verso-faces");
                 flow.add_css_class("verso-cards");
-                for country in places::countries(&places) {
+                for country in arranged(&places, group_by) {
                     add_country_card(&window, &flow, country);
                 }
             } else {
                 city_flow(&flow);
-                for place in places.iter() {
-                    add_city_card(&window, &flow, place, true);
+                for place in arranged(&places, group_by).into_iter().flat_map(|group| group.places) {
+                    add_city_card(&window, &flow, &place, true);
                 }
             }
         })
     };
     let again = render.clone();
     modes.connect_active_name_notify(move |modes| {
-        settings::shared().set("places.groupBy", Some(modes.active_name().as_deref().unwrap_or("None")));
+        settings::shared().set("places.groupBy", Some(modes.active_name().as_deref().unwrap_or(GroupBy::None.code())));
         again();
     });
     let (weak_window, read) = (window.downgrade(), places.clone());
@@ -74,15 +106,14 @@ pub fn places_page(window: &Window) -> adw::NavigationPage {
         let Some(window) = weak_window.upgrade() else { return };
         match outcome {
             Ok(assets) => {
-                let mut found: Vec<places::Place> = assets
+                let found: Vec<Place> = assets
                     .iter()
                     .filter_map(|details| {
                         let exif = details.exif.as_ref()?;
                         let city = exif.city.clone().filter(|city| !city.is_empty())?;
-                        Some(places::Place { city, country: exif.country.clone().unwrap_or_default(), photo_id: details.id.clone() })
+                        Some(Place { city, country: exif.country.clone().unwrap_or_default(), photo_id: details.id.clone() })
                     })
                     .collect();
-                found.sort_by_key(|place| place.city.to_lowercase());
                 read.replace(found);
                 render();
             }
@@ -101,7 +132,7 @@ fn city_flow(flow: &gtk::FlowBox) {
 
 /// A city as a square tile: its photo, its name on it, and its country under the name where cities of several
 /// countries show (`with_country`); it opens the city's photos.
-fn add_city_card(window: &Window, flow: &gtk::FlowBox, place: &places::Place, with_country: bool) {
+fn add_city_card(window: &Window, flow: &gtk::FlowBox, place: &Place, with_country: bool) {
     let Some(session) = window.session() else { return };
     let picture = crate::cards::picture(&session.textures, ImageKind::Thumbnail, &place.photo_id);
     let (tile, _) = crate::cards::square_tile(&picture, &place.city, with_country.then_some(place.country.as_str()));
@@ -118,7 +149,7 @@ const HOVER_CITIES: usize = 12;
 
 /// A country as a card: three of its places' photos, each labelled with its city; its name, how many places and the
 /// years its photos span on the photos (the years read as the card first shows); its first places by name on hover.
-fn add_country_card(window: &Window, flow: &gtk::FlowBox, country: places::Country) {
+fn add_country_card(window: &Window, flow: &gtk::FlowBox, country: Country) {
     let Some(session) = window.session() else { return };
     let name = country.name.clone().unwrap_or_else(|| tr("Unknown Country").to_owned());
     let shown = crate::cards::Card::new(&name, true);

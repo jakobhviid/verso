@@ -66,7 +66,7 @@ model of the library (the tree, its names, its store, content and uploads), link
 | Crate | Runs on | Kind | Holds |
 |---|---|---|---|
 | `immich-api` | every platform | lib | The Immich REST client and models ("The Immich API layer") |
-| `verso-core` | every platform | lib | The library model, naming, membership, metadata store and its change journal, content cache, upload logic, links, the sign-in flow, the settings table and config, the product's names (`product`), and what the gallery arranges alike on every platform: the Library's Years and Months (`overview`), the map's clusters (`map`), the Duplicates page's order (`duplicates`), which shared links show (`shared_links`), People's filter (`people`) and the date scroller (`rail`) |
+| `verso-core` | every platform | lib | The library model, naming, membership, metadata store and its change journal, content cache, upload logic, links, the sign-in flow, the settings table and config, the product's names (`product`), and what the gallery arranges alike on every platform: the Library's Years and Months (`overview`), the map's clusters (`map`), the Duplicates page's order (`duplicates`), which shared links show (`shared_links`), People's filter (`people`), Places' groups and order (`places`) and the date scroller (`rail`) |
 | `verso-bridge` | the Mac | lib | The bridge the Mac's Swift code calls through uniffi: Verso Drive's items by identifier, listings, whole originals, thumbnails, changes and uploads, the drive's settings, the gallery's calls (`ApiConnection`) and the core's arrangements (`arrangements`, and the date scroller's `rail`) |
 | `verso-linux` | Linux | lib | FUSE adapter (inode table, kernel invalidation, staging), freedesktop thumbnail seeding, Secret Service, notifications, translations, the D-Bus service and the tray: what the service and the window share, without GTK |
 | `verso-service` | Linux | bin | The service: the drive's daemon, the tray and the command line (`verso-service`), each command resolving its inputs, calling one core function and rendering the result |
@@ -1486,8 +1486,9 @@ ROADMAP, M8, has its status and what is still to come; DESIGN.md, "The apps' int
   pointer or the focus is on its card (`Card::note`, never in the way of a click), and has no Year grouping while
   sorting by the albums' own dates. Back from an album, it reads its albums again and redraws them, where it was, only
   if one changed.
-- **Places** (`places`) shows cities as square tiles, as People's faces are, since they are often many, and countries
-  as cards, whose years are two searches made as the card first shows.
+- **Places** shows cities as square tiles, as People's faces are, since they are often many, and countries as cards,
+  whose years are two searches made as the card first shows, both by name (`verso_core::places`, which arranges them
+  for the Mac and the iPhone too, where they also go by when each was last visited).
 - **Remembered choices** live in `$XDG_CONFIG_HOME/verso/gallery.json` (`settings`), beside the drive's `config.toml`,
   written at each change.
 - **Years, Months and All Photos:** the Library's header switches between them, as Photos and the Mac gallery do
@@ -2027,10 +2028,16 @@ to come.
   Library's Years and Months (`verso_core::overview`); the map's clusters, each with the box Immich's timeline takes
   (`verso_core::map`; fitting the map to the photos stays MapKit's, `ExploreMapFit`); the Duplicates page's order and
   what each group keeps at first; which shared links show, and whether one has expired; People's filter, with what
-  Immich v3.3 and later filter themselves; and the date scroller (`rail`; "The date scroller"). The views hand over
-  plain records (buckets with their counts, photos with their dates, ids and coordinates, choices by the codes the
-  settings keep them by, which are Linux's) and get places back by index; the records are `Identifiable` for
-  SwiftUI's lists (`VersoCore/CoreConnection.swift`).
+  Immich v3.3 and later filter themselves; Places' cities alone or by country, by visit or by name
+  (`verso_core::places`); and the date scroller (`rail`; "The date scroller"). The views hand over plain records
+  (buckets with their counts, photos with their dates, ids and coordinates, choices by the codes the settings keep
+  them by, which are Linux's) and get places back by index; the records are `Identifiable` for SwiftUI's lists
+  (`VersoCore/CoreConnection.swift`).
+  - **The order of names is the platform's,** in the person's language, which the core does not know: the Mac and the
+    iPhone hand each name over with its place in Finder's order (`localizedStandardCompare`, names alike sharing one),
+    so Å comes after Z in Danish and beside A in English, and Linux's window orders by lower-case letters
+    (`places::caseless`). Not chosen: a collator in the core (ICU4X's), a large dependency whose order would still
+    differ from the system's here and there.
 - **An album's name and description are text on its page,** changed with Edit Album (`AlbumActionsView`), never in
   place: a field in the header takes the keys the grid answers (Space, the arrows) while one types. A person's name is
   edited in place on their page.

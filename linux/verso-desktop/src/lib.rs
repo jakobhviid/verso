@@ -17,7 +17,6 @@ pub mod library; // sections of tiles: timelines, searches, lists
 pub mod links; // Open in Immich and immich-crosslink
 pub mod map; // the web map's arithmetic: what a view spans, the place at a point, fitting the photos
 pub mod notifications; // Verso's own notifications, kept on this computer
-pub mod places; // places as cities or by country
 pub mod preferences; // the settings windows' layout, from the shared settings table
 pub mod presentation; // the slideshow, face boxes, turning the view
 pub mod sandbox; // Verso's service in a Flatpak: started and stopped through the portals

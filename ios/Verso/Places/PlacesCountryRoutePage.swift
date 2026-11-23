@@ -4,6 +4,7 @@
 // its own: Places has read them on the way here.
 
 import SwiftUI
+import VersoCore
 
 struct PlacesCountryRoutePage: View {
     let session: LibrarySession
@@ -51,7 +52,7 @@ struct PlacesCountryRoutePage: View {
                 ProgressView()
             }
         } else {
-            let sorted = PlacesArrangement(groupBy: .none, sortBy: sortBy)
+            let sorted = PlacesOptions(groupBy: .none, sortBy: sortBy)
                 .sorted(cities, visits: PlacesCities.visits(cities, session: session))
                 .filter { $0.exifInfo?.city != nil }
             CardGrid(

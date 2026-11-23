@@ -1,12 +1,14 @@
 // Places: where the photos were taken, as Map or Places, switched by a segmented picker in the middle of the toolbar,
 // as Photos would. Map is the photos on the map, as Photos' Places opens, with Immich's map filters, and a tap on a
 // cluster pushes the photos in its box. Places is the countries as cards, as the Mac's and Linux's Places grouped by
-// country (PlacesArrangement), in the card sizes every card page shares (CardSize), sorted by when each was last
-// visited, most recent first, or by name (PlaceVisits reads the exact dates in the background); a country pushes its
-// cities (PlacesCountryRoutePage), and a city its photos. Names lead to photos, never back to the map. Every page it
-// opens is a Route, pushed onto the stack it is shown in; with Map in the tab bar it is that tab's first page.
+// country, in the card sizes every card page shares (CardSize), sorted by when each was last visited, most recent
+// first, or by name (PlaceVisits reads the exact dates in the background), grouped and sorted by the shared core
+// (`placesSections`, as on the Mac and Linux); a country pushes its cities (PlacesCountryRoutePage), and a city its
+// photos. Names lead to photos, never back to the map. Every page it opens is a Route, pushed onto the stack it is
+// shown in; with Map in the tab bar it is that tab's first page.
 
 import SwiftUI
+import VersoCore
 
 /// What Places shows.
 enum PlacesMode: String, CaseIterable, Identifiable {
@@ -102,7 +104,7 @@ struct PlacesView: View {
                 ProgressView()
             }
         } else {
-            let groups = PlacesArrangement(groupBy: .country, sortBy: sortBy)
+            let groups = PlacesOptions(groupBy: .country, sortBy: sortBy)
                 .groups(cities, visits: PlacesCities.visits(cities, session: session))
             CardGrid(
                 sections: [CardGridSection(id: "countries", count: groups.count)],

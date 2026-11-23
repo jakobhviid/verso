@@ -48,7 +48,6 @@ cases = {
     'album-review': api + [app('AlbumsActions'), 'Verso/Views/Albums/AlbumAssetTransfer.swift', 'Tests/verify-album-review.swift'],
     'albums-arrangement': models + ['Verso/API/Models+Metadata.swift', app('AlbumsArrangement'), app('CollapsedGroups'), support('Formatters'), 'Tests/AlbumsArrangementChecks.swift'],
     'grid-arrangement': api + [app('GridArrangement'), support('Formatters'), 'Tests/GridArrangementChecks.swift'],
-    'places-arrangement': models + ['Verso/API/Models+Metadata.swift', app('PlacesArrangement'), 'Tests/PlacesArrangementChecks.swift'],
     'crosslink': [app('Crosslink'), 'Tests/CrosslinkChecks.swift'],
     'crosslink-navigation': [app('Crosslink'), app('CrosslinkNavigation'), 'Tests/CrosslinkNavigationChecks.swift'],
     'similar-photos': api + [app('SimilarPhotos'), app('SimilarPhotosAnalyzer'), app('SimilarPhotosModel'), app('AssetsStackMutation'), support('ImagePipeline'), support('Formatters'), 'Tests/SimilarPhotosChecks.swift'],
