@@ -13,7 +13,7 @@ use immich_api::{Album, TimelineScope};
 use verso_desktop::connection::{self, Connection};
 use verso_desktop::images::Cache;
 use verso_desktop::library::{self, Source, Tile};
-use verso_desktop::arrangement::GridPage;
+use verso_core::grid_options::GridPage;
 use verso_desktop::{albums, links, text};
 use verso_core::albums as album_view;
 use verso_core::links::ImmichItem;

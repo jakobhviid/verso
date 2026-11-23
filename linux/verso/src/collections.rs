@@ -11,7 +11,7 @@ use immich_api::account::Proof;
 use immich_api::TimelineScope;
 use verso_desktop::images::Kind as ImageKind;
 use verso_desktop::library::Source;
-use verso_desktop::arrangement::GridPage;
+use verso_core::grid_options::GridPage;
 use verso_desktop::links;
 use verso_core::links::ImmichItem;
 use verso_linux::i18n::tr;

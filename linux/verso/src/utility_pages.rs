@@ -13,7 +13,7 @@ use immich_api::duplicate::{DuplicateGroup, DuplicateResolution};
 use immich_api::partner::PartnerDirection;
 use immich_api::{Tag, TagChanges, TimelineScope};
 use verso_core::duplicates::{self, SortBy};
-use verso_desktop::arrangement::GridPage;
+use verso_core::grid_options::GridPage;
 use verso_desktop::images::Kind as ImageKind;
 use verso_desktop::library::Source;
 use verso_desktop::{settings, tags, text};

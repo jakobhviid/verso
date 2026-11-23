@@ -6,7 +6,7 @@
 pub mod account_preferences; // the account's preferences in Immich
 pub mod actions; // what the gallery changes in Immich, with messages for people
 pub mod albums; // the albums' view settings remembered, and the sidebar's album sections
-pub mod arrangement; // a photo page's view options
+pub mod arrangement; // a photo page's view options remembered, and the source a page reads with them
 pub mod connection; // the signed-in account, shared with the drive
 pub mod dates; // when photos were taken: shifted by an amount, or set
 pub mod duplicates; // the Duplicates page's order, remembered

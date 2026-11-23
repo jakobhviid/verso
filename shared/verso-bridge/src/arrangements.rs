@@ -17,7 +17,7 @@ use immich_api::{ServerVersion, SharedLink, SharedLinkKind};
 use verso_core::duplicates::{self, Measure, SortBy};
 use verso_core::shared_links::{self, Arrangement, Filter};
 use verso_core::names::caseless;
-use verso_core::{albums, map, overview, people, places};
+use verso_core::{albums, grid_options, map, overview, people, places};
 
 use crate::gallery::GalleryVersion;
 
@@ -530,6 +530,149 @@ pub fn albums_collapsed_set(stored: String, group_ids: Vec<String>, group_by: St
     collapsed.json()
 }
 
+/// A photo page's view options, by the codes the settings keep them by: show `all` or `favorites`, media type `all`,
+/// `photos` or `videos`, sort by `taken` or `added`, order `desc` or `asc`, location `all` or `missing`, owner `anyone`
+/// or `mine`. Linux's codes, the ones written; the spelling the Mac and the iPhone kept before (`Favorites`, `IMAGE`,
+/// `createdAt`, `Missing`, `Mine`) is read too, and a code no platform writes is the option's default.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+pub struct GridOptions {
+    pub show: String,
+    pub media_type: String,
+    pub sort_by: String,
+    pub order: String,
+    pub location: String,
+    pub owner: String,
+}
+
+/// Which of the view options a page offers, and where Assign Location's filter starts.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+pub struct GridOffers {
+    pub favorites: bool,
+    pub media_type: bool,
+    pub location: bool,
+    pub sort_by: bool,
+    pub order: bool,
+    pub owner: bool,
+    /// The location filter's code at first: `missing` on Assign Location, `all` elsewhere.
+    pub default_location: String,
+}
+
+/// What a page's view options mean for its grid and for what Immich is asked.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+pub struct GridFacts {
+    /// Something is left out: the View Options button shows it.
+    pub is_filtered: bool,
+    /// Assign Location: the grid leaves out the photos with a place itself, as the timeline cannot.
+    pub hides_located: bool,
+    pub favorites_only: bool,
+    /// Immich's asset type the search API is asked for (`IMAGE` or `VIDEO`); none for both.
+    pub asset_type: Option<String>,
+    /// Photos or videos alone on a timeline page, read through the search API.
+    pub searches_timeline: bool,
+    /// By date added, which the timeline alone can, so not while searching.
+    pub sorts_by_date_added: bool,
+    /// The account's own photos alone: the timeline without partners'.
+    pub own_photos_only: bool,
+    pub oldest_first: bool,
+}
+
+fn grid_arrangement(options: &GridOptions) -> grid_options::Arrangement {
+    grid_options::Arrangement {
+        show: grid_options::Show::from_code(&options.show).unwrap_or_default(),
+        media_type: grid_options::MediaType::from_code(&options.media_type).unwrap_or_default(),
+        sort_by: grid_options::SortBy::from_code(&options.sort_by).unwrap_or_default(),
+        order: grid_options::Order::from_code(&options.order).unwrap_or_default(),
+        location: grid_options::Location::from_code(&options.location).unwrap_or_default(),
+        owner: grid_options::Owner::from_code(&options.owner).unwrap_or_default(),
+    }
+}
+
+/// A page's options as kept (`kept`, each by its name: `show`, `mediaType`, `sortBy`, `order`, `location`, `owner`),
+/// read in either spelling and limited to those the page offers (by its name in the settings' keys: `library`,
+/// `favorites`, `archive`, `partner`, `person`, `tag`, `locked`, `videos`, `largeFiles`, `geolocation`), each by the
+/// code written. An option a page does not offer, or kept by a code no platform writes, is the page's default; a page
+/// the core does not know offers none.
+#[uniffi::export]
+pub fn grid_options(page: String, kept: HashMap<String, String>) -> GridOptions {
+    let arrangement = match grid_options::GridPage::from_name(&page) {
+        Some(page) => grid_options::Arrangement::read(page, |option| kept.get(option).cloned()),
+        None => grid_options::Arrangement::default(),
+    };
+    GridOptions {
+        show: arrangement.show.code().to_owned(),
+        media_type: arrangement.media_type.code().to_owned(),
+        sort_by: arrangement.sort_by.code().to_owned(),
+        order: arrangement.order.code().to_owned(),
+        location: arrangement.location.code().to_owned(),
+        owner: arrangement.owner.code().to_owned(),
+    }
+}
+
+/// The code written for an option's value kept by a code in either spelling (`show`'s `Favorites` is `favorites`); none
+/// for an option or a code the core does not know.
+#[uniffi::export]
+pub fn grid_option_code(option: String, code: String) -> Option<String> {
+    let written = match option.as_str() {
+        "show" => grid_options::Show::from_code(&code).map(grid_options::Show::code),
+        "mediaType" => grid_options::MediaType::from_code(&code).map(grid_options::MediaType::code),
+        "sortBy" => grid_options::SortBy::from_code(&code).map(grid_options::SortBy::code),
+        "order" => grid_options::Order::from_code(&code).map(grid_options::Order::code),
+        "location" => grid_options::Location::from_code(&code).map(grid_options::Location::code),
+        "owner" => grid_options::Owner::from_code(&code).map(grid_options::Owner::code),
+        _ => None,
+    };
+    written.map(str::to_owned)
+}
+
+/// Which options a page offers, by its name; a page the core does not know offers none.
+#[uniffi::export]
+pub fn grid_offers(page: String) -> GridOffers {
+    match grid_options::GridPage::from_name(&page) {
+        Some(page) => GridOffers {
+            favorites: page.offers_favorites(),
+            media_type: page.offers_media_type(),
+            location: page.offers_location(),
+            sort_by: page.offers_sort_by(),
+            order: page.offers_order(),
+            owner: page.offers_owner(),
+            default_location: page.default_location().code().to_owned(),
+        },
+        None => GridOffers {
+            favorites: false,
+            media_type: false,
+            location: false,
+            sort_by: false,
+            order: false,
+            owner: false,
+            default_location: grid_options::Location::All.code().to_owned(),
+        },
+    }
+}
+
+/// What view options mean (`verso_core::grid_options`).
+#[uniffi::export]
+pub fn grid_facts(options: GridOptions) -> GridFacts {
+    let arrangement = grid_arrangement(&options);
+    GridFacts {
+        is_filtered: arrangement.is_filtered(),
+        hides_located: arrangement.hides_located(),
+        favorites_only: arrangement.favorites_only(),
+        asset_type: arrangement.media_type.kind().map(|kind| kind.as_str().to_owned()),
+        searches_timeline: arrangement.searches_timeline(),
+        sorts_by_date_added: arrangement.sorts_by_date_added(),
+        own_photos_only: arrangement.own_photos_only(),
+        oldest_first: arrangement.oldest_first(),
+    }
+}
+
+/// The month a photo falls in with these options, as a bucket's first seven characters (`2026-11`): by date added the
+/// month `created_at` falls in, in UTC, none without it; otherwise the month on the photo's own clock, from
+/// `local_date_time` (the wall clock where it was taken, written as UTC, as Immich sends it).
+#[uniffi::export]
+pub fn grid_month(options: GridOptions, local_date_time: String, created_at: Option<SystemTime>) -> Option<String> {
+    grid_arrangement(&options).month(&local_date_time, created_at.map(DateTime::<Utc>::from))
+}
+
 #[cfg(test)]
 mod tests {
     use std::time::Duration;
@@ -865,5 +1008,105 @@ mod tests {
         let all = albums_collapsed_set("{}".to_owned(), vec!["year-2025".to_owned(), "year-unknown".to_owned()], "Year".to_owned());
         assert_eq!(albums_collapsed(all, "Year".to_owned()), ["year-2025", "year-unknown"]);
         assert!(albums_collapsed("not json".to_owned(), "Year".to_owned()).is_empty());
+    }
+
+    fn kept(options: &[(&str, &str)]) -> HashMap<String, String> {
+        options.iter().map(|(option, code)| ((*option).to_owned(), (*code).to_owned())).collect()
+    }
+
+    fn grid(show: &str, media_type: &str, sort_by: &str, order: &str, location: &str, owner: &str) -> GridOptions {
+        GridOptions {
+            show: show.to_owned(),
+            media_type: media_type.to_owned(),
+            sort_by: sort_by.to_owned(),
+            order: order.to_owned(),
+            location: location.to_owned(),
+            owner: owner.to_owned(),
+        }
+    }
+
+    #[test]
+    fn a_pages_options_kept_in_the_macs_spelling_come_back_in_linuxs_limited_to_what_it_offers() {
+        let options = |page: &str, kept_options: &[(&str, &str)]| grid_options(page.to_owned(), kept(kept_options));
+        let defaults = grid("all", "all", "taken", "desc", "all", "anyone");
+        assert_eq!(options("library", &[]), defaults);
+        let mac = [("show", "Favorites"), ("sortBy", "createdAt"), ("order", "asc")];
+        assert_eq!(options("library", &mac), grid("favorites", "all", "added", "asc", "all", "anyone"));
+        assert_eq!(options("library", &[("show", "favorites"), ("sortBy", "added"), ("order", "asc")]), options("library", &mac));
+        assert_eq!(options("archive", &[]), defaults, "each page its own");
+        assert_eq!(options("library", &[("owner", "Mine")]).owner, "mine", "only the Library reads whose photos it shows");
+        assert_eq!(options("person", &[("owner", "Mine")]).owner, "anyone");
+        assert_eq!(options("favorites", &[("show", "Favorites")]), defaults, "pages without a favorites filter ignore a kept one");
+        assert_eq!(options("partner", &[("show", "Favorites"), ("mediaType", "VIDEO")]), defaults);
+        assert_eq!(options("tag", &[("order", "Nonsense")]).order, "desc");
+        let everything = [("show", "Favorites"), ("sortBy", "createdAt"), ("order", "asc"), ("mediaType", "VIDEO"), ("location", "All")];
+        assert_eq!(options("videos", &everything), grid("favorites", "all", "taken", "asc", "all", "anyone"));
+        assert_eq!(options("largeFiles", &[("mediaType", "IMAGE"), ("order", "asc")]), grid("all", "photos", "taken", "desc", "all", "anyone"));
+        assert_eq!(options("geolocation", &[]).location, "missing", "Assign Location starts with the photos without a place");
+        assert_eq!(options("geolocation", &everything), grid("all", "all", "added", "asc", "all", "anyone"));
+        assert_eq!(options("library", &[("location", "Missing")]).location, "all", "other pages ignore a place filter");
+        assert_eq!(options("everything", &mac), defaults, "a page the core does not know offers none");
+    }
+
+    #[test]
+    fn a_code_kept_in_either_spelling_is_written_in_linuxs() {
+        let code = |option: &str, code: &str| grid_option_code(option.to_owned(), code.to_owned());
+        assert_eq!(code("mediaType", "VIDEO").as_deref(), Some("videos"));
+        assert_eq!(code("mediaType", "photos").as_deref(), Some("photos"));
+        assert_eq!(code("show", "Favorites").as_deref(), Some("favorites"));
+        assert_eq!(code("sortBy", "createdAt").as_deref(), Some("added"));
+        assert_eq!(code("sortBy", "takenAt").as_deref(), Some("taken"));
+        assert_eq!(code("order", "asc").as_deref(), Some("asc"));
+        assert_eq!(code("location", "Missing").as_deref(), Some("missing"));
+        assert_eq!(code("owner", "Anyone").as_deref(), Some("anyone"));
+        assert_eq!(code("order", "Nonsense"), None);
+        assert_eq!(code("size", "large"), None);
+    }
+
+    #[test]
+    fn pages_offer_their_options() {
+        let media: Vec<&str> = ["library", "favorites", "archive", "partner", "person", "tag", "locked", "videos", "largeFiles", "geolocation"]
+            .into_iter()
+            .filter(|page| grid_offers((*page).to_owned()).media_type)
+            .collect();
+        assert_eq!(media, ["library", "favorites", "archive", "person", "tag", "locked", "largeFiles"]);
+        let assign = grid_offers("geolocation".to_owned());
+        assert!(assign.location && !assign.favorites && !assign.media_type && assign.sort_by && assign.order && assign.default_location == "missing");
+        let library = grid_offers("library".to_owned());
+        assert!(library.owner && !library.location && library.default_location == "all");
+        assert!(!grid_offers("largeFiles".to_owned()).order && !grid_offers("videos".to_owned()).sort_by);
+        assert!(!grid_offers("everything".to_owned()).favorites);
+    }
+
+    #[test]
+    fn view_options_mean_what_immich_is_asked_and_what_the_grid_leaves_out() {
+        let none = grid_facts(grid("all", "all", "taken", "desc", "all", "anyone"));
+        assert_eq!(
+            none,
+            GridFacts { is_filtered: false, hides_located: false, favorites_only: false, asset_type: None, searches_timeline: false, sorts_by_date_added: false, own_photos_only: false, oldest_first: false },
+            "the defaults ask the server for exactly what the page asks for"
+        );
+        assert!(grid_facts(grid("Favorites", "all", "taken", "desc", "all", "anyone")).favorites_only);
+        let mine = grid_facts(grid("all", "all", "createdAt", "desc", "all", "Mine"));
+        assert!(mine.own_photos_only && mine.is_filtered && !mine.searches_timeline && mine.sorts_by_date_added && !mine.favorites_only);
+        let added = grid_facts(grid("all", "all", "added", "asc", "all", "anyone"));
+        assert!(added.sorts_by_date_added && added.oldest_first && !added.is_filtered);
+        let videos = grid_facts(grid("all", "VIDEO", "added", "desc", "all", "anyone"));
+        assert!(videos.searches_timeline && videos.is_filtered && !videos.sorts_by_date_added);
+        assert_eq!(videos.asset_type.as_deref(), Some("VIDEO"));
+        assert_eq!(grid_facts(grid("all", "photos", "taken", "desc", "all", "anyone")).asset_type.as_deref(), Some("IMAGE"));
+        let located = grid_facts(grid("all", "all", "taken", "desc", "Missing", "anyone"));
+        assert!(located.hides_located && located.is_filtered && !located.searches_timeline);
+    }
+
+    #[test]
+    fn a_photos_month_goes_by_its_own_clock_or_by_date_added_the_upload_in_utc() {
+        let taken = "2026-01-01T00:30:00.000Z".to_owned();
+        let uploaded = Some(SystemTime::UNIX_EPOCH + Duration::from_secs(1_767_223_800)); // 2025-12-31T23:30:00Z
+        let month = |options: GridOptions, created_at: Option<SystemTime>| grid_month(options, taken.clone(), created_at);
+        assert_eq!(month(grid("all", "all", "taken", "desc", "all", "anyone"), uploaded).as_deref(), Some("2026-01"));
+        assert_eq!(month(grid("all", "all", "createdAt", "asc", "all", "anyone"), uploaded).as_deref(), Some("2025-12"));
+        assert_eq!(month(grid("all", "all", "added", "asc", "all", "anyone"), None), None);
+        assert_eq!(month(grid("all", "VIDEO", "added", "asc", "all", "anyone"), uploaded).as_deref(), Some("2026-01"), "search groups by the month taken");
     }
 }

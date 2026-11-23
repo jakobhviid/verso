@@ -10,7 +10,7 @@ use adw::prelude::*;
 use chrono::{Datelike, NaiveDate};
 use gtk::{gio, glib};
 use immich_api::{SuggestionKind, SuggestionQuery};
-use verso_desktop::arrangement::MediaType;
+use verso_core::grid_options::MediaType;
 use verso_desktop::images::Kind as ImageKind;
 use verso_desktop::library::{Source, Tile};
 use verso_desktop::search::{self, Filters, Mode, Order, Recent};

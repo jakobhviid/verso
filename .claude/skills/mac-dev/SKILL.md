@@ -64,7 +64,8 @@ mac/build-rust.sh debug                         # the bridge for both architectu
 cd mac/Verso && xcodegen                        # Verso.xcodeproj, git-ignored
 xcodebuild -project Verso.xcodeproj -scheme Verso -configuration Debug -destination platform=macOS \
   -derivedDataPath build/UnsignedData CODE_SIGNING_ALLOWED=NO build
-python3 check.py                                # Immich Gallery's offline checks, about a minute
+python3 check.py                                # Immich Gallery's offline checks, about a minute; those of Swift that
+                                                # calls the core link it from the bridge built above
 ./check-core.sh                                 # the endpoint calls through the core, against Immich's demo
 ```
 

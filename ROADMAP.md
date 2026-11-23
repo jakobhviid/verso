@@ -312,10 +312,14 @@ Immich Crosslink, the protocol between apps, and the takeover of Immich Mount's 
    - Done: the Library's Years and Months (`verso_core::overview`), the map's clusters (`verso_core::map`),
      duplicates' order and shared links' filter (`verso_core::duplicates`, `verso_core::shared_links`), people's
      filter (`verso_core::people`), Places' groups and order (`verso_core::places`), the albums' view settings and
-     collapsed groups (`verso_core::albums`) and the date scroller (`verso_core::rail`; ARCHITECTURE.md, "The date
-     scroller"). Left: the Mac's rail and Linux's scrubber, tried by hand.
+     collapsed groups (`verso_core::albums`), a photo page's view options (`verso_core::grid_options`) and the date
+     scroller (`verso_core::rail`; ARCHITECTURE.md, "The date scroller"). Left: the Mac's rail and Linux's scrubber,
+     tried by hand.
    - Next, in this order, the easiest and most shared first (the Swift files in `mac/Verso/Verso/App/`):
-     1. A photo page's view options: `GridArrangement.swift` and `arrangement.rs`, into the timeline's query.
+     1. The timeline's query from a photo page's view options: the core makes the query a page reads (the timeline's
+        settings, or the search for photos or videos alone, as `arrangement.rs`'s `source` makes Linux's), and
+        `AssetGridModel` asks the typed timeline call for it, in place of `GridArrangement.applied(to:)` on the Swift
+        `TimelineQuery` that `TypedTimeline` turns back into the core's settings.
      2. The sidebar's layout: `SidebarLayout.swift` (the Mac's sidebar and the iPhone's Collections) and
         `sidebar.rs`, which remember it differently, so the move carries the layouts kept.
      3. Recent searches and Verso's own notifications: `SearchHistory.swift` and `VersoNotifications.swift` against

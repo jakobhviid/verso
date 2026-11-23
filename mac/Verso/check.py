@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Compile/run offline integration regressions without starting Verso, on a Mac: `mac/Verso/check.py`.
 All clients use URLProtocol fixtures; credential access uses in-memory stubs. The endpoint calls go through the
-client's session here, as no check installs the shared core (`CoreTransport`).
+client's session here, as no check installs the shared core (`CoreTransport`). A check of Swift that asks the core how
+to arrange what it shows (a page's view options) links the core (VersoCore) from what `mac/build-rust.sh` built.
 """
 from pathlib import Path
 import subprocess
@@ -46,7 +47,6 @@ cases = {
     'original-drag': api + ['Verso/Views/Albums/AlbumAssetTransfer.swift', 'Verso/Views/Upload/UploadDropPolicy.swift', 'Verso/Views/MacIntegration/OriginalTransfer.swift', 'Verso/Views/MacIntegration/OriginalFilePromise.swift', 'Tests/OriginalDragChecks.swift'],
     'photo-grid-layout': [app('GridTileMetrics'), app('GridZoomTransition'), 'Verso/Views/Grid/PhotoGridGeometry.swift', 'Verso/Views/Grid/PhotoGridLayout.swift', 'Tests/PhotoGridLayoutChecks.swift'],
     'album-review': api + [app('AlbumsActions'), 'Verso/Views/Albums/AlbumAssetTransfer.swift', 'Tests/verify-album-review.swift'],
-    'grid-arrangement': api + [app('GridArrangement'), support('Formatters'), 'Tests/GridArrangementChecks.swift'],
     'crosslink': [app('Crosslink'), 'Tests/CrosslinkChecks.swift'],
     'crosslink-navigation': [app('Crosslink'), app('CrosslinkNavigation'), 'Tests/CrosslinkNavigationChecks.swift'],
     'similar-photos': api + [app('SimilarPhotos'), app('SimilarPhotosAnalyzer'), app('SimilarPhotosModel'), app('AssetsStackMutation'), support('ImagePipeline'), support('Formatters'), 'Tests/SimilarPhotosChecks.swift'],
@@ -54,8 +54,33 @@ cases = {
     'crosslink-page-navigation': [app('Crosslink'), app('CrosslinkNavigation'), 'Verso/Views/PageNavigation.swift', 'Verso/Views/PageNavigation+Crosslink.swift', 'Tests/CrosslinkPageNavigationChecks.swift'],
 }
 
+# The checks that link the shared core, and the core as the app links it: the bridge's bindings with Verso's wrapper and
+# mac/Shared, in a module of their own (VersoCore), and the bridge's library.
+with_core = {'paging-and-services'}
+bridge = repo.parent / 'build'
+core = out / 'core'
+linking_core = ['-I', str(core), '-I', str(bridge / 'headers'), str(core / 'libVersoCore.a'),
+                str(bridge / 'universal/libverso_bridge.a'), '-framework', 'Security', '-framework', 'SystemConfiguration']
+
+def build_core():
+    core.mkdir(parents=True, exist_ok=True)
+    sources = [bridge / 'Generated/verso_bridge.swift', *sorted((repo / 'VersoCore').glob('*.swift')),
+               *sorted((repo.parent / 'Shared').glob('*.swift'))]
+    log = out / 'core.log'
+    with log.open('w') as stream:
+        # uniffi writes its bindings for Swift 5's checking, as the Xcode project builds them.
+        built = subprocess.run(['swiftc', '-swift-version', '5', '-parse-as-library', '-module-name', 'VersoCore', '-emit-library',
+                                '-static', '-emit-module', '-emit-module-path', str(core / 'VersoCore.swiftmodule'),
+                                '-I', str(bridge / 'headers'), *map(str, sources), '-o', str(core / 'libVersoCore.a')],
+                               cwd=repo, stdout=stream, stderr=subprocess.STDOUT)
+    if built.returncode:
+        print(log.read_text())
+        raise SystemExit('VersoCore did not build: build the bridge first (mac/build-rust.sh)')
+
 def check(item):
     name, sources = item
+    if name in with_core:
+        sources = [*sources, *linking_core]
     if name == 'quick-look-downloads':
         # Open only access control for the offline harness; keep production download logic unchanged.
         exposed = out / 'MacQuickLook.swift'
@@ -68,6 +93,8 @@ def check(item):
         result = build.returncode or subprocess.run([str(binary)], cwd=repo, stdout=stream, stderr=subprocess.STDOUT).returncode
     return name, result, log
 
+if with_core & cases.keys():
+    build_core()
 with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
     results = list(pool.map(check, cases.items()))
 for name, result, log in results:

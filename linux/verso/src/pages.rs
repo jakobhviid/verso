@@ -14,7 +14,8 @@ use verso_linux::i18n::tr;
 
 use crate::dialogs::{self, AlbumChoice};
 use crate::grid::{Grid, Move};
-use verso_desktop::arrangement::{Arrangement, GridPage, MediaType};
+use verso_core::grid_options::{Arrangement, GridPage, MediaType, Order, Show, SortBy};
+use verso_desktop::arrangement as page_options;
 use verso_desktop::settings;
 use crate::overview::{Mode, Overview};
 use crate::window::Window;
@@ -246,16 +247,16 @@ fn view_options_menu(page: GridPage, arrangement: &Arrangement) -> gio::Menu {
         menu.append_section(Some(title), &part);
     };
     if page.offers_favorites() {
-        section(tr("Show"), "show", &[(tr("All Items"), "all"), (tr("Favorites"), "favorites")]);
+        section(tr("Show"), "show", &[(tr("All Items"), Show::All.code()), (tr("Favorites"), Show::Favorites.code())]);
     }
     if page.offers_media_type() {
         section(tr("Media Type"), "media", &[(tr("Photos and Videos"), MediaType::All.code()), (tr("Photos"), MediaType::Photos.code()), (tr("Videos"), MediaType::Videos.code())]);
     }
     if page.offers_sort_by() && arrangement.media_type == MediaType::All {
-        section(tr("Sort By"), "sort-by", &[(tr("Date Taken"), "taken"), (tr("Date Added"), "added")]);
+        section(tr("Sort By"), "sort-by", &[(tr("Date Taken"), SortBy::DateTaken.code()), (tr("Date Added"), SortBy::DateAdded.code())]);
     }
     if page.offers_order() {
-        section(tr("Order"), "order", &[(tr("Newest First"), "desc"), (tr("Oldest First"), "asc")]);
+        section(tr("Order"), "order", &[(tr("Newest First"), Order::NewestFirst.code()), (tr("Oldest First"), Order::OldestFirst.code())]);
     }
     menu
 }
@@ -267,8 +268,8 @@ pub fn grid_page(window: &Window, spec: Spec) -> (adw::NavigationPage, Option<Gr
     };
     // The page's view options turn the source it reads into the one shown (immich's API is v3.2 or later here, so
     // Date Added is always there).
-    let arrangement = Rc::new(Cell::new(spec.page.map(|page| Arrangement::load(page, settings::shared())).unwrap_or_default()));
-    let shown_source = if spec.page.is_some() { arrangement.get().source(&spec.source, true) } else { spec.source.clone() };
+    let arrangement = Rc::new(Cell::new(spec.page.map(|page| page_options::load(page, settings::shared())).unwrap_or_default()));
+    let shown_source = if spec.page.is_some() { page_options::source(&arrangement.get(), &spec.source, true) } else { spec.source.clone() };
     let grid = Grid::new(session.connection.client.clone(), session.textures.clone(), shown_source, &spec.empty_title, spec.empty_icon);
     if arrangement.get().is_filtered() {
         grid.set_empty_title(tr("No Matching Photos"));
@@ -454,10 +455,10 @@ pub fn grid_page(window: &Window, spec: Spec) -> (adw::NavigationPage, Option<Gr
     if let (Some(page), Some(button)) = (spec.page, view_options.clone()) {
         let current = arrangement.get();
         let initial = [
-            ("show", if current.favorites_only { "favorites" } else { "all" }),
+            ("show", current.show.code()),
             ("media", current.media_type.code()),
-            ("sort-by", if current.by_date_added { "added" } else { "taken" }),
-            ("order", if current.oldest_first { "asc" } else { "desc" }),
+            ("sort-by", current.sort_by.code()),
+            ("order", current.order.code()),
         ];
         for (name, value) in initial {
             let action = gio::SimpleAction::new_stateful(name, Some(glib::VariantTy::STRING), &value.to_variant());
@@ -468,18 +469,18 @@ pub fn grid_page(window: &Window, spec: Spec) -> (adw::NavigationPage, Option<Gr
                 let chosen = value.get::<String>().unwrap_or_default();
                 let mut changed = arrangement.get();
                 match action.name().as_str() {
-                    "show" => changed.favorites_only = chosen == "favorites",
+                    "show" => changed.show = Show::from_code(&chosen).unwrap_or_default(),
                     "media" => changed.media_type = MediaType::from_code(&chosen).unwrap_or_default(),
-                    "sort-by" => changed.by_date_added = chosen == "added",
-                    _ => changed.oldest_first = chosen == "asc",
+                    "sort-by" => changed.sort_by = SortBy::from_code(&chosen).unwrap_or_default(),
+                    _ => changed.order = Order::from_code(&chosen).unwrap_or_default(),
                 }
-                changed.save(page, settings::shared());
+                page_options::save(&changed, page, settings::shared());
                 arrangement.set(changed);
                 shown.set_empty_title(if changed.is_filtered() { tr("No Matching Photos") } else { &empty_title });
                 if let Some(overview) = overview.borrow().as_ref().and_then(std::rc::Weak::upgrade) {
                     overview.forget();
                 }
-                shown.set_source(changed.source(&base, true));
+                shown.set_source(page_options::source(&changed, &base, true));
                 if let Some(button) = weak_button.upgrade() {
                     button.set_menu_model(Some(&view_options_menu(page, &changed)));
                     if changed.is_filtered() { button.add_css_class("accent") } else { button.remove_css_class("accent") }

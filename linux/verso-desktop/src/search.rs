@@ -6,7 +6,7 @@ use chrono::{NaiveDate, TimeZone, Utc};
 use immich_api::search::AssetQuery;
 use immich_api::{AssetKind, SmartQuery, Visibility};
 
-use crate::arrangement::MediaType;
+use verso_core::grid_options::MediaType;
 use crate::library::Source;
 use crate::settings::Settings;
 

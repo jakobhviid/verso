@@ -1505,10 +1505,10 @@ ROADMAP, M8, has its status and what is still to come; DESIGN.md, "The apps' int
   the grid's layout of a month not read yet (placeholders at a typical shape, or squares), which a month read comes
   near; its rows land on the grid's by the photo at a row's start, and the mark follows the row at the top. The
   toolbar's Date Scroller toggle hides it on every grid (`grid.dateScroller`), as on the Mac.
-- **View Options** on the photo pages follow the Mac gallery's `GridArrangement` (`arrangement`), each page remembering
-  its own and offering only what it can. The timeline API narrows to favorites and orders (`isFavorite`, `order`,
-  `orderBy=createdAt`) but has no media type, so photos or videos alone read through the search API, which orders by
-  date taken.
+- **View Options** on the photo pages follow the Mac gallery's `GridArrangement`, each page remembering its own
+  (`arrangement`) and offering only what it can (`verso_core::grid_options`, which reads them for the Mac and the
+  iPhone too). The timeline API narrows to favorites and orders (`isFavorite`, `order`, `orderBy=createdAt`) but has no
+  media type, so photos or videos alone read through the search API, which orders by date taken.
 - **Cards** (`cards`) are how Shared Links, Countries, Memories and Albums show: one to three photos edge to edge carry
   the title and the rest on a fade at their foot, so no space goes to a block of text under them; only a link's
   buttons go under its photos. Five sizes (220 to 440 pixels wide at least, widened to fill a line, never more than
@@ -2063,12 +2063,20 @@ to come.
   what each group keeps at first; which shared links show, and whether one has expired; People's filter, with what
   Immich v3.3 and later filter themselves; Places' cities alone or by country, by visit or by name
   (`verso_core::places`); the Albums page's filter, groups and order, which groups are collapsed, and a sidebar
-  section's first albums (`verso_core::albums`); and the date scroller (`rail`; "The date scroller"). The views hand
-  over plain records (buckets with their counts, photos with their dates, ids and coordinates, choices by the codes
-  the settings keep them by, which are Linux's) and get places back by index; the records are `Identifiable` for
-  SwiftUI's lists (`VersoCore/CoreConnection.swift`). What a platform keeps in a form of its own, the core reads and
-  writes in that form: the Albums page's collapsed groups are one value for every grouping on the Mac and the iPhone
+  section's first albums (`verso_core::albums`); a photo page's view options, which a page offers and what they mean
+  for its grid (`verso_core::grid_options`; the query they make is still the Mac's `TimelineQuery`, ROADMAP, M9, step
+  8); and the date scroller (`rail`; "The date scroller"). The views hand over plain records (buckets with their
+  counts, photos with their dates, ids and coordinates, choices by the codes the settings keep them by, which are
+  Linux's) and get places back by index; the records are `Identifiable` for SwiftUI's lists
+  (`VersoCore/CoreConnection.swift`). What a platform keeps in a form of its own, the core reads and writes in that
+  form: the Albums page's collapsed groups are one value for every grouping on the Mac and the iPhone
   (`{"Year":["year-2024"]}`, as Immich's web app keeps them), and a value for each grouping, a group a line, on Linux.
+  - **A choice kept under two spellings is read in both and written in Linux's,** so nothing kept needs migrating: a
+    photo page's view options are written by Linux's lower-case codes (`favorites`, `photos`, `added`, as
+    `config.toml`'s are lower-case), and the Mac and the iPhone, which kept Immich's names (`Favorites`, `IMAGE`,
+    `createdAt`), read those too (`gridOptionCode`, behind each option's `init?(rawValue:)`, which `@AppStorage`
+    calls), writing Linux's from the next change on. Not chosen: migrating the kept settings at launch, code that would
+    have to stay until every installed copy had run it.
   - **The order of names is the platform's,** in the person's language, which the core does not know: the Mac and the
     iPhone hand each name over with its place in that order (`nameOrder`, names alike sharing one), Places' names as
     Finder sorts them (`localizedStandardCompare`), albums' titles and owners as Immich Gallery sorted them

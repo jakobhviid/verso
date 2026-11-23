@@ -12,7 +12,7 @@ use adw::prelude::*;
 use chrono::{Datelike, NaiveDate};
 use gtk::{gio, glib};
 use immich_api::{Person, PersonChanges, TimelineScope};
-use verso_desktop::arrangement::GridPage;
+use verso_core::grid_options::GridPage;
 use verso_desktop::images::Kind as ImageKind;
 use verso_desktop::library::Source;
 use verso_desktop::settings;

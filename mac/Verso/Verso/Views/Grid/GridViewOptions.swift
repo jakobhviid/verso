@@ -59,8 +59,7 @@ struct GridViewOptions: View {
             Divider()
             Toggle("Date Scroller", isOn: $showsDateScroller) // Also View > Show Date Scroller
         } label: {
-            let filtered = (page.offersFavoritesFilter && show != .all) || (page.offersMediaTypeFilter && mediaType != .all)
-                || (page.offersLocationFilter && location != .all)
+            let filtered = GridArrangement(page: page, show: show, mediaType: mediaType, location: location).isFiltered
             Label("View Options", systemImage: filtered ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease")
         }
         .help("View Options")

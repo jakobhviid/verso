@@ -9,7 +9,7 @@ use gtk::{gio, glib};
 use immich_api::search::AssetQuery;
 use verso_desktop::images::Kind as ImageKind;
 use verso_desktop::library::Source;
-use verso_desktop::arrangement::GridPage;
+use verso_core::grid_options::GridPage;
 use verso_desktop::settings;
 use verso_core::links::ImmichItem;
 use verso_core::names::caseless;

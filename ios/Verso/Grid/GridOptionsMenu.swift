@@ -110,8 +110,7 @@ struct GridOptionsMenu: View {
 
     private var isFiltered: Bool {
         guard let page else { return false }
-        return (page.offersFavoritesFilter && show != .all) || (page.offersMediaTypeFilter && mediaType != .all)
-            || (page.offersLocationFilter && location != .all)
+        return GridArrangement(page: page, show: show, mediaType: mediaType, location: location).isFiltered
     }
 }
 
