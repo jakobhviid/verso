@@ -653,6 +653,7 @@ pub fn grid_page(window: &Window, spec: Spec) -> (adw::NavigationPage, Option<Gr
     // Keys while the grid has the focus: Delete, Ctrl+A, Escape, and the period for favorites, as in the viewer.
     let keys = gtk::EventControllerKey::new();
     let (weak_window, shown, kind) = (window.downgrade(), grid.clone(), spec.kind.clone());
+    let offers_favorite = selection_actions(&spec.kind).iter().any(|(action, _, _)| *action == "favorite");
     keys.connect_key_pressed(move |_, key, _, modifiers| {
         let Some(window) = weak_window.upgrade() else { return glib::Propagation::Proceed };
         // Years and Months shown, the grid's keys wait.
@@ -685,6 +686,12 @@ pub fn grid_page(window: &Window, spec: Spec) -> (adw::NavigationPage, Option<Gr
             gtk::gdk::Key::Escape if shown.selecting() || !shown.selected_ids().is_empty() => shown.set_selecting(false),
             gtk::gdk::Key::Delete | gtk::gdk::Key::KP_Delete if !shown.selected_ids().is_empty() && kind != Kind::Partner => {
                 act(&window, &shown, &kind, if kind == Kind::Trash { "delete-forever" } else { "trash" })
+            }
+            // The selection becomes favorites, or stops being ones when every photo in it is one, as the viewer's key
+            // does for its photo, on the pages whose selection offers Favorite.
+            gtk::gdk::Key::period if offers_favorite && !shown.selected_ids().is_empty() => {
+                let all_favorites = shown.selected_tiles().iter().all(|tile| tile.is_favorite);
+                act(&window, &shown, &kind, if all_favorites { "unfavorite" } else { "favorite" })
             }
             _ => return glib::Propagation::Proceed,
         }

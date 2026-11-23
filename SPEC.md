@@ -802,7 +802,9 @@ first.
   here; Shift with an arrow extends the selection. Outside selection mode the ringed photo is the selection, as in
   Files, so a key acts on it; in selection mode Space adds it or takes it out. Return opens it; Ctrl+A selects every
   photo read so far; Escape leaves selection mode; Delete moves the selection to the trash after asking, naming a lone
-  photo by when it was taken, and in Recently Deleted's grid deletes them for good, after asking. Keyboard Shortcuts
+  photo by when it was taken, and in Recently Deleted's grid deletes them for good, after asking; the period makes the
+  selection favorites, or takes them out of Favorites when every photo in it is one, where the selection offers
+  Favorite. Keyboard Shortcuts
   lists these and the app's own: New Window (Ctrl+N), Search (Ctrl+F), Refresh (Ctrl+R or F5), Import (Ctrl+Shift+I),
   Info (Ctrl+I), bigger and smaller thumbnails (Ctrl+plus, Ctrl+minus), New Album (Ctrl+Alt+N), Preferences
   (Ctrl+comma), Keyboard Shortcuts (Ctrl+?) and Quit (Ctrl+Q).
