@@ -183,17 +183,11 @@ video bar stay the iPhone's (the Mac's floating video controls are its own nativ
    (ARCHITECTURE, "The photo grid on the Mac"). Left: photos taken out sliding into their new places.
 2. **The pinch as the iPhone's,** on that grid: built (ARCHITECTURE, "Pinching between sizes").
 3. **Live Photos as the iPhone's:** built (ARCHITECTURE, "Verso on the Mac", "Live Photos move as the iPhone's").
-   Left, with the maintainer at the Mac: the glimpse starting with the step as the arrow keys, the side arrows and a
-   swipe bring a Live Photo, moving on the slide, the neighbours' motions ready ahead and a quick run of steps; the
-   badge's place and look under the toolbar, in the light and dark appearances; ⌥Space and the toolbar's Live, with
-   sound.
 4. **Share opens the system's picker at once:** built (ARCHITECTURE, "Verso on the Mac", "Share opens the system's
    share picker at once"; SPEC, "Sharing from the Mac").
 5. **Card pages pinch and keep their place:** built (ARCHITECTURE, "Verso on the Mac", "A pinch goes through the card
    sizes"). Left: the iPhone's motion, the cards zooming as one grid with the fingers, once the cards are on the photo
-   grid's collection view (steps 1 and 2); and, with the maintainer at the Mac, the pinch on each page and the place
-   kept, at the top, the middle and the foot of a long page, and every step of − and +, ⌘− and ⌘+ and the pinch
-   changing the cards, − or + off at the ends, in a narrow and a wide window.
+   grid's collection view (steps 1 and 2).
 6. **Notifications:** Clear All in a section of more than one, and the bell orange while one needs a look, built
    (ARCHITECTURE, "Verso on the Mac", "An import shows at the foot of the sidebar"). Left, with the maintainer at the
    Mac: the orange bell in the light and dark sidebars, and Clear All of the server's notifications on a server that
@@ -635,11 +629,14 @@ Every idea below is a possible choice, none chosen yet:
 ## Next, in order
 
 Agreed with the maintainer; each item's detail is where it points.
-1. Releases cut by a tag (M9, step 6), with Linux's rpm and deb packages.
+1. Releases cut by a tag (M9, step 6): built for Linux's tarball and Flatpak; left, Linux's rpm and deb packages, and
+   the Apple builds (the maintainer's, with the Developer ID and TestFlight). Verso goes public with the Mac and Linux
+   before the App Store.
 2. The Swift twins into the Rust core (M9, step 8), an area at a time.
-3. Hidden photos into the Locked Folder (M10, "Backing the iPhone up"): the checks a real iPhone needs.
-4. iPad, before the first release (M10, step 5).
-5. Trusting a self-signed server certificate, for homelabs without a private CA in the system store.
+3. iPad, before the first release (M10, step 5).
+4. The app icon's looks: each design by day and by night, in colour or in greys, picked for light and dark mode.
+5. Trusting a self-signed server certificate, for homelabs without a private CA in the system store: never silently,
+   only after the person accepts that certificate, shown with its fingerprint, and asked again when it changes.
 6. Linux's map from the Immich server's own map setting (`mapLightStyleUrl`, `mapDarkStyleUrl`; Immich's own
    `tiles.immich.cloud` unless its admin chose another), drawn by libshumate's vector renderer (in Fedora 44's 1.6.3),
    in place of OpenStreetMap's servers, whose usage policy forbids an app's traffic. Apple's systems keep Apple's maps.
