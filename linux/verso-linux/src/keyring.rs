@@ -26,9 +26,28 @@ fn classify(error: oo7::Error) -> KeyringError {
         // In a Flatpak, the keyring is the Secret portal's: one that does not answer (no keyring in the session) is
         // as good as none, and the sign-in is kept in the app's own file instead, in its sandbox's folder.
         oo7::Error::File(oo7::file::Error::Portal(error)) => KeyringError::Unavailable(error.to_string()),
+        // A session whose bus has no keyring at all (a window manager's session on Ubuntu 24.04 that starts no GNOME
+        // Keyring, say), where a Flatpak finds no Secret portal either and oo7 asks the bus for the Secret Service: the
+        // bus answers that no such service is there, which oo7 hands on as the service's error.
+        oo7::Error::DBus(oo7::dbus::Error::Service(oo7::dbus::ServiceError::ZBus(error))) if no_such_service(&error) => {
+            KeyringError::Unavailable(error.to_string())
+        }
         other => KeyringError::Failed(other.to_string()),
     }
 }
+
+/// The bus's answer that nothing owns the name asked for, as a method's error or as zbus's own.
+fn no_such_service(error: &zbus::Error) -> bool {
+    const NAMES: [&str; 2] = ["org.freedesktop.DBus.Error.ServiceUnknown", "org.freedesktop.DBus.Error.NameHasNoOwner"];
+    match error {
+        zbus::Error::MethodError(name, _, _) => NAMES.contains(&name.as_str()),
+        zbus::Error::FDO(error) => {
+            matches!(**error, zbus::fdo::Error::ServiceUnknown(_) | zbus::fdo::Error::NameHasNoOwner(_))
+        }
+        _ => false,
+    }
+}
+
 
 /// The Secret Service's bus name, and the name KDE's `ksecretd` can be started by.
 const SECRET_SERVICE: &str = "org.freedesktop.secrets";
@@ -145,4 +164,27 @@ pub async fn is_stored(server: &str) -> bool {
 /// Whether `product` has a credential stored for `server`, looked for as [`is_stored`] does.
 pub async fn is_stored_by(product: &'static Product, server: &str) -> bool {
     existing_items(&attributes_of(product, server)).await.is_ok_and(|items| !items.is_empty())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn service_error(error: zbus::fdo::Error) -> oo7::Error {
+        oo7::Error::DBus(oo7::dbus::Error::Service(oo7::dbus::ServiceError::ZBus(zbus::Error::FDO(Box::new(error)))))
+    }
+
+    #[test]
+    fn a_bus_without_a_keyring_is_no_keyring() {
+        let unknown = service_error(zbus::fdo::Error::ServiceUnknown("org.freedesktop.secrets".to_owned()));
+        assert!(matches!(classify(unknown), KeyringError::Unavailable(_)));
+        let unowned = service_error(zbus::fdo::Error::NameHasNoOwner("org.freedesktop.secrets".to_owned()));
+        assert!(matches!(classify(unowned), KeyringError::Unavailable(_)));
+    }
+
+    #[test]
+    fn a_keyring_that_answers_with_an_error_has_failed() {
+        let refused = service_error(zbus::fdo::Error::AccessDenied("not allowed".to_owned()));
+        assert!(matches!(classify(refused), KeyringError::Failed(_)));
+    }
 }
