@@ -12,6 +12,7 @@ use verso_desktop::library::Source;
 use verso_desktop::arrangement::GridPage;
 use verso_desktop::settings;
 use verso_core::links::ImmichItem;
+use verso_core::names::caseless;
 use verso_core::places::{self, GroupBy, Header, SortBy};
 use verso_linux::i18n::tr;
 
@@ -44,7 +45,7 @@ struct Country {
 fn arranged(shown: &[Place], group_by: GroupBy) -> Vec<Country> {
     let read: Vec<places::Place> = shown.iter().map(|place| places::Place { city: place.city.clone(), country: Some(place.country.clone()), visit: None }).collect();
     places::Arrangement { group_by, sort_by: SortBy::Name }
-        .groups(&read, places::caseless)
+        .groups(&read, caseless)
         .into_iter()
         .map(|group| Country {
             name: match group.header {

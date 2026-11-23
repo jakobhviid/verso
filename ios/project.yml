@@ -79,11 +79,10 @@ targets:
       - ../mac/Verso/Verso/App/AccountPermissions.swift
       - ../mac/Verso/Verso/App/AdminModel.swift
       - ../mac/Verso/Verso/App/AlbumOrders.swift
-      - ../mac/Verso/Verso/App/AlbumsArrangement.swift
+      - ../mac/Verso/Verso/App/AlbumsOptions.swift
       - ../mac/Verso/Verso/App/AppIconDesign.swift
       - ../mac/Verso/Verso/App/AssetInspectorState.swift
       - ../mac/Verso/Verso/App/AssetsStackMutation.swift
-      - ../mac/Verso/Verso/App/CollapsedGroups.swift
       - ../mac/Verso/Verso/App/DuplicatesSortBy.swift
       - ../mac/Verso/Verso/App/ExploreFolders.swift
       - ../mac/Verso/Verso/App/ExploreMapFit.swift

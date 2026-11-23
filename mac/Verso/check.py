@@ -46,7 +46,6 @@ cases = {
     'original-drag': api + ['Verso/Views/Albums/AlbumAssetTransfer.swift', 'Verso/Views/Upload/UploadDropPolicy.swift', 'Verso/Views/MacIntegration/OriginalTransfer.swift', 'Verso/Views/MacIntegration/OriginalFilePromise.swift', 'Tests/OriginalDragChecks.swift'],
     'photo-grid-layout': [app('GridTileMetrics'), app('GridZoomTransition'), 'Verso/Views/Grid/PhotoGridGeometry.swift', 'Verso/Views/Grid/PhotoGridLayout.swift', 'Tests/PhotoGridLayoutChecks.swift'],
     'album-review': api + [app('AlbumsActions'), 'Verso/Views/Albums/AlbumAssetTransfer.swift', 'Tests/verify-album-review.swift'],
-    'albums-arrangement': models + ['Verso/API/Models+Metadata.swift', app('AlbumsArrangement'), app('CollapsedGroups'), support('Formatters'), 'Tests/AlbumsArrangementChecks.swift'],
     'grid-arrangement': api + [app('GridArrangement'), support('Formatters'), 'Tests/GridArrangementChecks.swift'],
     'crosslink': [app('Crosslink'), 'Tests/CrosslinkChecks.swift'],
     'crosslink-navigation': [app('Crosslink'), app('CrosslinkNavigation'), 'Tests/CrosslinkNavigationChecks.swift'],

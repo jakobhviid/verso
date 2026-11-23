@@ -69,14 +69,6 @@ extension PlacesOptions {
     /// Each city's and country's name by its place in the order of the person's language, as Finder sorts names; names
     /// alike in it share one.
     private static func names(_ places: [AssetResponse]) -> [String: UInt32] {
-        let names = Set(places.flatMap { [$0.exifInfo?.city ?? "", $0.exifInfo?.country ?? ""] })
-            .sorted { $0.localizedStandardCompare($1) == .orderedAscending }
-        var order: [String: UInt32] = [:]
-        var place: UInt32 = 0
-        for (index, name) in names.enumerated() {
-            if index > 0 && names[index - 1].localizedStandardCompare(name) != .orderedSame { place += 1 }
-            order[name] = place
-        }
-        return order
+        nameOrder(places.flatMap { [$0.exifInfo?.city ?? "", $0.exifInfo?.country ?? ""] }) { $0.localizedStandardCompare($1) }
     }
 }

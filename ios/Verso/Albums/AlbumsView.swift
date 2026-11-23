@@ -9,6 +9,7 @@
 // stack of the tab it is in.
 
 import SwiftUI
+import VersoCore
 
 struct AlbumsView: View {
     let session: LibrarySession
@@ -135,10 +136,11 @@ struct AlbumsView: View {
         Binding(get: { AlbumsPageMemory.shared.ownership }, set: { option in AlbumsPageMemory.shared.ownership = option })
     }
 
-    /// The Mac's arrangement, for the sections and the order; the segmented control does the filtering.
-    private var arrangement: AlbumsArrangement {
-        AlbumsArrangement(filter: .all, groupBy: sectioning.groupBy ?? AlbumsGroupBy.none, groupOrder: groupOrder,
-                          sortBy: sortBy, sortOrder: sortOrder)
+    /// The Mac's arrangement, for the sections and the order, worked out by the shared core as on the Mac and Linux
+    /// (`albumsSections`); the segmented control does the filtering.
+    private var arrangement: AlbumsOptions {
+        AlbumsOptions(filter: .all, groupBy: sectioning.groupBy ?? AlbumsGroupBy.none, groupOrder: groupOrder,
+                      sortBy: sortBy, sortOrder: sortOrder)
     }
 
     private func sections(of albums: [Album]) -> [AlbumsSection] {

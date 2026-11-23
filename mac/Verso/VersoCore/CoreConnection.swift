@@ -576,3 +576,16 @@ extension CoreConnection {
 // and a cluster of the map by its first photo.
 extension OverviewYear: Identifiable {}
 extension MapCluster: Identifiable {}
+
+/// Names by their places in the order `compare` gives, the person's language's, which only the app knows, as the core's
+/// arrangements take them (`placesSections`, `albumsSections`): names alike in it share a place.
+public func nameOrder(_ names: some Sequence<String>, by compare: (String, String) -> ComparisonResult) -> [String: UInt32] {
+    let sorted = Set(names).sorted { compare($0, $1) == .orderedAscending }
+    var order: [String: UInt32] = [:]
+    var place: UInt32 = 0
+    for (index, name) in sorted.enumerated() {
+        if index > 0 && compare(sorted[index - 1], name) != .orderedSame { place += 1 }
+        order[name] = place
+    }
+    return order
+}

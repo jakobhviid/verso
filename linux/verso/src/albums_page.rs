@@ -9,8 +9,8 @@ use std::rc::Rc;
 use adw::prelude::*;
 use gtk::{gio, glib};
 use immich_api::{Album, AlbumRole, AssetQuery};
-use verso_desktop::albums::{Arrangement, Filter, GroupBy, Header, SortBy, View};
-use verso_desktop::{settings, text};
+use verso_core::albums::{is_ascending, order_code, Arrangement, Filter, GroupBy, Header, SortBy, View};
+use verso_desktop::{albums, settings, text};
 use verso_linux::i18n::tr;
 
 use crate::cards::{and_list, Card, Shown};
@@ -58,7 +58,7 @@ pub fn albums_page(window: &Window) -> adw::NavigationPage {
     toolbar.set_content(Some(&stack));
     let page = adw::NavigationPage::builder().title(tr("Albums")).child(&toolbar).css_classes(["verso-card-page"]).build();
 
-    let arrangement = Arrangement::load(settings::shared());
+    let arrangement = albums::load(settings::shared());
     filters.set_active_name(Some(arrangement.filter.code()));
     let state = Rc::new(AlbumsPage {
         window: window.downgrade(),
@@ -132,7 +132,7 @@ impl AlbumsPage {
     fn change(self: &Rc<Self>, edit: impl FnOnce(&mut Arrangement)) {
         let mut arrangement = self.arrangement.get();
         edit(&mut arrangement);
-        arrangement.save(settings::shared());
+        albums::save(&arrangement, settings::shared());
         self.arrangement.set(arrangement);
         self.render();
     }
@@ -168,7 +168,7 @@ impl AlbumsPage {
     fn render(self: &Rc<Self>) {
         let arrangement = self.arrangement.get();
         self.options.set_menu_model(Some(&options_menu(&arrangement)));
-        let groups = arrangement.groups(&self.albums.borrow(), self.user_id().as_deref());
+        let groups = albums::groups(&arrangement, &self.albums.borrow(), self.user_id().as_deref());
         if groups.is_empty() {
             let filtered = arrangement.filter != Filter::All && !self.albums.borrow().is_empty();
             self.empty.set_title(if filtered { tr("No Matching Albums") } else { tr("No Albums") });
@@ -199,13 +199,14 @@ impl AlbumsPage {
         }
     }
 
-    fn fill_covers(self: &Rc<Self>, arrangement: &Arrangement, groups: Vec<verso_desktop::albums::Group>) {
+    fn fill_covers(self: &Rc<Self>, arrangement: &Arrangement, groups: Vec<albums::Group>) {
         while let Some(child) = self.covers.first_child() {
             self.covers.remove(&child);
         }
         let Some(window) = self.window.upgrade() else { return };
         let Some(session) = window.session() else { return };
-        let folded = folded_groups(arrangement.effective_group_by());
+        let group_by = arrangement.effective_group_by();
+        let folded = albums::collapsed(group_by, settings::shared());
         for group in groups {
             let flow = crate::cards::flow();
             flow.set_margin_bottom(12);
@@ -230,7 +231,7 @@ impl AlbumsPage {
                     Header::Mine => tr("My Albums").to_owned(),
                     Header::Owner(name) => name.clone(),
                 };
-                let is_folded = folded.contains(&group.id);
+                let is_folded = folded.is_collapsed(&group.id, group_by);
                 let arrow = gtk::Image::from_icon_name(if is_folded { "pan-end-symbolic" } else { "pan-down-symbolic" });
                 let label = gtk::Label::builder().label(&title).xalign(0.0).css_classes(["gallery-month"]).build();
                 let count = gtk::Label::builder().label(if group.albums.len() == 1 { tr("1 album").to_owned() } else { tr("{count} albums").replace("{count}", &group.albums.len().to_string()) }).css_classes(["dim-label"]).build();
@@ -241,13 +242,13 @@ impl AlbumsPage {
                 let button = gtk::Button::builder().child(&content).css_classes(["flat"]).halign(gtk::Align::Start).build();
                 button.update_property(&[gtk::accessible::Property::Label(&title)]);
                 flow.set_visible(!is_folded);
-                let (weak_flow, id, group_by) = (flow.downgrade(), group.id.clone(), arrangement.effective_group_by());
+                let (weak_flow, id) = (flow.downgrade(), group.id.clone());
                 button.connect_clicked(move |_| {
                     let Some(flow) = weak_flow.upgrade() else { return };
                     let folding = flow.is_visible();
                     flow.set_visible(!folding);
                     arrow.set_icon_name(Some(if folding { "pan-end-symbolic" } else { "pan-down-symbolic" }));
-                    set_folded(group_by, &id, folding);
+                    albums::set_collapsed(group_by, &id, folding, settings::shared());
                 });
                 self.covers.append(&button);
             }
@@ -326,14 +327,13 @@ impl AlbumsPage {
     fn install_actions(self: &Rc<Self>, page: &adw::NavigationPage) {
         let group = gio::SimpleActionGroup::new();
         let arrangement = self.arrangement.get();
-        let order = |ascending: bool| if ascending { "asc" } else { "desc" };
         let stateful = |name: &str, value: &str| gio::SimpleAction::new_stateful(name, Some(glib::VariantTy::STRING), &value.to_variant());
         let actions = [
             stateful("view", arrangement.view.code()),
             stateful("group-by", arrangement.group_by.code()),
-            stateful("group-order", order(arrangement.groups_ascending)),
+            stateful("group-order", order_code(arrangement.groups_ascending)),
             stateful("sort-by", arrangement.sort_by.code()),
-            stateful("sort-order", order(arrangement.ascending)),
+            stateful("sort-order", order_code(arrangement.ascending)),
         ];
         for action in actions {
             let weak = Rc::downgrade(self);
@@ -344,9 +344,9 @@ impl AlbumsPage {
                 match action.name().as_str() {
                     "view" => state.change(|arrangement| arrangement.view = View::from_code(&chosen).unwrap_or_default()),
                     "group-by" => state.change(|arrangement| *arrangement = arrangement.grouped_by(GroupBy::from_code(&chosen).unwrap_or_default())),
-                    "group-order" => state.change(|arrangement| arrangement.groups_ascending = chosen == "asc"),
+                    "group-order" => state.change(|arrangement| arrangement.groups_ascending = is_ascending(&chosen)),
                     "sort-by" => state.change(|arrangement| *arrangement = arrangement.sorted_by(SortBy::from_code(&chosen).unwrap_or_default())),
-                    _ => state.change(|arrangement| arrangement.ascending = chosen == "asc"),
+                    _ => state.change(|arrangement| arrangement.ascending = is_ascending(&chosen)),
                 }
             });
             group.add_action(&action);
@@ -382,8 +382,8 @@ impl AlbumsPage {
                 let Some(state) = weak.upgrade() else { return };
                 let arrangement = state.arrangement.get();
                 let group_by = arrangement.effective_group_by();
-                for group in arrangement.groups(&state.albums.borrow(), state.user_id().as_deref()) {
-                    set_folded(group_by, &group.id, folding);
+                for group in albums::groups(&arrangement, &state.albums.borrow(), state.user_id().as_deref()) {
+                    albums::set_collapsed(group_by, &group.id, folding, settings::shared());
                 }
                 state.render();
             });
@@ -559,21 +559,4 @@ fn options_menu(arrangement: &Arrangement) -> gio::Menu {
     menu.append_section(Some(tr("Sort By")), &section(&keys, "sort-by"));
     menu.append_section(Some(tr("Album Order")), &section(&[(tr("Ascending"), "asc"), (tr("Descending"), "desc")], "sort-order"));
     menu
-}
-
-fn folded_key(group_by: GroupBy) -> String {
-    format!("albums.collapsedGroups.{}", group_by.code())
-}
-
-fn folded_groups(group_by: GroupBy) -> Vec<String> {
-    settings::shared().get(&folded_key(group_by)).map(|value| value.split('\n').map(str::to_owned).collect()).unwrap_or_default()
-}
-
-fn set_folded(group_by: GroupBy, id: &str, folded: bool) {
-    let mut groups = folded_groups(group_by);
-    groups.retain(|known| known != id && !known.is_empty());
-    if folded {
-        groups.push(id.to_owned());
-    }
-    settings::shared().set(&folded_key(group_by), (!groups.is_empty()).then(|| groups.join("\n")).as_deref());
 }

@@ -1517,7 +1517,7 @@ ROADMAP, M8, has its status and what is still to come; DESIGN.md, "The apps' int
   card itself is not kept.
 - **The Albums page** (`albums`), after Immich's and the Mac gallery's, shows an album's description only while the
   pointer or the focus is on its card (`Card::note`, never in the way of a click), and has no Year grouping while
-  sorting by the albums' own dates. Back from an album, it reads its albums again and redraws them, where it was, only
+  sorting by the albums' own dates (`verso_core::albums`, which arranges them for the Mac and the iPhone too). Back from an album, it reads its albums again and redraws them, where it was, only
   if one changed.
 - **Places** shows cities as square tiles, as People's faces are, since they are often many, and countries as cards,
   whose years are two searches made as the card first shows, both by name (`verso_core::places`, which arranges them
@@ -2062,15 +2062,19 @@ to come.
   (`verso_core::map`; fitting the map to the photos stays MapKit's, `ExploreMapFit`); the Duplicates page's order and
   what each group keeps at first; which shared links show, and whether one has expired; People's filter, with what
   Immich v3.3 and later filter themselves; Places' cities alone or by country, by visit or by name
-  (`verso_core::places`); and the date scroller (`rail`; "The date scroller"). The views hand over plain records
-  (buckets with their counts, photos with their dates, ids and coordinates, choices by the codes the settings keep
-  them by, which are Linux's) and get places back by index; the records are `Identifiable` for SwiftUI's lists
-  (`VersoCore/CoreConnection.swift`).
+  (`verso_core::places`); the Albums page's filter, groups and order, which groups are collapsed, and a sidebar
+  section's first albums (`verso_core::albums`); and the date scroller (`rail`; "The date scroller"). The views hand
+  over plain records (buckets with their counts, photos with their dates, ids and coordinates, choices by the codes
+  the settings keep them by, which are Linux's) and get places back by index; the records are `Identifiable` for
+  SwiftUI's lists (`VersoCore/CoreConnection.swift`). What a platform keeps in a form of its own, the core reads and
+  writes in that form: the Albums page's collapsed groups are one value for every grouping on the Mac and the iPhone
+  (`{"Year":["year-2024"]}`, as Immich's web app keeps them), and a value for each grouping, a group a line, on Linux.
   - **The order of names is the platform's,** in the person's language, which the core does not know: the Mac and the
-    iPhone hand each name over with its place in Finder's order (`localizedStandardCompare`, names alike sharing one),
-    so Å comes after Z in Danish and beside A in English, and Linux's window orders by lower-case letters
-    (`places::caseless`). Not chosen: a collator in the core (ICU4X's), a large dependency whose order would still
-    differ from the system's here and there.
+    iPhone hand each name over with its place in that order (`nameOrder`, names alike sharing one), Places' names as
+    Finder sorts them (`localizedStandardCompare`), albums' titles and owners as Immich Gallery sorted them
+    (`localizedCompare`), so Å comes after Z in Danish and beside A in English; Linux's window orders by lower-case
+    letters (`names::caseless`). Not chosen: a collator in the core (ICU4X's), a large dependency whose order would
+    still differ from the system's here and there.
 - **An album's name and description are text on its page,** changed with Edit Album (`AlbumActionsView`), never in
   place: a field in the header takes the keys the grid answers (Space, the arrows) while one types. A person's name is
   edited in place on their page.

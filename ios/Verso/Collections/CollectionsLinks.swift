@@ -194,7 +194,7 @@ extension LibrarySession {
             let shared = group == .sharedAlbums
             let shown = albums.filter { $0.shared == shared && !layout.isDynamicItemHidden(collectionsItemKey("album:" + $0.id)) }
             let sortBy = layout.albumSorting(in: group.rawValue).flatMap(AlbumsSortBy.init(rawValue:)) ?? .mostRecentPhoto
-            return AlbumsArrangement.sidebar(shown, sortBy: sortBy, limit: nil)
+            return sortBy.sidebar(shown, limit: nil)
         }
     }
 

@@ -1,4 +1,5 @@
 import SwiftUI
+import VersoCore
 
 struct AlbumsView: View {
     @Environment(LibrarySession.self) private var session
@@ -18,8 +19,8 @@ struct AlbumsView: View {
     /// The album cards at each size.
     private static let cards = CardLayout(widths: [200, 240, 300, 370, 450])
 
-    private var arrangement: AlbumsArrangement {
-        AlbumsArrangement(filter: filter, groupBy: groupBy, groupOrder: groupOrder, sortBy: sortBy, sortOrder: sortOrder)
+    private var arrangement: AlbumsOptions {
+        AlbumsOptions(filter: filter, groupBy: groupBy, groupOrder: groupOrder, sortBy: sortBy, sortOrder: sortOrder)
     }
 
     var body: some View {
@@ -63,15 +64,15 @@ struct AlbumsView: View {
         .task { await session.reloadAlbums() }
     }
 
-    private var collapsed: CollapsedGroups { CollapsedGroups(stored: collapsedGroups) }
-
     private func covers(_ groups: [AlbumsGroup]) -> some View {
-        let groupBy = arrangement.effectiveGroupBy
+        // Which groups are collapsed, kept for each grouping as Immich keeps them ({"Year": ["year-2024"]}).
+        let grouping = arrangement.effectiveGroupBy.rawValue
+        let collapsed = Set(albumsCollapsed(stored: collapsedGroups, groupBy: grouping))
         return ScrollView {
             // Cards at every size, as on the iPhone.
             LazyVGrid(columns: Self.cards.columns(cardSize), spacing: 24, pinnedViews: [.sectionHeaders]) {
                 ForEach(groups) { group in
-                    let isCollapsed = collapsed.isCollapsed(group.id, in: groupBy.collapsingKey)
+                    let isCollapsed = collapsed.contains(group.id)
                     Section {
                         if !isCollapsed {
                             ForEach(group.albums) { album in
@@ -97,9 +98,8 @@ struct AlbumsView: View {
                         if let header = group.header {
                             // Like Immich, a group header collapses and expands its group.
                             Button {
-                                var groups = collapsed
-                                groups.toggle(group.id, in: groupBy.collapsingKey)
-                                withAnimation(.smooth(duration: 0.3)) { collapsedGroups = groups.stored }
+                                let toggled = albumsCollapseToggled(stored: collapsedGroups, groupId: group.id, groupBy: grouping)
+                                withAnimation(.smooth(duration: 0.3)) { collapsedGroups = toggled }
                             } label: {
                                 SectionHeader(title: title(header), disclosure: isCollapsed ? .collapsed : .expanded, count: group.albums.count)
                                     .contentShape(Rectangle())
@@ -235,15 +235,14 @@ struct AlbumsView: View {
                 if viewMode == .cover {
                     let groupBy = arrangement.effectiveGroupBy
                     Button("Expand All Groups") {
-                        var groups = collapsed
-                        groups.set([], in: groupBy.collapsingKey)
-                        withAnimation(.smooth(duration: 0.3)) { collapsedGroups = groups.stored }
+                        let expanded = albumsCollapsedSet(stored: collapsedGroups, groupIds: [], groupBy: groupBy.rawValue)
+                        withAnimation(.smooth(duration: 0.3)) { collapsedGroups = expanded }
                     }
                     .disabled(groupBy == .none)
                     Button("Collapse All Groups") {
-                        var groups = collapsed
-                        groups.set(arrangement.groups(session.albums, userID: session.user?.id).map(\.id), in: groupBy.collapsingKey)
-                        withAnimation(.smooth(duration: 0.3)) { collapsedGroups = groups.stored }
+                        let ids = arrangement.groups(session.albums, userID: session.user?.id).map(\.id)
+                        let collapsed = albumsCollapsedSet(stored: collapsedGroups, groupIds: ids, groupBy: groupBy.rawValue)
+                        withAnimation(.smooth(duration: 0.3)) { collapsedGroups = collapsed }
                     }
                     .disabled(groupBy == .none)
                 }

@@ -119,7 +119,7 @@ struct SidebarView: View {
         if section.listsAlbums {
             if editing {
                 let albums = session.albums.filter { $0.shared == (section.id == SidebarGroup.sharedAlbums.rawValue) }
-                ForEach(AlbumsArrangement.sidebar(albums, sortBy: layout.albumSortBy(in: section.id), limit: nil)) { album in
+                ForEach(layout.albumSortBy(in: section.id).sidebar(albums, limit: nil)) { album in
                     SidebarEditRow(isOn: dynamicVisibility(session.sidebarItemKey("album:" + album.id), layout: layout)) {
                         Label(album.albumName, systemImage: album.shared ? "person.2.crop.square.stack" : "rectangle.stack")
                     }
@@ -194,7 +194,7 @@ struct SidebarView: View {
                 return item(key, Text(verbatim: partner.name), "person.2") { $0.setDynamicItemHidden(false, key: key) }
             }
         }
-        items += AlbumsArrangement.sidebar(session.albums, sortBy: .title, limit: nil).compactMap { album in
+        items += AlbumsSortBy.title.sidebar(session.albums, limit: nil).compactMap { album in
             let key = session.sidebarItemKey("album:" + album.id)
             guard layout.isDynamicItemHidden(key) else { return nil }
             return item(key, Text(verbatim: album.albumName), album.shared ? "person.2.crop.square.stack" : "rectangle.stack") {
@@ -266,7 +266,7 @@ extension LibrarySession {
         let shown = albums.filter {
             $0.shared == (sectionID == SidebarGroup.sharedAlbums.rawValue) && !layout.isDynamicItemHidden(sidebarItemKey("album:" + $0.id))
         }
-        return AlbumsArrangement.sidebar(shown, sortBy: layout.albumSortBy(in: sectionID), limit: layout.albumLimit(in: sectionID))
+        return layout.albumSortBy(in: sectionID).sidebar(shown, limit: layout.albumLimit(in: sectionID))
     }
 
     func sidebarAlbumsTruncated(in sectionID: String, layout: SidebarLayout) -> Bool {

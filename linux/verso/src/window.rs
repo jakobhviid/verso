@@ -15,6 +15,7 @@ use verso_desktop::images::Cache;
 use verso_desktop::library::{self, Source, Tile};
 use verso_desktop::arrangement::GridPage;
 use verso_desktop::{albums, links, text};
+use verso_core::albums as album_view;
 use verso_core::links::ImmichItem;
 use verso_core::sign_in::BrowserSignIn;
 use verso_desktop::session::{self, ServerOffer, SignInError, SignedIn};
@@ -492,7 +493,7 @@ impl Window {
                     let chosen = value.get::<String>().unwrap_or_default();
                     if action.name().ends_with("-show") {
                         limit = chosen.parse().ok();
-                    } else if let Some(key) = albums::SortBy::from_code(&chosen) {
+                    } else if let Some(key) = album_view::SortBy::from_code(&chosen) {
                         sort_by = key;
                     }
                     section.save(settings, limit, sort_by);
@@ -978,7 +979,7 @@ impl Window {
 
     /// An album section: its heading with its Show and Sort menu, as many albums as chosen there, in its order, and Show
     /// All when there are more, as the Mac gallery lists them.
-    fn append_album_section(&self, albums: &[Album], section: albums::Section, filter: albums::Filter, title: &str) {
+    fn append_album_section(&self, albums: &[Album], section: albums::Section, filter: album_view::Filter, title: &str) {
         let sidebar = &self.imp().sidebar;
         let (limit, sort_by) = section.load(verso_desktop::settings::shared());
         let (listed, cut) = section.albums(albums, sort_by, limit);
@@ -1408,10 +1409,10 @@ impl Window {
             "assign-location" => crate::explore::assign_location_page(self),
             other if other.starts_with("albums-filter:") => {
                 // A section's Show All: the Albums page, showing that section's albums.
-                if let Some(filter) = albums::Filter::from_code(&other["albums-filter:".len()..]) {
+                if let Some(filter) = album_view::Filter::from_code(&other["albums-filter:".len()..]) {
                     let settings = verso_desktop::settings::shared();
-                    let arrangement = albums::Arrangement { filter, ..albums::Arrangement::load(settings) };
-                    arrangement.save(settings);
+                    let arrangement = album_view::Arrangement { filter, ..albums::load(settings) };
+                    albums::save(&arrangement, settings);
                 }
                 crate::albums_page::albums_page(self)
             }
@@ -2094,14 +2095,14 @@ fn album_heading_row(title: &str, section: albums::Section) -> gtk::ListBoxRow {
 }
 
 /// The albums' sort keys with their labels, as Immich names them.
-pub fn sort_labels() -> [(albums::SortBy, &'static str); 6] {
+pub fn sort_labels() -> [(album_view::SortBy, &'static str); 6] {
     [
-        (albums::SortBy::Title, tr("Title")),
-        (albums::SortBy::ItemCount, tr("Item Count")),
-        (albums::SortBy::DateModified, tr("Date Modified")),
-        (albums::SortBy::DateCreated, tr("Date Created")),
-        (albums::SortBy::MostRecentPhoto, tr("Most Recent Photo")),
-        (albums::SortBy::OldestPhoto, tr("Oldest Photo")),
+        (album_view::SortBy::Title, tr("Title")),
+        (album_view::SortBy::ItemCount, tr("Item Count")),
+        (album_view::SortBy::DateModified, tr("Date Modified")),
+        (album_view::SortBy::DateCreated, tr("Date Created")),
+        (album_view::SortBy::MostRecentPhoto, tr("Most Recent Photo")),
+        (album_view::SortBy::OldestPhoto, tr("Oldest Photo")),
     ]
 }
 
@@ -2173,10 +2174,10 @@ fn section_title(section: &verso_desktop::sidebar::Section) -> String {
 }
 
 /// The albums' sections: which albums each lists.
-fn album_section_of(id: &str) -> Option<(albums::Section, albums::Filter)> {
+fn album_section_of(id: &str) -> Option<(albums::Section, album_view::Filter)> {
     match id {
-        "my-albums" => Some((albums::Section::Mine, albums::Filter::Owned)),
-        "shared-albums" => Some((albums::Section::Shared, albums::Filter::Shared)),
+        "my-albums" => Some((albums::Section::Mine, album_view::Filter::Owned)),
+        "shared-albums" => Some((albums::Section::Shared, album_view::Filter::Shared)),
         _ => None,
     }
 }

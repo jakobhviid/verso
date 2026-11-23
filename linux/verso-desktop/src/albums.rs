@@ -1,249 +1,73 @@
-//! The albums' view settings, as Immich's web app and the Mac gallery have them (`AlbumsArrangement`): which albums
-//! (all, your own, shared), grouped by year or owner, sorted by one of six keys; and the sidebar's two album sections.
+//! The albums' view settings as Linux remembers them, in `gallery.json`, and the sidebar's two album sections; the
+//! arrangement itself, which albums show, their groups, their order and the groups collapsed, is the core's
+//! (`verso_core::albums`), as on the Mac and the iPhone. Titles and owners' names go by their lower-case letters.
 
-use std::cmp::Ordering;
-
-use chrono::{DateTime, Datelike, Utc};
 use immich_api::Album;
+use verso_core::albums::{is_ascending, order_code, sidebar, AlbumFacts, Arrangement, Collapsed, Filter, GroupBy, Header, SortBy, View};
+use verso_core::names::caseless;
 
 use crate::settings::Settings;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum Filter {
-    #[default]
-    All,
-    Owned,
-    Shared,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum GroupBy {
-    None,
-    #[default]
-    Year,
-    Owner,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum SortBy {
-    Title,
-    ItemCount,
-    DateModified,
-    DateCreated,
-    #[default]
-    MostRecentPhoto,
-    OldestPhoto,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum View {
-    #[default]
-    Covers,
-    List,
-}
-
-macro_rules! codes {
-    ($kind:ty: $($variant:ident = $code:literal),+) => {
-        impl $kind {
-            pub const ALL: &'static [$kind] = &[$(<$kind>::$variant),+];
-            pub fn code(self) -> &'static str { match self { $(<$kind>::$variant => $code),+ } }
-            pub fn from_code(code: &str) -> Option<$kind> { Self::ALL.iter().copied().find(|value| value.code() == code) }
-        }
-    };
-}
-codes!(Filter: All = "All", Owned = "Owned", Shared = "Shared");
-codes!(GroupBy: None = "None", Year = "Year", Owner = "Owner");
-codes!(SortBy: Title = "Title", ItemCount = "ItemCount", DateModified = "DateModified", DateCreated = "DateCreated", MostRecentPhoto = "MostRecentPhoto", OldestPhoto = "OldestPhoto");
-codes!(View: Covers = "Cover", List = "List");
-
-impl GroupBy {
-    pub fn default_ascending(self) -> bool {
-        self != GroupBy::Year
+/// The view options remembered, Immich's defaults where none were; an order not remembered is the choice's own.
+pub fn load(settings: &Settings) -> Arrangement {
+    let defaults = Arrangement::default();
+    let get = |key: &str| settings.get(&format!("albums.{key}"));
+    let group_by = get("groupBy").and_then(|code| GroupBy::from_code(&code)).unwrap_or(defaults.group_by);
+    let sort_by = get("sortBy").and_then(|code| SortBy::from_code(&code)).unwrap_or(defaults.sort_by);
+    Arrangement {
+        filter: get("filter").and_then(|code| Filter::from_code(&code)).unwrap_or(defaults.filter),
+        view: get("view").and_then(|code| View::from_code(&code)).unwrap_or(defaults.view),
+        group_by,
+        groups_ascending: get("groupOrder").map_or(group_by.default_ascending(), |order| is_ascending(&order)),
+        sort_by,
+        ascending: get("sortOrder").map_or(sort_by.default_ascending(), |order| is_ascending(&order)),
     }
 }
 
-impl SortBy {
-    /// Titles A to Z; counts and dates biggest and newest first.
-    pub fn default_ascending(self) -> bool {
-        self == SortBy::Title
-    }
+pub fn save(arrangement: &Arrangement, settings: &Settings) {
+    settings.set("albums.filter", Some(arrangement.filter.code()));
+    settings.set("albums.view", Some(arrangement.view.code()));
+    settings.set("albums.groupBy", Some(arrangement.group_by.code()));
+    settings.set("albums.groupOrder", Some(order_code(arrangement.groups_ascending)));
+    settings.set("albums.sortBy", Some(arrangement.sort_by.code()));
+    settings.set("albums.sortOrder", Some(order_code(arrangement.ascending)));
 }
 
-/// A group's heading.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Header {
-    Year(i32),
-    UnknownYear,
-    Mine,
-    Owner(String),
-}
-
+/// A group of albums, as the Albums page shows it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Group {
-    /// Stable across reads, for remembering which groups are folded.
+    /// Stable across reads, for remembering which groups are collapsed.
     pub id: String,
     pub header: Option<Header>,
     pub albums: Vec<Album>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Arrangement {
-    pub filter: Filter,
-    pub view: View,
-    pub group_by: GroupBy,
-    pub groups_ascending: bool,
-    pub sort_by: SortBy,
-    pub ascending: bool,
+/// The albums shown, filtered, grouped, and sorted within each group.
+pub fn groups(arrangement: &Arrangement, albums: &[Album], user_id: Option<&str>) -> Vec<Group> {
+    let facts: Vec<AlbumFacts> = albums.iter().map(AlbumFacts::from).collect();
+    arrangement
+        .groups(&facts, user_id, caseless)
+        .into_iter()
+        .map(|group| Group { id: group.id, header: group.header, albums: group.albums.into_iter().map(|index| albums[index].clone()).collect() })
+        .collect()
 }
 
-impl Default for Arrangement {
-    fn default() -> Arrangement {
-        Arrangement { filter: Filter::All, view: View::Covers, group_by: GroupBy::Year, groups_ascending: false, sort_by: SortBy::MostRecentPhoto, ascending: false }
-    }
+/// A grouping's collapsed groups, kept under a key of its own, a group a line.
+pub fn collapsed(group_by: GroupBy, settings: &Settings) -> Collapsed {
+    Collapsed::from_lines(group_by, &settings.get(&collapsed_key(group_by)).unwrap_or_default())
 }
 
-impl Arrangement {
-    pub fn load(settings: &Settings) -> Arrangement {
-        let defaults = Arrangement::default();
-        let get = |key: &str| settings.get(&format!("albums.{key}"));
-        let group_by = get("groupBy").and_then(|code| GroupBy::from_code(&code)).unwrap_or(defaults.group_by);
-        let sort_by = get("sortBy").and_then(|code| SortBy::from_code(&code)).unwrap_or(defaults.sort_by);
-        Arrangement {
-            filter: get("filter").and_then(|code| Filter::from_code(&code)).unwrap_or(defaults.filter),
-            view: get("view").and_then(|code| View::from_code(&code)).unwrap_or(defaults.view),
-            group_by,
-            groups_ascending: get("groupOrder").map_or(group_by.default_ascending(), |order| order == "asc"),
-            sort_by,
-            ascending: get("sortOrder").map_or(sort_by.default_ascending(), |order| order == "asc"),
-        }
+/// Collapse a group, or expand it.
+pub fn set_collapsed(group_by: GroupBy, id: &str, collapsing: bool, settings: &Settings) {
+    let mut collapsed = collapsed(group_by, settings);
+    if collapsed.is_collapsed(id, group_by) != collapsing {
+        collapsed.toggle(id, group_by);
     }
-
-    pub fn save(&self, settings: &Settings) {
-        let order = |ascending: bool| if ascending { "asc" } else { "desc" };
-        settings.set("albums.filter", Some(self.filter.code()));
-        settings.set("albums.view", Some(self.view.code()));
-        settings.set("albums.groupBy", Some(self.group_by.code()));
-        settings.set("albums.groupOrder", Some(order(self.groups_ascending)));
-        settings.set("albums.sortBy", Some(self.sort_by.code()));
-        settings.set("albums.sortOrder", Some(order(self.ascending)));
-    }
-
-    /// Choosing a sort key takes that key's own order, as Immich does.
-    pub fn sorted_by(mut self, sort_by: SortBy) -> Arrangement {
-        self.sort_by = sort_by;
-        self.ascending = sort_by.default_ascending();
-        self
-    }
-
-    /// Choosing a grouping takes its own order.
-    pub fn grouped_by(mut self, group_by: GroupBy) -> Arrangement {
-        self.group_by = group_by;
-        self.groups_ascending = group_by.default_ascending();
-        self
-    }
-
-    /// Immich turns year groups off while sorting by the albums' own dates, which say nothing of the photos' years.
-    pub fn allows(&self, group_by: GroupBy) -> bool {
-        group_by != GroupBy::Year || !matches!(self.sort_by, SortBy::DateCreated | SortBy::DateModified)
-    }
-
-    pub fn effective_group_by(&self) -> GroupBy {
-        if self.allows(self.group_by) { self.group_by } else { GroupBy::None }
-    }
-
-    /// The albums shown, filtered, grouped, and sorted within each group.
-    pub fn groups(&self, albums: &[Album], user_id: Option<&str>) -> Vec<Group> {
-        let shown: Vec<Album> = albums
-            .iter()
-            .filter(|album| match self.filter {
-                Filter::All => true,
-                Filter::Owned => owner_id(album) == user_id,
-                Filter::Shared => album.shared,
-            })
-            .cloned()
-            .collect();
-        if shown.is_empty() {
-            return Vec::new();
-        }
-        let groups = match self.effective_group_by() {
-            GroupBy::None => vec![Group { id: "albums".into(), header: None, albums: shown }],
-            GroupBy::Year => {
-                let year = |album: &Album| (if self.sort_by == SortBy::OldestPhoto { album.start_date } else { album.end_date }).map(|date| date.year());
-                let mut years: Vec<Option<i32>> = shown.iter().map(year).collect();
-                years.sort();
-                years.dedup();
-                let mut keyed: Vec<Option<i32>> = years;
-                ordered(&mut keyed, self.groups_ascending, |year| *year, |a, b| a.cmp(b));
-                keyed
-                    .into_iter()
-                    .map(|key| Group {
-                        id: key.map_or("year-unknown".into(), |year| format!("year-{year}")),
-                        header: Some(key.map_or(Header::UnknownYear, Header::Year)),
-                        albums: shown.iter().filter(|album| year(album) == key).cloned().collect(),
-                    })
-                    .collect()
-            }
-            GroupBy::Owner => {
-                let mut owners: Vec<(String, String)> = Vec::new();
-                for album in &shown {
-                    let id = owner_id(album).unwrap_or_default().to_owned();
-                    if Some(id.as_str()) != user_id && !owners.iter().any(|(known, _)| *known == id) {
-                        owners.push((id, album.owner().map(|owner| owner.name.clone()).unwrap_or_default()));
-                    }
-                }
-                ordered(&mut owners, self.groups_ascending, |(_, name)| Some(name.to_lowercase()), |a, b| a.cmp(b));
-                let others: Vec<Group> = owners
-                    .into_iter()
-                    .map(|(id, name)| Group { id: format!("owner-{id}"), header: Some(Header::Owner(name)), albums: shown.iter().filter(|album| owner_id(album) == Some(id.as_str())).cloned().collect() })
-                    .collect();
-                let mine: Vec<Album> = shown.iter().filter(|album| user_id.is_some() && owner_id(album) == user_id).cloned().collect();
-                let mine = (!mine.is_empty()).then(|| Group { id: "owner-mine".into(), header: Some(Header::Mine), albums: mine });
-                // Your own come first in ascending order and last in descending.
-                match (mine, self.groups_ascending) {
-                    (Some(mine), true) => std::iter::once(mine).chain(others).collect(),
-                    (Some(mine), false) => others.into_iter().chain(std::iter::once(mine)).collect(),
-                    (None, _) => others,
-                }
-            }
-        };
-        groups
-            .into_iter()
-            .map(|mut group| {
-                group.albums = self.sorted(group.albums);
-                group
-            })
-            .collect()
-    }
-
-    pub fn sorted(&self, mut albums: Vec<Album>) -> Vec<Album> {
-        let date = |value: Option<DateTime<Utc>>| value;
-        match self.sort_by {
-            SortBy::Title => ordered(&mut albums, self.ascending, |album| Some(album.name.to_lowercase()), |a, b| a.cmp(b)),
-            SortBy::ItemCount => ordered(&mut albums, self.ascending, |album| Some(album.asset_count), |a, b| a.cmp(b)),
-            SortBy::DateModified => ordered(&mut albums, self.ascending, |album| Some(album.updated_at), |a, b| a.cmp(b)),
-            SortBy::DateCreated => ordered(&mut albums, self.ascending, |album| Some(album.created_at), |a, b| a.cmp(b)),
-            SortBy::MostRecentPhoto => ordered(&mut albums, self.ascending, |album| date(album.end_date), |a, b| a.cmp(b)),
-            SortBy::OldestPhoto => ordered(&mut albums, self.ascending, |album| date(album.start_date), |a, b| a.cmp(b)),
-        }
-        albums
-    }
+    settings.set(&collapsed_key(group_by), collapsed.lines(group_by).as_deref());
 }
 
-fn owner_id(album: &Album) -> Option<&str> {
-    album.owner().map(|owner| owner.id.as_str())
-}
-
-/// A stable sort; elements without a key stay last in either order, like Immich's albums without photos.
-fn ordered<T, K>(elements: &mut [T], ascending: bool, key: impl Fn(&T) -> Option<K>, compare: impl Fn(&K, &K) -> Ordering) {
-    elements.sort_by(|a, b| match (key(a), key(b)) {
-        (Some(x), Some(y)) => {
-            let order = compare(&x, &y);
-            if ascending { order } else { order.reverse() }
-        }
-        (Some(_), None) => Ordering::Less,
-        (None, Some(_)) => Ordering::Greater,
-        (None, None) => Ordering::Equal,
-    });
+fn collapsed_key(group_by: GroupBy) -> String {
+    format!("albums.collapsedGroups.{}", group_by.code())
 }
 
 /// A sidebar album section: your own albums ("My Albums") or the shared ones.
@@ -265,16 +89,13 @@ impl Section {
     }
 
     /// The section's albums: unshared ones for My Albums, shared ones (yours too) for Shared Albums, as the Mac
-    /// gallery splits them.
+    /// gallery splits them; and whether the limit left some out.
     pub fn albums(self, albums: &[Album], sort_by: SortBy, limit: Option<usize>) -> (Vec<Album>, bool) {
-        let members: Vec<Album> = albums.iter().filter(|album| album.shared == (self == Section::Shared)).cloned().collect();
-        let total = members.len();
-        let mut sorted = Arrangement::default().sorted_by(sort_by).sorted(members);
-        if let Some(limit) = limit {
-            sorted.truncate(limit);
-        }
-        let cut = sorted.len() < total;
-        (sorted, cut)
+        let members: Vec<&Album> = albums.iter().filter(|album| album.shared == (self == Section::Shared)).collect();
+        let facts: Vec<AlbumFacts> = members.iter().map(|album| AlbumFacts::from(*album)).collect();
+        let listed: Vec<Album> = sidebar(&facts, sort_by, limit, caseless).into_iter().map(|index| members[index].clone()).collect();
+        let cut = listed.len() < members.len();
+        (listed, cut)
     }
 
     /// The section's remembered count (default 10) and order (default by date modified, newest first).
@@ -297,7 +118,7 @@ impl Section {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::TimeZone;
+    use chrono::{TimeZone, Utc};
     use immich_api::{AlbumMember, AlbumRole, User};
 
     fn album(name: &str, owner: &str, shared: bool, newest: Option<i32>, count: u64) -> Album {
@@ -321,7 +142,7 @@ mod tests {
     #[test]
     fn albums_group_by_year_newest_first_with_the_undated_last() {
         let albums = [album("a", "me", false, Some(2023), 1), album("b", "me", false, Some(2025), 2), album("c", "me", false, None, 0), album("d", "me", false, Some(2025), 5)];
-        let groups = Arrangement::default().groups(&albums, Some("me"));
+        let groups = groups(&Arrangement::default(), &albums, Some("me"));
         let headers: Vec<_> = groups.iter().map(|group| group.header.clone()).collect();
         assert_eq!(headers, [Some(Header::Year(2025)), Some(Header::Year(2023)), Some(Header::UnknownYear)]);
         assert_eq!(names(&groups[0].albums), ["b", "d"], "a stable sort keeps ties in order");
@@ -331,23 +152,47 @@ mod tests {
     fn filters_split_your_own_from_the_shared_and_owner_groups_put_yours_first_ascending() {
         let albums = [album("mine", "me", false, Some(2024), 1), album("ours", "me", true, Some(2024), 1), album("theirs", "ann", true, Some(2024), 1)];
         let owned = Arrangement { filter: Filter::Owned, ..Arrangement::default() };
-        assert_eq!(names(&owned.groups(&albums, Some("me"))[0].albums), ["mine", "ours"]);
+        assert_eq!(names(&groups(&owned, &albums, Some("me"))[0].albums), ["mine", "ours"]);
         let shared = Arrangement { filter: Filter::Shared, group_by: GroupBy::None, ..Arrangement::default() };
-        assert_eq!(names(&shared.groups(&albums, Some("me"))[0].albums), ["ours", "theirs"]);
+        assert_eq!(names(&groups(&shared, &albums, Some("me"))[0].albums), ["ours", "theirs"]);
         let by_owner = Arrangement::default().grouped_by(GroupBy::Owner);
-        let headers: Vec<_> = by_owner.groups(&albums, Some("me")).into_iter().map(|group| group.header).collect();
+        let headers: Vec<_> = groups(&by_owner, &albums, Some("me")).into_iter().map(|group| group.header).collect();
         assert_eq!(headers, [Some(Header::Mine), Some(Header::Owner("ANN".into()))]);
     }
 
     #[test]
-    fn sorting_by_the_albums_own_dates_turns_year_groups_off_and_a_key_takes_its_order() {
-        let arrangement = Arrangement::default().sorted_by(SortBy::DateModified);
-        assert_eq!(arrangement.effective_group_by(), GroupBy::None);
-        assert!(!arrangement.ascending);
-        assert!(Arrangement::default().sorted_by(SortBy::Title).ascending);
-        let albums = vec![album("b", "me", false, None, 1), album("a", "me", false, None, 3)];
-        assert_eq!(names(&Arrangement::default().sorted_by(SortBy::Title).sorted(albums.clone())), ["a", "b"]);
-        assert_eq!(names(&Arrangement::default().sorted_by(SortBy::ItemCount).sorted(albums)), ["a", "b"]);
+    fn the_view_options_are_remembered_and_an_order_not_remembered_is_the_choices_own() {
+        let folder = tempfile::tempdir().unwrap();
+        let settings = Settings::open(&folder.path().join("settings.json"));
+        assert_eq!(load(&settings), Arrangement::default());
+        let chosen = Arrangement { filter: Filter::Shared, view: View::List, ..Arrangement::default().grouped_by(GroupBy::Owner).sorted_by(SortBy::Title) };
+        save(&chosen, &settings);
+        assert_eq!(load(&settings), chosen);
+        assert_eq!(settings.get("albums.view").as_deref(), Some("List"));
+        assert_eq!((settings.get("albums.groupOrder").as_deref(), settings.get("albums.sortOrder").as_deref()), (Some("asc"), Some("asc")));
+        settings.set("albums.groupOrder", None);
+        settings.set("albums.sortOrder", None);
+        settings.set("albums.groupBy", Some("Year"));
+        let loaded = load(&settings);
+        assert!(!loaded.groups_ascending && loaded.ascending, "the newest year first, titles A to Z");
+    }
+
+    #[test]
+    fn collapsed_groups_are_kept_for_each_grouping_a_line_each() {
+        let folder = tempfile::tempdir().unwrap();
+        let settings = Settings::open(&folder.path().join("settings.json"));
+        set_collapsed(GroupBy::Year, "year-2024", true, &settings);
+        set_collapsed(GroupBy::Year, "year-unknown", true, &settings);
+        set_collapsed(GroupBy::Year, "year-2024", true, &settings);
+        set_collapsed(GroupBy::Owner, "owner-ann", true, &settings);
+        assert_eq!(settings.get("albums.collapsedGroups.Year").as_deref(), Some("year-2024\nyear-unknown"));
+        assert!(collapsed(GroupBy::Owner, &settings).is_collapsed("owner-ann", GroupBy::Owner));
+        assert!(!collapsed(GroupBy::Owner, &settings).is_collapsed("year-2024", GroupBy::Owner));
+        set_collapsed(GroupBy::Year, "year-2024", false, &settings);
+        set_collapsed(GroupBy::Year, "year-unknown", false, &settings);
+        assert_eq!(settings.get("albums.collapsedGroups.Year"), None);
+        set_collapsed(GroupBy::None, "albums", true, &settings);
+        assert_eq!(settings.get("albums.collapsedGroups.None"), None, "without a grouping nothing collapses");
     }
 
     #[test]
@@ -356,8 +201,11 @@ mod tests {
         let (mine, cut) = Section::Mine.albums(&albums, SortBy::Title, Some(5));
         assert_eq!((mine.len(), cut), (5, true));
         assert!(mine.iter().all(|album| !album.shared));
+        assert_eq!(names(&mine), ["a01", "a02", "a04", "a05", "a07"]);
         let (shared, cut) = Section::Shared.albums(&albums, SortBy::Title, None);
         assert_eq!((shared.len(), cut), (4, false));
+        let (newest, _) = Section::Shared.albums(&albums, SortBy::MostRecentPhoto, Some(2));
+        assert_eq!(names(&newest), ["a09", "a06"]);
         let folder = tempfile::tempdir().unwrap();
         let settings = Settings::open(&folder.path().join("settings.json"));
         assert_eq!(Section::Mine.load(&settings), (Some(10), SortBy::DateModified));

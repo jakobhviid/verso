@@ -311,20 +311,19 @@ Immich Crosslink, the protocol between apps, and the takeover of Immich Mount's 
    the bridge's tests.
    - Done: the Library's Years and Months (`verso_core::overview`), the map's clusters (`verso_core::map`),
      duplicates' order and shared links' filter (`verso_core::duplicates`, `verso_core::shared_links`), people's
-     filter (`verso_core::people`), Places' groups and order (`verso_core::places`) and the date scroller
-     (`verso_core::rail`; ARCHITECTURE.md, "The date scroller"). Left: the Mac's rail and Linux's scrubber, tried by
-     hand.
+     filter (`verso_core::people`), Places' groups and order (`verso_core::places`), the albums' view settings and
+     collapsed groups (`verso_core::albums`) and the date scroller (`verso_core::rail`; ARCHITECTURE.md, "The date
+     scroller"). Left: the Mac's rail and Linux's scrubber, tried by hand.
    - Next, in this order, the easiest and most shared first (the Swift files in `mac/Verso/Verso/App/`):
      1. A photo page's view options: `GridArrangement.swift` and `arrangement.rs`, into the timeline's query.
-     2. The albums' view settings: `AlbumsArrangement.swift` and `CollapsedGroups.swift` against `albums.rs`.
-     3. The sidebar's layout: `SidebarLayout.swift` (the Mac's sidebar and the iPhone's Collections) and
+     2. The sidebar's layout: `SidebarLayout.swift` (the Mac's sidebar and the iPhone's Collections) and
         `sidebar.rs`, which remember it differently, so the move carries the layouts kept.
-     4. Recent searches and Verso's own notifications: `SearchHistory.swift` and `VersoNotifications.swift` against
+     3. Recent searches and Verso's own notifications: `SearchHistory.swift` and `VersoNotifications.swift` against
         `search.rs` and `notifications.rs`, with what they keep per account.
-     5. How far an album or a link reaches: the Mac's `SharingReach.swift` (its links' expiry in Swift, checked by
+     4. How far an album or a link reaches: the Mac's `SharingReach.swift` (its links' expiry in Swift, checked by
         `check.py`) and the iPhone's `AlbumsShareReach`, against the window's `sharing.rs` (`Audience`).
-     6. Imports: `UploadQueue.swift` and `uploads.rs`, the largest, around each platform's file access.
-     7. The Immich client's calls: the typed calls (ARCHITECTURE.md, "Typed calls") bring immich-api's models, and
+     5. Imports: `UploadQueue.swift` and `uploads.rs`, the largest, around each platform's file access.
+     6. The Immich client's calls: the typed calls (ARCHITECTURE.md, "Typed calls") bring immich-api's models, and
         the Swift models and `ImmichClient` go as the views take the bridge's records.
 
 **Releases are cut by a tag** (AGENTS.md, "Versioning", has how; ARCHITECTURE, "Verso's releases", why). Not built

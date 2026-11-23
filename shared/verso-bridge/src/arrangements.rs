@@ -1,10 +1,10 @@
 //! How the gallery arranges what it shows, worked out in the core for the Mac and the iPhone as for Linux's window
 //! (ARCHITECTURE.md, "Verso on the Mac"): the Library's Years and Months (`verso_core::overview`), the map's clusters
 //! (`verso_core::map`), the Duplicates page's order (`verso_core::duplicates`), which shared links show
-//! (`verso_core::shared_links`), People's filter (`verso_core::people`) and Places' groups and order
-//! (`verso_core::places`). The Swift side names a timeline's months by their bucket (`2025-03-01`), as its grid does,
-//! and gets them back the same way; a choice kept in its settings goes by its code, the same on Linux, and a list it
-//! sorts or filters comes back as the places of its items.
+//! (`verso_core::shared_links`), People's filter (`verso_core::people`), Places' groups and order
+//! (`verso_core::places`) and the albums' view settings (`verso_core::albums`). The Swift side names a timeline's
+//! months by their bucket (`2025-03-01`), as its grid does, and gets them back the same way; a choice kept in its
+//! settings goes by its code, the same on Linux, and a list it sorts or filters comes back as the places of its items.
 
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -16,7 +16,8 @@ use immich_api::timeline::YearMonth;
 use immich_api::{ServerVersion, SharedLink, SharedLinkKind};
 use verso_core::duplicates::{self, Measure, SortBy};
 use verso_core::shared_links::{self, Arrangement, Filter};
-use verso_core::{map, overview, people, places};
+use verso_core::names::caseless;
+use verso_core::{albums, map, overview, people, places};
 
 use crate::gallery::GalleryVersion;
 
@@ -305,7 +306,7 @@ fn named(names: &HashMap<String, u32>) -> impl Fn(&str, &str) -> Ordering + '_ {
         (Some(first), Some(second)) => first.cmp(second),
         (Some(_), None) => Ordering::Less,
         (None, Some(_)) => Ordering::Greater,
-        (None, None) => places::caseless(first, second),
+        (None, None) => caseless(first, second),
     }
 }
 
@@ -340,6 +341,193 @@ pub fn places_sections(cities: Vec<PlacesCity>, options: PlacesOptions, names: H
 pub fn places_sorted(cities: Vec<PlacesCity>, sort_by: String, names: HashMap<String, u32>) -> Vec<u32> {
     let arrangement = places::Arrangement { sort_by: places::SortBy::from_code(&sort_by).unwrap_or_default(), ..places::Arrangement::default() };
     arrangement.sorted(&places_of(cities), named(&names)).into_iter().map(|place| place as u32).collect()
+}
+
+/// An album, as the Albums page's arrangement reads it.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+pub struct AlbumFacts {
+    pub title: String,
+    /// Its owner's id; none where the server named no owner.
+    pub owner_id: Option<String>,
+    /// Its owner's name, empty where the server named no owner.
+    pub owner_name: String,
+    /// Shared with other people, in either direction.
+    pub shared: bool,
+    pub asset_count: u64,
+    pub created_at: Option<SystemTime>,
+    pub updated_at: Option<SystemTime>,
+    /// When its oldest and its newest photo were taken (the wall clock where each was, written as UTC, as Immich sends
+    /// it); none for an album without photos.
+    pub start_date: Option<SystemTime>,
+    pub end_date: Option<SystemTime>,
+}
+
+/// The Albums page's view options, by the codes the settings keep them by, the same on Linux: which albums (`All`,
+/// `Owned`, `Shared`), grouped by `None`, `Year` or `Owner` in a group order (`asc` or `desc`), sorted by `Title`,
+/// `ItemCount`, `DateModified`, `DateCreated`, `MostRecentPhoto` or `OldestPhoto` in an album order. A code the core
+/// does not know is Immich's default (`All`, `Year`, `MostRecentPhoto`), an order not `asc` descending.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+pub struct AlbumsOptions {
+    pub filter: String,
+    pub group_by: String,
+    pub group_order: String,
+    pub sort_by: String,
+    pub sort_order: String,
+}
+
+/// A group's heading: a year of the albums' photos, or none for the albums without photos; the account's own albums,
+/// or another owner's.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Enum)]
+pub enum AlbumsHeader {
+    Year { year: i32 },
+    UnknownYear,
+    Mine,
+    Owner { name: String },
+}
+
+/// A group of the Albums page.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+pub struct AlbumsSection {
+    /// Stable across reads, for remembering which groups are collapsed: `albums`, `year-<year>`, `year-unknown`,
+    /// `owner-mine` or `owner-<id>`.
+    pub id: String,
+    /// None for the albums ungrouped.
+    pub header: Option<AlbumsHeader>,
+    /// Its albums, by their places in the list given, in the order chosen.
+    pub albums: Vec<u32>,
+}
+
+fn albums_arrangement(options: &AlbumsOptions) -> albums::Arrangement {
+    albums::Arrangement {
+        filter: albums::Filter::from_code(&options.filter).unwrap_or_default(),
+        view: albums::View::default(),
+        group_by: albums::GroupBy::from_code(&options.group_by).unwrap_or_default(),
+        groups_ascending: albums::is_ascending(&options.group_order),
+        sort_by: albums::SortBy::from_code(&options.sort_by).unwrap_or_default(),
+        ascending: albums::is_ascending(&options.sort_order),
+    }
+}
+
+fn album_facts(albums: Vec<AlbumFacts>) -> Vec<albums::AlbumFacts> {
+    let date = |time: Option<SystemTime>| time.map(DateTime::<Utc>::from);
+    albums
+        .into_iter()
+        .map(|album| albums::AlbumFacts {
+            title: album.title,
+            owner_id: album.owner_id,
+            owner_name: album.owner_name,
+            shared: album.shared,
+            asset_count: album.asset_count,
+            created_at: date(album.created_at),
+            updated_at: date(album.updated_at),
+            start_date: date(album.start_date),
+            end_date: date(album.end_date),
+        })
+        .collect()
+}
+
+/// Indices, as the places of the items Swift gave.
+fn positions(indices: Vec<usize>) -> Vec<u32> {
+    indices.into_iter().map(|index| index as u32).collect()
+}
+
+/// The albums (given in the server's order) the options show for the account `user_id`, filtered, grouped and sorted
+/// within each group (`verso_core::albums`): all of them in one group without a header; a group for each year of their
+/// photos, the albums without photos last; or a group for each owner, by name, the account's own first in ascending
+/// order and last in descending. Year groups are none while sorting by the albums' own dates. `names` holds each
+/// title and owner's name by its place in the order of the person's language, names alike there sharing one.
+#[uniffi::export]
+pub fn albums_sections(albums: Vec<AlbumFacts>, options: AlbumsOptions, user_id: Option<String>, names: HashMap<String, u32>) -> Vec<AlbumsSection> {
+    albums_arrangement(&options)
+        .groups(&album_facts(albums), user_id.as_deref(), named(&names))
+        .into_iter()
+        .map(|group| AlbumsSection {
+            id: group.id,
+            header: group.header.map(|header| match header {
+                albums::Header::Year(year) => AlbumsHeader::Year { year },
+                albums::Header::UnknownYear => AlbumsHeader::UnknownYear,
+                albums::Header::Mine => AlbumsHeader::Mine,
+                albums::Header::Owner(name) => AlbumsHeader::Owner { name },
+            }),
+            albums: positions(group.albums),
+        })
+        .collect()
+}
+
+/// The places of the albums (given in the server's order) sorted by the options' key and album order, whatever their
+/// filter and grouping: an album without the date sorted by goes last in either order, and albums alike keep the
+/// server's order. `names` is as for `albums_sections`.
+#[uniffi::export]
+pub fn albums_sorted(albums: Vec<AlbumFacts>, options: AlbumsOptions, names: HashMap<String, u32>) -> Vec<u32> {
+    positions(albums_arrangement(&options).sorted(&album_facts(albums), named(&names)))
+}
+
+/// The places of a sidebar section's albums: the first `limit` of them (all without one), sorted by the key given, by
+/// its code, in its own order, titles A to Z and the rest newest or largest first. `names` is as for
+/// `albums_sections`.
+#[uniffi::export]
+pub fn albums_sidebar(albums: Vec<AlbumFacts>, sort_by: String, limit: Option<u32>, names: HashMap<String, u32>) -> Vec<u32> {
+    let sort_by = albums::SortBy::from_code(&sort_by).unwrap_or_default();
+    positions(albums::sidebar(&album_facts(albums), sort_by, limit.map(|limit| limit as usize), named(&names)))
+}
+
+/// The grouping the options show, by its code: the one chosen, or `None` where sorting by the albums' own dates turns
+/// year groups off.
+#[uniffi::export]
+pub fn albums_grouping(options: AlbumsOptions) -> String {
+    albums_arrangement(&options).effective_group_by().code().to_owned()
+}
+
+/// Whether the options' sort key allows a grouping, by its code: year groups need the photos' dates, so sorting by the
+/// albums' own turns them off, as Immich does.
+#[uniffi::export]
+pub fn albums_allows_grouping(options: AlbumsOptions, group_by: String) -> bool {
+    albums::GroupBy::from_code(&group_by).is_none_or(|group_by| albums_arrangement(&options).allows(group_by))
+}
+
+/// The group order a grouping takes when chosen, by its code: `desc` for years, the newest first, `asc` for owners and
+/// for none.
+#[uniffi::export]
+pub fn albums_group_order_by_default(group_by: String) -> String {
+    albums::order_code(albums::GroupBy::from_code(&group_by).unwrap_or_default().default_ascending()).to_owned()
+}
+
+/// The album order a sort key takes when chosen, by its code: `asc` for titles, `desc` for counts and dates, the
+/// largest and newest first.
+#[uniffi::export]
+pub fn albums_sort_order_by_default(sort_by: String) -> String {
+    albums::order_code(albums::SortBy::from_code(&sort_by).unwrap_or_default().default_ascending()).to_owned()
+}
+
+/// The groups collapsed in a grouping, by its code, from what the settings keep for every grouping
+/// (`{"Year":["year-2024"]}`, as Immich's web app keeps them); none for `None`, or from what is not that.
+#[uniffi::export]
+pub fn albums_collapsed(stored: String, group_by: String) -> Vec<String> {
+    match albums::GroupBy::from_code(&group_by) {
+        Some(group_by) => albums::Collapsed::from_json(&stored).ids(group_by).to_vec(),
+        None => Vec::new(),
+    }
+}
+
+/// What the settings keep once a group of a grouping is collapsed, or expanded where it was collapsed. Without a
+/// grouping (`None`, or a code the core does not know) nothing changes.
+#[uniffi::export]
+pub fn albums_collapse_toggled(stored: String, group_id: String, group_by: String) -> String {
+    let mut collapsed = albums::Collapsed::from_json(&stored);
+    if let Some(group_by) = albums::GroupBy::from_code(&group_by) {
+        collapsed.toggle(&group_id, group_by);
+    }
+    collapsed.json()
+}
+
+/// What the settings keep once a grouping's collapsed groups are these, all at once: none to expand them all.
+#[uniffi::export]
+pub fn albums_collapsed_set(stored: String, group_ids: Vec<String>, group_by: String) -> String {
+    let mut collapsed = albums::Collapsed::from_json(&stored);
+    if let Some(group_by) = albums::GroupBy::from_code(&group_by) {
+        collapsed.set(group_ids, group_by);
+    }
+    collapsed.json()
 }
 
 #[cfg(test)]
@@ -564,5 +752,118 @@ mod tests {
         let twins = vec![cities()[0].clone(), PlacesCity { name: "AARHUS".to_owned(), ..cities()[0].clone() }];
         assert_eq!(places_sorted(twins.clone(), "Name".to_owned(), ranked(&[&["Aarhus", "AARHUS"]])), [0, 1], "names alike keep the server's order");
         assert_eq!(places_sorted(twins, "Name".to_owned(), HashMap::new()), [0, 1], "names it is not given go by their lower-case letters");
+    }
+
+    /// A day of a year, at UTC midnight, as Immich sends an album's dates.
+    fn on(year: i32, month: u32, day: u32) -> Option<SystemTime> {
+        use chrono::TimeZone;
+        Some(Utc.with_ymd_and_hms(year, month, day, 0, 0, 0).unwrap().into())
+    }
+
+    /// The Mac's check's albums, as the server sends them: a, b and c with photos, d without; b shared by me with Zoe,
+    /// c shared by Zoe with me, d by Adam.
+    fn album_list() -> Vec<AlbumFacts> {
+        let album = |title: &str, owner: &str, shared: bool, count: u64, dates: [Option<SystemTime>; 4]| AlbumFacts {
+            title: title.to_owned(),
+            owner_id: Some(owner.to_lowercase()),
+            owner_name: owner.to_owned(),
+            shared,
+            asset_count: count,
+            created_at: dates[0],
+            updated_at: dates[1],
+            start_date: dates[2],
+            end_date: dates[3],
+        };
+        vec![
+            album("beach", "Me", false, 5, [on(2020, 1, 1), on(2026, 1, 3), on(2023, 6, 1), on(2025, 1, 1)]),
+            album("Alps", "Me", true, 9, [on(2021, 1, 1), on(2026, 1, 1), on(2024, 12, 1), on(2024, 12, 31)]),
+            album("Cats", "Zoe", true, 2, [on(2022, 1, 1), on(2026, 1, 2), on(2022, 3, 1), on(2025, 7, 1)]),
+            album("Empty", "Adam", true, 0, [on(2023, 1, 1), on(2026, 1, 4), None, None]),
+        ]
+    }
+
+    /// The titles' and owners' order as Finder gives it in English.
+    fn album_names() -> HashMap<String, u32> {
+        ranked(&[&["Adam"], &["Alps"], &["beach"], &["Cats"], &["Empty"], &["Me"], &["Zoe"]])
+    }
+
+    fn albums_options(filter: &str, group_by: &str, group_order: &str, sort_by: &str, sort_order: &str) -> AlbumsOptions {
+        AlbumsOptions { filter: filter.to_owned(), group_by: group_by.to_owned(), group_order: group_order.to_owned(), sort_by: sort_by.to_owned(), sort_order: sort_order.to_owned() }
+    }
+
+    #[test]
+    fn albums_group_by_year_or_owner_and_come_back_as_their_places() {
+        let sections = |options: AlbumsOptions| albums_sections(album_list(), options, Some("me".to_owned()), album_names());
+        let years = sections(albums_options("All", "Year", "desc", "MostRecentPhoto", "desc"));
+        let headers: Vec<_> = years.iter().map(|section| section.header.clone()).collect();
+        assert_eq!(headers, [Some(AlbumsHeader::Year { year: 2025 }), Some(AlbumsHeader::Year { year: 2024 }), Some(AlbumsHeader::UnknownYear)]);
+        assert_eq!(years.iter().map(|section| section.albums.clone()).collect::<Vec<_>>(), [vec![2, 0], vec![1], vec![3]]);
+        let owners = sections(albums_options("All", "Owner", "asc", "Title", "asc"));
+        let headers: Vec<_> = owners.iter().map(|section| section.header.clone()).collect();
+        let owner = |name: &str| Some(AlbumsHeader::Owner { name: name.to_owned() });
+        assert_eq!(headers, [Some(AlbumsHeader::Mine), owner("Adam"), owner("Zoe")]);
+        assert_eq!(owners[0], AlbumsSection { id: "owner-mine".to_owned(), header: Some(AlbumsHeader::Mine), albums: vec![1, 0] });
+        let shared = sections(albums_options("Shared", "None", "desc", "Title", "asc"));
+        assert_eq!(shared, [AlbumsSection { id: "albums".to_owned(), header: None, albums: vec![1, 2, 3] }]);
+        assert_eq!(sections(albums_options("Mine", "Decade", "up", "Colour", "down")), years, "codes it does not know are Immich's defaults");
+        assert!(albums_sections(Vec::new(), albums_options("All", "Year", "desc", "Title", "asc"), None, album_names()).is_empty());
+    }
+
+    #[test]
+    fn albums_sort_by_a_key_and_a_sidebar_section_takes_its_first_in_the_keys_own_order() {
+        let sorted = |sort_by: &str, sort_order: &str| albums_sorted(album_list(), albums_options("All", "None", "asc", sort_by, sort_order), album_names());
+        assert_eq!(sorted("Title", "asc"), [1, 0, 2, 3]);
+        assert_eq!(sorted("ItemCount", "desc"), [1, 0, 2, 3]);
+        assert_eq!(sorted("DateCreated", "desc"), [3, 2, 1, 0]);
+        assert_eq!(sorted("OldestPhoto", "asc"), [2, 0, 1, 3], "an album without photos last in either order");
+        assert_eq!(sorted("OldestPhoto", "desc"), [1, 0, 2, 3]);
+        let sidebar = |sort_by: &str, limit: Option<u32>| albums_sidebar(album_list(), sort_by.to_owned(), limit, album_names());
+        assert_eq!(sidebar("DateModified", Some(2)), [3, 0]);
+        assert_eq!(sidebar("MostRecentPhoto", Some(3)), [2, 0, 1]);
+        assert_eq!(sidebar("Title", None), [1, 0, 2, 3]);
+        assert_eq!(sidebar("Title", Some(10)).len(), 4);
+        let danish = ranked(&[&["Alps"], &["beach"], &["Zoe"], &["Ålborg"]]);
+        let english = ranked(&[&["Ålborg"], &["Alps"], &["beach"], &["Zoe"]]);
+        let titled = |titles: &[&str], names: HashMap<String, u32>| {
+            let albums = titles.iter().map(|title| AlbumFacts { title: (*title).to_owned(), ..album_list()[0].clone() }).collect();
+            albums_sidebar(albums, "Title".to_owned(), None, names)
+        };
+        assert_eq!(titled(&["Ålborg", "Zoe", "Alps"], danish), [2, 1, 0], "Å after Z in Danish");
+        assert_eq!(titled(&["Ålborg", "Zoe", "Alps"], english), [0, 2, 1], "Å beside A in English");
+    }
+
+    #[test]
+    fn albums_turn_year_groups_off_by_the_albums_own_dates_and_each_choice_takes_its_order() {
+        let options = |sort_by: &str| albums_options("All", "Year", "desc", sort_by, "desc");
+        for sort_by in ["DateCreated", "DateModified"] {
+            assert_eq!(albums_grouping(options(sort_by)), "None");
+            assert!(!albums_allows_grouping(options(sort_by), "Year".to_owned()));
+            assert!(albums_allows_grouping(options(sort_by), "Owner".to_owned()) && albums_allows_grouping(options(sort_by), "None".to_owned()));
+            let sections = albums_sections(album_list(), options(sort_by), Some("me".to_owned()), album_names());
+            assert_eq!(sections.iter().map(|section| section.header.clone()).collect::<Vec<_>>(), [None]);
+        }
+        assert_eq!(albums_grouping(options("OldestPhoto")), "Year");
+        assert_eq!(albums_grouping(albums_options("All", "Owner", "asc", "DateCreated", "desc")), "Owner");
+        assert_eq!(albums_group_order_by_default("Year".to_owned()), "desc");
+        assert_eq!(albums_group_order_by_default("Owner".to_owned()), "asc");
+        assert_eq!(albums_sort_order_by_default("Title".to_owned()), "asc");
+        for sort_by in ["ItemCount", "DateModified", "DateCreated", "MostRecentPhoto", "OldestPhoto"] {
+            assert_eq!(albums_sort_order_by_default(sort_by.to_owned()), "desc");
+        }
+    }
+
+    #[test]
+    fn albums_keep_their_collapsed_groups_for_each_grouping_as_immich_does() {
+        let stored = albums_collapse_toggled(String::new(), "year-2024".to_owned(), "Year".to_owned());
+        let stored = albums_collapse_toggled(stored, "owner-zoe".to_owned(), "Owner".to_owned());
+        assert_eq!(stored, r#"{"Owner":["owner-zoe"],"Year":["year-2024"]}"#);
+        assert_eq!(albums_collapsed(stored.clone(), "Year".to_owned()), ["year-2024"]);
+        assert!(albums_collapsed(stored.clone(), "None".to_owned()).is_empty());
+        assert_eq!(albums_collapse_toggled(stored.clone(), "albums".to_owned(), "None".to_owned()), stored, "without a grouping nothing changes");
+        let stored = albums_collapse_toggled(stored, "year-2024".to_owned(), "Year".to_owned());
+        assert_eq!(albums_collapsed_set(stored, Vec::new(), "Owner".to_owned()), "{}");
+        let all = albums_collapsed_set("{}".to_owned(), vec!["year-2025".to_owned(), "year-unknown".to_owned()], "Year".to_owned());
+        assert_eq!(albums_collapsed(all, "Year".to_owned()), ["year-2025", "year-unknown"]);
+        assert!(albums_collapsed("not json".to_owned(), "Year".to_owned()).is_empty());
     }
 }

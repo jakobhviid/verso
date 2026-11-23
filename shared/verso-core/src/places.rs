@@ -1,8 +1,8 @@
 //! Places: Immich's list of cities, one photo for each, as cities or grouped by country (Immich's web app's places
 //! page, PlacesList.svelte), sorted by when each was last visited, most recent or oldest first, or by name (after
 //! Immich Gallery's `PlacesArrangement`). Linux's window, the Mac and the iPhone (through `verso-bridge`) all arrange
-//! here. The order of names is the platform's, which knows the person's language, and a city's last visit is the date
-//! of its newest photo, which the Mac and the iPhone read.
+//! here. The order of names is the platform's (`names`), which knows the person's language, and a city's last visit is
+//! the date of its newest photo, which the Mac and the iPhone read.
 
 use std::cmp::Ordering;
 
@@ -176,14 +176,10 @@ impl Arrangement {
     }
 }
 
-/// Names in the order of their lower-case letters, as Linux's window orders them.
-pub fn caseless(first: &str, second: &str) -> Ordering {
-    first.to_lowercase().cmp(&second.to_lowercase())
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::names::caseless;
     use chrono::{Duration, NaiveDate};
 
     fn place(city: &str, country: Option<&str>) -> Place {
