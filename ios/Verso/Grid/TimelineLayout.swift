@@ -152,38 +152,40 @@ struct TimelineLayout: Equatable {
 /// The photo grid's zoom levels, chosen with a pinch: every count of photos a row from three to the densest, one level
 /// each, as the Mac's grid has every count. A phone in portrait shows the counts themselves, as Photos shows three or
 /// five a row on any iPhone's width, up to fifteen a row on a 393-point iPhone and more on a wider one (seventeen on a
-/// Pro Max); a wider grid (landscape, an iPad) keeps the tiles' size and shows more of them in a row.
+/// Pro Max); an iPad in portrait shows them too, as Photos shows five a row on any iPad, its tiles larger; a wider grid
+/// (landscape, or an iPad's window wider than tall) keeps the tiles' size and shows more of them in a row.
 enum GridZoom {
     static let storageKey = "grid.zoom"
-    /// Five a row on a phone in portrait, Photos' own default.
+    /// Five a row in portrait, Photos' own default on an iPhone and an iPad.
     static let defaultLevel = 2
 
-    /// The width the densest count is an iPhone's at, and the one an iPad scales the counts from, whose tiles are
-    /// larger.
+    /// The width the densest count is an iPhone's at.
     private static let compactWidth = 393.0
-    private static let regularWidth = 640.0
     /// Wider than any phone in portrait.
     private static let portraitWidth = 500.0
 
-    /// The counts a row at a width, the fewest first, the first at level 0.
-    static func counts(width: CGFloat, regular: Bool) -> ClosedRange<Int> {
-        let scale = Double(width) / (regular ? regularWidth : compactWidth)
+    /// The counts a row in a grid of `width` by `height`, the fewest first, the first at level 0: a phone's from its
+    /// width, an iPad's (`regular`) from its shorter side, where it shows the counts themselves.
+    static func counts(width: CGFloat, height: CGFloat, regular: Bool) -> ClosedRange<Int> {
+        let base = regular ? max(1, min(Double(width), Double(height))) : compactWidth
+        let scale = Double(width) / base
         let fewest = !regular && Double(width) <= portraitWidth ? 3 : max(3, Int((3 * scale).rounded()))
         return fewest...max(fewest, Int((15 * scale).rounded()))
     }
 
-    /// The levels at a width.
-    static func levels(width: CGFloat, regular: Bool) -> ClosedRange<Int> {
-        let counts = counts(width: width, regular: regular)
+    /// The levels in a grid of that size.
+    static func levels(width: CGFloat, height: CGFloat, regular: Bool) -> ClosedRange<Int> {
+        let counts = counts(width: width, height: height, regular: regular)
         return 0...(counts.upperBound - counts.lowerBound)
     }
 
-    static func clamped(_ level: Int, width: CGFloat, regular: Bool) -> Int {
-        let levels = levels(width: width, regular: regular)
+    static func clamped(_ level: Int, width: CGFloat, height: CGFloat, regular: Bool) -> Int {
+        let levels = levels(width: width, height: height, regular: regular)
         return min(max(level, levels.lowerBound), levels.upperBound)
     }
 
-    static func columns(level: Int, width: CGFloat, regular: Bool) -> Int {
-        counts(width: width, regular: regular).lowerBound + clamped(level, width: width, regular: regular)
+    static func columns(level: Int, width: CGFloat, height: CGFloat, regular: Bool) -> Int {
+        counts(width: width, height: height, regular: regular).lowerBound
+            + clamped(level, width: width, height: height, regular: regular)
     }
 }

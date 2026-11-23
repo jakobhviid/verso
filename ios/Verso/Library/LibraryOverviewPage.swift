@@ -80,6 +80,9 @@ struct LibraryOverviewPage: View {
                             LibraryYearCard(model: model, year: year, pipeline: session.pipeline)
                         }
                         .buttonStyle(.plain)
+                        // Under an iPad's pointer the year lifts, as Photos' cards do.
+                        .contentShape(.hoverEffect, .rect(cornerRadius: 22))
+                        .hoverEffect(.lift)
                         .accessibilityLabel(Text(verbatim: year.id))
                         .id(year.id)
                     }

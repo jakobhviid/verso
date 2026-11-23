@@ -1,21 +1,20 @@
 // The account's picture on iOS, in Collections' toolbar alone, as Photos keeps the profile in Collections: a circle,
 // as an account is everywhere in Verso (DESIGN.md), its profile picture or its initials on Immich's colour for them,
 // with a ring round it while the sheet holds notifications (in the accent, orange where one asks something of the
-// person), and the unread ones' count in the toolbar's red badge. A tap opens the account's sheet
-// (AccountSheet): the notifications, the profile, the account's Immich features and security, Administration for an
-// admin, About Verso, and Sign Out.
+// person), and the unread ones' count in the toolbar's red badge. A tap opens the account's sheet (AccountSheet), which
+// the window presents, as the keyboard's Settings… opens it too: the notifications, the profile, the account's Immich
+// features and security, Administration for an admin, About Verso, and Sign Out.
 
 import SwiftUI
 import UIKit
 
 struct AccountButton: View {
     let services: AccountServices
-    @State private var showingAccount = false
+    /// Opens the account's sheet.
+    let open: () -> Void
 
     var body: some View {
-        Button {
-            showingAccount = true
-        } label: {
+        Button(action: open) {
             AccountCircle(user: services.user, picture: services.profilePicture, size: 32)
                 .padding(3)
                 .overlay {
@@ -32,9 +31,6 @@ struct AccountButton: View {
         .badge(services.unreadNotificationCount)
         .accessibilityLabel("Account")
         .accessibilityValue(accessibilityValue)
-        .sheet(isPresented: $showingAccount) {
-            AccountSheet(services: services)
-        }
     }
 
     /// The account's name, and how many notifications are unread, or kept, when any are.

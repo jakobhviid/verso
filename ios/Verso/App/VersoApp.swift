@@ -13,6 +13,11 @@ struct VersoApp: App {
 
     init() {
         CoreTransport.install() // the endpoint calls through the shared Rust core
+        // The Backup page opens in the window in front, one of several on an iPad.
+        BackupCenter.shared.frontWindow = {
+            UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.flatMap(\.windows)
+                .first(where: \.isKeyWindow)
+        }
     }
 
     var body: some Scene {
@@ -20,6 +25,8 @@ struct VersoApp: App {
             VersoRoot()
                 .environment(app)
         }
+        // The hardware keyboard's commands, in iPadOS's menu bar (VersoCommands).
+        .commands { VersoCommands() }
     }
 }
 

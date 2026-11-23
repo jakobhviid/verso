@@ -83,6 +83,8 @@ struct TimelineCollection: UIViewRepresentable {
     /// The zoom levels a pinch goes between (GridPinch).
     let zoom: TimelineZoom
     let refresh: () async -> Void
+    /// The keyboard's keys while selecting; none otherwise.
+    var keys: GridKeys? = nil
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
@@ -135,6 +137,7 @@ struct TimelineCollection: UIViewRepresentable {
         view.isScrollEnabled = isScrollEnabled && !pinch.isActive
         coordinator.sideways?.isEnabled = sidewaysEnabled
         (view as? TimelineCollectionView)?.anchoredAtBottom = anchoredAtBottom
+        (view as? TimelineCollectionView)?.keys = keys
         apply(insets, to: view)
         guard let layout = view.collectionViewLayout as? TimelineCollectionLayout,
               let applied = coordinator.applied else { return }
@@ -337,6 +340,49 @@ struct TimelineCollection: UIViewRepresentable {
 private final class TimelineCollectionView: UICollectionView {
     var anchoredAtBottom = false
     private var landedFirst = false
+    /// The keys of a selection, which take the keyboard while it lasts (GridKeys).
+    var keys: GridKeys? {
+        didSet {
+            if keys != nil { takeKeyboard() } else if oldValue != nil, isFirstResponder { resignFirstResponder() }
+        }
+    }
+
+    override var canBecomeFirstResponder: Bool { keys != nil }
+
+    /// Takes the keyboard, once the update in progress is over, unless a field is being typed in.
+    private func takeKeyboard() {
+        guard window != nil, !isFirstResponder else { return }
+        Task { @MainActor [weak self] in
+            guard let self, keys != nil, window != nil, !isFirstResponder,
+                  !(UIResponder.firstResponder is UITextInput) else { return }
+            becomeFirstResponder()
+        }
+    }
+
+    override var keyCommands: [UIKeyCommand]? {
+        guard let keys else { return [] }
+        var commands: [UIKeyCommand] = []
+        if let favorite = keys.favorite {
+            commands.append(command(".", [], favorite.title, #selector(favoriteSelection)))
+        }
+        if let delete = keys.delete {
+            commands.append(command(UIKeyCommand.inputDelete, .command, delete.title, #selector(deleteSelection)))
+        }
+        commands.append(command(UIKeyCommand.inputEscape, [], String(localized: "Cancel"), #selector(cancelSelecting)))
+        return commands
+    }
+
+    private func command(_ input: String, _ modifiers: UIKeyModifierFlags, _ title: String,
+                         _ action: Selector) -> UIKeyCommand {
+        let command = UIKeyCommand(title: title, action: action, input: input, modifierFlags: modifiers)
+        // Ahead of the system's own Esc.
+        command.wantsPriorityOverSystemBehavior = true
+        return command
+    }
+
+    @objc private func favoriteSelection() { keys?.favorite?.perform() }
+    @objc private func deleteSelection() { keys?.delete?.perform() }
+    @objc private func cancelSelecting() { keys?.cancel() }
 
     override func didMoveToWindow() {
         super.didMoveToWindow()
@@ -570,4 +616,18 @@ final class TimelineCollectionLayout: UICollectionViewLayout, PinchZoomLayout {
     override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
         newBounds.width != collectionView?.bounds.width
     }
+}
+
+/// A selection's keys on a hardware keyboard, as the Mac's grid has them: "." favorites or unfavorites the photos
+/// selected, ⌘⌫ deletes them (asking first, as the bar's Delete does) and Esc ends selecting, as Cancel does; ⌘A is
+/// Select All's own (AssetGridPage). Each where it applies to the photos selected.
+struct GridKeys {
+    struct Action {
+        let title: String
+        let perform: @MainActor () -> Void
+    }
+
+    var favorite: Action?
+    var delete: Action?
+    let cancel: @MainActor () -> Void
 }

@@ -45,6 +45,9 @@ struct AlbumPage: View {
                 AssetGridPage(session: session, source: .album(album.id), title: name, header: AnyView(header))
                     // A grid of its own for each order, which opens at its top: the first photo of the order.
                     .id(model.albumOrder)
+                    // Photos dropped from another app on an iPad go into the library and the album, where the account
+                    // may add to it.
+                    .importDrops(queue: session.upload, albumID: album.id, refused: details?.canEdit(userID) != true)
             }
         }
         .toolbar {

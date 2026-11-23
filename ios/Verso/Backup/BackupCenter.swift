@@ -40,6 +40,10 @@ final class BackupCenter {
     /// The Backup page is open, over the tabs (LibraryTabs): every way to it (the Library's card and line, the account's
     /// row, a notification, a Live Activity) opens this one.
     var pageShown = false
+    /// The window it opens in, with several on an iPad: the one in front as it was asked for; any while none was.
+    @ObservationIgnored private(set) weak var pageWindow: AnyObject?
+    /// The window in front, which the app's windows tell (LibraryTabs), as this knows no UIKit.
+    @ObservationIgnored var frontWindow: () -> AnyObject? = { nil }
     /// The Library's card that offers backing up, until it is switched on or the person says Not Now (this device's).
     private(set) var invitationDismissed = UserDefaults.standard.bool(forKey: invitationKey)
     private static let invitationKey = "backup.invitationDismissed"
@@ -237,8 +241,9 @@ final class BackupCenter {
         BackupScheduler.submitContinued(title: "Backing Up to Immich")
     }
 
-    /// Opens the Backup page, from wherever Verso is.
+    /// Opens the Backup page, from wherever Verso is, in the window in front.
     func showPage() {
+        pageWindow = frontWindow()
         pageShown = true
     }
 
@@ -256,7 +261,7 @@ final class BackupCenter {
     /// Opens Free Up Space's review on the Backup page, from wherever Verso is.
     func showFreeUp() {
         reviewRequested = BackupSettings.current.keepMonths != nil
-        pageShown = true
+        showPage()
     }
 
     /// The Library's card for what is ready to free (FreeUpRules.cardShown): backing up on and past its first run, a

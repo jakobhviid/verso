@@ -422,8 +422,11 @@ components without our code, which is the main reason to build on them. Nothing 
   and Rename.
 - **iPad:** the iPhone's tabs in iPadOS's floating bar at the top (`.tabViewStyle(.tabBarOnly)`), never a sidebar,
   which made the iPad look like another app (the maintainer's choice), with room for one more chosen page (Albums and
-  People by default) and Search apart at the bar's end; drag and drop between apps, several windows. The iPad is the
-  iPhone app, with no interface of its own to keep (the maintainer: as little to maintain twice as possible).
+  People by default) and Search apart at the bar's end. The iPad is the iPhone app, with no interface of its own to
+  keep (the maintainer: as little to maintain twice as possible), its views laid out by the size class where Photos on
+  the iPad lays its own out otherwise: five photos a row in portrait, Years, Months and All always at the foot, the
+  viewer's buttons in its top bar and its details in a panel; with the Mac's keys in the menu bar, the pointer's
+  effects, drag and drop between apps, and several windows (ARCHITECTURE, "Verso on the iPad"; SPEC, "On the iPad").
 - **Motion:** the maintainer's rule holds (motion only for what the person does; nothing animates in as it loads).
   iOS's push and zoom transitions are the platform's answer to a tap, and platform conventions win (PRINCIPLES).
 
@@ -579,7 +582,12 @@ checks.
 3. Collections and Search; album pages; selecting and its actions. Built.
 4. Imports: the photo picker, Files, their progress under the Library's title, going on in the background, and the
    notifications, built; the share extension is not.
-5. iPad: the tab bar at the top without a sidebar (built), drag and drop, several windows. Before the first release.
+5. iPad: built (ARCHITECTURE, "Verso on the iPad"). What only a real iPad shows: Esc and ⌘⌫ from a hardware
+   keyboard (the Simulator's test keys never reach an app) and the list ⌘ held shows; a drag out into Files, Mail and
+   Notes, and a drop from Photos and Files, a Live Photo among them; a trackpad's pointer over the cards and rows;
+   Stage Manager's small windows and two windows side by side; and whether the navigation bar's buttons always stand
+   in the tab bar's row, as Photos' do, where the Simulator sometimes gives them a row of their own under it. A
+   selection dragged out as one is not built.
 6. Verso Drive in Files (built; SPEC, "In the Files app"); widgets, Shortcuts, Control Center (below, "Verso in the
    system's places").
 7. TestFlight, then the App Store, with the walkthrough video (below, "The walkthrough video").
@@ -621,8 +629,8 @@ Every idea below is a possible choice, none chosen yet:
   original downloads), Save Image, and the phone's own photos.
 - Save to Photos for a Live Photo and a video, and the phone's own tiles' menu.
 - The viewer on a phone: Live Photos, the Locked Folder and light mode.
-- A viewer walk on the lab server; iPad keyboard shortcuts; Verso Drive's settings; editing an external library's
-  paths; saving an edit checked against the lab server.
+- A viewer walk on the lab server; Verso Drive's settings; editing an external library's paths; saving an edit
+  checked against the lab server.
 - Verso Drive switched off: the Files app still lists an empty location named after the app, as iOS keeps an
   extension's own default location while its app has none (SPEC, "In the Files app"; ARCHITECTURE, "Verso Drive on
   the iPhone and the iPad"). Whether it can go.
@@ -634,18 +642,17 @@ Agreed with the maintainer; each item's detail is where it points.
    the Apple builds (the maintainer's, with the Developer ID and TestFlight). Verso goes public with the Mac and Linux
    before the App Store.
 2. The Swift twins into the Rust core (M9, step 8), an area at a time.
-3. iPad, before the first release (M10, step 5).
-4. The app icon's looks: each design by day and by night, in colour or in greys, picked for light and dark mode.
-5. Trusting a self-signed server certificate on the Mac and the iPhone: done in the core and on Linux (ARCHITECTURE.md,
+3. iPad on a real iPad, before the first release (M10, step 5).
+4. Trusting a self-signed server certificate on the Mac and the iPhone: done in the core and on Linux (ARCHITECTURE.md,
    "A certificate of the server's own", which has the Apple step's plan); left, the pin in the App Group's config and
    the bridge's clients, the question in SwiftUI, and the app's own URLSession and AVPlayer requests.
-6. Linux's map from the Immich server's own map setting (`mapLightStyleUrl`, `mapDarkStyleUrl`; Immich's own
+5. Linux's map from the Immich server's own map setting (`mapLightStyleUrl`, `mapDarkStyleUrl`; Immich's own
    `tiles.immich.cloud` unless its admin chose another), drawn by libshumate's vector renderer (in Fedora 44's 1.6.3),
    in place of OpenStreetMap's servers, whose usage policy forbids an app's traffic. Apple's systems keep Apple's maps.
-7. Verso's page, with its design (M9, step 7).
-8. Verso in the system's places, and the smaller gaps on the iPhone (M10).
-9. The walkthrough video (M10).
-10. The history cleaned at the public launch (M8, "Going public").
+6. Verso's page, with its design (M9, step 7).
+7. Verso in the system's places, and the smaller gaps on the iPhone (M10).
+8. The walkthrough video (M10).
+9. The history cleaned at the public launch (M8, "Going public").
 
 ## The full Immich API
 

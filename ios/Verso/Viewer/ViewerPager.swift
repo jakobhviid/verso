@@ -295,6 +295,20 @@ class ViewerPage: UIViewController, UIGestureRecognizerDelegate {
         pan.delegate = self
         target.addGestureRecognizer(pan)
         closePan = pan
+        // With the details in a panel (an iPad), a swipe up brings them and a swipe down takes them away, as the
+        // stage's scroll does on a phone.
+        for direction in [UISwipeGestureRecognizer.Direction.up, .down] {
+            let swipe = UISwipeGestureRecognizer(target: self, action: #selector(swiped(_:)))
+            swipe.direction = direction
+            swipe.cancelsTouchesInView = false
+            swipe.delegate = self
+            target.addGestureRecognizer(swipe)
+        }
+    }
+
+    @objc private func swiped(_ recognizer: UISwipeGestureRecognizer) {
+        guard let state, state.detailsInPanel, !state.isZoomed else { return }
+        if recognizer.direction == .up { state.showDetails() } else { state.hideDetails() }
     }
 
     @objc private func tapped() {
@@ -339,6 +353,9 @@ class ViewerPage: UIViewController, UIGestureRecognizerDelegate {
 
     /// Down from the photo alone, to close; up is the stage's scroll, and sideways the pager's.
     func gestureRecognizerShouldBegin(_ recognizer: UIGestureRecognizer) -> Bool {
+        if let swipe = recognizer as? UISwipeGestureRecognizer, let state {
+            return state.detailsInPanel && !state.isZoomed && state.showsDetails == (swipe.direction == .down)
+        }
         guard recognizer === closePan, let pan = recognizer as? UIPanGestureRecognizer, let state else { return true }
         let velocity = pan.velocity(in: nil)
         guard allowsCloseDrag, velocity.y > 0, abs(velocity.y) > abs(velocity.x) * 1.5 else { return false }

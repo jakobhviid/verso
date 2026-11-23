@@ -1,7 +1,8 @@
 // Collections' toolbar on iOS (ROADMAP.md, M10), the one place the account shows, as Photos keeps the profile in
 // Collections: a "+" menu, then the account's picture with a red badge counting the unread notifications, which its
 // sheet opens with. The menu makes a New Album as Albums does (a name, then the album opens on Collections' stack),
-// and starts an import into the library, from Photos or from Files (ImportPickers.swift).
+// and starts an import into the library, from Photos or from Files (ImportPickers.swift). The window presents the
+// account's sheet and the import's pickers (LibraryTabs), as the keyboard's commands ask for them too.
 
 import SwiftUI
 
@@ -15,10 +16,10 @@ extension View {
 private struct CollectionsToolbar: ViewModifier {
     let session: LibrarySession
     @Environment(\.pushRoute) private var pushRoute
+    /// The window's, which presents the account's sheet and the import's pickers, as the keyboard also asks for them.
+    @Environment(LibraryChrome.self) private var chrome: LibraryChrome?
     @State private var naming = false
     @State private var newName = ""
-    @State private var choosingPhotos = false
-    @State private var choosingFiles = false
 
     func body(content: Content) -> some View {
         let canImport = ImportCoordinator.of(session.upload).canStart
@@ -33,8 +34,8 @@ private struct CollectionsToolbar: ViewModifier {
                             }
                         }
                         Section {
-                            Button("Import from Photos…", systemImage: "photo.on.rectangle") { choosingPhotos = true }
-                            Button("Import from Files…", systemImage: "folder") { choosingFiles = true }
+                            Button("Import from Photos…", systemImage: "photo.on.rectangle") { chrome?.choosingPhotos = true }
+                            Button("Import from Files…", systemImage: "folder") { chrome?.choosingFiles = true }
                         }
                         .disabled(!canImport)
                     } label: {
@@ -43,7 +44,7 @@ private struct CollectionsToolbar: ViewModifier {
                 }
                 ToolbarSpacer(.fixed, placement: .topBarTrailing)
                 ToolbarItem(placement: .topBarTrailing) {
-                    AccountButton(services: session.services)
+                    AccountButton(services: session.services) { chrome?.accountShown = true }
                 }
                 // The button draws its own glass, a circle as the +'s: the toolbar's around a view of our own is a
                 // capsule, wider than it is tall.
@@ -57,7 +58,6 @@ private struct CollectionsToolbar: ViewModifier {
             } message: {
                 Text("Enter a name for this album.")
             }
-            .importPickers(queue: session.upload, choosingPhotos: $choosingPhotos, choosingFiles: $choosingFiles)
     }
 
     /// Makes the album, then opens it on Collections' stack, as Albums does; a failure is the window's Album Error.

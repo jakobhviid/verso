@@ -17,7 +17,8 @@
 // among Immich's at the newest end, from the phone (AssetGridPage's `showsPhoneTiles`); the filters, Years and Months
 // are Immich's alone. While backing up is off and the person has not said Not Now, a card above the tab bar, by the
 // newest photos where the Library opens, offers it (BackupInvitationCard); while it is on, the same place has Free Up
-// Space's card once there is real space to gain (FreeUpCard).
+// Space's card once there is real space to gain (FreeUpCard). On an iPad, as in Photos there, Years, Months and All
+// are always at the foot's middle in a capsule of the page's own, and the card is a sheet's width under it.
 
 import SwiftUI
 
@@ -29,6 +30,9 @@ struct LibraryTabView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     /// The partners have been read once, so a filter of a partner no longer sharing goes back to All Items.
     @State private var partnersRead = false
+
+    /// The card's width in a regular width, as wide as a sheet of iPadOS's, rather than the whole screen's.
+    private static let regularCardWidth: CGFloat = 560
 
     var body: some View {
         let partners = session.sharing.receivedPartners
@@ -51,26 +55,31 @@ struct LibraryTabView: View {
                               onScrolledAway: { chrome.libraryScrolledBack() },
                               showsPhoneTiles: filter == .all)
                     .safeAreaInset(edge: .bottom) {
-                        if !chrome.isSelecting {
-                            if BackupCenter.shared.invitationShown {
-                                BackupInvitationCard()
-                            } else if let card = FreeUpCard.shown {
-                                FreeUpCard(kind: card)
+                        VStack(spacing: 12) {
+                            if !chrome.isSelecting {
+                                // In a regular width the page's own capsule holds Years, Months and All, always, as
+                                // Photos' on an iPad (the accessory is a phone's, LibraryTabs), above the card where
+                                // one shows, and the newest photos rest above it.
+                                if horizontalSizeClass == .regular, filter.showsWholeLibrary {
+                                    LibraryModeCapsule(mode: modeBinding)
+                                }
+                                Group {
+                                    if BackupCenter.shared.invitationShown {
+                                        BackupInvitationCard()
+                                    } else if let card = FreeUpCard.shown {
+                                        FreeUpCard(kind: card)
+                                    }
+                                }
+                                .frame(maxWidth: horizontalSizeClass == .regular ? Self.regularCardWidth : .infinity)
                             }
                         }
+                        .padding(.bottom, horizontalSizeClass == .regular && filter.showsWholeLibrary ? 12 : 0)
                     }
+                    // Photos dropped from another app on an iPad go into the library.
+                    .importDrops(queue: session.upload)
                     // A page of its own for each filter, which opens at its newest photos.
                     .id(filter)
                     .transition(.opacity)
-                    // In a regular width the page's own capsule holds Years, Months and All (the accessory is a
-                    // phone's, LibraryTabs).
-                    .overlay(alignment: .bottom) {
-                        if horizontalSizeClass == .regular, filter.showsWholeLibrary, !chrome.libraryAtNewestEnd,
-                           !chrome.isSelecting {
-                            LibraryModeCapsule(mode: modeBinding)
-                                .padding(.bottom, 12)
-                        }
-                    }
             }
         }
         // The sort replaces what the grid shows, as a filter does.

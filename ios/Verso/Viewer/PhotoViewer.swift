@@ -6,8 +6,11 @@
 // one capsule, and More; under Back a
 // Live Photo's LIVE badge, and under More a stacked photo's badge, which opens its stack (ViewerStackSheet); above the
 // bottom bar a filmstrip of the photos beside it; along the bottom Share, then Favorite, Info and Edit together, then
-// Delete, or Restore and Delete Permanently in Recently Deleted. Edit turns and crops the picture
-// (ViewerPictureEditor). A swipe up or Info slides the photo up with its details beneath (ViewerDetails). More is the
+// Delete, or Restore and Delete Permanently in Recently Deleted. In a regular width (an iPad), as Photos has it there,
+// the bottom bar's buttons are in the top bar, Share and Favorite together beside Back and Edit, Info and Delete
+// together before More, with the filmstrip alone at the foot. Edit turns and crops the picture (ViewerPictureEditor). A
+// swipe up or Info slides the photo up with its details beneath (ViewerDetails), or on an iPad brings them in a panel
+// at the trailing side (ViewerStage). The keyboard's keys are the viewer's own (ViewerKeys). More is the
 // menu of photo actions a long press on a tile shows (PhotoActionsMenu), for the photo shown, with Start Slideshow;
 // what the bar holds it leaves to the bar. Deleting, archiving or hiding a photo shows the next one, through the
 // grid's model, so the grids change with it.
@@ -36,6 +39,12 @@ struct PhotoViewer: View {
     @AppStorage(ViewerPlaceNames.appleMapsKey) private var looksUpPlaceNames = false
     @Environment(LibraryChrome.self) private var chrome: LibraryChrome?
     @Environment(\.pushRoute) private var pushRoute
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    /// The bars' buttons are at the top, as Photos has them on an iPad, the details in a panel beside the photo.
+    private var barsAtTop: Bool { horizontalSizeClass == .regular }
+    /// The room a resized iPad window's controls take at its top leading corner, which Back keeps clear of.
+    @State private var controlsInset: CGFloat = 0
 
     /// The state says which photo it opens on and whether the grid shows the model's photos last to first
     /// (ViewerState.readsBackwards); the host shares it, for the photo's flight and its drag.
@@ -54,6 +63,8 @@ struct PhotoViewer: View {
                 ViewerStage(state: state, modelRevision: modelRevision)
                 controls(titles)
             }
+            // The keyboard's keys while the photo shows: the arrows, Space, ".", ⌘I, ⌘⌫ and Esc.
+            .background(ViewerKeys(state: state))
             // For UI tests, which ask whether a viewer shows.
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier("Viewer")
@@ -63,7 +74,7 @@ struct PhotoViewer: View {
             .toolbar(.hidden, for: .navigationBar)
             // The stage draws the backdrop, which fades in and out with the viewer.
             .containerBackground(.clear, for: .navigation)
-            .statusBarHidden(state.isOpen && (!state.chromeVisible || state.detailsActive))
+            .statusBarHidden(state.isOpen && (!state.chromeVisible || (state.detailsActive && !barsAtTop)))
             .persistentSystemOverlays(state.chromeVisible ? .automatic : .hidden)
             .navigationDestination(for: ViewerDetailsRoute.self) { route in destination(route) }
             .sheet(item: $state.presented) { presentation in
@@ -72,7 +83,7 @@ struct PhotoViewer: View {
             .sheet(item: $actionSheet) { sheet in
                 PhotoActionSheetView(session: session, sheet: sheet) { _ in }
             }
-            .shareSheet(item: $sharing) { request in shareContent(request.ids) }
+            .shareSheet(item: $sharing, fromTop: barsAtTop) { request in shareContent(request.ids) }
             .sensoryFeedback(.success, trigger: saved)
             .fullScreenCover(item: $state.editing) { asset in
                 ViewerPictureEditor(session: session, asset: asset)
@@ -97,7 +108,14 @@ struct PhotoViewer: View {
         }
         .viewerHost()
         .onAppear(perform: start)
-        .onDisappear { state.stop() }
+        .onDisappear {
+            state.stop()
+            chrome?.viewerShown(state, false)
+        }
+        // The keyboard's commands leave the photo alone while a sheet or a question of the viewer's shows over it.
+        .onChange(of: sharing != nil || actionSheet != nil || confirmingDelete, initial: true) { _, shown in
+            state.sheetShown = shown
+        }
         .task(id: "\(state.currentID)|\(session.metadata.revision)|\(state.detailsAttempt)") {
             await state.loadDetails()
         }
@@ -115,6 +133,9 @@ struct PhotoViewer: View {
     private func start() {
         let host = host
         state.start(close: { host.close() })
+        // The keyboard's commands reach the viewer in front (VersoCommands): its bar's Favorite and Delete.
+        state.keyActions = ViewerKeyActions(favorite: toggleFavorite, delete: { confirmingDelete = true })
+        chrome?.viewerShown(state, true)
         // Where the viewer opened from a tab's page, the details' people, albums and tags open on that tab's stack,
         // as a link there does, once the viewer has closed into its tile; the Locked Folder keeps them inside the
         // viewer.
@@ -172,10 +193,12 @@ struct PhotoViewer: View {
     private func controls(_ titles: (title: String, subtitle: String)) -> some View {
         let shown = state.isOpen && state.chromeVisible && state.closeDrag == nil && state.closePinch == nil
         let topShown = shown && !state.detailsActive
+        // With the bars at the top, they stay beside the details' panel, as the bottom bar stays beside the details.
+        let barShown = barsAtTop ? shown : topShown
         return VStack(spacing: 0) {
             topBar(titles)
-                .opacity(topShown ? 1 : 0)
-                .allowsHitTesting(topShown)
+                .opacity(barShown ? 1 : 0)
+                .allowsHitTesting(barShown)
             HStack(alignment: .top, spacing: 0) {
                 if topShown, let item = state.currentItem, item.livePhotoVideoID != nil {
                     ViewerLiveBadge(state: state, item: item)
@@ -200,19 +223,23 @@ struct PhotoViewer: View {
             }
             Spacer(minLength: 0)
             if topShown, state.currentItem?.isVideo == true {
-                // Its ends line up with the bottom bar's, 28 points from the edges.
+                // Its ends line up with the bottom bar's, 28 points from the edges; on an iPad, as wide as a sheet, in
+                // the middle.
                 ViewerVideoBar(video: state.video) { state.fadeChromeForVideo() }
+                    .frame(maxWidth: barsAtTop ? 640 : .infinity)
                     .padding(.horizontal, 28)
-                    .padding(.bottom, 12)
+                    .padding(.bottom, barsAtTop ? 16 : 12)
                     .transition(.opacity)
             } else if topShown, model.totalCount > 1 {
                 ViewerFilmstrip(state: state)
-                    .padding(.bottom, 10)
+                    .padding(.bottom, barsAtTop ? 16 : 10)
                     .transition(.opacity)
             }
-            bottomBar
-                .opacity(shown ? 1 : 0)
-                .allowsHitTesting(shown)
+            if !barsAtTop {
+                bottomBar
+                    .opacity(shown ? 1 : 0)
+                    .allowsHitTesting(shown)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
@@ -220,17 +247,58 @@ struct PhotoViewer: View {
     /// Back, the place and day in their capsule, and More, where the system's bar has them: glass circles of 44 points,
     /// 20 from the edges, at the top of the safe area (as the system's bar has them on an iPhone 17 Pro Max).
     private func topBar(_ titles: (title: String, subtitle: String)) -> some View {
+        Group {
+            if barsAtTop {
+                topBarWithActions
+                    // The title in the middle of the screen, whatever the sides hold, and never over them.
+                    .overlay {
+                        ViewerTitleCapsule(title: titles.title, subtitle: titles.subtitle) { state.toggleDetails() }
+                            .frame(maxWidth: 320)
+                    }
+            } else {
+                HStack(spacing: 8) {
+                    Button("Back", systemImage: "chevron.backward") { host.close() }
+                        .modifier(ViewerBarCircle(size: 44))
+                    Spacer(minLength: 0)
+                    ViewerTitleCapsule(title: titles.title, subtitle: titles.subtitle) { state.toggleDetails() }
+                    Spacer(minLength: 0)
+                    moreMenu
+                        .modifier(ViewerBarCircle(size: 44))
+                }
+            }
+        }
+        .padding(.leading, max(20, controlsInset + 8))
+        .padding(.trailing, 20)
+        .frame(height: 44)
+        .windowControlsInset($controlsInset)
+    }
+
+    /// The top bar on an iPad, as Photos': Back, then Share and Favorite together; at the other end Edit, Info, Delete
+    /// and More together (in Recently Deleted, Restore, Info, Delete Permanently and More).
+    private var topBarWithActions: some View {
         HStack(spacing: 8) {
             Button("Back", systemImage: "chevron.backward") { host.close() }
                 .modifier(ViewerBarCircle(size: 44))
+            if model.source != .trash {
+                HStack(spacing: 0) {
+                    shareButton.modifier(ViewerBarItem(width: 52, height: 44))
+                    favoriteButton.modifier(ViewerBarItem(width: 52, height: 44))
+                }
+                .glassEffect(.regular.interactive(), in: .capsule)
+            }
             Spacer(minLength: 0)
-            ViewerTitleCapsule(title: titles.title, subtitle: titles.subtitle) { state.toggleDetails() }
-            Spacer(minLength: 0)
-            moreMenu
-                .modifier(ViewerBarCircle(size: 44))
+            HStack(spacing: 0) {
+                if model.source == .trash {
+                    restoreButton.modifier(ViewerBarItem(width: 52, height: 44))
+                } else {
+                    editButton.modifier(ViewerBarItem(width: 52, height: 44))
+                }
+                infoButton.modifier(ViewerBarItem(width: 52, height: 44))
+                deleteButton.modifier(ViewerBarItem(width: 52, height: 44))
+                moreMenu.modifier(ViewerBarItem(width: 52, height: 44))
+            }
+            .glassEffect(.regular.interactive(), in: .capsule)
         }
-        .padding(.horizontal, 20)
-        .frame(height: 44)
     }
 
     /// Share, then Favorite, Info and Edit in one capsule, then Delete, where the system's bottom bar has them: circles
@@ -282,12 +350,17 @@ struct PhotoViewer: View {
 
     private var favoriteButton: some View {
         let favorite = state.currentItem?.isFavorite == true
-        return Button(favorite ? "Unfavorite" : "Favorite", systemImage: favorite ? "heart.fill" : "heart") {
-            // In Favorites, unfavoriting takes the photo out of the grid, and the next one shows.
-            leave { id in await model.setFavorite([id], !favorite) }
-        }
+        return Button(favorite ? "Unfavorite" : "Favorite", systemImage: favorite ? "heart.fill" : "heart",
+                      action: toggleFavorite)
         .contentTransition(.symbolEffect(.replace))
         .disabled(!model.canMutate(currentIDs))
+    }
+
+    /// In Favorites, unfavoriting takes the photo out of the grid, and the next one shows.
+    private func toggleFavorite() {
+        guard model.canMutate(currentIDs) else { return }
+        let favorite = state.currentItem?.isFavorite == true
+        leave { id in await model.setFavorite([id], !favorite) }
     }
 
     private var infoButton: some View {

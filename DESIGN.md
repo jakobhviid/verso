@@ -279,6 +279,15 @@ sections, the pages, the viewer's info), drawn with each platform's own toolkit:
   photo on its way to Immich carries a small white mark in its tile's top trailing corner, with the badges' shadow: a
   ring filling while it uploads, a cloud with an upward arrow while it waits, a clock while the connection holds it
   back, an exclamation mark on orange when it needs a look.
+- **On the iPad,** the same pieces where Photos on the iPad has them (ARCHITECTURE.md, "Verso on the iPad"): the tabs
+  in iPadOS's floating bar at the top, never a sidebar; a page's title and its line in the navigation bar's row, beside
+  its buttons; five photos a row in portrait; Years, Months and All always in a glass capsule at the foot's middle,
+  backing up's card under it at a sheet's width. The viewer's buttons are in its top bar, Back, then Share and Favorite
+  together, and at the other end Edit, Info, Delete and More together, with the filmstrip alone at the foot and a
+  video's bar a sheet's width in its middle; the details are a panel at the trailing side under the top bar, titled
+  Info with a close button, in the background colour with rounded corners and a soft shadow, the cards the iPhone's.
+  Under the pointer, cards lift and Collections' rows and headers light up. A window narrower than a regular width is
+  laid out as an iPhone.
 - **The Backup page** is backing up's one page on the iPhone and the iPad: a list of iOS's own whose top is the page's
   status, centred, as Settings' feature pages have theirs: a cloud symbol (the accent while it works, and only then
   pulsing with the system's variable colour; green with a tick when backed up; grey while it waits; orange when the

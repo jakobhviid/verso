@@ -37,8 +37,7 @@ struct CollectionsTabView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
-        .navigationTitle("Collections")
-        .toolbarTitleDisplayMode(.inlineLarge)
+        .modifier(CollectionsTitle(regular: sizeClass == .regular))
         .collectionsToolbar(session: session)
         .refreshable { await refresh(blocks) }
         .task(id: previewsWanted(blocks)) { await loadPreviews(blocks) }
@@ -61,11 +60,21 @@ struct CollectionsTabView: View {
         }
     }
 
-    /// A section's links in a grouped box under the section's name, which collapses it.
+    /// A section's links in a grouped box under the section's name, which collapses it; in a regular width, as Photos'
+    /// Utilities on an iPad, each link a box of its own, two to a row.
     private func rowsBlock(_ section: SidebarSection, entries: [CollectionsEntry]) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             CollectionsSectionHeader(title: section.collectionsLabel, expanded: expanded(section))
-            if !section.isCollapsed {
+            if !section.isCollapsed, sizeClass == .regular {
+                LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                    ForEach(entries) { entry in
+                        row(entry)
+                            .background(Color(uiColor: .secondarySystemBackground))
+                            .clipShape(.rect(cornerRadius: collectionsBoxCornerRadius))
+                    }
+                }
+                .padding(.horizontal, collectionsMargin)
+            } else if !section.isCollapsed {
                 VStack(spacing: 0) {
                     ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
                         if index > 0 {
@@ -251,6 +260,7 @@ struct CollectionsBlockHeader: View {
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)
+            .hoverEffect(.highlight)
             .accessibilityAddTraits(.isHeader)
             Spacer(minLength: 0)
         }
@@ -283,6 +293,7 @@ struct CollectionsSectionHeader: View {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
+        .hoverEffect(.highlight)
         .accessibilityAddTraits(.isHeader)
         .accessibilityValue(expanded ? Text("Expanded") : Text("Collapsed"))
     }
@@ -323,6 +334,8 @@ struct CollectionsRow: View {
             .contentShape(.rect)
         }
         .buttonStyle(CollectionsRowStyle())
+        // Under an iPad's pointer the row is lit, as a list's row is.
+        .hoverEffect(.highlight)
     }
 }
 
@@ -345,6 +358,8 @@ struct CollectionsCardRow<Content: View>: View {
             LazyHStack(alignment: .top, spacing: 12) {
                 content
                     .buttonStyle(.plain)
+                    .contentShape(.hoverEffect, .rect(cornerRadius: 12, style: .continuous))
+                    .hoverEffect(.lift)
                     .containerRelativeFrame(.horizontal, count: Int(perScreen * 2), span: 2, spacing: 12)
             }
             .scrollTargetLayout()
@@ -352,5 +367,21 @@ struct CollectionsCardRow<Content: View>: View {
         .contentMargins(.horizontal, collectionsMargin, for: .scrollContent)
         .scrollTargetBehavior(.viewAligned)
         .scrollIndicators(.hidden)
+    }
+}
+
+/// Collections' title: the system's large title in the bar's row on a phone; on an iPad the photo pages' own
+/// (PageTitle), which iPadOS's top tab bar leaves room for where it hides the system's.
+private struct CollectionsTitle: ViewModifier {
+    let regular: Bool
+
+    func body(content: Content) -> some View {
+        if regular {
+            content.cardPageTitle(String(localized: "Collections"))
+        } else {
+            content
+                .navigationTitle("Collections")
+                .toolbarTitleDisplayMode(.inlineLarge)
+        }
     }
 }

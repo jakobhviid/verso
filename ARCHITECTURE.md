@@ -2604,8 +2604,9 @@ controls fade in where they stand, and it shrinks back into the tile of the phot
 
 The photo grid's zoom levels (every count a row from 3 to the densest, one level each; `GridZoom`) and the card pages'
 card sizes change with a pinch. A phone in portrait shows the counts themselves, as Photos shows 3 or 5 a row on any
-iPhone, up to 15 on a 393-point iPhone and 17 on a Pro Max; a wider grid keeps the tiles' size and shows more of them
-in a row. The default is 5, Photos'. Photos' grid stays one grid of squares as it zooms: it scales with the fingers
+iPhone, up to 15 on a 393-point iPhone and 17 on a Pro Max, and so does an iPad in portrait, its tiles larger, as
+Photos shows 5 a row on any iPad; a wider grid keeps the tiles' size and shows more of them in a row. The default is
+5, Photos'. Photos' grid stays one grid of squares as it zooms: it scales with the fingers
 about the photo under them, and each square fades from its photo at the level shown to its photo at the next.
 - **The photo grid pinches so** (`ios/Verso/Grid/GridPinch.swift`, `TimelineCollection.swift`): the two levels'
   squares are made the same size and laid on each other at the photo under the fingers, making one grid that scales
@@ -2651,6 +2652,58 @@ the apps (SPEC.md, "Sharing from the iPhone"; `ios/Verso/Grid/ShareSheet.swift`,
   over to a link action; a file representation (`registerFileRepresentation`), which iOS hands to Save to Files as a
   copy of its own and deletes before Save to Files reads it; and downloading every original before the sheet opens,
   which makes a link wait. The cost: the sheet shows no progress while an original downloads.
+
+### Verso on the iPad
+
+The iPad is the iPhone's app (the maintainer's choice: as little to maintain twice as possible), its views laid out by
+the size class where Photos on the iPad lays its own out otherwise, and following the Mac where the Mac solved the same
+thing (SPEC.md, "On the iPad"; ROADMAP.md, M10). A window narrower than a regular width (Split View, a small window) is
+the iPhone's layout.
+- **The tabs at the top, never a sidebar** (`.tabViewStyle(.tabBarOnly)`; the maintainer's choice, as a sidebar made
+  the iPad look like another app), with room for one more page.
+- **A page's title stands in the navigation bar's row,** found from UIKit's own bar (`NavigationBarRow`, PageTitle):
+  iPadOS puts the bar's buttons beside the tab bar in its row, as Photos has them, or in a row of its own under it, and
+  the title and its line go where the buttons are, so the line never stands a row away from its title. Where the tab
+  bar shares that row and leaves the title too little room (an iPad mini in portrait), the title stands under the
+  row, as on a pushed page.
+- **A resized window's controls** (Stage Manager, windowed apps) sit at its top leading corner: the system's bars keep
+  clear of them on their own, and what Verso draws in the bars' place (a page's title, the viewer's top bar) keeps
+  clear of them by UIKit's corner-adapted safe area (`WindowControls`).
+- **Five photos a row in portrait,** as Photos shows on every iPad, its tiles larger than a phone's; the counts are
+  taken from the grid's shorter side, so landscape and a window wider than tall keep the tiles' size and show more
+  (`GridZoom`).
+- **Years, Months and All are always at the foot,** in a capsule of the page's own, as Photos has them on an iPad
+  (the shrinking tab bar's accessory is a phone's). Backing up's card stands under it, a sheet's width rather than the
+  screen's.
+- **The viewer's buttons are in its top bar,** as Photos' on an iPad: Back, then Share and Favorite together; Edit,
+  Info, Delete and More together at the other end; the filmstrip alone at the foot, and a video's bar a sheet's width
+  in its middle. The details are a panel at the trailing side under the top bar, as Photos' Info, the photo staying
+  where it is; the cards are the iPhone's (`ViewerDetails`).
+  - **Not chosen:** the iPhone's bottom bar, which on a 13-inch iPad puts Share and Delete 1000 points apart; and the
+    details scrolling up under the photo, whose cards and lines then run the screen's whole width.
+- **The keyboard's commands** are SwiftUI's in the menu bar (`VersoCommands`: Settings…, New Album…, the imports,
+  Find, Years, Months and All), each window publishing what they act on (`focusedSceneValue`). The keys of a photo
+  open (the arrows, Space, ".", ⌘I, ⌘⌫, Esc) are key commands of a view of UIKit's in the viewer that takes the
+  keyboard as the photo opens (`ViewerKeys`), and those of a selection the grid's collection view's while it lasts
+  (`GridKeys`); ⌘A is Select All's own button's.
+  - **Why not all in the menu bar:** its commands come after the scroll views' own use of the arrows and Space, which
+    scroll the pager instead; a key command of the responder's own can ask to come first
+    (`wantsPriorityOverSystemBehavior`). And iPadOS's own Edit menu holds ⌘A (Select All, for text): a key the menu
+    bar holds twice ends the app as its menu is built ("Replacement elements contain duplicates"), so ⌘A stays with
+    text fields and Select All's button; the text styles (Bold, Italic, Underline) go, as Verso has no styled text,
+    leaving ⌘I to Show Info.
+- **Under the pointer,** cards lift and Collections' rows light up (`hoverEffect`); the system's controls answer it on
+  their own.
+- **Drag and drop:** a tile drags the Mac's `OriginalTransfer` (both apps compile it): the original, named and typed as
+  the server has it, downloaded once the receiving app asks, and the mark of the app's own drags. The Library and an
+  album's page take drops of photos and videos from other apps as imports (`importDrops`, `ImportCoordinator`), each
+  copied out of the system's loan before the queue sends it, and refuse the app's own drags by their mark.
+  - **Not chosen yet:** a selection dragged as one, which needs SwiftUI's drag container across the collection view's
+    cells, each a hosting root of its own.
+- **Several windows** (`UIApplicationSupportsMultipleScenes`): each window has its own `LibrarySession` and chrome over
+  the one account, as each of the Mac's windows has. What one place asks to show (the Backup page, from a card, a
+  notification or a Live Activity) opens in the window in front (`BackupCenter.frontWindow`), not in every window.
+- **Flatpak impact:** none; this is the iPad's.
 
 ### Verso Drive on the iPhone and the iPad
 

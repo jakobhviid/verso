@@ -1234,6 +1234,45 @@ how many photos and videos and the first one's picture:
 - The two link actions download nothing. They show for the account's own photos, where the server has shared links,
   and not in the Locked Folder or Recently Deleted.
 
+## On the iPad
+
+Verso on the iPad is the iPhone's app, laid out for the room (ARCHITECTURE.md, "Verso on the iPad"), with a hardware
+keyboard, a pointer, drag and drop and several windows.
+- **The keyboard.** iPadOS's menu bar, and the list that holding ⌘ shows, have Verso's commands, with the Mac's keys
+  where the Mac has the same command:
+
+  | Where | Key | What it does |
+  |---|---|---|
+  | Anywhere | ⌘, | Settings…: the account's sheet |
+  | | ⌘F | Find: Search, its field ready to type in |
+  | | ⌘1, ⌘2, ⌘3 | The Library in Years, Months or All |
+  | | ⌥⌘N | New Album… |
+  | | ⇧⌘I | Import from Files… (Import from Photos… is in File, without a key) |
+  | Selecting | ⌘A | Select All |
+  | | . | Favorite, or Unfavorite where every photo selected is one |
+  | | ⌘⌫ | Delete, asking first as the bar's Delete does |
+  | | Esc | Cancel: the selection ends |
+  | A photo open | ← → | The photo to the left or right, as a swipe brings it |
+  | | Space | Play or pause a video; play a Live Photo whole |
+  | | . | Favorite or Unfavorite |
+  | | ⌘I | Show or hide the details |
+  | | ⌘⌫ | Delete (Delete Permanently in Recently Deleted), asking first |
+  | | Esc | Close the photo, back into its tile |
+
+  A field being typed in (Search, a caption) keeps its own keys. A sheet over a page or a photo has the keyboard while
+  it shows. iPadOS's text styles (Bold, Italic, Underline) are not in the menu bar: Verso has no styled text.
+- **The pointer:** cards (albums, people, memories, places, links, years) lift under it, Collections' rows and
+  headers light up, and the system's buttons, menus and tabs answer it as everywhere in iPadOS.
+- **Dragging a photo out** of any grid into another app (Files, Mail, Notes, another photo app) gives it the photo's
+  original, under its own name and in its own format, downloaded once the app takes it, as dragging out of the Mac's
+  grid does. One photo goes with each drag.
+- **Dropping photos and videos in** from another app (Photos, Files) imports them as Import from Photos… does: on the
+  Library into the library, on an album's page into the library and that album, where the account may add to it
+  (an album it may only view takes no drop). A Live Photo arrives as its photo and its video, which Immich pairs.
+  Photos dragged within Verso are in Immich already, and no page takes them.
+- **Several windows:** each window has its own tabs, pages, selection and viewer over the one account, as each of the
+  Mac's windows has. The Backup page opens in the window in front, whichever way it is asked for.
+
 ## Sharing from the Mac
 
 **Share** (the toolbar's ↑, for the photos selected or the one open; Share in a photo's right-click menu) opens the

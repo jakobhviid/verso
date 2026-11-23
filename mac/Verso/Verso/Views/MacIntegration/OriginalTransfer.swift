@@ -4,7 +4,8 @@ import Synchronization
 import UniformTypeIdentifiers
 
 /// The single drag payload of a grid or viewer asset. Outside the app it is only the original
-/// file; the marker and album asset IDs follow it for the app's own drop targets.
+/// file; the marker and album asset IDs follow it for the app's own drop targets. The iPhone's and the iPad's tiles
+/// drag it too, without album IDs (ios/Verso/Grid/TimelineGrid.swift).
 struct OriginalTransfer: Transferable, Identifiable, Sendable {
     let id: String
     var isVideo = false
@@ -221,4 +222,16 @@ final class OriginalDrag: Sendable {
     private static func comparable(_ name: String) -> String {
         name.precomposedStringWithCanonicalMapping.lowercased()
     }
+}
+
+/// Marks original-file drags without changing their file representation or album selection, so the app's own drop
+/// targets that import files leave its own photos alone.
+struct OriginalDragMarker: Codable, Transferable {
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(contentType: .immichOriginalDrag)
+    }
+}
+
+extension UTType {
+    static let immichOriginalDrag = UTType(exportedAs: "dev.hviid.Verso.original-drag", conformingTo: .data)
 }

@@ -60,6 +60,8 @@ struct TimelineGrid: View {
     /// The safe area the grid runs on under, its bars and the page's title among them.
     @State private var safeArea = EdgeInsets()
     @State private var gridWidth: CGFloat = 0
+    /// The grid's height, whose shorter side with its width sets an iPad's counts a row (GridZoom).
+    @State private var gridHeight: CGFloat = 0
     @State private var dragSelection: GridDragSelection?
     @State private var autoScroll: Task<Void, Never>?
     /// The grid goes to the end it opens at as its photos are laid out, until the person moves it or a photo is asked for.
@@ -83,7 +85,10 @@ struct TimelineGrid: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { gridWidth = $0 }
+        .onGeometryChange(for: CGSize.self) { $0.size } action: { size in
+            gridWidth = size.width
+            gridHeight = size.height
+        }
     }
 
     // MARK: Empty
@@ -169,7 +174,8 @@ struct TimelineGrid: View {
 
     private func grid(width: CGFloat) -> some View {
         let layout = layoutCache.layout(for: model, reversed: reversed, phone: phoneMerge, phoneByDate: phoneByDate)
-        let columns = GridZoom.columns(level: zoomLevel, width: width, regular: horizontalSizeClass == .regular)
+        let columns = GridZoom.columns(level: zoomLevel, width: width, height: gridHeight,
+                                       regular: horizontalSizeClass == .regular)
         let metrics = GridTileMetrics(columns: columns, width: width, spacing: spacing)
         let rowCount = layout.rowCount(columns: columns)
         let isSelecting = actions.state.isSelecting
@@ -211,7 +217,8 @@ struct TimelineGrid: View {
             sidewaysEnabled: isSelecting,
             onSidewaysDrag: { event in sidewaysDrag(event, layout: layout, metrics: metrics, rowCount: rowCount) },
             zoom: zoom(width: width),
-            refresh: { [model] in await model.reload() }
+            refresh: { [model] in await model.reload() },
+            keys: isSelecting ? selectionKeys : nil
         )
         // The photos run on under the bars, which the collection view's insets keep them clear of at rest.
         .ignoresSafeArea(.container, edges: .vertical)
@@ -260,14 +267,44 @@ struct TimelineGrid: View {
     private func zoom(width: CGFloat) -> TimelineZoom {
         let regular = horizontalSizeClass == .regular
         let spacing = spacing
+        let height = gridHeight
         return TimelineZoom(
-            level: GridZoom.clamped(zoomLevel, width: width, regular: regular),
+            level: GridZoom.clamped(zoomLevel, width: width, height: height, regular: regular),
             metrics: { level in
-                guard GridZoom.levels(width: width, regular: regular).contains(level) else { return nil }
-                return GridTileMetrics(columns: GridZoom.columns(level: level, width: width, regular: regular),
+                guard GridZoom.levels(width: width, height: height, regular: regular).contains(level) else { return nil }
+                return GridTileMetrics(columns: GridZoom.columns(level: level, width: width, height: height,
+                                                                 regular: regular),
                                        width: width, spacing: spacing)
             },
             actions: GridZoomActions(began: { landing = false }, changed: { level in zoomLevel = level }))
+    }
+
+    /// A selection's keys (GridKeys): Favorite and Delete where they apply to the photos selected, and Cancel.
+    private var selectionKeys: GridKeys {
+        let ids = model.selection.sorted()
+        var keys = GridKeys(cancel: { [actions] in actions.endSelecting() })
+        guard !ids.isEmpty, actions.source != .trash else {
+            if !ids.isEmpty, actions.canDelete(ids) {
+                keys.delete = GridKeys.Action(title: String(localized: "Delete Permanently")) { [actions] in
+                    actions.requestDelete(ids)
+                }
+            }
+            return keys
+        }
+        let context = actions.context(for: ids, place: .selectionBar)
+        if context.favorite {
+            keys.favorite = GridKeys.Action(title: context.allFavorite ? String(localized: "Unfavorite")
+                                                : String(localized: "Favorite")) { [actions] in
+                actions.favorite(ids, !context.allFavorite)
+            }
+        }
+        if actions.canDelete(ids) {
+            keys.delete = GridKeys.Action(title: actions.deletesPermanently ? String(localized: "Delete Permanently")
+                                              : String(localized: "Delete")) { [actions] in
+                actions.requestDelete(ids)
+            }
+        }
+        return keys
     }
 
     // MARK: Landing
@@ -572,6 +609,9 @@ struct TimelineTile: View {
                 // Where the viewer's zoom starts and ends for this photo.
                 .background(ViewerZoomAnchor(id: asset.id, sources: actions.state.zoomSources))
                 .onTapGesture { open(asset) }
+                // Dragged out to another app, the photo is its original, downloaded once the app takes it, as on the
+                // Mac; the long press's menu goes as the drag begins.
+                .draggable(OriginalTransfer(id: asset.id, isVideo: asset.isVideo, client: actions.session.client))
                 .contextMenu {
                     GridTileMenu(actions: actions, asset: asset)
                 } preview: {

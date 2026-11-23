@@ -62,10 +62,13 @@ struct SharedLinkAddress: Identifiable {
 }
 
 extension View {
-    /// The share sheet for `request`'s photos once it is set; `onClose` once the sheet has closed, whatever was done.
-    func shareSheet<Request: Identifiable>(item request: Binding<Request?>, content: @escaping (Request) -> ShareContent,
+    /// The share sheet for `request`'s photos once it is set; `onClose` once the sheet has closed, whatever was done. On
+    /// an iPad it points at Share where it is: at the bottom's leading end, or at the top's (`fromTop`), beside Back.
+    func shareSheet<Request: Identifiable>(item request: Binding<Request?>, fromTop: Bool = false,
+                                           content: @escaping (Request) -> ShareContent,
                                            onClose: @escaping () -> Void = {}) -> some View {
-        background(ShareSheetPresenter(request: request, makeSheet: { ShareSheetController.photos(content($0)) },
+        background(ShareSheetPresenter(request: request, fromTop: fromTop,
+                                       makeSheet: { ShareSheetController.photos(content($0)) },
                                        onClose: { _ in onClose() }))
     }
 
@@ -81,6 +84,8 @@ extension View {
 /// the sheet has closed for good.
 private struct ShareSheetPresenter<Request: Identifiable>: UIViewControllerRepresentable {
     @Binding var request: Request?
+    /// Share is at the top's leading end, beside Back, as the viewer has it on an iPad.
+    var fromTop = false
     let makeSheet: (Request) -> ShareSheetController
     let onClose: (Bool) -> Void
 
@@ -123,10 +128,12 @@ private struct ShareSheetPresenter<Request: Identifiable>: UIViewControllerRepre
             var presenter = controller
             while let presented = presenter.presentedViewController, !presented.isBeingDismissed { presenter = presented }
             if let popover = sheet.popoverPresentationController {
-                // On iPad, from the bottom's leading end, where Share is in the bars.
-                popover.sourceView = controller.view
-                popover.sourceRect = CGRect(x: controller.view.bounds.minX + 40, y: controller.view.bounds.maxY - 40,
-                                            width: 1, height: 1)
+                // On iPad, from where Share is in the bars: the bottom's leading end, or the top's beside Back.
+                let view = controller.view!
+                popover.sourceView = view
+                popover.sourceRect = fromTop
+                    ? CGRect(x: view.bounds.minX + 98, y: view.safeAreaInsets.top + 22, width: 1, height: 1)
+                    : CGRect(x: view.bounds.minX + 40, y: view.bounds.maxY - 40, width: 1, height: 1)
             }
             presenter.present(sheet, animated: true)
         }

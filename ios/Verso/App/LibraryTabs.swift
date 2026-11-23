@@ -90,6 +90,31 @@ extension LibraryChrome {
     private(set) var finishedSelection: FinishedSelection?
     /// Each tab's path, made as the tab first shows; each is observed on its own, so a push redraws its tab alone.
     @ObservationIgnored private var paths: [LibraryTab: TabPath] = [:]
+    /// The account's sheet, from its picture in Collections' toolbar or the keyboard's Settings… (⌘,).
+    var accountShown = false
+    /// The room a resized iPad window's controls take at its top leading corner, which a page's title keeps clear of
+    /// (WindowControls); 0 where there are none.
+    var windowControlsInset: CGFloat = 0
+    /// The window the tabs are in, one of several on an iPad, where the Backup page opens when asked for in it.
+    @ObservationIgnored weak var window: UIWindow?
+    /// The photo picker and the Files importer of an import into the library, from Collections' "+" or the keyboard.
+    var choosingPhotos = false
+    var choosingFiles = false
+    /// Counts Find's asking (⌘F): Search shows, its field ready to type in.
+    private(set) var searchRequests = 0
+    /// The viewers shown in the window, the front one last, which the keyboard's commands act on (VersoCommands).
+    private(set) var viewers: [ViewerState] = []
+
+    /// Find: Search, its field ready to type in.
+    func findInSearch() {
+        selectedTab = .search
+        searchRequests += 1
+    }
+
+    func viewerShown(_ viewer: ViewerState, _ shown: Bool) {
+        viewers.removeAll { $0 === viewer }
+        if shown { viewers.append(viewer) }
+    }
 
     struct FinishedSelection: Equatable {
         let grid: ObjectIdentifier
@@ -283,7 +308,6 @@ struct LibraryTabs: View {
 
     private func tabs(_ session: LibrarySession) -> some View {
         @Bindable var chrome = chrome
-        @Bindable var backup = BackupCenter.shared
         let choices = TabBarChoice.decode(storedChoices)
         return TabView(selection: Binding(get: { chrome.selectedTab }, set: { tab in
             if tab == chrome.selectedTab { reselected(tab) }
@@ -321,6 +345,14 @@ struct LibraryTabs: View {
             LibraryModeAccessory(mode: $chrome.libraryMode, chrome: chrome)
         }
         .onGeometryChange(for: CGFloat.self) { $0.safeAreaInsets.top } action: { chrome.windowTopInset = $0 }
+        // The window's controls, where a window is resized on an iPad, read across the top of the window.
+        .overlay(alignment: .top) {
+            Color.clear
+                .frame(maxWidth: .infinity)
+                .frame(height: 44)
+                .allowsHitTesting(false)
+                .windowControlsInset($chrome.windowControlsInset)
+        }
         // A photo opened from any tab's grid shows over the tabs, in place (ViewerHost).
         .viewerHost()
         // At the newest end, and in Years and Months, the whole tab bar shows.
@@ -330,17 +362,7 @@ struct LibraryTabs: View {
         .onChange(of: chrome.path(for: .library).routes.count) { chrome.libraryBarLeft() }
         .onChange(of: chrome.isSelecting) { chrome.libraryBarLeft() }
         .modifier(GridAlbumActionsPresentation(session: session, chrome: chrome))
-        // The Backup page, from wherever it is asked for: the Library's card and line, a notification, a Live Activity.
-        .sheet(isPresented: $backup.pageShown) {
-            NavigationStack {
-                BackupPage(services: services)
-                    .toolbar {
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button(role: .close) { BackupCenter.shared.pageShown = false }
-                        }
-                    }
-            }
-        }
+        .modifier(LibraryWindowPresentations(session: session, chrome: chrome))
         .environment(chrome)
         .alert("Album Error", isPresented: albumErrorShown(session)) {
             Button("OK") { session.albumActions.error = nil }
@@ -428,5 +450,71 @@ private struct ChosenTabPage: View {
         case .archive:
             AssetGridPage(session: session, source: .archive, title: String(localized: "Archive"), landsOnTab: .choice(.archive))
         }
+    }
+}
+
+/// The window a view is in, for what opens in one window of several.
+private struct WindowReader: UIViewRepresentable {
+    let found: (UIWindow?) -> Void
+
+    func makeUIView(context: Context) -> Reader {
+        let reader = Reader()
+        reader.isUserInteractionEnabled = false
+        reader.found = found
+        return reader
+    }
+
+    func updateUIView(_ reader: Reader, context: Context) {
+        reader.found = found
+    }
+
+    final class Reader: UIView {
+        var found: ((UIWindow?) -> Void)?
+
+        override func didMoveToWindow() {
+            super.didMoveToWindow()
+            found?(window)
+        }
+    }
+}
+
+/// What a window presents over its tabs, whoever asks: the account's sheet (Collections' toolbar, Settings… on the
+/// keyboard), an import's pickers (Collections' "+", the keyboard), and the Backup page (the Library's card and line, a
+/// notification, a Live Activity), in the window in front where there are several; and what the keyboard's commands
+/// act on in this window (VersoCommands).
+private struct LibraryWindowPresentations: ViewModifier {
+    let session: LibrarySession
+    @Bindable var chrome: LibraryChrome
+
+    func body(content: Content) -> some View {
+        let backup = BackupCenter.shared
+        content
+            .sheet(isPresented: $chrome.accountShown) {
+                AccountSheet(services: session.services)
+            }
+            .importPickers(queue: session.upload, choosingPhotos: $chrome.choosingPhotos,
+                           choosingFiles: $chrome.choosingFiles)
+            .focusedSceneValue(\.libraryWindow, LibraryWindow(chrome: chrome, session: session))
+            .background(WindowReader { chrome.window = $0 })
+            .sheet(isPresented: backupPageShown) {
+                NavigationStack {
+                    BackupPage(services: session.services)
+                        .toolbar {
+                            ToolbarItem(placement: .confirmationAction) {
+                                Button(role: .close) { backup.pageShown = false }
+                            }
+                        }
+                }
+            }
+    }
+
+    /// The Backup page shows in this window: asked for while it was in front, or while the window in front, or this
+    /// one, was not known.
+    private var backupPageShown: Binding<Bool> {
+        let backup = BackupCenter.shared
+        let chrome = chrome
+        return Binding(
+            get: { backup.pageShown && (backup.pageWindow == nil || chrome.window == nil || backup.pageWindow === chrome.window) },
+            set: { shown in if !shown { backup.pageShown = false } })
     }
 }

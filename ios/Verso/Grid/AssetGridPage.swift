@@ -178,6 +178,12 @@ struct AssetGridPage: View {
 
     // MARK: Photos on their way
 
+    /// Every photo the page shows selected, the photos on their way among them.
+    private func selectAll(_ model: AssetGridModel) {
+        model.selectAll()
+        model.selection.formUnion(phoneTiles(model).map(\.photo.gridID))
+    }
+
     /// The photos on their way the grid shows among Immich's: on the Library's own timeline, in its usual order
     /// (newest first in the model). Each that arrived shows until the model has Immich's photo for it; while its month
     /// is counted and still being read, Immich's photo is among the month's placeholders, so the tile goes.
@@ -207,13 +213,11 @@ struct AssetGridPage: View {
                 let total = model.totalCount + phone.count
                 let everything = total > 0 && model.selection.count >= total
                 Button(everything ? "Deselect All" : "Select All") {
-                    if everything {
-                        model.selection = []
-                    } else {
-                        model.selectAll()
-                        model.selection.formUnion(phone.map(\.photo.gridID))
-                    }
+                    if everything { model.selection = [] } else { selectAll(model) }
                 }
+                // ⌘A on a hardware keyboard, while Select All is offered: the button's, as iPadOS's menus hold ⌘A
+                // for text (VersoCommands); the selection's other keys are the grid's (GridKeys).
+                .keyboardShortcut(everything ? nil : KeyboardShortcut("a", modifiers: .command))
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Cancel", systemImage: "xmark", role: .close) { actions.endSelecting() }

@@ -85,9 +85,12 @@ extension View {
 
 extension View {
     /// A card opened by a tap of one finger, as the photo grid's tiles are, rather than as a button or a link, so a
-    /// pinch on it changes the cards' size and does not open it.
+    /// pinch on it changes the cards' size and does not open it. Under an iPad's pointer it lifts, as iPadOS's cards
+    /// do.
     func cardOpens(_ open: @escaping () -> Void) -> some View {
         contentShape(.rect)
+            .contentShape(.hoverEffect, .rect(cornerRadius: 12, style: .continuous))
+            .hoverEffect(.lift)
             .onTapGesture(perform: open)
             .accessibilityAddTraits(.isButton)
             .accessibilityAction(.default, open)

@@ -12,7 +12,8 @@ import SwiftUI
 /// drag down is the page's, which closes the viewer; the scroll's own bounce there moves nothing, the photo staying
 /// where it is. As the viewer opens and closes, a picture of the photo flies between its tile and its place over the
 /// page, which waits hidden under it (ViewerHost); a drag down shrinks the photo and lets the grid show through, as
-/// Photos' does.
+/// Photos' does. In a regular width (an iPad), as Photos has it there, the photo stays where it is and the details are
+/// a panel at the trailing side under the top bar, which Info and ⌘I bring and take away.
 struct ViewerStage: View {
     let state: ViewerState
     /// Changes as the model's months load or change, for the pager to ask for the neighbours again.
@@ -20,8 +21,67 @@ struct ViewerStage: View {
     @State private var position = ScrollPosition(y: 0)
     /// The scroll's place, kept for the stops and the settling without drawing anything anew.
     @State private var scroll = ViewerStageScroll()
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     var body: some View {
+        Group {
+            if horizontalSizeClass == .regular {
+                panelStage
+            } else {
+                scrollStage
+            }
+        }
+        .onChange(of: horizontalSizeClass, initial: true) { _, sizeClass in
+            state.detailsInPanel = sizeClass == .regular
+        }
+    }
+
+    /// The photo alone, its details in a panel beside it.
+    private var panelStage: some View {
+        GeometryReader { proxy in
+            let screen = proxy.size
+            let drag = state.closeDrag ?? .zero
+            ZStack(alignment: .topTrailing) {
+                backdrop(height: screen.height)
+                ViewerPager(state: state, modelRevision: modelRevision,
+                            imageRevision: state.session.metadata.imageRevision)
+                    .scaleEffect(ViewerState.closeDragScale(drag, height: screen.height))
+                    .offset(drag)
+                    .frame(width: screen.width, height: screen.height)
+                    .opacity(state.flight == nil ? 1 : 0)
+                if state.showsDetails, state.isOpen {
+                    // Under the top bar, and clear of the filmstrip at the foot.
+                    let top = proxy.safeAreaInsets.top + 64
+                    ViewerDetailsPanel(state: state, maxHeight: screen.height - top - proxy.safeAreaInsets.bottom - 72)
+                        .padding(.top, top)
+                        .padding(.trailing, 20)
+                        .transition(.opacity)
+                }
+                if let flight = state.flight {
+                    ViewerFlightPicture(flight: flight, origin: proxy.frame(in: .global).origin)
+                }
+            }
+            .animation(.easeOut(duration: 0.2), value: state.showsDetails)
+        }
+        .ignoresSafeArea()
+        // Taken away, the details stop loading, as the scroll's settling has them stop on a phone.
+        .onChange(of: state.showsDetails) { _, shows in
+            if !shows { state.detailsSettled(at: 0, rest: 1) }
+        }
+    }
+
+    /// Black with the controls hidden, as Photos leaves a photo, else the system's background; in as the viewer opens,
+    /// out as it closes, and thinning as a drag down takes the photo away.
+    private func backdrop(height: CGFloat) -> some View {
+        let drag = state.closeDrag ?? .zero
+        return Color(uiColor: state.chromeVisible || state.detailsActive ? .systemBackground : .black)
+            .opacity(state.isOpen ? min(ViewerState.closeDragBackdrop(drag, height: height),
+                                        ViewerState.pinchBackdrop(state.closePinch)) : 0)
+            .animation(.easeInOut(duration: 0.2), value: state.chromeVisible || state.detailsActive)
+    }
+
+    /// The photo full screen and its details below it, in one scroll.
+    private var scrollStage: some View {
         GeometryReader { proxy in
             let screen = proxy.size
             let layout = ViewerDetailsLayout(screen: screen, aspectRatio: CGFloat(state.currentItem?.ratio ?? 1))
@@ -29,12 +89,7 @@ struct ViewerStage: View {
             let rest = max(1, screen.height - layout.photoHeight)
             let drag = state.closeDrag ?? .zero
             ZStack(alignment: .top) {
-                // Black with the controls hidden, as Photos leaves a photo, else the system's background; in as the
-                // viewer opens, out as it closes, and thinning as a drag down takes the photo away.
-                Color(uiColor: state.chromeVisible || state.detailsActive ? .systemBackground : .black)
-                    .opacity(state.isOpen ? min(ViewerState.closeDragBackdrop(drag, height: screen.height),
-                                                ViewerState.pinchBackdrop(state.closePinch)) : 0)
-                    .animation(.easeInOut(duration: 0.2), value: state.chromeVisible || state.detailsActive)
+                backdrop(height: screen.height)
                 ScrollView(.vertical) {
                     VStack(spacing: 0) {
                         ViewerPager(state: state, modelRevision: modelRevision,
@@ -97,6 +152,43 @@ struct ViewerStage: View {
     }
 }
 
+/// The details in a panel at the trailing side, on an iPad, as Photos' Info: its title and Close at the top, the cards
+/// scrolling under them, as tall as they are up to the room there is.
+private struct ViewerDetailsPanel: View {
+    let state: ViewerState
+    let maxHeight: CGFloat
+    @State private var contentHeight: CGFloat = 0
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text("Info")
+                    .font(.headline)
+                    .accessibilityAddTraits(.isHeader)
+                Spacer(minLength: 0)
+                Button("Close", systemImage: "xmark", role: .close) { state.hideDetails() }
+                    .labelStyle(.iconOnly)
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.circle)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            ScrollView {
+                ViewerDetails(state: state, bottomClearance: 16)
+                    .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { contentHeight = $0 }
+            }
+            .scrollIndicators(.hidden)
+            .scrollDismissesKeyboard(.interactively)
+            .frame(height: min(max(contentHeight, 120), max(120, maxHeight - 60)))
+        }
+        .frame(width: 380)
+        .background(Color(uiColor: .systemBackground), in: .rect(cornerRadius: 28, style: .continuous))
+        .shadow(color: .black.opacity(0.18), radius: 24, y: 8)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("Viewer Details Panel")
+    }
+}
+
 /// Where the stage's scroll is, and the stop a finger let it go short of; kept for the stops, never drawn.
 final class ViewerStageScroll: @unchecked Sendable {
     var offset: CGFloat = 0
@@ -147,7 +239,8 @@ struct ViewerBarCircle: ViewModifier {
     }
 }
 
-/// One of the bottom bar's grouped controls (Favorite, Info, Edit): its symbol alone, its part of the group's capsule.
+/// One of the bottom bar's grouped controls (Favorite, Info, Edit): its symbol alone, its part of the group's capsule,
+/// lit on its own under an iPad's pointer.
 struct ViewerBarItem: ViewModifier {
     let width: CGFloat
     let height: CGFloat
@@ -159,6 +252,8 @@ struct ViewerBarItem: ViewModifier {
             .buttonStyle(.plain)
             .frame(width: width, height: height)
             .contentShape(.rect)
+            .contentShape(.hoverEffect, .capsule)
+            .hoverEffect(.highlight)
     }
 }
 

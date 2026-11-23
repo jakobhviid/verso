@@ -119,6 +119,10 @@ targets:
       - ../mac/Verso/Verso/Support/ImagePipeline.swift
       - ../mac/Verso/Verso/Support/LiveMotions.swift
       - ../mac/Verso/Verso/Support/ThumbHash.swift
+      # A photo dragged out of a grid as its original, downloaded once another app takes it, and the mark that keeps
+      # the app's own drops from importing it again.
+      - ../mac/Verso/Verso/Views/MacIntegration/OriginalTransfer.swift
+      - ../mac/Verso/Verso/Views/Albums/AlbumAssetTransfer.swift
       # The Mac's Icon Composer documents, which are documents rather than folders of resources: the release's
       # white paper and Verso Dev's blue.
       - path: ../mac/Verso/Verso/AppIcon.icon

@@ -1,6 +1,6 @@
 // What iOS adds around the shared UploadQueue (mac/Verso/Verso/App/UploadQueue.swift), one for each queue: photos
-// chosen in the photo picker written out as files for it, with their original names and data, and removed once the
-// queue is done with them; a notification when an import ends while Verso is in the background, asked for at the
+// chosen in the photo picker, or dropped on an iPad from another app, written out as files for it, with their original
+// names and data, and removed once the queue is done with them; a notification when an import ends while Verso is in the background, asked for at the
 // first import; and the time to finish in the background, with the system's own progress where Verso's Info.plist
 // allows it (BGContinuedProcessingTask).
 
@@ -66,9 +66,27 @@ final class ImportCoordinator {
     /// Photos and videos chosen in the photo picker: each written out with its original name and data (a Live
     /// Photo as its photo and its video, which Immich pairs), then imported as files are.
     func importPhotos(_ items: [PhotosPickerItem], albumID: String?) {
-        guard let queue, !items.isEmpty, preparation == nil else { return }
+        importStaged(items.count, albumID: albumID) { await ImportStaging.stage(items[$0]) }
+    }
+
+    /// Photos, videos and files dropped on the iPad from another app (Photos, Files): each written out as its own
+    /// file, a Live Photo as its photo and its video, then imported as the picker's are.
+    func importDropped(_ providers: [NSItemProvider], albumID: String?) {
+        let dropped = DroppedItems(providers: providers)
+        importStaged(providers.count, albumID: albumID) { await ImportStaging.stage(dropped.providers[$0]) }
+    }
+
+    /// The items of a drop, read a few at a time off the main actor; an item provider may be read from any thread.
+    private struct DroppedItems: @unchecked Sendable {
+        let providers: [NSItemProvider]
+    }
+
+    /// Writes out `count` items for the queue, a few at a time (`stage` gives an item's files, none when it could not
+    /// be read), then hands them over, the folders made for them swept once the queue is done with them.
+    private func importStaged(_ count: Int, albumID: String?, stage: @escaping @Sendable (Int) async -> [URL]) {
+        guard let queue, count > 0, preparation == nil else { return }
         Self.askForNotificationsOnce()
-        preparing = Preparing(done: 0, total: items.count)
+        preparing = Preparing(done: 0, total: count)
         // Shown from now, as the queue shows an import from its start.
         queue.showsBanner = true
         preparation = Task {
@@ -78,9 +96,9 @@ final class ImportCoordinator {
             await withTaskGroup(of: [URL].self) { group in
                 var next = 0
                 // A few at a time: each may wait for its original to come down from iCloud.
-                while next < min(3, items.count) {
-                    let item = items[next]
-                    group.addTask { await ImportStaging.stage(item) }
+                while next < min(3, count) {
+                    let index = next
+                    group.addTask { await stage(index) }
                     next += 1
                 }
                 for await staged in group {
@@ -91,9 +109,9 @@ final class ImportCoordinator {
                     // An import that ended meanwhile went into the notifications; this one stays shown.
                     if !queue.showsBanner { queue.showsBanner = true }
                     if Task.isCancelled { group.cancelAll(); continue }
-                    if next < items.count {
-                        let item = items[next]
-                        group.addTask { await ImportStaging.stage(item) }
+                    if next < count {
+                        let index = next
+                        group.addTask { await stage(index) }
                         next += 1
                     }
                 }
@@ -308,6 +326,54 @@ enum ImportNotifications {
 enum ImportStaging {
     static let root = FileManager.default.temporaryDirectory.appendingPathComponent("Verso Imports", isDirectory: true)
 
+    /// A dropped item's files, or none when it could not be read: a Live Photo's photo and video, else the first
+    /// photo or video it offers, in its own format, copied before the system takes its copy away.
+    static func stage(_ provider: NSItemProvider) async -> [URL] {
+        if provider.canLoadObject(ofClass: PHLivePhoto.self) {
+            let livePhoto: PHLivePhoto? = await withCheckedContinuation { continuation in
+                _ = provider.loadObject(ofClass: PHLivePhoto.self) { object, _ in
+                    continuation.resume(returning: object as? PHLivePhoto)
+                }
+            }
+            if let livePhoto, let files = try? await livePhotoFiles(livePhoto), !files.isEmpty { return files }
+        }
+        guard let type = provider.registeredContentTypes.first(where: { $0.conforms(to: .image) || $0.conforms(to: .movie) })
+        else { return [] }
+        let fallback = type.conforms(to: .movie) ? "Video.mov" : "Photo.heic"
+        return await withCheckedContinuation { continuation in
+            _ = provider.loadFileRepresentation(for: type, openInPlace: false) { file, _, _ in
+                guard let file, let kept = try? keep(file, fallback: fallback) else {
+                    continuation.resume(returning: [])
+                    return
+                }
+                continuation.resume(returning: [kept])
+            }
+        }
+    }
+
+    /// Whether a drop holds anything to import: a photo or a video, and none of the app's own drags of its photos,
+    /// which are in Immich already.
+    static func canImport(_ providers: [NSItemProvider]) -> Bool {
+        !providers.isEmpty && providers.allSatisfy { provider in
+            !provider.hasItemConformingToTypeIdentifier(UTType.immichOriginalDrag.identifier)
+        } && providers.contains { provider in
+            provider.registeredContentTypes.contains { $0.conforms(to: .image) || $0.conforms(to: .movie) }
+        }
+    }
+
+    /// A file the system lends for a moment, copied into a folder of its own under its own name.
+    static func keep(_ file: URL, fallback: String) throws -> URL {
+        let folder = try makeFolder()
+        let kept = folder.appendingPathComponent(fileName(file.lastPathComponent, fallback: fallback))
+        do {
+            try FileManager.default.copyItem(at: file, to: kept)
+        } catch {
+            try? FileManager.default.removeItem(at: folder)
+            throw error
+        }
+        return kept
+    }
+
     /// The item's files, or none when it could not be read.
     static func stage(_ item: PhotosPickerItem) async -> [URL] {
         var files: [URL] = []
@@ -362,6 +428,10 @@ enum ImportStaging {
     /// A Live Photo's original photo and video, as the library keeps them.
     private static func livePhoto(_ item: PhotosPickerItem) async throws -> [URL] {
         guard let livePhoto = try await item.loadTransferable(type: PHLivePhoto.self) else { return [] }
+        return try await livePhotoFiles(livePhoto)
+    }
+
+    private static func livePhotoFiles(_ livePhoto: PHLivePhoto) async throws -> [URL] {
         let resources = PHAssetResource.assetResources(for: livePhoto)
             .filter { $0.type == .photo || $0.type == .pairedVideo }
         guard resources.contains(where: { $0.type == .photo }) else { return [] }
@@ -408,14 +478,6 @@ struct ImportPickedFile: Transferable {
     }
 
     private static func keep(_ file: URL, fallback: String) throws -> URL {
-        let folder = try ImportStaging.makeFolder()
-        let kept = folder.appendingPathComponent(ImportStaging.fileName(file.lastPathComponent, fallback: fallback))
-        do {
-            try FileManager.default.copyItem(at: file, to: kept)
-        } catch {
-            try? FileManager.default.removeItem(at: folder)
-            throw error
-        }
-        return kept
+        try ImportStaging.keep(file, fallback: fallback)
     }
 }

@@ -33,6 +33,12 @@ enum ViewerPlaceNames {
     static var looksUpWithAppleMaps: Bool { UserDefaults.standard.bool(forKey: appleMapsKey) }
 }
 
+/// The viewer's bar's Favorite and Delete, as its page does them, for the keyboard's commands (VersoCommands).
+struct ViewerKeyActions {
+    let favorite: @MainActor () -> Void
+    let delete: @MainActor () -> Void
+}
+
 @MainActor @Observable
 final class ViewerState {
     let session: LibrarySession
@@ -60,6 +66,9 @@ final class ViewerState {
     /// The details are up under the photo, scrolled there or brought by Info; the stage scrolls to them, or back to
     /// the photo alone, as this changes (ViewerStage).
     private(set) var showsDetails = false
+    /// The details are a panel beside the photo (an iPad's), which swipes up and down bring and take away, rather than
+    /// a scroll under it (ViewerStage).
+    var detailsInPanel = false
     /// The details are shown, being scrolled, or going away: what they show loads, and the swipe down that closes the
     /// viewer waits.
     private(set) var detailsActive = false
@@ -126,6 +135,11 @@ final class ViewerState {
     @ObservationIgnored private var placesAsked: Set<String> = []
     /// Opens a page on the stack of the tab the viewer was opened from, closing the viewer, where it can be reached.
     @ObservationIgnored var openInTab: ((Route) -> Void)?
+    /// A sheet or question of the viewer's own shows over it (Share, Add To, Delete's question), so the keyboard's
+    /// commands leave it alone.
+    var sheetShown = false
+    /// The bottom bar's Favorite and Delete, as the viewer's page does them, for the keyboard's commands.
+    @ObservationIgnored var keyActions: ViewerKeyActions?
 
     /// The scroll to the details and back, as Info, the title or a tap on the photo brings them or sends them away.
     static let detailsAnimation = Animation.spring(duration: 0.42, bounce: 0.12)
@@ -148,6 +162,43 @@ final class ViewerState {
     var currentDetails: AssetResponse? {
         guard let asset = inspector.asset, asset.id == currentID else { return nil }
         return asset
+    }
+
+    // MARK: The keyboard
+
+    /// Something shows over the photo: a sheet, an editor, the slideshow, or a page its details opened.
+    var covered: Bool {
+        sheetShown || presented != nil || editing != nil || slideshowShown || !detailsPath.isEmpty
+    }
+
+    var canFavorite: Bool { model.canMutate([currentID]) }
+    var canDelete: Bool { model.canDelete([currentID]) }
+    /// Recently Deleted and the Locked Folder delete for good, as does a server without a trash.
+    var deletesPermanently: Bool {
+        model.source == .trash || model.source == .locked || !session.features.trash
+    }
+
+    /// The photo beside the shown one, as the arrow keys ask: 1 the one to the right, -1 the one to the left, sliding
+    /// in as a swipe brings it. A month not loaded yet starts loading, and the next press goes on.
+    func step(_ step: Int) {
+        guard let next = neighbour(of: currentID, step: step) else { return }
+        showPage?(next, step, true)
+    }
+
+    /// Space: a video plays or pauses, the controls fading as Play's do; a Live Photo plays whole, as when held.
+    func playOrPause() {
+        guard let item = currentItem else { return }
+        if item.isVideo {
+            video.togglePlay()
+            if video.isPlaying { fadeChromeForVideo() }
+        } else if item.livePhotoVideoID != nil {
+            playLivePhoto?()
+        }
+    }
+
+    /// Back, into the tile of the photo shown.
+    func closeViewer() {
+        close()
     }
 
     // MARK: Showing and leaving

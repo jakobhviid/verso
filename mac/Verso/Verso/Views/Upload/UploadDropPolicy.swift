@@ -2,17 +2,6 @@ import AppKit
 import CoreTransferable
 import UniformTypeIdentifiers
 
-/// Marks original-file drags without changing their file representation or album selection.
-struct OriginalDragMarker: Codable, Transferable {
-    static var transferRepresentation: some TransferRepresentation {
-        CodableRepresentation(contentType: .immichOriginalDrag)
-    }
-}
-
-extension UTType {
-    static let immichOriginalDrag = UTType(exportedAs: "dev.hviid.Verso.original-drag", conformingTo: .data)
-}
-
 enum UploadDropPolicy {
     static func isInternal(_ providers: [NSItemProvider], pasteboard: NSPasteboard = NSPasteboard(name: .drag)) -> Bool {
         // AppKit can lowercase custom types on the drag pasteboard.

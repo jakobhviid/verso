@@ -19,6 +19,9 @@ struct SearchTabView: View {
     @State private var history = SearchHistory()
     @State private var suggestions = SearchSuggestionsModel()
     @State private var showingFilters = false
+    /// Find's askings (⌘F) answered, so each opens the field once.
+    @State private var findsAnswered = 0
+    @Environment(LibraryChrome.self) private var chrome: LibraryChrome?
 
     var body: some View {
         content
@@ -40,6 +43,13 @@ struct SearchTabView: View {
                     filters = chosen
                     run(chosen)
                 }
+            }
+            // Find (⌘F): the field, ready to type in.
+            .onChange(of: chrome?.searchRequests ?? 0, initial: true) { _, requests in
+                guard requests > findsAnswered else { return }
+                findsAnswered = requests
+                searchActive = true
+                fieldFocused = true
             }
             .task(id: session.user?.id) { history.load(session: session) }
             .task(id: session.services.reconnections) { await suggestions.load(session) }
