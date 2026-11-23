@@ -2846,7 +2846,9 @@ iPad", has what the person sees.
   - **PNG sets at each size iOS asks for** (the Home Screen's 60 points at 2x and 3x, Spotlight's, Settings' and
     notifications'), rather than one 1024 picture: a fraction of the size, but the Home Screen's large icons would be
     scaled up from 180 pixels.
-  - **Any look for each mode on the iPhone:** a set for each pair, 784 of them.
+  - **Any look for each mode on the iPhone:** a set for each pair, 784 of them. Nor a design for each mode with one
+    colour or graphite switch: 98 sets, about 22 MB on a phone (5 to 8 MB with the pictures' colours reduced), too
+    much for an icon's choice (the maintainer's choice).
   - **On the Mac, the choice in `config.toml` as `app.icon`:** that file is in the App Group, where Verso Drive's
     extension reads it too, and the icon is the app's alone; the app keeps its own choices as user defaults, as the
     menu bar icon's colour is an app setting rather than `tray.colour`.
