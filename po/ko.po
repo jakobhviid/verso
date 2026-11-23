@@ -10,88 +10,96 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: linux/verso-service/src/commands.rs:467
-#: linux/verso-linux/src/daemon.rs:506
+#: linux/verso-service/src/commands.rs:471
+#: linux/verso-linux/src/daemon.rs:508
 msgid "Verso Drive is not mounted"
 msgstr "Verso Drive가 마운트되지 않음"
 
-#: linux/verso-service/src/commands.rs:467
-#: linux/verso-linux/src/daemon.rs:506
+#: linux/verso-service/src/commands.rs:471
+#: linux/verso-linux/src/daemon.rs:508
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "Verso 기본 설정에서 드라이브를 켠 다음 링크를 다시 여십시오."
 
-#: linux/verso-service/src/online.rs:448
+#: linux/verso-service/src/online.rs:543
 msgid "The keyring stayed locked. Open {app}, or run “{command}”, to try again."
 msgstr "키링이 잠긴 상태로 남아 있습니다. 다시 시도하려면 {app}를 열거나 “{command}”를 실행하십시오."
 
-#: linux/verso-service/src/online.rs:449
+#: linux/verso-service/src/online.rs:544
 msgid "Immich is not mounted"
 msgstr "Immich가 마운트되지 않음"
 
-#: linux/verso-linux/src/daemon.rs:505
+#: linux/verso-linux/src/daemon.rs:507
 msgid "Links from other apps are off"
 msgstr "다른 앱에서 온 링크가 꺼져 있습니다"
 
-#: linux/verso-linux/src/daemon.rs:505
+#: linux/verso-linux/src/daemon.rs:507
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "다른 앱이 가리키는 항목을 보려면 Verso 설정에서 Immich Crosslink를 켜세요."
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:509
 msgid "A link from another app cannot be opened"
 msgstr "다른 앱에서 온 링크를 열 수 없습니다"
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:509
 msgid "It is not a valid Immich link."
 msgstr "유효한 Immich 링크가 아닙니다."
 
-#: linux/verso-linux/src/daemon.rs:508
-#: linux/verso-linux/src/daemon.rs:512
+#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:514
 msgid "Nothing to show"
 msgstr "표시할 항목 없음"
 
-#: linux/verso-linux/src/daemon.rs:508
+#: linux/verso-linux/src/daemon.rs:510
 msgid "Verso Drive has no place for what this link points to."
 msgstr "Verso Drive에는 이 링크가 가리키는 대상을 표시할 곳이 없습니다."
 
-#: linux/verso-linux/src/daemon.rs:509
+#: linux/verso-linux/src/daemon.rs:511
 msgid "Not signed in to {host}"
 msgstr "{host}에 로그인되지 않음"
 
-#: linux/verso-linux/src/daemon.rs:509
+#: linux/verso-linux/src/daemon.rs:511
 msgid "Verso is signed in to another Immich server."
 msgstr "Verso가 다른 Immich 서버에 로그인되어 있습니다."
 
-#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:512
 msgid "Another Immich account"
 msgstr "다른 Immich 계정"
 
-#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:512
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "이 링크는 Verso가 로그인한 계정이 아닌 다른 계정의 링크입니다."
 
-#: linux/verso-linux/src/daemon.rs:513
+#: linux/verso-linux/src/daemon.rs:515
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "드라이브에 이 항목이 표시되지 않습니다. 숨겨져 있거나, 꺼진 섹션에 있거나, 사용자와 공유되지 않았을 수 있습니다."
 
-#: linux/verso-linux/src/daemon.rs:515
-#: linux/verso-linux/src/daemon.rs:591
+#: linux/verso-linux/src/daemon.rs:517
+#: linux/verso-linux/src/daemon.rs:603
 msgid "Immich is unreachable"
 msgstr "Immich에 연결할 수 없음"
 
-#: linux/verso-linux/src/daemon.rs:515
+#: linux/verso-linux/src/daemon.rs:517
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "Immich 서버에 연결할 수 없습니다. 나중에 링크를 다시 시도하십시오."
 
-#: linux/verso-linux/src/daemon.rs:592
+#: linux/verso-linux/src/daemon.rs:599
+msgid "Immich's certificate is not trusted"
+msgstr "Immich의 인증서를 신뢰할 수 없음"
+
+#: linux/verso-linux/src/daemon.rs:600
+msgid "The Immich server presented a certificate {app} does not trust, so nothing is sent to it. Open {app} to check the certificate. Files you opened before stay available."
+msgstr "Immich 서버가 {app}에서 신뢰하지 않는 인증서를 제시하여 아무것도 보내지 않습니다. 인증서를 확인하려면 {app}를 여십시오. 이전에 연 파일은 계속 사용할 수 있습니다."
+
+#: linux/verso-linux/src/daemon.rs:604
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "Immich 서버에 연결할 수 없습니다. 이전에 연 파일은 계속 사용할 수 있습니다."
 
-#: linux/verso-linux/src/daemon.rs:595
+#: linux/verso-linux/src/daemon.rs:607
 #: linux/verso-linux/src/tray.rs:128
 msgid "Signed out of Immich"
 msgstr "Immich에서 로그아웃됨"
 
-#: linux/verso-linux/src/daemon.rs:596
+#: linux/verso-linux/src/daemon.rs:608
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "Immich에서 더 이상 이 로그인을 허용하지 않습니다. 다시 로그인하려면 {app}을(를) 여십시오."
 
@@ -112,12 +120,12 @@ msgid "Files not uploaded: {count}"
 msgstr "업로드되지 않은 파일: {count}"
 
 #: linux/verso-linux/src/folders.rs:213
-#: shared/verso-core/src/settings.rs:225
+#: shared/verso-core/src/settings.rs:232
 msgid "Make Albums"
 msgstr "앨범 만들기"
 
 #: linux/verso-linux/src/folders.rs:213
-#: shared/verso-core/src/settings.rs:224
+#: shared/verso-core/src/settings.rs:231
 msgid "Timeline Only"
 msgstr "타임라인만"
 
@@ -198,7 +206,7 @@ msgid "{drive} cannot open “{name}”"
 msgstr "{drive}에서 “{name}”을(를) 열 수 없음"
 
 #: linux/verso-linux/src/notify.rs:73
-#: shared/verso-core/src/settings.rs:246
+#: shared/verso-core/src/settings.rs:253
 msgid "Verso Drive"
 msgstr "Verso Drive"
 
@@ -393,101 +401,173 @@ msgstr "파일 이름"
 #: linux/verso-desktop/src/preferences.rs:128
 #: linux/verso-desktop/src/preferences.rs:128
 #: linux/verso-desktop/src/preferences.rs:128
-#: shared/verso-core/src/settings.rs:131
+#: shared/verso-core/src/settings.rs:136
 msgid "Open in Immich and Copy Immich Link"
 msgstr "Immich에서 열기 및 Immich 링크 복사"
 
-#: linux/verso-desktop/src/session.rs:60
+#: linux/verso-desktop/src/session.rs:61
 msgid "Online"
 msgstr "온라인"
 
-#: linux/verso-desktop/src/session.rs:61
+#: linux/verso-desktop/src/session.rs:62
 msgid "Server unreachable; files you opened before stay available"
 msgstr "서버에 연결할 수 없음; 이전에 연 파일은 계속 사용 가능"
 
-#: linux/verso-desktop/src/session.rs:62
+#: linux/verso-desktop/src/session.rs:63
 msgid "Signed out; sign in again"
 msgstr "로그아웃됨; 다시 로그인하십시오"
 
-#: linux/verso-desktop/src/session.rs:64
-#: linux/verso-desktop/src/session.rs:74
+#: linux/verso-desktop/src/session.rs:65
+#: linux/verso-desktop/src/session.rs:75
 msgid "Not running"
 msgstr "실행 중이 아님"
 
-#: linux/verso-desktop/src/session.rs:71
+#: linux/verso-desktop/src/session.rs:72
 msgid "{used} of {limit}"
 msgstr "{limit} 중 {used} 사용"
 
-#: linux/verso-desktop/src/session.rs:88
+#: linux/verso-desktop/src/session.rs:89
 msgid "writing"
 msgstr "쓰는 중"
 
-#: linux/verso-desktop/src/session.rs:88
+#: linux/verso-desktop/src/session.rs:89
 msgid "uploading"
 msgstr "업로드 중"
 
-#: linux/verso-desktop/src/session.rs:89
+#: linux/verso-desktop/src/session.rs:90
 msgid "{name}, {phase}"
 msgstr "{name}, {phase}"
 
-#: linux/verso-desktop/src/session.rs:92
+#: linux/verso-desktop/src/session.rs:93
 msgid "{name} and {count} more"
 msgstr "{name} 외 {count}개"
 
-#: linux/verso-desktop/src/session.rs:118
+#: linux/verso-desktop/src/session.rs:122
 msgid "That address cannot be used: {error}"
 msgstr "해당 주소를 사용할 수 없음: {error}"
 
-#: linux/verso-desktop/src/session.rs:166
-#: linux/verso-desktop/src/session.rs:176
-#: linux/verso-desktop/src/session.rs:510
-#: linux/verso-desktop/src/session.rs:513
+#: linux/verso-desktop/src/session.rs:207
+msgid "Trust it only if this fingerprint is your server's: on the server, “openssl x509 -noout -fingerprint -sha256 -in” with its certificate file shows it."
+msgstr "이 지문이 서버의 것과 같을 때만 신뢰하십시오. 서버에서 인증서 파일과 함께 “openssl x509 -noout -fingerprint -sha256 -in”을 실행하면 표시됩니다."
+
+#: linux/verso-desktop/src/session.rs:210
+msgid "The Server's Certificate Changed"
+msgstr "서버 인증서가 변경됨"
+
+#: linux/verso-desktop/src/session.rs:211
+msgid "{host} presented another certificate than the one you trusted for it. If its certificate was renewed or replaced, that is expected; if not, someone between Verso and the server may be pretending to be it. Verso sends nothing to it until you decide."
+msgstr "{host}이(가) 신뢰하도록 지정한 인증서와 다른 인증서를 제시했습니다. 인증서를 갱신하거나 교체했다면 예상된 일이지만, 그렇지 않다면 Verso와 서버 사이의 누군가가 서버를 사칭하고 있을 수 있습니다. 결정하기 전까지 Verso는 아무것도 보내지 않습니다."
+
+#: linux/verso-desktop/src/session.rs:215
+msgid "Trust This Server's Certificate?"
+msgstr "이 서버의 인증서를 신뢰하시겠습니까?"
+
+#: linux/verso-desktop/src/session.rs:216
+msgid "The certificate {host} presented is not one this computer trusts. A server at home often has a certificate of its own, but anyone between Verso and the server could also be pretending to be it."
+msgstr "{host}이(가) 제시한 인증서는 이 컴퓨터가 신뢰하는 인증서가 아닙니다. 가정용 서버는 자체 인증서를 쓰는 경우가 많지만, Verso와 서버 사이의 누군가가 서버를 사칭하고 있을 수도 있습니다."
+
+#: linux/verso-desktop/src/session.rs:222
+msgid "It expired on {date}."
+msgstr "{date}에 만료되었습니다."
+
+#: linux/verso-desktop/src/session.rs:223
+msgid "It is not valid before {date}."
+msgstr "{date} 이전에는 유효하지 않습니다."
+
+#: linux/verso-desktop/src/session.rs:224
+msgid "It was not made for {host}."
+msgstr "{host}용으로 발급되지 않았습니다."
+
+#: linux/verso-desktop/src/session.rs:231
+msgid "Not stated"
+msgstr "명시되지 않음"
+
+#: linux/verso-desktop/src/session.rs:237
+msgid "Fingerprint (SHA-256)"
+msgstr "지문(SHA-256)"
+
+#: linux/verso-desktop/src/session.rs:238
+msgid "Issued To"
+msgstr "발급 대상"
+
+#: linux/verso-desktop/src/session.rs:239
+msgid "Issued By"
+msgstr "발급자"
+
+#: linux/verso-desktop/src/session.rs:239
+msgid "Itself (self-signed)"
+msgstr "자기 자신(자체 서명)"
+
+#: linux/verso-desktop/src/session.rs:240
+msgid "Valid From"
+msgstr "유효 기간 시작"
+
+#: linux/verso-desktop/src/session.rs:241
+msgid "Valid Until"
+msgstr "유효 기간 끝"
+
+#: linux/verso-desktop/src/session.rs:244
+msgid "Trusted Until Now"
+msgstr "지금까지 신뢰한 인증서"
+
+#: linux/verso-desktop/src/session.rs:246
+msgid "Cancel"
+msgstr "취소"
+
+#: linux/verso-desktop/src/session.rs:246
+msgid "Trust This Certificate"
+msgstr "이 인증서 신뢰"
+
+#: linux/verso-desktop/src/session.rs:268
+#: linux/verso-desktop/src/session.rs:278
+#: linux/verso-desktop/src/session.rs:617
+#: linux/verso-desktop/src/session.rs:620
 msgid "Kept in {file}"
 msgstr "{file}에 보관됨"
 
-#: linux/verso-desktop/src/session.rs:171
-#: linux/verso-desktop/src/session.rs:515
+#: linux/verso-desktop/src/session.rs:273
+#: linux/verso-desktop/src/session.rs:622
 msgid "Kept in the keyring"
 msgstr "키링에 보관됨"
 
-#: linux/verso-desktop/src/session.rs:178
+#: linux/verso-desktop/src/session.rs:280
 msgid "The keyring stayed locked, so nothing was saved."
 msgstr "키링이 잠긴 상태로 남아 있어 아무것도 저장되지 않았습니다."
 
-#: linux/verso-desktop/src/session.rs:256
+#: linux/verso-desktop/src/session.rs:362
 msgid "Verso shows its icon in the top bar while you are signed in."
 msgstr "Verso는 로그인되어 있는 동안 상단 표시줄에 아이콘을 표시합니다."
 
-#: linux/verso-desktop/src/session.rs:257
-#: linux/verso-desktop/src/session.rs:261
+#: linux/verso-desktop/src/session.rs:363
+#: linux/verso-desktop/src/session.rs:367
 msgid "Signed in, but the background service did not start: {error}"
 msgstr "로그인했지만 백그라운드 서비스가 시작되지 않았습니다: {error}"
 
-#: linux/verso-desktop/src/session.rs:260
+#: linux/verso-desktop/src/session.rs:366
 msgid "Signed in, but the background service cannot start: {error}."
 msgstr "로그인했지만 백그라운드 서비스를 시작할 수 없습니다: {error}."
 
-#: linux/verso-desktop/src/session.rs:290
+#: linux/verso-desktop/src/session.rs:396
 msgid "Verso Drive is not part of this version of Verso."
 msgstr "이 버전의 Verso에는 Verso Drive가 포함되어 있지 않습니다."
 
-#: linux/verso-desktop/src/session.rs:296
+#: linux/verso-desktop/src/session.rs:402
 msgid "The background service did not restart: {error}"
 msgstr "백그라운드 서비스가 다시 시작되지 않았습니다: {error}"
 
-#: linux/verso-desktop/src/session.rs:337
+#: linux/verso-desktop/src/session.rs:443
 msgid "Immich Mount is no longer signed in."
 msgstr "Immich Mount가 더 이상 로그인되어 있지 않습니다."
 
-#: linux/verso-desktop/src/session.rs:342
+#: linux/verso-desktop/src/session.rs:449
 msgid "Immich no longer accepts Immich Mount's sign-in; sign in instead."
 msgstr "Immich에서 더 이상 Immich Mount의 로그인을 허용하지 않습니다. 대신 로그인하십시오."
 
-#: linux/verso-desktop/src/session.rs:391
+#: linux/verso-desktop/src/session.rs:498
 msgid "Signed in, but the mount cannot start: {error}."
 msgstr "로그인했지만 마운트를 시작할 수 없습니다: {error}."
 
-#: linux/verso-desktop/src/session.rs:395
+#: linux/verso-desktop/src/session.rs:502
 msgid "Signed in, but the mount did not start: {error}"
 msgstr "로그인했지만 마운트가 시작되지 않았습니다: {error}"
 
@@ -597,7 +677,7 @@ msgid "Picture"
 msgstr "그림"
 
 #: linux/verso/src/drive_preferences.rs:212
-#: shared/verso-core/src/settings.rs:233
+#: shared/verso-core/src/settings.rs:240
 msgid "Paper"
 msgstr "종이"
 
@@ -655,216 +735,220 @@ msgstr "{app}이(가) 더 이상 설치되어 있지 않습니다."
 msgid "Verso could not open {app}: {error}"
 msgstr "Verso가 {app}을(를) 열 수 없습니다: {error}"
 
-#: shared/verso-core/src/settings.rs:106
+#: shared/verso-core/src/settings.rs:110
 msgid "The Immich server; /api is added"
 msgstr "Immich 서버; /api가 자동으로 추가됨"
 
-#: shared/verso-core/src/settings.rs:107
+#: shared/verso-core/src/settings.rs:111
+msgid "The SHA-256 fingerprint of the server's own certificate, trusted where the system does not trust it"
+msgstr "시스템이 신뢰하지 않을 때 신뢰하는, 서버 자체 인증서의 SHA-256 지문"
+
+#: shared/verso-core/src/settings.rs:112
 msgid "Show the library as a drive in the file manager"
 msgstr "라이브러리를 파일 관리자에 드라이브로 표시"
 
-#: shared/verso-core/src/settings.rs:108
+#: shared/verso-core/src/settings.rs:113
 msgid "Where the mount appears"
 msgstr "마운트가 나타나는 위치"
 
-#: shared/verso-core/src/settings.rs:109
+#: shared/verso-core/src/settings.rs:114
 msgid "The drive's name in the sidebar"
 msgstr "사이드바에 표시되는 드라이브 이름"
 
-#: shared/verso-core/src/settings.rs:110
+#: shared/verso-core/src/settings.rs:115
 msgid "Mount when the session starts"
 msgstr "세션 시작 시 마운트"
 
-#: shared/verso-core/src/settings.rs:111
+#: shared/verso-core/src/settings.rs:116
 msgid "List the drive in Files' sidebar as a drive, with its unmount button; off, as a bookmark"
 msgstr "‘파일’ 사이드바에 드라이브를 마운트 해제 버튼이 있는 드라이브로 표시; 끄면 책갈피로 표시"
 
-#: shared/verso-core/src/settings.rs:112
+#: shared/verso-core/src/settings.rs:117
 msgid "Show the Photos section"
 msgstr "Photos 섹션 표시"
 
-#: shared/verso-core/src/settings.rs:113
+#: shared/verso-core/src/settings.rs:118
 msgid "Show the Albums section"
 msgstr "Albums 섹션 표시"
 
-#: shared/verso-core/src/settings.rs:114
+#: shared/verso-core/src/settings.rs:119
 msgid "Show the People section"
 msgstr "People 섹션 표시"
 
-#: shared/verso-core/src/settings.rs:115
+#: shared/verso-core/src/settings.rs:120
 msgid "Show the Places section"
 msgstr "Places 섹션 표시"
 
-#: shared/verso-core/src/settings.rs:116
+#: shared/verso-core/src/settings.rs:121
 msgid "Show the Favorites section"
 msgstr "Favorites 섹션 표시"
 
-#: shared/verso-core/src/settings.rs:117
+#: shared/verso-core/src/settings.rs:122
 msgid "Show the Archive section"
 msgstr "Archive 섹션 표시"
 
-#: shared/verso-core/src/settings.rs:118
+#: shared/verso-core/src/settings.rs:123
 msgid "Day folders inside months"
 msgstr "월 안의 일별 폴더"
 
-#: shared/verso-core/src/settings.rs:119
+#: shared/verso-core/src/settings.rs:124
 msgid "Year and month folders inside albums"
 msgstr "앨범 안의 연도 및 월 폴더"
 
-#: shared/verso-core/src/settings.rs:120
+#: shared/verso-core/src/settings.rs:125
 msgid "Year and month folders inside people"
 msgstr "인물 안의 연도 및 월 폴더"
 
-#: shared/verso-core/src/settings.rs:121
+#: shared/verso-core/src/settings.rs:126
 msgid "Year and month folders inside cities"
 msgstr "도시 안의 연도 및 월 폴더"
 
-#: shared/verso-core/src/settings.rs:122
+#: shared/verso-core/src/settings.rs:127
 msgid "Year and month folders inside favorites"
 msgstr "즐겨찾기 안의 연도 및 월 폴더"
 
-#: shared/verso-core/src/settings.rs:123
+#: shared/verso-core/src/settings.rs:128
 msgid "Year and month folders inside the archive"
 msgstr "보관함 안의 연도 및 월 폴더"
 
-#: shared/verso-core/src/settings.rs:124
+#: shared/verso-core/src/settings.rs:129
 msgid "How album folders are named and grouped"
 msgstr "앨범 폴더의 이름 지정 및 그룹화 방식"
 
-#: shared/verso-core/src/settings.rs:125
+#: shared/verso-core/src/settings.rs:130
 msgid "How files are named"
 msgstr "파일 이름 지정 방식"
 
-#: shared/verso-core/src/settings.rs:126
+#: shared/verso-core/src/settings.rs:131
 msgid "The content cache's size limit"
 msgstr "콘텐츠 캐시 크기 제한"
 
-#: shared/verso-core/src/settings.rs:127
+#: shared/verso-core/src/settings.rs:132
 msgid "Show the Upload folder, and upload what is copied into it"
 msgstr "Upload 폴더를 표시하고 그 안에 복사한 항목 업로드"
 
-#: shared/verso-core/src/settings.rs:128
+#: shared/verso-core/src/settings.rs:133
 msgid "Folders copied into Upload"
 msgstr "Upload에 복사한 폴더"
 
-#: shared/verso-core/src/settings.rs:129
+#: shared/verso-core/src/settings.rs:134
 msgid "Also seed 1024 px thumbnails from the preview"
 msgstr "미리 보기에서 1024px 썸네일도 생성"
 
-#: shared/verso-core/src/settings.rs:130
+#: shared/verso-core/src/settings.rs:135
 msgid "Refuse thumbnailer reads of originals"
 msgstr "썸네일 생성기의 원본 읽기 거부"
 
-#: shared/verso-core/src/settings.rs:132
+#: shared/verso-core/src/settings.rs:137
 msgid "What a double click on Verso's top bar icon opens"
 msgstr "Verso 상단 표시줄 아이콘을 두 번 클릭하면 열 항목"
 
-#: shared/verso-core/src/settings.rs:133
+#: shared/verso-core/src/settings.rs:138
 msgid "Verso's top bar icon in colour: the lens's five colours, grey while the server cannot be reached"
 msgstr "Verso 상단 표시줄 아이콘을 컬러로 표시: 렌즈의 다섯 가지 색, 서버에 연결할 수 없는 동안은 회색"
 
-#: shared/verso-core/src/settings.rs:134
+#: shared/verso-core/src/settings.rs:139
 msgid "Verso's app icon in the light style: the picture on its print, its paper and its lens"
 msgstr "밝은 스타일의 Verso 앱 아이콘: 인화된 사진의 그림, 종이, 렌즈"
 
-#: shared/verso-core/src/settings.rs:135
+#: shared/verso-core/src/settings.rs:140
 msgid "Verso's app icon in the dark style: the picture on its print, its paper and its lens"
 msgstr "어두운 스타일의 Verso 앱 아이콘: 인화된 사진의 그림, 종이, 렌즈"
 
-#: shared/verso-core/src/settings.rs:136
+#: shared/verso-core/src/settings.rs:141
 msgid "Show what other apps link to (Immich Crosslink)"
 msgstr "다른 앱이 가리키는 항목 보기 (Immich Crosslink)"
 
-#: shared/verso-core/src/settings.rs:137
+#: shared/verso-core/src/settings.rs:142
 msgid "Verso: take part as Verso Gallery, so other apps show items in it"
 msgstr "Verso: Verso Gallery로 참여하여 다른 앱이 그 안에서 항목을 보여 줄 수 있게 함"
 
-#: shared/verso-core/src/settings.rs:138
+#: shared/verso-core/src/settings.rs:143
 msgid "Verso: take part as Verso Drive, so other apps show items in Files while the drive is on"
 msgstr "Verso: Verso Drive로 참여하여 드라이브가 켜져 있는 동안 다른 앱이 ‘파일’에서 항목을 보여 줄 수 있게 함"
 
-#: shared/verso-core/src/settings.rs:139
+#: shared/verso-core/src/settings.rs:144
 msgid "Apps left out of Show in, by their desktop entry or bundle id, separated by ;"
 msgstr "‘보기’에서 뺄 앱, 데스크톱 항목 또는 번들 ID로, ;로 구분"
 
-#: shared/verso-core/src/settings.rs:140
+#: shared/verso-core/src/settings.rs:145
 msgid "Tell me when a new version is out"
 msgstr "새 버전이 나오면 알림"
 
-#: shared/verso-core/src/settings.rs:141
+#: shared/verso-core/src/settings.rs:146
 msgid "Headless only: a 0600 file holding the credential"
 msgstr "헤드리스 전용: 자격 증명을 담은 0600 파일"
 
-#: shared/verso-core/src/settings.rs:215
+#: shared/verso-core/src/settings.rs:222
 msgid "Never"
 msgstr "안 함"
 
-#: shared/verso-core/src/settings.rs:216
+#: shared/verso-core/src/settings.rs:223
 msgid "From 500 Items"
 msgstr "500개 항목부터"
 
-#: shared/verso-core/src/settings.rs:217
+#: shared/verso-core/src/settings.rs:224
 msgid "Always"
 msgstr "항상"
 
-#: shared/verso-core/src/settings.rs:218
+#: shared/verso-core/src/settings.rs:225
 msgid "Year in the Name (2023 - Trip)"
 msgstr "이름에 연도 포함 (2023 - 여행)"
 
-#: shared/verso-core/src/settings.rs:219
+#: shared/verso-core/src/settings.rs:226
 msgid "Year Folders (2023/Trip)"
 msgstr "연도 폴더 (2023/여행)"
 
-#: shared/verso-core/src/settings.rs:220
+#: shared/verso-core/src/settings.rs:227
 msgid "Name Only (Trip)"
 msgstr "이름만 (여행)"
 
-#: shared/verso-core/src/settings.rs:221
+#: shared/verso-core/src/settings.rs:228
 msgid "Date and Time Taken"
 msgstr "촬영 날짜 및 시간"
 
-#: shared/verso-core/src/settings.rs:222
+#: shared/verso-core/src/settings.rs:229
 msgid "Original File Names"
 msgstr "원본 파일 이름"
 
-#: shared/verso-core/src/settings.rs:223
+#: shared/verso-core/src/settings.rs:230
 msgid "Ask Each Time"
 msgstr "매번 묻기"
 
-#: shared/verso-core/src/settings.rs:227
-#: shared/verso-core/src/settings.rs:247
+#: shared/verso-core/src/settings.rs:234
+#: shared/verso-core/src/settings.rs:254
 msgid "Verso"
 msgstr "Verso"
 
-#: shared/verso-core/src/settings.rs:228
+#: shared/verso-core/src/settings.rs:235
 msgid "Verso Drive in Files"
 msgstr "‘파일’의 Verso Drive"
 
-#: shared/verso-core/src/settings.rs:229
+#: shared/verso-core/src/settings.rs:236
 msgid "Preferences"
 msgstr "기본 설정"
 
-#: shared/verso-core/src/settings.rs:230
+#: shared/verso-core/src/settings.rs:237
 msgid "Mist"
 msgstr "안개"
 
-#: shared/verso-core/src/settings.rs:231
+#: shared/verso-core/src/settings.rs:238
 msgid "Sand"
 msgstr "모래"
 
-#: shared/verso-core/src/settings.rs:232
+#: shared/verso-core/src/settings.rs:239
 msgid "Dark"
 msgstr "다크"
 
-#: shared/verso-core/src/settings.rs:234
+#: shared/verso-core/src/settings.rs:241
 msgid "Frame"
 msgstr "액자"
 
-#: shared/verso-core/src/settings.rs:235
+#: shared/verso-core/src/settings.rs:242
 msgid "Slate"
 msgstr "슬레이트"
 
-#: shared/verso-core/src/settings.rs:236
+#: shared/verso-core/src/settings.rs:243
 msgid "Sky"
 msgstr "하늘"
 

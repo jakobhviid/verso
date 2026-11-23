@@ -3,7 +3,7 @@
 
 use std::path::PathBuf;
 
-use immich_api::{Client, UserDetails};
+use immich_api::{CertificatePin, Client, UserDetails};
 use verso_core::settings::Config;
 use verso_linux::credentials::{read_credential_file, Credential};
 use verso_linux::i18n::tr;
@@ -66,13 +66,13 @@ pub fn gallery_cache_root() -> PathBuf {
         .join("gallery")
 }
 
-/// A client for `server` with `credential`.
-pub fn client(server: &str, credential: Option<&Credential>) -> Result<Client, String> {
+/// A client for `server` with `credential`, also trusting the certificate `trusted` names for it.
+pub fn client(server: &str, credential: Option<&Credential>, trusted: Option<CertificatePin>) -> Result<Client, String> {
     let credential = credential.map(|credential| match credential {
         Credential::ApiKey(key) => immich_api::Credential::ApiKey(key.clone()),
         Credential::Session(token) => immich_api::Credential::Session(token.clone()),
     });
-    Client::new(server, credential, &user_agent()).map_err(|error| tr("That address cannot be used: {error}").replace("{error}", &error.to_string()))
+    Client::trusting(server, credential, &user_agent(), trusted).map_err(|error| tr("That address cannot be used: {error}").replace("{error}", &error.to_string()))
 }
 
 /// The stored credential, looked for where the daemon looks: a configured `credential.file`, the default file a
@@ -96,7 +96,9 @@ async fn stored_credential(paths: &Paths, config: &Config, server: &str) -> Resu
     }
 }
 
-/// Connect with the stored server and credential. `Ok(None)` when nobody is signed in.
+/// Connect with the stored server, credential and trusted certificate. `Ok(None)` when nobody is signed in. A server
+/// that cannot be reached, or whose certificate is not the one trusted for it, gives a connection without its account,
+/// which the window asks again (and asks the person about the certificate).
 pub async fn connect() -> Result<Option<Connection>, String> {
     let paths = Paths::from_environment();
     let text = match std::fs::read_to_string(paths.config_file()) {
@@ -107,7 +109,7 @@ pub async fn connect() -> Result<Option<Connection>, String> {
     let config = Config::from_toml(&text).map_err(|error| error.to_string())?;
     let Some(server) = config.server_url.clone().filter(|url| !url.trim().is_empty()) else { return Ok(None) };
     let Some(credential) = stored_credential(&paths, &config, &server).await? else { return Ok(None) };
-    let client = client(&server, Some(&credential))?;
+    let client = client(&server, Some(&credential), config.server_certificate)?;
     let with_api_key = matches!(credential, Credential::ApiKey(_));
     let account = match client.me().await {
         Ok(account) => Some(account),

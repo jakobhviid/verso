@@ -36,20 +36,16 @@ pub use gallery::{ApiAnswer, ApiConnection, ApiField};
 
 /// The system's own judgement of a server's certificate on macOS and iOS, handed to immich-api once, before the first
 /// client: iOS lets no program list its trusted roots, so `rustls-native-certs` finds none there, and on the Mac it
-/// follows the trust settings the user and their profiles give too. Elsewhere immich-api's own roots stay.
+/// follows the trust settings the user and their profiles give too. immich-api checks the certificate trusted for the
+/// server after it (`immich_api::certificate`). Elsewhere immich-api's own roots stay.
 fn install_platform_tls() {
     #[cfg(target_vendor = "apple")]
     {
         static INSTALLED: std::sync::Once = std::sync::Once::new();
         INSTALLED.call_once(|| {
-            use rustls_platform_verifier::BuilderVerifierExt;
             let provider = Arc::new(rustls::crypto::ring::default_provider());
-            let config = rustls::ClientConfig::builder_with_provider(provider)
-                .with_safe_default_protocol_versions()
-                .and_then(|builder| builder.with_platform_verifier())
-                .map(|builder| builder.with_no_client_auth());
-            match config {
-                Ok(config) => immich_api::client::set_tls_config(config),
+            match rustls_platform_verifier::Verifier::new(provider) {
+                Ok(verifier) => immich_api::certificate::set_system_verifier(Arc::new(verifier)),
                 Err(error) => log::error!("the system's certificate verifier is not available: {error}"),
             }
         });
@@ -1657,7 +1653,7 @@ pub async fn probe(address: String) -> Result<ServerOffer, BridgeError> {
                 _ => break,
             }
         }
-        let offer = in_time(sign_in::probe(&client, &address)).await?;
+        let offer = in_time(async { sign_in::probe(&client, &address).await.map_err(String::from) }).await?;
         Ok(ServerOffer { address: offer.url, version: offer.version, browser_button: offer.browser_button, password: offer.password })
     })
     .await

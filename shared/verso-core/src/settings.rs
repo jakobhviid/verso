@@ -101,9 +101,14 @@ impl AppIconLook {
     }
 }
 
+/// The certificate trusted for the server in `server.url` where the system does not trust it: its SHA-256 fingerprint
+/// (`immich_api::certificate`), set by a person's choice as they sign in, and replaced or removed with the server.
+pub const CERTIFICATE_KEY: &str = "server.certificate_sha256";
+
 /// Every setting, in display order.
 pub const SETTINGS: &[Setting] = &[
     Setting { key: "server.url", kind: Kind::Text, description: "The Immich server; /api is added", default: "" },
+    Setting { key: CERTIFICATE_KEY, kind: Kind::Text, description: "The SHA-256 fingerprint of the server's own certificate, trusted where the system does not trust it", default: "" },
     Setting { key: "mount.enabled", kind: Kind::Bool, description: "Show the library as a drive in the file manager", default: "false" },
     Setting { key: "mount.path", kind: Kind::Path, description: "Where the mount appears", default: "~/Verso" },
     Setting { key: "mount.name", kind: Kind::Choice(MOUNT_NAMES), description: "The drive's name in the sidebar", default: "verso" },
@@ -163,6 +168,8 @@ pub enum Pane {
 /// Every setting's pane. A test keeps it whole: a setting added to the table without a place here fails it.
 pub const PANES: &[(&str, Pane)] = &[
     ("server.url", Pane::CommandLine),
+    // Set by trusting the certificate as one signs in; Verso's Account page shows it, and forgets it.
+    (CERTIFICATE_KEY, Pane::CommandLine),
     // Verso Drive's switch, on its status page.
     ("mount.enabled", Pane::CommandLine),
     ("mount.path", Pane::General),
@@ -295,6 +302,9 @@ pub fn setting(key: &str) -> Result<&'static Setting, SettingError> {
 pub fn validate(key: &str, given: &str) -> Result<(), SettingError> {
     let setting = setting(key)?;
     let invalid = |expected: String| SettingError::InvalidValue { key: key.to_string(), expected, given: given.to_string() };
+    if key == CERTIFICATE_KEY && immich_api::CertificatePin::parse(given).is_none() {
+        return Err(invalid("a SHA-256 fingerprint: 64 hexadecimal digits, in pairs separated by colons or not".into()));
+    }
     match setting.kind {
         Kind::Bool => given.parse::<bool>().map(|_| ()).map_err(|_| invalid("`true` or `false`".into())),
         Kind::Text | Kind::Path => if given.trim().is_empty() { Err(invalid("non-empty".into())) } else { Ok(()) },
@@ -330,6 +340,8 @@ pub fn parse_size(text: &str) -> Option<u64> {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Config {
     pub server_url: Option<String>,
+    /// The certificate trusted for that server where the system does not trust it ([`CERTIFICATE_KEY`]).
+    pub server_certificate: Option<immich_api::CertificatePin>,
     pub mount_path: String,
     /// Whether the library is mounted as a drive at all (`mount.enabled`): Verso's drive is off until switched on.
     pub mount_enabled: bool,
@@ -406,6 +418,7 @@ impl Config {
         };
         Ok(Config {
             server_url: optional("server.url")?,
+            server_certificate: optional(CERTIFICATE_KEY)?.and_then(|text| immich_api::CertificatePin::parse(&text)),
             mount_path: effective("mount.path")?,
             mount_enabled: flag("mount.enabled")?,
             mount_name: mount_name(&effective("mount.name")?),
@@ -530,6 +543,19 @@ mod tests {
         for name in VERSO.drive_names.iter().chain(IMMICH_MOUNT.drive_names) {
             assert_eq!(validate("mount.name", name), Ok(()), "{name}");
         }
+    }
+
+    #[test]
+    fn the_certificate_trusted_for_the_server_is_a_fingerprint() {
+        let pin = immich_api::CertificatePin::of(b"a certificate");
+        assert!(set_value("", CERTIFICATE_KEY, "trust me").is_err());
+        assert!(set_value("", CERTIFICATE_KEY, "AB:CD").is_err());
+        let text = set_value("[server]\nurl = \"https://photos.home.arpa\"\n", CERTIFICATE_KEY, &pin.to_string()).unwrap();
+        assert_eq!(Config::from_toml(&text).unwrap().server_certificate, Some(pin));
+        let written_without_colons = set_value("", CERTIFICATE_KEY, &pin.to_string().replace(':', "").to_lowercase()).unwrap();
+        assert_eq!(Config::from_toml(&written_without_colons).unwrap().server_certificate, Some(pin));
+        assert_eq!(Config::from_toml(&unset_value(&text, CERTIFICATE_KEY).unwrap()).unwrap().server_certificate, None);
+        assert_eq!(Config::from_toml("").unwrap().server_certificate, None);
     }
 
     #[test]

@@ -30,6 +30,8 @@ anyhow = "1"
 clap = { version = "4", features = ["derive", "wrap_help"] }
 clap_complete = "4"
 clap_mangen = "0.2"
+# A certificate's dates, as `login` shows them before asking whether to trust it.
+chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
 
 [dev-dependencies]
 assert_cmd = "2"

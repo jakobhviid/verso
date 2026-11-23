@@ -10,88 +10,96 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: linux/verso-service/src/commands.rs:467
-#: linux/verso-linux/src/daemon.rs:506
+#: linux/verso-service/src/commands.rs:471
+#: linux/verso-linux/src/daemon.rs:508
 msgid "Verso Drive is not mounted"
 msgstr "Verso Drive bağlı değil"
 
-#: linux/verso-service/src/commands.rs:467
-#: linux/verso-linux/src/daemon.rs:506
+#: linux/verso-service/src/commands.rs:471
+#: linux/verso-linux/src/daemon.rs:508
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "Sürücüyü Verso Tercihleri’nde etkinleştirin, ardından bağlantıyı yeniden açın."
 
-#: linux/verso-service/src/online.rs:448
+#: linux/verso-service/src/online.rs:543
 msgid "The keyring stayed locked. Open {app}, or run “{command}”, to try again."
 msgstr "Anahtarlık kilitli kaldı. Yeniden denemek için {app}’u açın veya “{command}” komutunu çalıştırın."
 
-#: linux/verso-service/src/online.rs:449
+#: linux/verso-service/src/online.rs:544
 msgid "Immich is not mounted"
 msgstr "Immich bağlı değil"
 
-#: linux/verso-linux/src/daemon.rs:505
+#: linux/verso-linux/src/daemon.rs:507
 msgid "Links from other apps are off"
 msgstr "Başka uygulamalardan gelen bağlantılar kapalı"
 
-#: linux/verso-linux/src/daemon.rs:505
+#: linux/verso-linux/src/daemon.rs:507
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "Başka uygulamaların bağlantı verdiği öğeleri göstermek için Verso ayarlarında Immich Crosslink’i açın."
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:509
 msgid "A link from another app cannot be opened"
 msgstr "Başka bir uygulamadan gelen bağlantı açılamıyor"
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:509
 msgid "It is not a valid Immich link."
 msgstr "Geçerli bir Immich bağlantısı değil."
 
-#: linux/verso-linux/src/daemon.rs:508
-#: linux/verso-linux/src/daemon.rs:512
+#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:514
 msgid "Nothing to show"
 msgstr "Gösterilecek bir şey yok"
 
-#: linux/verso-linux/src/daemon.rs:508
+#: linux/verso-linux/src/daemon.rs:510
 msgid "Verso Drive has no place for what this link points to."
 msgstr "Verso Drive’ta bu bağlantının gösterdiği şey için bir yer yok."
 
-#: linux/verso-linux/src/daemon.rs:509
+#: linux/verso-linux/src/daemon.rs:511
 msgid "Not signed in to {host}"
 msgstr "{host} sunucusunda oturum açık değil"
 
-#: linux/verso-linux/src/daemon.rs:509
+#: linux/verso-linux/src/daemon.rs:511
 msgid "Verso is signed in to another Immich server."
 msgstr "Verso başka bir Immich sunucusunda oturum açmış."
 
-#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:512
 msgid "Another Immich account"
 msgstr "Başka bir Immich hesabı"
 
-#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:512
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "Bağlantı, Verso’un oturum açtığı hesaptan farklı bir hesap için."
 
-#: linux/verso-linux/src/daemon.rs:513
+#: linux/verso-linux/src/daemon.rs:515
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "Sürücü bunu göstermiyor. Gizlenmiş, kapatılmış bir bölümde ya da sizinle paylaşılmamış olabilir."
 
-#: linux/verso-linux/src/daemon.rs:515
-#: linux/verso-linux/src/daemon.rs:591
+#: linux/verso-linux/src/daemon.rs:517
+#: linux/verso-linux/src/daemon.rs:603
 msgid "Immich is unreachable"
 msgstr "Immich’e ulaşılamıyor"
 
-#: linux/verso-linux/src/daemon.rs:515
+#: linux/verso-linux/src/daemon.rs:517
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "Immich sunucusuna ulaşılamıyor. Bağlantıyı daha sonra yeniden deneyin."
 
-#: linux/verso-linux/src/daemon.rs:592
+#: linux/verso-linux/src/daemon.rs:599
+msgid "Immich's certificate is not trusted"
+msgstr "Immich’in sertifikası güvenilir değil"
+
+#: linux/verso-linux/src/daemon.rs:600
+msgid "The Immich server presented a certificate {app} does not trust, so nothing is sent to it. Open {app} to check the certificate. Files you opened before stay available."
+msgstr "Immich sunucusu {app} uygulamasının güvenmediği bir sertifika sundu, bu yüzden ona hiçbir şey gönderilmiyor. Sertifikayı denetlemek için {app} uygulamasını açın. Daha önce açtığınız dosyalar kullanılabilir kalır."
+
+#: linux/verso-linux/src/daemon.rs:604
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "Immich sunucusuna ulaşılamıyor. Daha önce açtığınız dosyalar kullanılabilir kalır."
 
-#: linux/verso-linux/src/daemon.rs:595
+#: linux/verso-linux/src/daemon.rs:607
 #: linux/verso-linux/src/tray.rs:128
 msgid "Signed out of Immich"
 msgstr "Immich oturumu kapatıldı"
 
-#: linux/verso-linux/src/daemon.rs:596
+#: linux/verso-linux/src/daemon.rs:608
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "Immich artık bu oturum açma işlemini kabul etmiyor. Yeniden oturum açmak için {app} uygulamasını açın."
 
@@ -112,12 +120,12 @@ msgid "Files not uploaded: {count}"
 msgstr "Yüklenmeyen dosyalar: {count}"
 
 #: linux/verso-linux/src/folders.rs:213
-#: shared/verso-core/src/settings.rs:225
+#: shared/verso-core/src/settings.rs:232
 msgid "Make Albums"
 msgstr "Albüm oluştur"
 
 #: linux/verso-linux/src/folders.rs:213
-#: shared/verso-core/src/settings.rs:224
+#: shared/verso-core/src/settings.rs:231
 msgid "Timeline Only"
 msgstr "Yalnızca zaman tüneli"
 
@@ -198,7 +206,7 @@ msgid "{drive} cannot open “{name}”"
 msgstr "{drive}, “{name}” dosyasını açamıyor"
 
 #: linux/verso-linux/src/notify.rs:73
-#: shared/verso-core/src/settings.rs:246
+#: shared/verso-core/src/settings.rs:253
 msgid "Verso Drive"
 msgstr "Verso Drive"
 
@@ -393,101 +401,173 @@ msgstr "Dosya Adları"
 #: linux/verso-desktop/src/preferences.rs:128
 #: linux/verso-desktop/src/preferences.rs:128
 #: linux/verso-desktop/src/preferences.rs:128
-#: shared/verso-core/src/settings.rs:131
+#: shared/verso-core/src/settings.rs:136
 msgid "Open in Immich and Copy Immich Link"
 msgstr "Immich’te Aç ve Immich Bağlantısını Kopyala"
 
-#: linux/verso-desktop/src/session.rs:60
+#: linux/verso-desktop/src/session.rs:61
 msgid "Online"
 msgstr "Çevrim içi"
 
-#: linux/verso-desktop/src/session.rs:61
+#: linux/verso-desktop/src/session.rs:62
 msgid "Server unreachable; files you opened before stay available"
 msgstr "Sunucuya ulaşılamıyor; daha önce açtığınız dosyalar kullanılabilir kalır"
 
-#: linux/verso-desktop/src/session.rs:62
+#: linux/verso-desktop/src/session.rs:63
 msgid "Signed out; sign in again"
 msgstr "Oturum kapatıldı; yeniden oturum açın"
 
-#: linux/verso-desktop/src/session.rs:64
-#: linux/verso-desktop/src/session.rs:74
+#: linux/verso-desktop/src/session.rs:65
+#: linux/verso-desktop/src/session.rs:75
 msgid "Not running"
 msgstr "Çalışmıyor"
 
-#: linux/verso-desktop/src/session.rs:71
+#: linux/verso-desktop/src/session.rs:72
 msgid "{used} of {limit}"
 msgstr "{used} / {limit}"
 
-#: linux/verso-desktop/src/session.rs:88
+#: linux/verso-desktop/src/session.rs:89
 msgid "writing"
 msgstr "yazılıyor"
 
-#: linux/verso-desktop/src/session.rs:88
+#: linux/verso-desktop/src/session.rs:89
 msgid "uploading"
 msgstr "yükleniyor"
 
-#: linux/verso-desktop/src/session.rs:89
+#: linux/verso-desktop/src/session.rs:90
 msgid "{name}, {phase}"
 msgstr "{name}, {phase}"
 
-#: linux/verso-desktop/src/session.rs:92
+#: linux/verso-desktop/src/session.rs:93
 msgid "{name} and {count} more"
 msgstr "{name} ve {count} dosya daha"
 
-#: linux/verso-desktop/src/session.rs:118
+#: linux/verso-desktop/src/session.rs:122
 msgid "That address cannot be used: {error}"
 msgstr "Bu adres kullanılamaz: {error}"
 
-#: linux/verso-desktop/src/session.rs:166
-#: linux/verso-desktop/src/session.rs:176
-#: linux/verso-desktop/src/session.rs:510
-#: linux/verso-desktop/src/session.rs:513
+#: linux/verso-desktop/src/session.rs:207
+msgid "Trust it only if this fingerprint is your server's: on the server, “openssl x509 -noout -fingerprint -sha256 -in” with its certificate file shows it."
+msgstr "Ona yalnızca bu parmak izi sunucunuzunkiyse güvenin: sunucuda, sertifika dosyasıyla birlikte “openssl x509 -noout -fingerprint -sha256 -in” komutu bunu gösterir."
+
+#: linux/verso-desktop/src/session.rs:210
+msgid "The Server's Certificate Changed"
+msgstr "Sunucunun sertifikası değişti"
+
+#: linux/verso-desktop/src/session.rs:211
+msgid "{host} presented another certificate than the one you trusted for it. If its certificate was renewed or replaced, that is expected; if not, someone between Verso and the server may be pretending to be it. Verso sends nothing to it until you decide."
+msgstr "{host}, onun için güvendiğiniz sertifikadan farklı bir sertifika sundu. Sertifikası yenilendiyse ya da değiştirildiyse bu beklenen bir durumdur; değilse Verso ile sunucu arasındaki biri sunucuymuş gibi davranıyor olabilir. Siz karar verene kadar Verso ona hiçbir şey göndermez."
+
+#: linux/verso-desktop/src/session.rs:215
+msgid "Trust This Server's Certificate?"
+msgstr "Bu sunucunun sertifikasına güvenilsin mi?"
+
+#: linux/verso-desktop/src/session.rs:216
+msgid "The certificate {host} presented is not one this computer trusts. A server at home often has a certificate of its own, but anyone between Verso and the server could also be pretending to be it."
+msgstr "{host} tarafından sunulan sertifika, bu bilgisayarın güvendiği sertifikalardan biri değil. Evdeki bir sunucunun çoğu zaman kendi sertifikası olur, ancak Verso ile sunucu arasındaki herhangi biri de sunucuymuş gibi davranıyor olabilir."
+
+#: linux/verso-desktop/src/session.rs:222
+msgid "It expired on {date}."
+msgstr "Süresi {date} tarihinde doldu."
+
+#: linux/verso-desktop/src/session.rs:223
+msgid "It is not valid before {date}."
+msgstr "{date} tarihinden önce geçerli değil."
+
+#: linux/verso-desktop/src/session.rs:224
+msgid "It was not made for {host}."
+msgstr "{host} için düzenlenmemiş."
+
+#: linux/verso-desktop/src/session.rs:231
+msgid "Not stated"
+msgstr "Belirtilmemiş"
+
+#: linux/verso-desktop/src/session.rs:237
+msgid "Fingerprint (SHA-256)"
+msgstr "Parmak izi (SHA-256)"
+
+#: linux/verso-desktop/src/session.rs:238
+msgid "Issued To"
+msgstr "Verildiği yer"
+
+#: linux/verso-desktop/src/session.rs:239
+msgid "Issued By"
+msgstr "Veren"
+
+#: linux/verso-desktop/src/session.rs:239
+msgid "Itself (self-signed)"
+msgstr "Kendisi (kendinden imzalı)"
+
+#: linux/verso-desktop/src/session.rs:240
+msgid "Valid From"
+msgstr "Geçerlilik başlangıcı"
+
+#: linux/verso-desktop/src/session.rs:241
+msgid "Valid Until"
+msgstr "Geçerlilik sonu"
+
+#: linux/verso-desktop/src/session.rs:244
+msgid "Trusted Until Now"
+msgstr "Şimdiye kadar güvenilen"
+
+#: linux/verso-desktop/src/session.rs:246
+msgid "Cancel"
+msgstr "İptal"
+
+#: linux/verso-desktop/src/session.rs:246
+msgid "Trust This Certificate"
+msgstr "Bu sertifikaya güven"
+
+#: linux/verso-desktop/src/session.rs:268
+#: linux/verso-desktop/src/session.rs:278
+#: linux/verso-desktop/src/session.rs:617
+#: linux/verso-desktop/src/session.rs:620
 msgid "Kept in {file}"
 msgstr "{file} içinde saklanıyor"
 
-#: linux/verso-desktop/src/session.rs:171
-#: linux/verso-desktop/src/session.rs:515
+#: linux/verso-desktop/src/session.rs:273
+#: linux/verso-desktop/src/session.rs:622
 msgid "Kept in the keyring"
 msgstr "Anahtarlıkta saklanıyor"
 
-#: linux/verso-desktop/src/session.rs:178
+#: linux/verso-desktop/src/session.rs:280
 msgid "The keyring stayed locked, so nothing was saved."
 msgstr "Anahtarlık kilitli kaldı, bu yüzden hiçbir şey kaydedilmedi."
 
-#: linux/verso-desktop/src/session.rs:256
+#: linux/verso-desktop/src/session.rs:362
 msgid "Verso shows its icon in the top bar while you are signed in."
 msgstr "Verso, oturumunuz açıkken simgesini üst çubukta gösterir."
 
-#: linux/verso-desktop/src/session.rs:257
-#: linux/verso-desktop/src/session.rs:261
+#: linux/verso-desktop/src/session.rs:363
+#: linux/verso-desktop/src/session.rs:367
 msgid "Signed in, but the background service did not start: {error}"
 msgstr "Oturum açıldı ancak arka plan hizmeti başlamadı: {error}"
 
-#: linux/verso-desktop/src/session.rs:260
+#: linux/verso-desktop/src/session.rs:366
 msgid "Signed in, but the background service cannot start: {error}."
 msgstr "Oturum açıldı ancak arka plan hizmeti başlatılamıyor: {error}."
 
-#: linux/verso-desktop/src/session.rs:290
+#: linux/verso-desktop/src/session.rs:396
 msgid "Verso Drive is not part of this version of Verso."
 msgstr "Verso Drive, Verso’nun bu sürümünde yer almıyor."
 
-#: linux/verso-desktop/src/session.rs:296
+#: linux/verso-desktop/src/session.rs:402
 msgid "The background service did not restart: {error}"
 msgstr "Arka plan hizmeti yeniden başlamadı: {error}"
 
-#: linux/verso-desktop/src/session.rs:337
+#: linux/verso-desktop/src/session.rs:443
 msgid "Immich Mount is no longer signed in."
 msgstr "Immich Mount’un oturumu artık açık değil."
 
-#: linux/verso-desktop/src/session.rs:342
+#: linux/verso-desktop/src/session.rs:449
 msgid "Immich no longer accepts Immich Mount's sign-in; sign in instead."
 msgstr "Immich artık Immich Mount’un oturumunu kabul etmiyor; bunun yerine oturum açın."
 
-#: linux/verso-desktop/src/session.rs:391
+#: linux/verso-desktop/src/session.rs:498
 msgid "Signed in, but the mount cannot start: {error}."
 msgstr "Oturum açıldı ancak bağlama başlatılamıyor: {error}."
 
-#: linux/verso-desktop/src/session.rs:395
+#: linux/verso-desktop/src/session.rs:502
 msgid "Signed in, but the mount did not start: {error}"
 msgstr "Oturum açıldı ancak bağlama başlamadı: {error}"
 
@@ -597,7 +677,7 @@ msgid "Picture"
 msgstr "Resim"
 
 #: linux/verso/src/drive_preferences.rs:212
-#: shared/verso-core/src/settings.rs:233
+#: shared/verso-core/src/settings.rs:240
 msgid "Paper"
 msgstr "Kâğıt"
 
@@ -655,216 +735,220 @@ msgstr "{app} artık yüklü değil."
 msgid "Verso could not open {app}: {error}"
 msgstr "Verso {app} uygulamasını açamadı: {error}"
 
-#: shared/verso-core/src/settings.rs:106
+#: shared/verso-core/src/settings.rs:110
 msgid "The Immich server; /api is added"
 msgstr "Immich sunucusu; /api eklenir"
 
-#: shared/verso-core/src/settings.rs:107
+#: shared/verso-core/src/settings.rs:111
+msgid "The SHA-256 fingerprint of the server's own certificate, trusted where the system does not trust it"
+msgstr "Sistemin güvenmediği yerde güvenilen, sunucunun kendi sertifikasının SHA-256 parmak izi"
+
+#: shared/verso-core/src/settings.rs:112
 msgid "Show the library as a drive in the file manager"
 msgstr "Kitaplığı dosya yöneticisinde bir sürücü olarak göster"
 
-#: shared/verso-core/src/settings.rs:108
+#: shared/verso-core/src/settings.rs:113
 msgid "Where the mount appears"
 msgstr "Sürücünün görüneceği yer"
 
-#: shared/verso-core/src/settings.rs:109
+#: shared/verso-core/src/settings.rs:114
 msgid "The drive's name in the sidebar"
 msgstr "Sürücünün kenar çubuğundaki adı"
 
-#: shared/verso-core/src/settings.rs:110
+#: shared/verso-core/src/settings.rs:115
 msgid "Mount when the session starts"
 msgstr "Oturum başladığında bağla"
 
-#: shared/verso-core/src/settings.rs:111
+#: shared/verso-core/src/settings.rs:116
 msgid "List the drive in Files' sidebar as a drive, with its unmount button; off, as a bookmark"
 msgstr "Sürücüyü Dosyalar’ın kenar çubuğunda ayırma düğmesiyle bir sürücü olarak listele; kapalıysa yer imi olarak"
 
-#: shared/verso-core/src/settings.rs:112
+#: shared/verso-core/src/settings.rs:117
 msgid "Show the Photos section"
 msgstr "Photos bölümünü göster"
 
-#: shared/verso-core/src/settings.rs:113
+#: shared/verso-core/src/settings.rs:118
 msgid "Show the Albums section"
 msgstr "Albums bölümünü göster"
 
-#: shared/verso-core/src/settings.rs:114
+#: shared/verso-core/src/settings.rs:119
 msgid "Show the People section"
 msgstr "People bölümünü göster"
 
-#: shared/verso-core/src/settings.rs:115
+#: shared/verso-core/src/settings.rs:120
 msgid "Show the Places section"
 msgstr "Places bölümünü göster"
 
-#: shared/verso-core/src/settings.rs:116
+#: shared/verso-core/src/settings.rs:121
 msgid "Show the Favorites section"
 msgstr "Favorites bölümünü göster"
 
-#: shared/verso-core/src/settings.rs:117
+#: shared/verso-core/src/settings.rs:122
 msgid "Show the Archive section"
 msgstr "Archive bölümünü göster"
 
-#: shared/verso-core/src/settings.rs:118
+#: shared/verso-core/src/settings.rs:123
 msgid "Day folders inside months"
 msgstr "Ayların içinde gün klasörleri"
 
-#: shared/verso-core/src/settings.rs:119
+#: shared/verso-core/src/settings.rs:124
 msgid "Year and month folders inside albums"
 msgstr "Albümlerin içinde yıl ve ay klasörleri"
 
-#: shared/verso-core/src/settings.rs:120
+#: shared/verso-core/src/settings.rs:125
 msgid "Year and month folders inside people"
 msgstr "Kişilerin içinde yıl ve ay klasörleri"
 
-#: shared/verso-core/src/settings.rs:121
+#: shared/verso-core/src/settings.rs:126
 msgid "Year and month folders inside cities"
 msgstr "Şehirlerin içinde yıl ve ay klasörleri"
 
-#: shared/verso-core/src/settings.rs:122
+#: shared/verso-core/src/settings.rs:127
 msgid "Year and month folders inside favorites"
 msgstr "Favorilerin içinde yıl ve ay klasörleri"
 
-#: shared/verso-core/src/settings.rs:123
+#: shared/verso-core/src/settings.rs:128
 msgid "Year and month folders inside the archive"
 msgstr "Arşivin içinde yıl ve ay klasörleri"
 
-#: shared/verso-core/src/settings.rs:124
+#: shared/verso-core/src/settings.rs:129
 msgid "How album folders are named and grouped"
 msgstr "Albüm klasörlerinin nasıl adlandırılıp gruplanacağı"
 
-#: shared/verso-core/src/settings.rs:125
+#: shared/verso-core/src/settings.rs:130
 msgid "How files are named"
 msgstr "Dosyaların nasıl adlandırılacağı"
 
-#: shared/verso-core/src/settings.rs:126
+#: shared/verso-core/src/settings.rs:131
 msgid "The content cache's size limit"
 msgstr "İçerik önbelleğinin boyut sınırı"
 
-#: shared/verso-core/src/settings.rs:127
+#: shared/verso-core/src/settings.rs:132
 msgid "Show the Upload folder, and upload what is copied into it"
 msgstr "Upload klasörünü göster ve içine kopyalananları yükle"
 
-#: shared/verso-core/src/settings.rs:128
+#: shared/verso-core/src/settings.rs:133
 msgid "Folders copied into Upload"
 msgstr "Upload’a kopyalanan klasörler"
 
-#: shared/verso-core/src/settings.rs:129
+#: shared/verso-core/src/settings.rs:134
 msgid "Also seed 1024 px thumbnails from the preview"
 msgstr "Önizlemeden 1024 piksellik küçük resimler de oluştur"
 
-#: shared/verso-core/src/settings.rs:130
+#: shared/verso-core/src/settings.rs:135
 msgid "Refuse thumbnailer reads of originals"
 msgstr "Küçük resim oluşturucuların özgün dosyaları okumasını reddet"
 
-#: shared/verso-core/src/settings.rs:132
+#: shared/verso-core/src/settings.rs:137
 msgid "What a double click on Verso's top bar icon opens"
 msgstr "Verso’nun üst çubuk simgesine çift tıklayınca ne açılacağı"
 
-#: shared/verso-core/src/settings.rs:133
+#: shared/verso-core/src/settings.rs:138
 msgid "Verso's top bar icon in colour: the lens's five colours, grey while the server cannot be reached"
 msgstr "Verso’nun üst çubuk simgesi renkli: merceğin beş rengi, sunucuya ulaşılamazken gri"
 
-#: shared/verso-core/src/settings.rs:134
+#: shared/verso-core/src/settings.rs:139
 msgid "Verso's app icon in the light style: the picture on its print, its paper and its lens"
 msgstr "Açık stilde Verso’nun uygulama simgesi: baskısındaki resim, kâğıdı ve merceği"
 
-#: shared/verso-core/src/settings.rs:135
+#: shared/verso-core/src/settings.rs:140
 msgid "Verso's app icon in the dark style: the picture on its print, its paper and its lens"
 msgstr "Koyu stilde Verso’nun uygulama simgesi: baskısındaki resim, kâğıdı ve merceği"
 
-#: shared/verso-core/src/settings.rs:136
+#: shared/verso-core/src/settings.rs:141
 msgid "Show what other apps link to (Immich Crosslink)"
 msgstr "Başka uygulamaların bağlantı verdiği öğeleri göster (Immich Crosslink)"
 
-#: shared/verso-core/src/settings.rs:137
+#: shared/verso-core/src/settings.rs:142
 msgid "Verso: take part as Verso Gallery, so other apps show items in it"
 msgstr "Verso: Verso Gallery olarak katıl, böylece diğer uygulamalar öğeleri orada gösterebilsin"
 
-#: shared/verso-core/src/settings.rs:138
+#: shared/verso-core/src/settings.rs:143
 msgid "Verso: take part as Verso Drive, so other apps show items in Files while the drive is on"
 msgstr "Verso: Verso Drive olarak katıl, böylece diğer uygulamalar sürücü açıkken öğeleri Dosyalar’da gösterebilsin"
 
-#: shared/verso-core/src/settings.rs:139
+#: shared/verso-core/src/settings.rs:144
 msgid "Apps left out of Show in, by their desktop entry or bundle id, separated by ;"
 msgstr "Göster menüsünden çıkarılan uygulamalar, masaüstü girdisi veya paket kimliğiyle, ; ile ayrılmış"
 
-#: shared/verso-core/src/settings.rs:140
+#: shared/verso-core/src/settings.rs:145
 msgid "Tell me when a new version is out"
 msgstr "Yeni bir sürüm çıktığında bana bildir"
 
-#: shared/verso-core/src/settings.rs:141
+#: shared/verso-core/src/settings.rs:146
 msgid "Headless only: a 0600 file holding the credential"
 msgstr "Yalnızca masaüstü olmadan: kimlik bilgisini tutan 0600 izinli bir dosya"
 
-#: shared/verso-core/src/settings.rs:215
+#: shared/verso-core/src/settings.rs:222
 msgid "Never"
 msgstr "Asla"
 
-#: shared/verso-core/src/settings.rs:216
+#: shared/verso-core/src/settings.rs:223
 msgid "From 500 Items"
 msgstr "500 öğeden itibaren"
 
-#: shared/verso-core/src/settings.rs:217
+#: shared/verso-core/src/settings.rs:224
 msgid "Always"
 msgstr "Her zaman"
 
-#: shared/verso-core/src/settings.rs:218
+#: shared/verso-core/src/settings.rs:225
 msgid "Year in the Name (2023 - Trip)"
 msgstr "Yıl adda (2023 - Gezi)"
 
-#: shared/verso-core/src/settings.rs:219
+#: shared/verso-core/src/settings.rs:226
 msgid "Year Folders (2023/Trip)"
 msgstr "Yıl klasörleri (2023/Gezi)"
 
-#: shared/verso-core/src/settings.rs:220
+#: shared/verso-core/src/settings.rs:227
 msgid "Name Only (Trip)"
 msgstr "Yalnızca ad (Gezi)"
 
-#: shared/verso-core/src/settings.rs:221
+#: shared/verso-core/src/settings.rs:228
 msgid "Date and Time Taken"
 msgstr "Çekim tarihi ve saati"
 
-#: shared/verso-core/src/settings.rs:222
+#: shared/verso-core/src/settings.rs:229
 msgid "Original File Names"
 msgstr "Özgün dosya adları"
 
-#: shared/verso-core/src/settings.rs:223
+#: shared/verso-core/src/settings.rs:230
 msgid "Ask Each Time"
 msgstr "Her seferinde sor"
 
-#: shared/verso-core/src/settings.rs:227
-#: shared/verso-core/src/settings.rs:247
+#: shared/verso-core/src/settings.rs:234
+#: shared/verso-core/src/settings.rs:254
 msgid "Verso"
 msgstr "Verso"
 
-#: shared/verso-core/src/settings.rs:228
+#: shared/verso-core/src/settings.rs:235
 msgid "Verso Drive in Files"
 msgstr "Dosyalar’da Verso Drive"
 
-#: shared/verso-core/src/settings.rs:229
+#: shared/verso-core/src/settings.rs:236
 msgid "Preferences"
 msgstr "Tercihler"
 
-#: shared/verso-core/src/settings.rs:230
+#: shared/verso-core/src/settings.rs:237
 msgid "Mist"
 msgstr "Sis"
 
-#: shared/verso-core/src/settings.rs:231
+#: shared/verso-core/src/settings.rs:238
 msgid "Sand"
 msgstr "Kum"
 
-#: shared/verso-core/src/settings.rs:232
+#: shared/verso-core/src/settings.rs:239
 msgid "Dark"
 msgstr "Koyu"
 
-#: shared/verso-core/src/settings.rs:234
+#: shared/verso-core/src/settings.rs:241
 msgid "Frame"
 msgstr "Çerçeve"
 
-#: shared/verso-core/src/settings.rs:235
+#: shared/verso-core/src/settings.rs:242
 msgid "Slate"
 msgstr "Arduvaz"
 
-#: shared/verso-core/src/settings.rs:236
+#: shared/verso-core/src/settings.rs:243
 msgid "Sky"
 msgstr "Gökyüzü"
 

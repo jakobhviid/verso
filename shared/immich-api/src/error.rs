@@ -13,6 +13,8 @@ use std::time::Duration;
 
 use reqwest::StatusCode;
 
+use crate::certificate::CertificateRefusal;
+
 /// What [`ApiError::Offline`] says first, so an app that holds only an error's text tells an unreachable server from
 /// other failures ([`is_offline_text`]).
 const OFFLINE_TEXT: &str = "cannot reach the Immich server";
@@ -22,10 +24,20 @@ pub fn is_offline_text(text: &str) -> bool {
     text.contains(OFFLINE_TEXT)
 }
 
+/// What [`ApiError::UntrustedCertificate`] and [`ApiError::CertificateChanged`] say first, so an app that holds only an
+/// error's text tells a refused certificate from other failures ([`is_certificate_text`]).
+const CERTIFICATE_TEXT: &str = "the server's certificate";
+
+/// Whether an error's text says the server's certificate was refused, wherever it is quoted.
+pub fn is_certificate_text(text: &str) -> bool {
+    text.contains(CERTIFICATE_TEXT)
+}
+
 /// What went wrong talking to Immich.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum ApiError {
-    /// The server could not be reached: connection refused, DNS, TLS, a timeout, or a dropped connection.
+    /// The server could not be reached: connection refused, DNS, TLS (a certificate refused for a reason no person
+    /// overrules among them), a timeout, or a dropped connection.
     #[error("cannot reach the Immich server: {0}")]
     Offline(String),
 
@@ -64,9 +76,28 @@ pub enum ApiError {
     /// Reading or writing a local file failed: a file being uploaded, or an original being downloaded.
     #[error("cannot use the local file: {0}")]
     LocalFile(String),
+
+    /// The server presented a certificate the system does not trust, and none is trusted for the server: the person
+    /// may decide to trust it. Nothing was sent to the server.
+    #[error("the server's certificate is not trusted by this system ({})", .0.why())]
+    UntrustedCertificate(Box<CertificateRefusal>),
+
+    /// The server presented another certificate than the one trusted for it: renewed, or someone pretending to be the
+    /// server. Never trusted by itself; the person decides again. Nothing was sent to the server.
+    #[error("the server's certificate is not the one trusted for it")]
+    CertificateChanged(Box<CertificateRefusal>),
 }
 
 impl ApiError {
+    /// The certificate refused, when the server's certificate was ([`ApiError::UntrustedCertificate`],
+    /// [`ApiError::CertificateChanged`]).
+    pub fn certificate_refusal(&self) -> Option<&CertificateRefusal> {
+        match self {
+            ApiError::UntrustedCertificate(refusal) | ApiError::CertificateChanged(refusal) => Some(refusal),
+            _ => None,
+        }
+    }
+
     /// The status and the server's own words, when the server turned the request down with a status of its own (a
     /// 400 for a validation failure, a 409): what an app that shows the server's reason, or tells statuses apart,
     /// needs. `None` for every other error, the statuses with a kind of their own among them (401, 403, 404, busy).
@@ -165,6 +196,9 @@ fn missing_permission(message: &str) -> Option<String> {
 
 /// Map a transport failure (no HTTP response at all) to an [`ApiError`].
 pub(crate) fn from_transport(error: &reqwest::Error) -> ApiError {
+    if let Some(refusal) = crate::certificate::refusal_in(error) {
+        return if refusal.changed() { ApiError::CertificateChanged(Box::new(refusal)) } else { ApiError::UntrustedCertificate(Box::new(refusal)) };
+    }
     let text = without_query(error, describe(error));
     if error.is_builder() || error.is_decode() {
         return ApiError::Protocol(text);

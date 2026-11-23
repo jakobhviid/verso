@@ -39,22 +39,64 @@ pub struct Session {
     pub account: String,
 }
 
+/// Why a server could not be checked: its certificate, which the person decides on, or a message for people.
+#[derive(Debug, Clone)]
+pub enum SignInError {
+    /// The server's certificate is not one the system trusts, or not the one trusted for the server: the person may
+    /// trust it, and the client made trusting it (`Client::trusting`) asks again (ARCHITECTURE.md, "A certificate of
+    /// the server's own"). `refusal.changed()` when another one was trusted.
+    Certificate(Box<immich_api::CertificateRefusal>),
+    Failed(String),
+}
+
+impl SignInError {
+    /// An error of the client's, with what was being done (`Could not reach …: `) before its words.
+    fn from_api(error: immich_api::ApiError, doing: &str) -> SignInError {
+        match error.certificate_refusal() {
+            Some(refusal) => SignInError::Certificate(Box::new(refusal.clone())),
+            None => SignInError::Failed(format!("{doing}{error}")),
+        }
+    }
+}
+
+impl std::fmt::Display for SignInError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SignInError::Certificate(refusal) if refusal.changed() => write!(formatter, "The server's certificate is not the one trusted for it ({}).", refusal.certificate.sha256),
+            SignInError::Certificate(refusal) => write!(formatter, "The server's certificate is not trusted by this system ({}; {}).", refusal.why(), refusal.certificate.sha256),
+            SignInError::Failed(message) => formatter.write_str(message),
+        }
+    }
+}
+
+impl From<SignInError> for String {
+    fn from(error: SignInError) -> String {
+        error.to_string()
+    }
+}
+
+impl From<String> for SignInError {
+    fn from(message: String) -> SignInError {
+        SignInError::Failed(message)
+    }
+}
+
 // Every edition's sign-in, over a client it made with its own user agent (`anonymous` has no credential). Errors are
 // messages for people.
 
 /// Check the server at `url` and what sign-in methods it offers. Needs no credential.
-pub async fn probe(anonymous: &Client, url: &str) -> Result<ServerOffer, String> {
-    let version = anonymous.server_version().await.map_err(|error| format!("Could not reach {url}: {error}"))?;
+pub async fn probe(anonymous: &Client, url: &str) -> Result<ServerOffer, SignInError> {
+    let version = anonymous.server_version().await.map_err(|error| SignInError::from_api(error, &format!("Could not reach {url}: ")))?;
     if !version.is_supported() {
-        return Err(format!(
+        return Err(SignInError::Failed(format!(
             "This server runs Immich {version}. {} needs {} or later.",
             crate::product::current().name,
             immich_api::version::MINIMUM_SUPPORTED
-        ));
+        )));
     }
-    let features = anonymous.server_features().await.map_err(|error| error.to_string())?;
+    let features = anonymous.server_features().await.map_err(|error| SignInError::from_api(error, ""))?;
     let browser_button = if features.oauth {
-        let config = anonymous.server_config().await.map_err(|error| error.to_string())?;
+        let config = anonymous.server_config().await.map_err(|error| SignInError::from_api(error, ""))?;
         Some(if config.oauth_button_text.trim().is_empty() { "Sign in with SSO".to_owned() } else { config.oauth_button_text })
     } else {
         None

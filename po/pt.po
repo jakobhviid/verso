@@ -10,88 +10,96 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: linux/verso-service/src/commands.rs:467
-#: linux/verso-linux/src/daemon.rs:506
+#: linux/verso-service/src/commands.rs:471
+#: linux/verso-linux/src/daemon.rs:508
 msgid "Verso Drive is not mounted"
 msgstr "O Verso Drive não está montado"
 
-#: linux/verso-service/src/commands.rs:467
-#: linux/verso-linux/src/daemon.rs:506
+#: linux/verso-service/src/commands.rs:471
+#: linux/verso-linux/src/daemon.rs:508
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "Ative-o nas Preferências do Verso e abra o link novamente."
 
-#: linux/verso-service/src/online.rs:448
+#: linux/verso-service/src/online.rs:543
 msgid "The keyring stayed locked. Open {app}, or run “{command}”, to try again."
 msgstr "O chaveiro continuou bloqueado. Abra o {app} ou execute “{command}” para tentar novamente."
 
-#: linux/verso-service/src/online.rs:449
+#: linux/verso-service/src/online.rs:544
 msgid "Immich is not mounted"
 msgstr "O Immich não está montado"
 
-#: linux/verso-linux/src/daemon.rs:505
+#: linux/verso-linux/src/daemon.rs:507
 msgid "Links from other apps are off"
 msgstr "Os links de outros apps estão desligados"
 
-#: linux/verso-linux/src/daemon.rs:505
+#: linux/verso-linux/src/daemon.rs:507
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "Ative o Immich Crosslink nos ajustes do Verso para mostrar o que outros apps indicam."
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:509
 msgid "A link from another app cannot be opened"
 msgstr "Não é possível abrir um link de outro app"
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:509
 msgid "It is not a valid Immich link."
 msgstr "Não é um link válido do Immich."
 
-#: linux/verso-linux/src/daemon.rs:508
-#: linux/verso-linux/src/daemon.rs:512
+#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:514
 msgid "Nothing to show"
 msgstr "Nada para mostrar"
 
-#: linux/verso-linux/src/daemon.rs:508
+#: linux/verso-linux/src/daemon.rs:510
 msgid "Verso Drive has no place for what this link points to."
 msgstr "O Verso Drive não tem lugar para aquilo para onde este link aponta."
 
-#: linux/verso-linux/src/daemon.rs:509
+#: linux/verso-linux/src/daemon.rs:511
 msgid "Not signed in to {host}"
 msgstr "Sessão não iniciada em {host}"
 
-#: linux/verso-linux/src/daemon.rs:509
+#: linux/verso-linux/src/daemon.rs:511
 msgid "Verso is signed in to another Immich server."
 msgstr "O Verso está com a sessão iniciada em outro servidor Immich."
 
-#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:512
 msgid "Another Immich account"
 msgstr "Outra conta do Immich"
 
-#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:512
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "O link é de uma conta diferente daquela com que o Verso iniciou a sessão."
 
-#: linux/verso-linux/src/daemon.rs:513
+#: linux/verso-linux/src/daemon.rs:515
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "A unidade não mostra isto. Pode estar oculto, em uma seção desativada ou não compartilhado com você."
 
-#: linux/verso-linux/src/daemon.rs:515
-#: linux/verso-linux/src/daemon.rs:591
+#: linux/verso-linux/src/daemon.rs:517
+#: linux/verso-linux/src/daemon.rs:603
 msgid "Immich is unreachable"
 msgstr "O Immich está inacessível"
 
-#: linux/verso-linux/src/daemon.rs:515
+#: linux/verso-linux/src/daemon.rs:517
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "O servidor Immich está inacessível. Tente o link novamente mais tarde."
 
-#: linux/verso-linux/src/daemon.rs:592
+#: linux/verso-linux/src/daemon.rs:599
+msgid "Immich's certificate is not trusted"
+msgstr "O certificado do Immich não é confiável"
+
+#: linux/verso-linux/src/daemon.rs:600
+msgid "The Immich server presented a certificate {app} does not trust, so nothing is sent to it. Open {app} to check the certificate. Files you opened before stay available."
+msgstr "O servidor do Immich apresentou um certificado em que o {app} não confia, então nada é enviado a ele. Abra o {app} para verificar o certificado. Os arquivos que você abriu antes continuam disponíveis."
+
+#: linux/verso-linux/src/daemon.rs:604
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "O servidor Immich está inacessível. Os arquivos que você abriu antes continuam disponíveis."
 
-#: linux/verso-linux/src/daemon.rs:595
+#: linux/verso-linux/src/daemon.rs:607
 #: linux/verso-linux/src/tray.rs:128
 msgid "Signed out of Immich"
 msgstr "Sessão do Immich encerrada"
 
-#: linux/verso-linux/src/daemon.rs:596
+#: linux/verso-linux/src/daemon.rs:608
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "O Immich não aceita mais este início de sessão. Abra o {app} para iniciar a sessão novamente."
 
@@ -112,12 +120,12 @@ msgid "Files not uploaded: {count}"
 msgstr "Arquivos não enviados: {count}"
 
 #: linux/verso-linux/src/folders.rs:213
-#: shared/verso-core/src/settings.rs:225
+#: shared/verso-core/src/settings.rs:232
 msgid "Make Albums"
 msgstr "Criar álbuns"
 
 #: linux/verso-linux/src/folders.rs:213
-#: shared/verso-core/src/settings.rs:224
+#: shared/verso-core/src/settings.rs:231
 msgid "Timeline Only"
 msgstr "Só a linha do tempo"
 
@@ -198,7 +206,7 @@ msgid "{drive} cannot open “{name}”"
 msgstr "{drive} não consegue abrir “{name}”"
 
 #: linux/verso-linux/src/notify.rs:73
-#: shared/verso-core/src/settings.rs:246
+#: shared/verso-core/src/settings.rs:253
 msgid "Verso Drive"
 msgstr "Verso Drive"
 
@@ -393,101 +401,173 @@ msgstr "Nomes dos arquivos"
 #: linux/verso-desktop/src/preferences.rs:128
 #: linux/verso-desktop/src/preferences.rs:128
 #: linux/verso-desktop/src/preferences.rs:128
-#: shared/verso-core/src/settings.rs:131
+#: shared/verso-core/src/settings.rs:136
 msgid "Open in Immich and Copy Immich Link"
 msgstr "Abrir no Immich e Copiar link do Immich"
 
-#: linux/verso-desktop/src/session.rs:60
+#: linux/verso-desktop/src/session.rs:61
 msgid "Online"
 msgstr "Conectado"
 
-#: linux/verso-desktop/src/session.rs:61
+#: linux/verso-desktop/src/session.rs:62
 msgid "Server unreachable; files you opened before stay available"
 msgstr "Servidor inacessível; os arquivos que você abriu antes continuam disponíveis"
 
-#: linux/verso-desktop/src/session.rs:62
+#: linux/verso-desktop/src/session.rs:63
 msgid "Signed out; sign in again"
 msgstr "Sessão encerrada; inicie a sessão novamente"
 
-#: linux/verso-desktop/src/session.rs:64
-#: linux/verso-desktop/src/session.rs:74
+#: linux/verso-desktop/src/session.rs:65
+#: linux/verso-desktop/src/session.rs:75
 msgid "Not running"
 msgstr "Não está em execução"
 
-#: linux/verso-desktop/src/session.rs:71
+#: linux/verso-desktop/src/session.rs:72
 msgid "{used} of {limit}"
 msgstr "{used} de {limit}"
 
-#: linux/verso-desktop/src/session.rs:88
+#: linux/verso-desktop/src/session.rs:89
 msgid "writing"
 msgstr "gravando"
 
-#: linux/verso-desktop/src/session.rs:88
+#: linux/verso-desktop/src/session.rs:89
 msgid "uploading"
 msgstr "enviando"
 
-#: linux/verso-desktop/src/session.rs:89
+#: linux/verso-desktop/src/session.rs:90
 msgid "{name}, {phase}"
 msgstr "{name}, {phase}"
 
-#: linux/verso-desktop/src/session.rs:92
+#: linux/verso-desktop/src/session.rs:93
 msgid "{name} and {count} more"
 msgstr "{name} e mais {count}"
 
-#: linux/verso-desktop/src/session.rs:118
+#: linux/verso-desktop/src/session.rs:122
 msgid "That address cannot be used: {error}"
 msgstr "Esse endereço não pode ser usado: {error}"
 
-#: linux/verso-desktop/src/session.rs:166
-#: linux/verso-desktop/src/session.rs:176
-#: linux/verso-desktop/src/session.rs:510
-#: linux/verso-desktop/src/session.rs:513
+#: linux/verso-desktop/src/session.rs:207
+msgid "Trust it only if this fingerprint is your server's: on the server, “openssl x509 -noout -fingerprint -sha256 -in” with its certificate file shows it."
+msgstr "Confie nele apenas se esta impressão digital for a do seu servidor: no servidor, “openssl x509 -noout -fingerprint -sha256 -in” com o arquivo do certificado a mostra."
+
+#: linux/verso-desktop/src/session.rs:210
+msgid "The Server's Certificate Changed"
+msgstr "O certificado do servidor mudou"
+
+#: linux/verso-desktop/src/session.rs:211
+msgid "{host} presented another certificate than the one you trusted for it. If its certificate was renewed or replaced, that is expected; if not, someone between Verso and the server may be pretending to be it. Verso sends nothing to it until you decide."
+msgstr "{host} apresentou um certificado diferente daquele em que você confiou para ele. Se o certificado foi renovado ou substituído, isso é esperado; caso contrário, alguém entre o Verso e o servidor pode estar se passando por ele. O Verso não envia nada a ele até você decidir."
+
+#: linux/verso-desktop/src/session.rs:215
+msgid "Trust This Server's Certificate?"
+msgstr "Confiar no certificado deste servidor?"
+
+#: linux/verso-desktop/src/session.rs:216
+msgid "The certificate {host} presented is not one this computer trusts. A server at home often has a certificate of its own, but anyone between Verso and the server could also be pretending to be it."
+msgstr "O certificado que {host} apresentou não é um dos que este computador considera confiáveis. Um servidor doméstico costuma ter um certificado próprio, mas qualquer pessoa entre o Verso e o servidor também poderia estar se passando por ele."
+
+#: linux/verso-desktop/src/session.rs:222
+msgid "It expired on {date}."
+msgstr "Ele expirou em {date}."
+
+#: linux/verso-desktop/src/session.rs:223
+msgid "It is not valid before {date}."
+msgstr "Ele não é válido antes de {date}."
+
+#: linux/verso-desktop/src/session.rs:224
+msgid "It was not made for {host}."
+msgstr "Ele não foi emitido para {host}."
+
+#: linux/verso-desktop/src/session.rs:231
+msgid "Not stated"
+msgstr "Não informado"
+
+#: linux/verso-desktop/src/session.rs:237
+msgid "Fingerprint (SHA-256)"
+msgstr "Impressão digital (SHA-256)"
+
+#: linux/verso-desktop/src/session.rs:238
+msgid "Issued To"
+msgstr "Emitido para"
+
+#: linux/verso-desktop/src/session.rs:239
+msgid "Issued By"
+msgstr "Emitido por"
+
+#: linux/verso-desktop/src/session.rs:239
+msgid "Itself (self-signed)"
+msgstr "Ele mesmo (autoassinado)"
+
+#: linux/verso-desktop/src/session.rs:240
+msgid "Valid From"
+msgstr "Válido de"
+
+#: linux/verso-desktop/src/session.rs:241
+msgid "Valid Until"
+msgstr "Válido até"
+
+#: linux/verso-desktop/src/session.rs:244
+msgid "Trusted Until Now"
+msgstr "Confiável até agora"
+
+#: linux/verso-desktop/src/session.rs:246
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: linux/verso-desktop/src/session.rs:246
+msgid "Trust This Certificate"
+msgstr "Confiar neste certificado"
+
+#: linux/verso-desktop/src/session.rs:268
+#: linux/verso-desktop/src/session.rs:278
+#: linux/verso-desktop/src/session.rs:617
+#: linux/verso-desktop/src/session.rs:620
 msgid "Kept in {file}"
 msgstr "Guardada em {file}"
 
-#: linux/verso-desktop/src/session.rs:171
-#: linux/verso-desktop/src/session.rs:515
+#: linux/verso-desktop/src/session.rs:273
+#: linux/verso-desktop/src/session.rs:622
 msgid "Kept in the keyring"
 msgstr "Guardada no chaveiro"
 
-#: linux/verso-desktop/src/session.rs:178
+#: linux/verso-desktop/src/session.rs:280
 msgid "The keyring stayed locked, so nothing was saved."
 msgstr "O chaveiro continuou bloqueado, então nada foi salvo."
 
-#: linux/verso-desktop/src/session.rs:256
+#: linux/verso-desktop/src/session.rs:362
 msgid "Verso shows its icon in the top bar while you are signed in."
 msgstr "O Verso mostra seu ícone na barra superior enquanto você está com a sessão iniciada."
 
-#: linux/verso-desktop/src/session.rs:257
-#: linux/verso-desktop/src/session.rs:261
+#: linux/verso-desktop/src/session.rs:363
+#: linux/verso-desktop/src/session.rs:367
 msgid "Signed in, but the background service did not start: {error}"
 msgstr "Sessão iniciada, mas o serviço em segundo plano não foi iniciado: {error}"
 
-#: linux/verso-desktop/src/session.rs:260
+#: linux/verso-desktop/src/session.rs:366
 msgid "Signed in, but the background service cannot start: {error}."
 msgstr "Sessão iniciada, mas o serviço em segundo plano não pode ser iniciado: {error}."
 
-#: linux/verso-desktop/src/session.rs:290
+#: linux/verso-desktop/src/session.rs:396
 msgid "Verso Drive is not part of this version of Verso."
 msgstr "O Verso Drive não faz parte desta versão do Verso."
 
-#: linux/verso-desktop/src/session.rs:296
+#: linux/verso-desktop/src/session.rs:402
 msgid "The background service did not restart: {error}"
 msgstr "O serviço em segundo plano não foi reiniciado: {error}"
 
-#: linux/verso-desktop/src/session.rs:337
+#: linux/verso-desktop/src/session.rs:443
 msgid "Immich Mount is no longer signed in."
 msgstr "O Immich Mount não está mais com a sessão iniciada."
 
-#: linux/verso-desktop/src/session.rs:342
+#: linux/verso-desktop/src/session.rs:449
 msgid "Immich no longer accepts Immich Mount's sign-in; sign in instead."
 msgstr "O Immich não aceita mais o início de sessão do Immich Mount; em vez disso, inicie a sessão."
 
-#: linux/verso-desktop/src/session.rs:391
+#: linux/verso-desktop/src/session.rs:498
 msgid "Signed in, but the mount cannot start: {error}."
 msgstr "Sessão iniciada, mas a montagem não pode começar: {error}."
 
-#: linux/verso-desktop/src/session.rs:395
+#: linux/verso-desktop/src/session.rs:502
 msgid "Signed in, but the mount did not start: {error}"
 msgstr "Sessão iniciada, mas a montagem não começou: {error}"
 
@@ -597,7 +677,7 @@ msgid "Picture"
 msgstr "Imagem"
 
 #: linux/verso/src/drive_preferences.rs:212
-#: shared/verso-core/src/settings.rs:233
+#: shared/verso-core/src/settings.rs:240
 msgid "Paper"
 msgstr "Papel"
 
@@ -655,216 +735,220 @@ msgstr "{app} não está mais instalado."
 msgid "Verso could not open {app}: {error}"
 msgstr "O Verso não conseguiu abrir {app}: {error}"
 
-#: shared/verso-core/src/settings.rs:106
+#: shared/verso-core/src/settings.rs:110
 msgid "The Immich server; /api is added"
 msgstr "O servidor do Immich; /api é adicionado"
 
-#: shared/verso-core/src/settings.rs:107
+#: shared/verso-core/src/settings.rs:111
+msgid "The SHA-256 fingerprint of the server's own certificate, trusted where the system does not trust it"
+msgstr "A impressão digital SHA-256 do certificado próprio do servidor, considerado confiável onde o sistema não confia nele"
+
+#: shared/verso-core/src/settings.rs:112
 msgid "Show the library as a drive in the file manager"
 msgstr "Mostrar a biblioteca como uma unidade no gerenciador de arquivos"
 
-#: shared/verso-core/src/settings.rs:108
+#: shared/verso-core/src/settings.rs:113
 msgid "Where the mount appears"
 msgstr "Onde a montagem aparece"
 
-#: shared/verso-core/src/settings.rs:109
+#: shared/verso-core/src/settings.rs:114
 msgid "The drive's name in the sidebar"
 msgstr "O nome da unidade na barra lateral"
 
-#: shared/verso-core/src/settings.rs:110
+#: shared/verso-core/src/settings.rs:115
 msgid "Mount when the session starts"
 msgstr "Montar ao iniciar a sessão"
 
-#: shared/verso-core/src/settings.rs:111
+#: shared/verso-core/src/settings.rs:116
 msgid "List the drive in Files' sidebar as a drive, with its unmount button; off, as a bookmark"
 msgstr "Listar a unidade na barra lateral do Arquivos como unidade, com o botão de desmontar; desligado, como marcador"
 
-#: shared/verso-core/src/settings.rs:112
+#: shared/verso-core/src/settings.rs:117
 msgid "Show the Photos section"
 msgstr "Mostrar a seção Photos"
 
-#: shared/verso-core/src/settings.rs:113
+#: shared/verso-core/src/settings.rs:118
 msgid "Show the Albums section"
 msgstr "Mostrar a seção Albums"
 
-#: shared/verso-core/src/settings.rs:114
+#: shared/verso-core/src/settings.rs:119
 msgid "Show the People section"
 msgstr "Mostrar a seção People"
 
-#: shared/verso-core/src/settings.rs:115
+#: shared/verso-core/src/settings.rs:120
 msgid "Show the Places section"
 msgstr "Mostrar a seção Places"
 
-#: shared/verso-core/src/settings.rs:116
+#: shared/verso-core/src/settings.rs:121
 msgid "Show the Favorites section"
 msgstr "Mostrar a seção Favorites"
 
-#: shared/verso-core/src/settings.rs:117
+#: shared/verso-core/src/settings.rs:122
 msgid "Show the Archive section"
 msgstr "Mostrar a seção Archive"
 
-#: shared/verso-core/src/settings.rs:118
+#: shared/verso-core/src/settings.rs:123
 msgid "Day folders inside months"
 msgstr "Pastas de dias dentro dos meses"
 
-#: shared/verso-core/src/settings.rs:119
+#: shared/verso-core/src/settings.rs:124
 msgid "Year and month folders inside albums"
 msgstr "Pastas de ano e mês dentro dos álbuns"
 
-#: shared/verso-core/src/settings.rs:120
+#: shared/verso-core/src/settings.rs:125
 msgid "Year and month folders inside people"
 msgstr "Pastas de ano e mês dentro das pessoas"
 
-#: shared/verso-core/src/settings.rs:121
+#: shared/verso-core/src/settings.rs:126
 msgid "Year and month folders inside cities"
 msgstr "Pastas de ano e mês dentro das cidades"
 
-#: shared/verso-core/src/settings.rs:122
+#: shared/verso-core/src/settings.rs:127
 msgid "Year and month folders inside favorites"
 msgstr "Pastas de ano e mês dentro dos favoritos"
 
-#: shared/verso-core/src/settings.rs:123
+#: shared/verso-core/src/settings.rs:128
 msgid "Year and month folders inside the archive"
 msgstr "Pastas de ano e mês dentro do arquivo"
 
-#: shared/verso-core/src/settings.rs:124
+#: shared/verso-core/src/settings.rs:129
 msgid "How album folders are named and grouped"
 msgstr "Como as pastas de álbuns são nomeadas e agrupadas"
 
-#: shared/verso-core/src/settings.rs:125
+#: shared/verso-core/src/settings.rs:130
 msgid "How files are named"
 msgstr "Como os arquivos são nomeados"
 
-#: shared/verso-core/src/settings.rs:126
+#: shared/verso-core/src/settings.rs:131
 msgid "The content cache's size limit"
 msgstr "O limite de tamanho do cache de conteúdo"
 
-#: shared/verso-core/src/settings.rs:127
+#: shared/verso-core/src/settings.rs:132
 msgid "Show the Upload folder, and upload what is copied into it"
 msgstr "Mostrar a pasta Upload e enviar o que for copiado para ela"
 
-#: shared/verso-core/src/settings.rs:128
+#: shared/verso-core/src/settings.rs:133
 msgid "Folders copied into Upload"
 msgstr "Pastas copiadas para Upload"
 
-#: shared/verso-core/src/settings.rs:129
+#: shared/verso-core/src/settings.rs:134
 msgid "Also seed 1024 px thumbnails from the preview"
 msgstr "Gerar também miniaturas de 1024 px a partir da prévia"
 
-#: shared/verso-core/src/settings.rs:130
+#: shared/verso-core/src/settings.rs:135
 msgid "Refuse thumbnailer reads of originals"
 msgstr "Impedir que geradores de miniaturas leiam os originais"
 
-#: shared/verso-core/src/settings.rs:132
+#: shared/verso-core/src/settings.rs:137
 msgid "What a double click on Verso's top bar icon opens"
 msgstr "O que um clique duplo no ícone do Verso na barra superior abre"
 
-#: shared/verso-core/src/settings.rs:133
+#: shared/verso-core/src/settings.rs:138
 msgid "Verso's top bar icon in colour: the lens's five colours, grey while the server cannot be reached"
 msgstr "Ícone do Verso na barra superior em cores: as cinco cores da lente, cinza enquanto o servidor estiver inacessível"
 
-#: shared/verso-core/src/settings.rs:134
+#: shared/verso-core/src/settings.rs:139
 msgid "Verso's app icon in the light style: the picture on its print, its paper and its lens"
 msgstr "O ícone do aplicativo Verso no estilo claro: a imagem na sua cópia impressa, seu papel e sua lente"
 
-#: shared/verso-core/src/settings.rs:135
+#: shared/verso-core/src/settings.rs:140
 msgid "Verso's app icon in the dark style: the picture on its print, its paper and its lens"
 msgstr "O ícone do aplicativo Verso no estilo escuro: a imagem na sua cópia impressa, seu papel e sua lente"
 
-#: shared/verso-core/src/settings.rs:136
+#: shared/verso-core/src/settings.rs:141
 msgid "Show what other apps link to (Immich Crosslink)"
 msgstr "Mostrar o que outros apps indicam (Immich Crosslink)"
 
-#: shared/verso-core/src/settings.rs:137
+#: shared/verso-core/src/settings.rs:142
 msgid "Verso: take part as Verso Gallery, so other apps show items in it"
 msgstr "Verso: participar como Verso Gallery, para que outros apps mostrem itens nele"
 
-#: shared/verso-core/src/settings.rs:138
+#: shared/verso-core/src/settings.rs:143
 msgid "Verso: take part as Verso Drive, so other apps show items in Files while the drive is on"
 msgstr "Verso: participar como Verso Drive, para que outros apps mostrem itens no Arquivos enquanto a unidade estiver ligada"
 
-#: shared/verso-core/src/settings.rs:139
+#: shared/verso-core/src/settings.rs:144
 msgid "Apps left out of Show in, by their desktop entry or bundle id, separated by ;"
 msgstr "Apps deixados de fora de Mostrar no, pelo id da entrada de desktop ou do pacote, separados por ;"
 
-#: shared/verso-core/src/settings.rs:140
+#: shared/verso-core/src/settings.rs:145
 msgid "Tell me when a new version is out"
 msgstr "Avisar quando sair uma nova versão"
 
-#: shared/verso-core/src/settings.rs:141
+#: shared/verso-core/src/settings.rs:146
 msgid "Headless only: a 0600 file holding the credential"
 msgstr "Somente sem ambiente gráfico: um arquivo 0600 que guarda a credencial"
 
-#: shared/verso-core/src/settings.rs:215
+#: shared/verso-core/src/settings.rs:222
 msgid "Never"
 msgstr "Nunca"
 
-#: shared/verso-core/src/settings.rs:216
+#: shared/verso-core/src/settings.rs:223
 msgid "From 500 Items"
 msgstr "A partir de 500 itens"
 
-#: shared/verso-core/src/settings.rs:217
+#: shared/verso-core/src/settings.rs:224
 msgid "Always"
 msgstr "Sempre"
 
-#: shared/verso-core/src/settings.rs:218
+#: shared/verso-core/src/settings.rs:225
 msgid "Year in the Name (2023 - Trip)"
 msgstr "Ano no nome (2023 - Viagem)"
 
-#: shared/verso-core/src/settings.rs:219
+#: shared/verso-core/src/settings.rs:226
 msgid "Year Folders (2023/Trip)"
 msgstr "Pastas por ano (2023/Viagem)"
 
-#: shared/verso-core/src/settings.rs:220
+#: shared/verso-core/src/settings.rs:227
 msgid "Name Only (Trip)"
 msgstr "Somente o nome (Viagem)"
 
-#: shared/verso-core/src/settings.rs:221
+#: shared/verso-core/src/settings.rs:228
 msgid "Date and Time Taken"
 msgstr "Data e hora da captura"
 
-#: shared/verso-core/src/settings.rs:222
+#: shared/verso-core/src/settings.rs:229
 msgid "Original File Names"
 msgstr "Nomes de arquivo originais"
 
-#: shared/verso-core/src/settings.rs:223
+#: shared/verso-core/src/settings.rs:230
 msgid "Ask Each Time"
 msgstr "Perguntar sempre"
 
-#: shared/verso-core/src/settings.rs:227
-#: shared/verso-core/src/settings.rs:247
+#: shared/verso-core/src/settings.rs:234
+#: shared/verso-core/src/settings.rs:254
 msgid "Verso"
 msgstr "Verso"
 
-#: shared/verso-core/src/settings.rs:228
+#: shared/verso-core/src/settings.rs:235
 msgid "Verso Drive in Files"
 msgstr "Verso Drive no Arquivos"
 
-#: shared/verso-core/src/settings.rs:229
+#: shared/verso-core/src/settings.rs:236
 msgid "Preferences"
 msgstr "Preferências"
 
-#: shared/verso-core/src/settings.rs:230
+#: shared/verso-core/src/settings.rs:237
 msgid "Mist"
 msgstr "Névoa"
 
-#: shared/verso-core/src/settings.rs:231
+#: shared/verso-core/src/settings.rs:238
 msgid "Sand"
 msgstr "Areia"
 
-#: shared/verso-core/src/settings.rs:232
+#: shared/verso-core/src/settings.rs:239
 msgid "Dark"
 msgstr "Escuro"
 
-#: shared/verso-core/src/settings.rs:234
+#: shared/verso-core/src/settings.rs:241
 msgid "Frame"
 msgstr "Moldura"
 
-#: shared/verso-core/src/settings.rs:235
+#: shared/verso-core/src/settings.rs:242
 msgid "Slate"
 msgstr "Ardósia"
 
-#: shared/verso-core/src/settings.rs:236
+#: shared/verso-core/src/settings.rs:243
 msgid "Sky"
 msgstr "Céu"
 

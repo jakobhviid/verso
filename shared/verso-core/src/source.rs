@@ -27,6 +27,14 @@ pub enum SourceError {
     Changed,
 }
 
+impl SourceError {
+    /// Whether the server is out of reach because its certificate is not trusted, or not the one trusted for it,
+    /// rather than because it cannot be reached: the person decides in Verso (`crate::immich::source_error`).
+    pub fn is_certificate(&self) -> bool {
+        matches!(self, SourceError::Offline(reason) if immich_api::is_certificate_text(reason))
+    }
+}
+
 /// What changed in the library since the last look, as far as the source can tell. Empty when nothing did, or when
 /// the source cannot say (the freshness windows still apply).
 #[derive(Debug, Clone, Default, PartialEq, Eq)]

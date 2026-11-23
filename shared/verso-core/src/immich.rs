@@ -685,6 +685,9 @@ pub fn source_error(error: ApiError) -> SourceError {
         ApiError::RangeNotSatisfiable => SourceError::Changed,
         ApiError::Transient { .. } => SourceError::Busy,
         ApiError::Protocol(reason) | ApiError::LocalFile(reason) => SourceError::Protocol(reason),
+        // Nothing reaches the server until the person decides about its certificate (in the window): the drive serves
+        // what it holds, as while the server cannot be reached, saying why (`SourceError::is_certificate`).
+        refused @ (ApiError::UntrustedCertificate(_) | ApiError::CertificateChanged(_)) => SourceError::Offline(refused.to_string()),
     }
 }
 

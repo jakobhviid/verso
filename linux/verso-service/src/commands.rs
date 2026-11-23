@@ -145,6 +145,10 @@ fn online_checks(paths: &Paths) -> Vec<doctor::Check> {
             answered,
             entry("credential", Problem, detail.clone(), Some("Use an API key with the permissions in WORKFLOWS.md, section 2")),
         ],
+        ("untrusted-certificate", _) => vec![
+            entry("server", Problem, detail.clone(), Some(format!("Check its certificate in the app, or sign in again with `{}`, which asks about it", verso_core::product::command("login"))).as_deref()),
+            unchecked(),
+        ],
         ("offline", _) if server.version.is_none() => vec![unreachable(), unchecked()],
         ("offline", _) => vec![answered, unchecked()],
         (_, kind) => vec![answered, entry("credential", Fine, format!("accepted ({})", kind.unwrap_or("none")), None)],

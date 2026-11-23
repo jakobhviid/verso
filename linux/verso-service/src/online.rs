@@ -6,9 +6,9 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use anyhow::{bail, Context, Result};
-use immich_api::{Client, TimelineScope};
+use immich_api::{CertificatePin, CertificateRefusal, Client, TimelineScope};
 use verso_core::immich::ImmichSource;
-use verso_core::settings::Config;
+use verso_core::settings::{self, Config};
 use verso_core::sign_in::{self, BrowserSignIn};
 use verso_linux::credentials::{read_credential_file, write_credential_file, Credential};
 use verso_linux::keyring::{self, KeyringError};
@@ -18,7 +18,7 @@ use verso_linux::mounts::{mount_state, MountState};
 use verso_linux::paths::Paths;
 use serde::Serialize;
 
-use crate::commands::{configure_set, load_config};
+use crate::commands::{configure_set, configure_unset, load_config};
 
 /// How `login` signs in.
 #[derive(Debug, Clone, Copy)]
@@ -81,12 +81,65 @@ fn configured_server(config: &Config) -> Result<String> {
         .with_context(|| format!("no server is configured; sign in with `{}`", verso_core::product::command("login --server URL")))
 }
 
-fn client(server_url: &str, credential: Option<&Credential>) -> Result<Client> {
+/// A client for `server_url`, also trusting the certificate `trusted` names for it (`server.certificate_sha256`).
+fn client(server_url: &str, credential: Option<&Credential>, trusted: Option<CertificatePin>) -> Result<Client> {
     let credential = credential.map(|credential| match credential {
         Credential::ApiKey(key) => immich_api::Credential::ApiKey(key.clone()),
         Credential::Session(token) => immich_api::Credential::Session(token.clone()),
     });
-    Client::new(server_url, credential, &verso_core::product::user_agent()).with_context(|| format!("using the server URL {server_url}"))
+    Client::trusting(server_url, credential, &verso_core::product::user_agent(), trusted).with_context(|| format!("using the server URL {server_url}"))
+}
+
+/// How a refused certificate is told on the command line: what the person compares, and how to trust it.
+fn certificate_lines(server_url: &str, refusal: &CertificateRefusal) -> String {
+    let certificate = &refusal.certificate;
+    let opening = if refusal.changed() {
+        format!("{server_url} presents another certificate than the one trusted for it ({}).", refusal.trusted.map(|pin| pin.to_string()).unwrap_or_default())
+    } else {
+        format!("The certificate {server_url} presents is not one this computer trusts ({}).", refusal.why())
+    };
+    let or_unstated = |text: &str| if text.trim().is_empty() { "not stated".to_owned() } else { text.to_owned() };
+    let day = |moment: Option<chrono::DateTime<chrono::Utc>>| moment.map_or_else(|| "?".to_owned(), |moment| moment.format("%Y-%m-%d").to_string());
+    let expired = certificate.valid_until.is_some_and(|until| until < chrono::Utc::now());
+    format!(
+        "{opening}\n  Fingerprint (SHA-256): {}\n  Issued to: {}\n  Issued by: {}\n  Valid: {} to {}{}\nAnyone between this computer and the server could be pretending to be it. Trust it only if this fingerprint is your server's: on the server, `openssl x509 -noout -fingerprint -sha256 -in <its certificate file>` shows it.",
+        certificate.sha256,
+        or_unstated(&certificate.subject),
+        if certificate.self_signed { "itself (self-signed)".to_owned() } else { or_unstated(&certificate.issuer) },
+        day(certificate.valid_from),
+        day(certificate.valid_until),
+        if expired { " (expired)" } else { "" },
+    )
+}
+
+/// The certificate to trust for `server_url`, whose own the system refused (`refused`, presented without a pin): the
+/// one given with `--trust-certificate`, which must be the one presented; the one kept for the server, when it is that
+/// one; else the person's answer on a terminal. Without a terminal, how to trust it.
+fn certificate_to_trust(server_url: &str, refused: &CertificateRefusal, given: Option<CertificatePin>, kept: Option<CertificatePin>) -> Result<CertificatePin> {
+    let presented = refused.certificate.sha256;
+    if let Some(given) = given {
+        if given != presented {
+            bail!("{server_url} presents the certificate {presented}, not {given}; nothing was trusted");
+        }
+        return Ok(given);
+    }
+    if kept == Some(presented) {
+        return Ok(presented);
+    }
+    let refusal = CertificateRefusal { trusted: kept, ..refused.clone() };
+    if !std::io::stdin().is_terminal() {
+        bail!(
+            "{}\nIf it is, sign in with `{}`",
+            certificate_lines(server_url, &refusal),
+            verso_core::product::command(&format!("login --trust-certificate {presented}"))
+        );
+    }
+    eprintln!("{}", certificate_lines(server_url, &refusal));
+    let answer = read_line("Trust this certificate? [y/N] ")?;
+    if !matches!(answer.to_ascii_lowercase().as_str(), "y" | "yes") {
+        bail!("the certificate was not trusted, so nothing was sent to {server_url}");
+    }
+    Ok(presented)
 }
 
 fn runtime() -> Result<tokio::runtime::Runtime> {
@@ -140,18 +193,39 @@ pub struct LoginReport {
     pub user: Option<String>,
     /// `the keyring`, or the credential file's path.
     pub stored_in: String,
+    /// The certificate trusted for the server where this computer does not trust it, as its SHA-256 fingerprint.
+    pub certificate: Option<String>,
 }
 
-/// Sign in, check the credential against the server, and store it with the server's URL.
-pub fn login(paths: &Paths, method: LoginMethod, server: Option<String>) -> Result<LoginReport> {
+/// Sign in, check the credential against the server, and store it with the server's URL, and with the certificate
+/// trusted for it where the system does not trust the server's own (`trust_certificate`, else the person's answer).
+pub fn login(paths: &Paths, method: LoginMethod, server: Option<String>, trust_certificate: Option<CertificatePin>) -> Result<LoginReport> {
     let config = load_config(paths)?;
     let server_url = match server {
         Some(server) => server,
         None => configured_server(&config)?,
     };
+    let same = |address: &str| address.trim().trim_end_matches('/').to_owned();
+    let kept = config.server_certificate.filter(|_| config.server_url.as_deref().is_some_and(|configured| same(configured) == same(&server_url)));
     let runtime = runtime()?;
-    let anonymous = client(&server_url, None)?;
-    let version = runtime.block_on(anonymous.server_version()).with_context(|| format!("reaching {server_url}"))?;
+    // Asked first as the system judges it, so a certificate given or kept is trusted only where the system refuses the
+    // one presented, and only when it is that one.
+    let unpinned = client(&server_url, None, None)?;
+    let (anonymous, version, trusted) = match runtime.block_on(unpinned.server_version()) {
+        Ok(version) => {
+            if trust_certificate.is_some() {
+                crate::ui::warn(&format!("this computer trusts {server_url}'s certificate, so --trust-certificate is not needed; no certificate is kept"));
+            }
+            (unpinned, version, None)
+        }
+        Err(error) => {
+            let Some(refused) = error.certificate_refusal() else { return Err(error).with_context(|| format!("reaching {server_url}")) };
+            let trusted = certificate_to_trust(&server_url, refused, trust_certificate, kept)?;
+            let anonymous = client(&server_url, None, Some(trusted))?;
+            let version = runtime.block_on(anonymous.server_version()).with_context(|| format!("reaching {server_url}"))?;
+            (anonymous, version, Some(trusted))
+        }
+    };
     if !version.is_supported() {
         bail!("{server_url} runs Immich {version}; {} needs {} or later", verso_core::product::current().name, immich_api::version::MINIMUM_SUPPORTED);
     }
@@ -160,7 +234,7 @@ pub fn login(paths: &Paths, method: LoginMethod, server: Option<String>) -> Resu
         LoginMethod::ApiKey => {
             let credential = Credential::ApiKey(read_secret("API key: ")?);
             runtime
-                .block_on(client(&server_url, Some(&credential))?.api_key_permissions())
+                .block_on(client(&server_url, Some(&credential), trusted)?.api_key_permissions())
                 .context("the server did not accept the API key")?;
             (credential, None)
         }
@@ -216,13 +290,18 @@ pub fn login(paths: &Paths, method: LoginMethod, server: Option<String>) -> Resu
         },
     };
     configure_set(paths, "server.url", &server_url)?;
-    Ok(LoginReport { server: server_url, server_version: version.to_string(), method: credential.kind(), user, stored_in })
+    // The certificate belongs to this server: one trusted for another, or one the system no longer needs, goes.
+    match trusted {
+        Some(certificate) => configure_set(paths, settings::CERTIFICATE_KEY, &certificate.to_string())?,
+        None => configure_unset(paths, settings::CERTIFICATE_KEY)?,
+    };
+    Ok(LoginReport { server: server_url, server_version: version.to_string(), method: credential.kind(), user, stored_in, certificate: trusted.map(|certificate| certificate.to_string()) })
 }
 
 /// The shape WORKFLOWS.md documents for `verso-service status --json`.
 #[derive(Serialize)]
 pub struct StatusReport {
-    /// `unconfigured`, `online`, `offline`, `signed-out`, `missing-permission` or `unmounted`.
+    /// `unconfigured`, `online`, `offline`, `untrusted-certificate`, `signed-out`, `missing-permission` or `unmounted`.
     pub state: &'static str,
     /// Why, when the state is not `online`.
     pub detail: Option<String>,
@@ -247,6 +326,8 @@ pub struct FetchedStatus {
 pub struct ServerStatus {
     pub url: String,
     pub version: Option<String>,
+    /// The certificate trusted for the server where this computer does not trust it (`server.certificate_sha256`).
+    pub certificate: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -289,7 +370,11 @@ pub fn status(paths: &Paths) -> Result<StatusReport> {
     let mut report = StatusReport {
         state: "unconfigured",
         detail: None,
-        server: config.server_url.clone().filter(|url| !url.trim().is_empty()).map(|url| ServerStatus { url, version: None }),
+        server: config
+            .server_url
+            .clone()
+            .filter(|url| !url.trim().is_empty())
+            .map(|url| ServerStatus { url, version: None, certificate: config.server_certificate.map(|certificate| certificate.to_string()) }),
         account: AccountStatus { email: None, credential: None },
         change_feed: "polling",
         // Set below once the credential is read: a session also follows the sync stream.
@@ -316,7 +401,7 @@ pub fn status(paths: &Paths) -> Result<StatusReport> {
     if matches!(credential, Credential::Session(_)) {
         report.change_feed = "sync-stream";
     }
-    let client = client(&server_url, Some(&credential))?;
+    let client = client(&server_url, Some(&credential), config.server_certificate)?;
     match runtime.block_on(server_version_soon(&client)) {
         Ok(version) => {
             if let Some(server) = report.server.as_mut() {
@@ -327,6 +412,14 @@ pub fn status(paths: &Paths) -> Result<StatusReport> {
         Err(error) => {
             report.state = "offline";
             report.detail = Some(error.to_string());
+            if let Some(refusal) = error.certificate_refusal() {
+                report.state = "untrusted-certificate";
+                report.detail = Some(format!(
+                    "{error}: it presents {}; if that is your server's, sign in again in the app, or with `{}`",
+                    refusal.certificate.sha256,
+                    verso_core::product::command(&format!("login --trust-certificate {}", refusal.certificate.sha256))
+                ));
+            }
             return Ok(report);
         }
     }
@@ -354,7 +447,7 @@ pub fn revoke_session(paths: &Paths) -> bool {
     let Ok(server_url) = configured_server(&config) else { return false };
     let Ok(runtime) = runtime() else { return false };
     let Ok(credential @ Credential::Session(_)) = load_credential(paths, &config, &server_url, &runtime) else { return false };
-    let Ok(client) = client(&server_url, Some(&credential)) else { return false };
+    let Ok(client) = client(&server_url, Some(&credential), config.server_certificate) else { return false };
     // The timeout must be created inside the runtime, which owns the timer.
     let ended = runtime.block_on(async { tokio::time::timeout(std::time::Duration::from_secs(5), client.logout()).await });
     matches!(ended, Ok(Ok(())))
@@ -415,9 +508,11 @@ fn daemon_without_drive(
         let client = client.clone();
         async move {
             match client.my_email().await {
-                Err(immich_api::ApiError::Unauthorized) => State::SignedOut,
-                Err(immich_api::ApiError::Offline(_) | immich_api::ApiError::Transient { .. }) => State::Offline,
-                _ => State::Online,
+                Err(immich_api::ApiError::Unauthorized) => (State::SignedOut, false),
+                // Out of reach until the person decides about the certificate, in Verso.
+                Err(immich_api::ApiError::UntrustedCertificate(_) | immich_api::ApiError::CertificateChanged(_)) => (State::Offline, true),
+                Err(immich_api::ApiError::Offline(_) | immich_api::ApiError::Transient { .. }) => (State::Offline, false),
+                _ => (State::Online, false),
             }
         }
     };
@@ -451,7 +546,7 @@ pub fn daemon(paths: &Paths) -> Result<Option<StopReason>> {
         }
         Err(error) => return Err(error),
     };
-    let client = client(&server_url, Some(&credential))?;
+    let client = client(&server_url, Some(&credential), config.server_certificate)?;
     // The mount comes first: a server that drops requests would otherwise hold it back for the client's retries (four
     // minutes, on Bazzite), with the mount point an empty folder all along.
     let version = match runtime.block_on(server_version_soon(&client)) {
@@ -574,7 +669,7 @@ mod tests {
 
     #[test]
     fn account_names_are_the_servers_host_and_port() {
-        let named = |url: &str| account_name(&client(url, None).unwrap());
+        let named = |url: &str| account_name(&client(url, None, None).unwrap());
         assert_eq!(named("http://192.168.1.20:2283"), "192.168.1.20-2283");
         assert_eq!(named("https://photos.example.org"), "photos.example.org-443");
     }

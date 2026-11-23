@@ -19,17 +19,24 @@ bytes = "1"
 futures-util = { version = "0.3", default-features = false, features = ["std"] }
 chrono = { version = "0.4", default-features = false, features = ["std"] }
 sha1 = "0.10"
+# A certificate's fingerprint, the pin that trusts it (`certificate`).
+sha2 = "0.10"
 base64 = "0.22"
 
-# The TLS configuration a program may hand every client (`client::set_tls_config`), in reqwest's own rustls.
-rustls = { version = "0.23", default-features = false, features = ["std"], optional = true }
+# Every client's TLS configuration (`certificate`), in reqwest's own rustls: the system's verification, then the
+# certificate trusted for the server; and the roots the system lists, unless the platform hands its own verifier over.
+rustls = { version = "0.23", default-features = false, features = ["std", "ring", "tls12"], optional = true }
+rustls-native-certs = { version = "0.8", optional = true }
 
 [features]
 # TLS is a feature only so the portability check (`--no-default-features --target aarch64-apple-darwin`) can skip
 # ring's C code, which does not cross-compile on Linux. Every binary uses the default.
 default = ["tls"]
-tls = ["reqwest/rustls-tls-native-roots", "dep:rustls"]
+tls = ["reqwest/rustls-tls-native-roots", "dep:rustls", "dep:rustls-native-certs"]
 
 [dev-dependencies]
 tempfile = "3"
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "time", "fs", "io-util"] }
+# Certificates and a TLS server of the tests' own (`certificate`).
+rcgen = { version = "0.14", default-features = false, features = ["crypto", "ring"] }
+tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12"] }

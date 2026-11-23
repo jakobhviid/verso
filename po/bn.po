@@ -10,88 +10,96 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: linux/verso-service/src/commands.rs:467
-#: linux/verso-linux/src/daemon.rs:506
+#: linux/verso-service/src/commands.rs:471
+#: linux/verso-linux/src/daemon.rs:508
 msgid "Verso Drive is not mounted"
 msgstr "Verso Drive মাউন্ট করা নেই"
 
-#: linux/verso-service/src/commands.rs:467
-#: linux/verso-linux/src/daemon.rs:506
+#: linux/verso-service/src/commands.rs:471
+#: linux/verso-linux/src/daemon.rs:508
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "Verso-এর পছন্দসমূহে ড্রাইভটি চালু করুন, তারপর লিংকটি আবার খুলুন।"
 
-#: linux/verso-service/src/online.rs:448
+#: linux/verso-service/src/online.rs:543
 msgid "The keyring stayed locked. Open {app}, or run “{command}”, to try again."
 msgstr "কিরিং লক অবস্থায় রয়ে গেছে। আবার চেষ্টা করতে {app} খুলুন, অথবা “{command}” চালান।"
 
-#: linux/verso-service/src/online.rs:449
+#: linux/verso-service/src/online.rs:544
 msgid "Immich is not mounted"
 msgstr "Immich মাউন্ট করা নেই"
 
-#: linux/verso-linux/src/daemon.rs:505
+#: linux/verso-linux/src/daemon.rs:507
 msgid "Links from other apps are off"
 msgstr "অন্য অ্যাপের লিংক বন্ধ আছে"
 
-#: linux/verso-linux/src/daemon.rs:505
+#: linux/verso-linux/src/daemon.rs:507
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "অন্য অ্যাপ যা দেখায় তা দেখাতে Verso-এর সেটিংসে Immich Crosslink চালু করুন।"
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:509
 msgid "A link from another app cannot be opened"
 msgstr "অন্য অ্যাপের একটি লিংক খোলা যাচ্ছে না"
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:509
 msgid "It is not a valid Immich link."
 msgstr "এটি কোনো বৈধ Immich লিংক নয়।"
 
-#: linux/verso-linux/src/daemon.rs:508
-#: linux/verso-linux/src/daemon.rs:512
+#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:514
 msgid "Nothing to show"
 msgstr "দেখানোর মতো কিছু নেই"
 
-#: linux/verso-linux/src/daemon.rs:508
+#: linux/verso-linux/src/daemon.rs:510
 msgid "Verso Drive has no place for what this link points to."
 msgstr "এই লিংকটি যা নির্দেশ করে, Verso Drive-এ তার জন্য কোনো জায়গা নেই।"
 
-#: linux/verso-linux/src/daemon.rs:509
+#: linux/verso-linux/src/daemon.rs:511
 msgid "Not signed in to {host}"
 msgstr "{host}-এ সাইন-ইন করা নেই"
 
-#: linux/verso-linux/src/daemon.rs:509
+#: linux/verso-linux/src/daemon.rs:511
 msgid "Verso is signed in to another Immich server."
 msgstr "Verso অন্য একটি Immich সার্ভারে সাইন-ইন করা আছে।"
 
-#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:512
 msgid "Another Immich account"
 msgstr "অন্য একটি Immich অ্যাকাউন্ট"
 
-#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:512
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "লিংকটি অন্য একটি অ্যাকাউন্টের জন্য, Verso যে অ্যাকাউন্টে সাইন-ইন করা আছে সেটির জন্য নয়।"
 
-#: linux/verso-linux/src/daemon.rs:513
+#: linux/verso-linux/src/daemon.rs:515
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "ড্রাইভে এটি দেখা যায় না। এটি লুকানো থাকতে পারে, বন্ধ করা কোনো বিভাগে থাকতে পারে, অথবা আপনার সাথে শেয়ার করা না-ও হতে পারে।"
 
-#: linux/verso-linux/src/daemon.rs:515
-#: linux/verso-linux/src/daemon.rs:591
+#: linux/verso-linux/src/daemon.rs:517
+#: linux/verso-linux/src/daemon.rs:603
 msgid "Immich is unreachable"
 msgstr "Immich-এ পৌঁছানো যাচ্ছে না"
 
-#: linux/verso-linux/src/daemon.rs:515
+#: linux/verso-linux/src/daemon.rs:517
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "Immich সার্ভারে পৌঁছানো যাচ্ছে না। পরে আবার লিংকটি চেষ্টা করুন।"
 
-#: linux/verso-linux/src/daemon.rs:592
+#: linux/verso-linux/src/daemon.rs:599
+msgid "Immich's certificate is not trusted"
+msgstr "Immich-এর সার্টিফিকেট বিশ্বস্ত নয়"
+
+#: linux/verso-linux/src/daemon.rs:600
+msgid "The Immich server presented a certificate {app} does not trust, so nothing is sent to it. Open {app} to check the certificate. Files you opened before stay available."
+msgstr "Immich সার্ভার এমন একটি সার্টিফিকেট দেখিয়েছে যেটিকে {app} বিশ্বাস করে না, তাই সেখানে কিছু পাঠানো হয় না। সার্টিফিকেট যাচাই করতে {app} খুলুন। আগে খোলা ফাইলগুলো পাওয়া যাবে।"
+
+#: linux/verso-linux/src/daemon.rs:604
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "Immich সার্ভারে পৌঁছানো যাচ্ছে না। আগে খোলা ফাইলগুলো পাওয়া যাবে।"
 
-#: linux/verso-linux/src/daemon.rs:595
+#: linux/verso-linux/src/daemon.rs:607
 #: linux/verso-linux/src/tray.rs:128
 msgid "Signed out of Immich"
 msgstr "Immich থেকে সাইন-আউট হয়েছে"
 
-#: linux/verso-linux/src/daemon.rs:596
+#: linux/verso-linux/src/daemon.rs:608
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "Immich আর এই সাইন-ইন গ্রহণ করে না। আবার সাইন-ইন করতে {app} খুলুন।"
 
@@ -112,12 +120,12 @@ msgid "Files not uploaded: {count}"
 msgstr "যে ফাইলগুলো আপলোড হয়নি: {count}"
 
 #: linux/verso-linux/src/folders.rs:213
-#: shared/verso-core/src/settings.rs:225
+#: shared/verso-core/src/settings.rs:232
 msgid "Make Albums"
 msgstr "অ্যালবাম তৈরি করুন"
 
 #: linux/verso-linux/src/folders.rs:213
-#: shared/verso-core/src/settings.rs:224
+#: shared/verso-core/src/settings.rs:231
 msgid "Timeline Only"
 msgstr "শুধু টাইমলাইন"
 
@@ -198,7 +206,7 @@ msgid "{drive} cannot open “{name}”"
 msgstr "{drive} “{name}” খুলতে পারছে না"
 
 #: linux/verso-linux/src/notify.rs:73
-#: shared/verso-core/src/settings.rs:246
+#: shared/verso-core/src/settings.rs:253
 msgid "Verso Drive"
 msgstr "Verso Drive"
 
@@ -393,101 +401,173 @@ msgstr "ফাইলের নাম"
 #: linux/verso-desktop/src/preferences.rs:128
 #: linux/verso-desktop/src/preferences.rs:128
 #: linux/verso-desktop/src/preferences.rs:128
-#: shared/verso-core/src/settings.rs:131
+#: shared/verso-core/src/settings.rs:136
 msgid "Open in Immich and Copy Immich Link"
 msgstr "Immich-এ খুলুন ও Immich লিংক কপি করুন"
 
-#: linux/verso-desktop/src/session.rs:60
+#: linux/verso-desktop/src/session.rs:61
 msgid "Online"
 msgstr "অনলাইন"
 
-#: linux/verso-desktop/src/session.rs:61
+#: linux/verso-desktop/src/session.rs:62
 msgid "Server unreachable; files you opened before stay available"
 msgstr "সার্ভারে পৌঁছানো যাচ্ছে না; আগে খোলা ফাইলগুলো পাওয়া যাবে"
 
-#: linux/verso-desktop/src/session.rs:62
+#: linux/verso-desktop/src/session.rs:63
 msgid "Signed out; sign in again"
 msgstr "সাইন-আউট হয়েছে; আবার সাইন-ইন করুন"
 
-#: linux/verso-desktop/src/session.rs:64
-#: linux/verso-desktop/src/session.rs:74
+#: linux/verso-desktop/src/session.rs:65
+#: linux/verso-desktop/src/session.rs:75
 msgid "Not running"
 msgstr "চলছে না"
 
-#: linux/verso-desktop/src/session.rs:71
+#: linux/verso-desktop/src/session.rs:72
 msgid "{used} of {limit}"
 msgstr "{limit}-এর মধ্যে {used}"
 
-#: linux/verso-desktop/src/session.rs:88
+#: linux/verso-desktop/src/session.rs:89
 msgid "writing"
 msgstr "লেখা হচ্ছে"
 
-#: linux/verso-desktop/src/session.rs:88
+#: linux/verso-desktop/src/session.rs:89
 msgid "uploading"
 msgstr "আপলোড হচ্ছে"
 
-#: linux/verso-desktop/src/session.rs:89
+#: linux/verso-desktop/src/session.rs:90
 msgid "{name}, {phase}"
 msgstr "{name}, {phase}"
 
-#: linux/verso-desktop/src/session.rs:92
+#: linux/verso-desktop/src/session.rs:93
 msgid "{name} and {count} more"
 msgstr "{name} ও আরও {count}টি"
 
-#: linux/verso-desktop/src/session.rs:118
+#: linux/verso-desktop/src/session.rs:122
 msgid "That address cannot be used: {error}"
 msgstr "এই ঠিকানা ব্যবহার করা যাবে না: {error}"
 
-#: linux/verso-desktop/src/session.rs:166
-#: linux/verso-desktop/src/session.rs:176
-#: linux/verso-desktop/src/session.rs:510
-#: linux/verso-desktop/src/session.rs:513
+#: linux/verso-desktop/src/session.rs:207
+msgid "Trust it only if this fingerprint is your server's: on the server, “openssl x509 -noout -fingerprint -sha256 -in” with its certificate file shows it."
+msgstr "এই ফিঙ্গারপ্রিন্ট আপনার সার্ভারের হলে তবেই এটিকে বিশ্বাস করুন: সার্ভারে, এর সার্টিফিকেট ফাইল দিয়ে “openssl x509 -noout -fingerprint -sha256 -in” এটি দেখায়।"
+
+#: linux/verso-desktop/src/session.rs:210
+msgid "The Server's Certificate Changed"
+msgstr "সার্ভারের সার্টিফিকেট বদলে গেছে"
+
+#: linux/verso-desktop/src/session.rs:211
+msgid "{host} presented another certificate than the one you trusted for it. If its certificate was renewed or replaced, that is expected; if not, someone between Verso and the server may be pretending to be it. Verso sends nothing to it until you decide."
+msgstr "আপনি যে সার্টিফিকেটকে বিশ্বাস করেছিলেন, {host} তার বদলে অন্য একটি সার্টিফিকেট দেখিয়েছে। সার্টিফিকেট নবায়ন বা বদল করা হলে এটি প্রত্যাশিত; না হলে, Verso ও সার্ভারের মাঝে কেউ সার্ভার সেজে থাকতে পারে। আপনি সিদ্ধান্ত না নেওয়া পর্যন্ত Verso সেখানে কিছু পাঠায় না।"
+
+#: linux/verso-desktop/src/session.rs:215
+msgid "Trust This Server's Certificate?"
+msgstr "এই সার্ভারের সার্টিফিকেট বিশ্বাস করবেন?"
+
+#: linux/verso-desktop/src/session.rs:216
+msgid "The certificate {host} presented is not one this computer trusts. A server at home often has a certificate of its own, but anyone between Verso and the server could also be pretending to be it."
+msgstr "{host} যে সার্টিফিকেট দেখিয়েছে, এই কম্পিউটার সেটিকে বিশ্বাস করে না। বাড়ির সার্ভারের প্রায়ই নিজস্ব সার্টিফিকেট থাকে, কিন্তু Verso ও সার্ভারের মাঝে যে কেউ সার্ভার সেজেও থাকতে পারে।"
+
+#: linux/verso-desktop/src/session.rs:222
+msgid "It expired on {date}."
+msgstr "এর মেয়াদ {date}-এ শেষ হয়েছে।"
+
+#: linux/verso-desktop/src/session.rs:223
+msgid "It is not valid before {date}."
+msgstr "এটি {date}-এর আগে বৈধ নয়।"
+
+#: linux/verso-desktop/src/session.rs:224
+msgid "It was not made for {host}."
+msgstr "এটি {host}-এর জন্য তৈরি হয়নি।"
+
+#: linux/verso-desktop/src/session.rs:231
+msgid "Not stated"
+msgstr "উল্লেখ নেই"
+
+#: linux/verso-desktop/src/session.rs:237
+msgid "Fingerprint (SHA-256)"
+msgstr "ফিঙ্গারপ্রিন্ট (SHA-256)"
+
+#: linux/verso-desktop/src/session.rs:238
+msgid "Issued To"
+msgstr "যাকে ইস্যু করা হয়েছে"
+
+#: linux/verso-desktop/src/session.rs:239
+msgid "Issued By"
+msgstr "যে ইস্যু করেছে"
+
+#: linux/verso-desktop/src/session.rs:239
+msgid "Itself (self-signed)"
+msgstr "নিজেই (সেলফ-সাইনড)"
+
+#: linux/verso-desktop/src/session.rs:240
+msgid "Valid From"
+msgstr "বৈধতা শুরু"
+
+#: linux/verso-desktop/src/session.rs:241
+msgid "Valid Until"
+msgstr "বৈধতা শেষ"
+
+#: linux/verso-desktop/src/session.rs:244
+msgid "Trusted Until Now"
+msgstr "এখন পর্যন্ত বিশ্বস্ত"
+
+#: linux/verso-desktop/src/session.rs:246
+msgid "Cancel"
+msgstr "বাতিল করুন"
+
+#: linux/verso-desktop/src/session.rs:246
+msgid "Trust This Certificate"
+msgstr "এই সার্টিফিকেট বিশ্বাস করুন"
+
+#: linux/verso-desktop/src/session.rs:268
+#: linux/verso-desktop/src/session.rs:278
+#: linux/verso-desktop/src/session.rs:617
+#: linux/verso-desktop/src/session.rs:620
 msgid "Kept in {file}"
 msgstr "{file}-এ রাখা আছে"
 
-#: linux/verso-desktop/src/session.rs:171
-#: linux/verso-desktop/src/session.rs:515
+#: linux/verso-desktop/src/session.rs:273
+#: linux/verso-desktop/src/session.rs:622
 msgid "Kept in the keyring"
 msgstr "কিরিং-এ রাখা আছে"
 
-#: linux/verso-desktop/src/session.rs:178
+#: linux/verso-desktop/src/session.rs:280
 msgid "The keyring stayed locked, so nothing was saved."
 msgstr "কিরিং লক অবস্থায় রয়ে গেছে, তাই কিছু সংরক্ষণ করা হয়নি।"
 
-#: linux/verso-desktop/src/session.rs:256
+#: linux/verso-desktop/src/session.rs:362
 msgid "Verso shows its icon in the top bar while you are signed in."
 msgstr "আপনি সাইন-ইন থাকা অবস্থায় Verso টপ বারে তার আইকন দেখায়।"
 
-#: linux/verso-desktop/src/session.rs:257
-#: linux/verso-desktop/src/session.rs:261
+#: linux/verso-desktop/src/session.rs:363
+#: linux/verso-desktop/src/session.rs:367
 msgid "Signed in, but the background service did not start: {error}"
 msgstr "সাইন-ইন হয়েছে, কিন্তু ব্যাকগ্রাউন্ড সার্ভিস শুরু হয়নি: {error}"
 
-#: linux/verso-desktop/src/session.rs:260
+#: linux/verso-desktop/src/session.rs:366
 msgid "Signed in, but the background service cannot start: {error}."
 msgstr "সাইন-ইন হয়েছে, কিন্তু ব্যাকগ্রাউন্ড সার্ভিস শুরু করা যাচ্ছে না: {error}।"
 
-#: linux/verso-desktop/src/session.rs:290
+#: linux/verso-desktop/src/session.rs:396
 msgid "Verso Drive is not part of this version of Verso."
 msgstr "Verso Drive, Verso-এর এই সংস্করণের অংশ নয়।"
 
-#: linux/verso-desktop/src/session.rs:296
+#: linux/verso-desktop/src/session.rs:402
 msgid "The background service did not restart: {error}"
 msgstr "ব্যাকগ্রাউন্ড সার্ভিস আবার শুরু হয়নি: {error}"
 
-#: linux/verso-desktop/src/session.rs:337
+#: linux/verso-desktop/src/session.rs:443
 msgid "Immich Mount is no longer signed in."
 msgstr "Immich Mount আর সাইন-ইন করা নেই।"
 
-#: linux/verso-desktop/src/session.rs:342
+#: linux/verso-desktop/src/session.rs:449
 msgid "Immich no longer accepts Immich Mount's sign-in; sign in instead."
 msgstr "Immich আর Immich Mount-এর সাইন-ইন গ্রহণ করে না; তার বদলে সাইন-ইন করুন।"
 
-#: linux/verso-desktop/src/session.rs:391
+#: linux/verso-desktop/src/session.rs:498
 msgid "Signed in, but the mount cannot start: {error}."
 msgstr "সাইন-ইন হয়েছে, কিন্তু মাউন্ট শুরু করা যাচ্ছে না: {error}।"
 
-#: linux/verso-desktop/src/session.rs:395
+#: linux/verso-desktop/src/session.rs:502
 msgid "Signed in, but the mount did not start: {error}"
 msgstr "সাইন-ইন হয়েছে, কিন্তু মাউন্ট শুরু হয়নি: {error}"
 
@@ -597,7 +677,7 @@ msgid "Picture"
 msgstr "ছবি"
 
 #: linux/verso/src/drive_preferences.rs:212
-#: shared/verso-core/src/settings.rs:233
+#: shared/verso-core/src/settings.rs:240
 msgid "Paper"
 msgstr "কাগজ"
 
@@ -655,216 +735,220 @@ msgstr "{app} আর ইনস্টল করা নেই।"
 msgid "Verso could not open {app}: {error}"
 msgstr "Verso {app} খুলতে পারেনি: {error}"
 
-#: shared/verso-core/src/settings.rs:106
+#: shared/verso-core/src/settings.rs:110
 msgid "The Immich server; /api is added"
 msgstr "Immich সার্ভার; /api যোগ করা হয়"
 
-#: shared/verso-core/src/settings.rs:107
+#: shared/verso-core/src/settings.rs:111
+msgid "The SHA-256 fingerprint of the server's own certificate, trusted where the system does not trust it"
+msgstr "সার্ভারের নিজস্ব সার্টিফিকেটের SHA-256 ফিঙ্গারপ্রিন্ট, সিস্টেম যেখানে বিশ্বাস করে না সেখানে বিশ্বস্ত"
+
+#: shared/verso-core/src/settings.rs:112
 msgid "Show the library as a drive in the file manager"
 msgstr "লাইব্রেরিটি ফাইল ম্যানেজারে ড্রাইভ হিসেবে দেখান"
 
-#: shared/verso-core/src/settings.rs:108
+#: shared/verso-core/src/settings.rs:113
 msgid "Where the mount appears"
 msgstr "মাউন্ট কোথায় দেখা যায়"
 
-#: shared/verso-core/src/settings.rs:109
+#: shared/verso-core/src/settings.rs:114
 msgid "The drive's name in the sidebar"
 msgstr "সাইডবারে ড্রাইভের নাম"
 
-#: shared/verso-core/src/settings.rs:110
+#: shared/verso-core/src/settings.rs:115
 msgid "Mount when the session starts"
 msgstr "সেশন শুরু হলে মাউন্ট করুন"
 
-#: shared/verso-core/src/settings.rs:111
+#: shared/verso-core/src/settings.rs:116
 msgid "List the drive in Files' sidebar as a drive, with its unmount button; off, as a bookmark"
 msgstr "ফাইল অ্যাপের সাইডবারে ড্রাইভটিকে আনমাউন্ট বোতামসহ ড্রাইভ হিসেবে দেখান; বন্ধ থাকলে বুকমার্ক হিসেবে"
 
-#: shared/verso-core/src/settings.rs:112
+#: shared/verso-core/src/settings.rs:117
 msgid "Show the Photos section"
 msgstr "Photos বিভাগ দেখান"
 
-#: shared/verso-core/src/settings.rs:113
+#: shared/verso-core/src/settings.rs:118
 msgid "Show the Albums section"
 msgstr "Albums বিভাগ দেখান"
 
-#: shared/verso-core/src/settings.rs:114
+#: shared/verso-core/src/settings.rs:119
 msgid "Show the People section"
 msgstr "People বিভাগ দেখান"
 
-#: shared/verso-core/src/settings.rs:115
+#: shared/verso-core/src/settings.rs:120
 msgid "Show the Places section"
 msgstr "Places বিভাগ দেখান"
 
-#: shared/verso-core/src/settings.rs:116
+#: shared/verso-core/src/settings.rs:121
 msgid "Show the Favorites section"
 msgstr "Favorites বিভাগ দেখান"
 
-#: shared/verso-core/src/settings.rs:117
+#: shared/verso-core/src/settings.rs:122
 msgid "Show the Archive section"
 msgstr "Archive বিভাগ দেখান"
 
-#: shared/verso-core/src/settings.rs:118
+#: shared/verso-core/src/settings.rs:123
 msgid "Day folders inside months"
 msgstr "মাসের ভিতরে দিনের ফোল্ডার"
 
-#: shared/verso-core/src/settings.rs:119
+#: shared/verso-core/src/settings.rs:124
 msgid "Year and month folders inside albums"
 msgstr "অ্যালবামের ভিতরে বছর ও মাসের ফোল্ডার"
 
-#: shared/verso-core/src/settings.rs:120
+#: shared/verso-core/src/settings.rs:125
 msgid "Year and month folders inside people"
 msgstr "ব্যক্তিদের ভিতরে বছর ও মাসের ফোল্ডার"
 
-#: shared/verso-core/src/settings.rs:121
+#: shared/verso-core/src/settings.rs:126
 msgid "Year and month folders inside cities"
 msgstr "শহরের ভিতরে বছর ও মাসের ফোল্ডার"
 
-#: shared/verso-core/src/settings.rs:122
+#: shared/verso-core/src/settings.rs:127
 msgid "Year and month folders inside favorites"
 msgstr "প্রিয়গুলির ভিতরে বছর ও মাসের ফোল্ডার"
 
-#: shared/verso-core/src/settings.rs:123
+#: shared/verso-core/src/settings.rs:128
 msgid "Year and month folders inside the archive"
 msgstr "আর্কাইভের ভিতরে বছর ও মাসের ফোল্ডার"
 
-#: shared/verso-core/src/settings.rs:124
+#: shared/verso-core/src/settings.rs:129
 msgid "How album folders are named and grouped"
 msgstr "অ্যালবাম ফোল্ডারের নামকরণ ও গ্রুপিং কীভাবে হবে"
 
-#: shared/verso-core/src/settings.rs:125
+#: shared/verso-core/src/settings.rs:130
 msgid "How files are named"
 msgstr "ফাইলের নামকরণ কীভাবে হবে"
 
-#: shared/verso-core/src/settings.rs:126
+#: shared/verso-core/src/settings.rs:131
 msgid "The content cache's size limit"
 msgstr "কনটেন্ট ক্যাশের আকারের সীমা"
 
-#: shared/verso-core/src/settings.rs:127
+#: shared/verso-core/src/settings.rs:132
 msgid "Show the Upload folder, and upload what is copied into it"
 msgstr "Upload ফোল্ডার দেখান, এবং এতে কপি করা সবকিছু আপলোড করুন"
 
-#: shared/verso-core/src/settings.rs:128
+#: shared/verso-core/src/settings.rs:133
 msgid "Folders copied into Upload"
 msgstr "Upload-এ কপি করা ফোল্ডার"
 
-#: shared/verso-core/src/settings.rs:129
+#: shared/verso-core/src/settings.rs:134
 msgid "Also seed 1024 px thumbnails from the preview"
 msgstr "প্রিভিউ থেকে 1024 px থাম্বনেলও তৈরি করুন"
 
-#: shared/verso-core/src/settings.rs:130
+#: shared/verso-core/src/settings.rs:135
 msgid "Refuse thumbnailer reads of originals"
 msgstr "থাম্বনেলারকে আসল ফাইল পড়তে দেবেন না"
 
-#: shared/verso-core/src/settings.rs:132
+#: shared/verso-core/src/settings.rs:137
 msgid "What a double click on Verso's top bar icon opens"
 msgstr "Verso-এর টপ বার আইকনে ডাবল-ক্লিক করলে কী খোলে"
 
-#: shared/verso-core/src/settings.rs:133
+#: shared/verso-core/src/settings.rs:138
 msgid "Verso's top bar icon in colour: the lens's five colours, grey while the server cannot be reached"
 msgstr "Verso-এর টপ বার আইকন রঙিন: লেন্সের পাঁচটি রং, আর সার্ভারে পৌঁছানো না গেলে ধূসর"
 
-#: shared/verso-core/src/settings.rs:134
+#: shared/verso-core/src/settings.rs:139
 msgid "Verso's app icon in the light style: the picture on its print, its paper and its lens"
 msgstr "হালকা স্টাইলে Verso-এর অ্যাপ আইকন: তার প্রিন্টের ছবি, কাগজ আর লেন্স"
 
-#: shared/verso-core/src/settings.rs:135
+#: shared/verso-core/src/settings.rs:140
 msgid "Verso's app icon in the dark style: the picture on its print, its paper and its lens"
 msgstr "গাঢ় স্টাইলে Verso-এর অ্যাপ আইকন: তার প্রিন্টের ছবি, কাগজ আর লেন্স"
 
-#: shared/verso-core/src/settings.rs:136
+#: shared/verso-core/src/settings.rs:141
 msgid "Show what other apps link to (Immich Crosslink)"
 msgstr "অন্য অ্যাপ যা দেখায় তা দেখান (Immich Crosslink)"
 
-#: shared/verso-core/src/settings.rs:137
+#: shared/verso-core/src/settings.rs:142
 msgid "Verso: take part as Verso Gallery, so other apps show items in it"
 msgstr "Verso: Verso Gallery হিসেবে অংশ নিন, যাতে অন্য অ্যাপ এতে আইটেম দেখায়"
 
-#: shared/verso-core/src/settings.rs:138
+#: shared/verso-core/src/settings.rs:143
 msgid "Verso: take part as Verso Drive, so other apps show items in Files while the drive is on"
 msgstr "Verso: Verso Drive হিসেবে অংশ নিন, যাতে ড্রাইভ চালু থাকলে অন্য অ্যাপ ফাইল অ্যাপে আইটেম দেখায়"
 
-#: shared/verso-core/src/settings.rs:139
+#: shared/verso-core/src/settings.rs:144
 msgid "Apps left out of Show in, by their desktop entry or bundle id, separated by ;"
 msgstr "\"দেখান\" থেকে বাদ দেওয়া অ্যাপ, ডেস্কটপ এন্ট্রি বা বান্ডল আইডি দিয়ে, ; দিয়ে আলাদা"
 
-#: shared/verso-core/src/settings.rs:140
+#: shared/verso-core/src/settings.rs:145
 msgid "Tell me when a new version is out"
 msgstr "নতুন সংস্করণ এলে আমাকে জানাও"
 
-#: shared/verso-core/src/settings.rs:141
+#: shared/verso-core/src/settings.rs:146
 msgid "Headless only: a 0600 file holding the credential"
 msgstr "শুধু হেডলেস: ক্রেডেনশিয়াল রাখা একটি 0600 ফাইল"
 
-#: shared/verso-core/src/settings.rs:215
+#: shared/verso-core/src/settings.rs:222
 msgid "Never"
 msgstr "কখনো না"
 
-#: shared/verso-core/src/settings.rs:216
+#: shared/verso-core/src/settings.rs:223
 msgid "From 500 Items"
 msgstr "500টি আইটেম থেকে"
 
-#: shared/verso-core/src/settings.rs:217
+#: shared/verso-core/src/settings.rs:224
 msgid "Always"
 msgstr "সবসময়"
 
-#: shared/verso-core/src/settings.rs:218
+#: shared/verso-core/src/settings.rs:225
 msgid "Year in the Name (2023 - Trip)"
 msgstr "নামে বছর (2023 - ভ্রমণ)"
 
-#: shared/verso-core/src/settings.rs:219
+#: shared/verso-core/src/settings.rs:226
 msgid "Year Folders (2023/Trip)"
 msgstr "বছরের ফোল্ডার (2023/ভ্রমণ)"
 
-#: shared/verso-core/src/settings.rs:220
+#: shared/verso-core/src/settings.rs:227
 msgid "Name Only (Trip)"
 msgstr "শুধু নাম (ভ্রমণ)"
 
-#: shared/verso-core/src/settings.rs:221
+#: shared/verso-core/src/settings.rs:228
 msgid "Date and Time Taken"
 msgstr "তোলার তারিখ ও সময়"
 
-#: shared/verso-core/src/settings.rs:222
+#: shared/verso-core/src/settings.rs:229
 msgid "Original File Names"
 msgstr "আসল ফাইলের নাম"
 
-#: shared/verso-core/src/settings.rs:223
+#: shared/verso-core/src/settings.rs:230
 msgid "Ask Each Time"
 msgstr "প্রতিবার জিজ্ঞেস করুন"
 
-#: shared/verso-core/src/settings.rs:227
-#: shared/verso-core/src/settings.rs:247
+#: shared/verso-core/src/settings.rs:234
+#: shared/verso-core/src/settings.rs:254
 msgid "Verso"
 msgstr "Verso"
 
-#: shared/verso-core/src/settings.rs:228
+#: shared/verso-core/src/settings.rs:235
 msgid "Verso Drive in Files"
 msgstr "ফাইল অ্যাপে Verso Drive"
 
-#: shared/verso-core/src/settings.rs:229
+#: shared/verso-core/src/settings.rs:236
 msgid "Preferences"
 msgstr "পছন্দসমূহ"
 
-#: shared/verso-core/src/settings.rs:230
+#: shared/verso-core/src/settings.rs:237
 msgid "Mist"
 msgstr "কুয়াশা"
 
-#: shared/verso-core/src/settings.rs:231
+#: shared/verso-core/src/settings.rs:238
 msgid "Sand"
 msgstr "বালি"
 
-#: shared/verso-core/src/settings.rs:232
+#: shared/verso-core/src/settings.rs:239
 msgid "Dark"
 msgstr "গাঢ়"
 
-#: shared/verso-core/src/settings.rs:234
+#: shared/verso-core/src/settings.rs:241
 msgid "Frame"
 msgstr "ফ্রেম"
 
-#: shared/verso-core/src/settings.rs:235
+#: shared/verso-core/src/settings.rs:242
 msgid "Slate"
 msgstr "স্লেট"
 
-#: shared/verso-core/src/settings.rs:236
+#: shared/verso-core/src/settings.rs:243
 msgid "Sky"
 msgstr "আকাশ"
 

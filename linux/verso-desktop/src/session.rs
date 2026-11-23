@@ -6,9 +6,10 @@
 use std::path::PathBuf;
 use std::process::Command;
 
-use immich_api::Client;
+use immich_api::{CertificatePin, Client};
 use verso_core::settings::{self, Config};
 use verso_core::sign_in::{self, BrowserSignIn};
+pub use verso_core::sign_in::SignInError;
 use verso_linux::credentials::{write_credential_file, Credential};
 use verso_linux::i18n::tr;
 use verso_linux::keyring::{self, KeyringError};
@@ -110,53 +111,154 @@ async fn daemon_report() -> Option<DaemonReport> {
 
 pub use verso_core::sign_in::normalised_address;
 
-fn client(url: &str, credential: Option<&Credential>) -> Result<Client, String> {
+// Every step of signing in to `url` trusts `trusted` too: the certificate the person chose to trust for that server
+// (ARCHITECTURE.md, "A certificate of the server's own"), kept with it once signed in (`store_credential`).
+
+fn client(url: &str, credential: Option<&Credential>, trusted: Option<CertificatePin>) -> Result<Client, String> {
     let credential = credential.map(|credential| match credential {
         Credential::ApiKey(key) => immich_api::Credential::ApiKey(key.clone()),
         Credential::Session(token) => immich_api::Credential::Session(token.clone()),
     });
-    Client::new(url, credential, &verso_core::product::user_agent()).map_err(|error| tr("That address cannot be used: {error}").replace("{error}", &error.to_string()))
+    Client::trusting(url, credential, &verso_core::product::user_agent(), trusted).map_err(|error| tr("That address cannot be used: {error}").replace("{error}", &error.to_string()))
 }
 
-/// Check the server and what sign-in methods it offers. Needs no credential.
-pub async fn probe(url: String) -> Result<ServerOffer, String> {
-    sign_in::probe(&client(&url, None)?, &url).await
+/// Check the server and what sign-in methods it offers. Needs no credential. A certificate the system does not trust,
+/// unless it is `trusted`, comes back for the person to decide on (`SignInError::Certificate`).
+pub async fn probe(url: String, trusted: Option<CertificatePin>) -> Result<ServerOffer, SignInError> {
+    sign_in::probe(&client(&url, None, trusted)?, &url).await
 }
 
 /// Start a browser sign-in: the identity provider's address to open.
-pub async fn begin_browser_sign_in(url: String, state: String, code_challenge: String) -> Result<String, String> {
-    sign_in::begin_browser(&client(&url, None)?, &state, &code_challenge).await
+pub async fn begin_browser_sign_in(url: String, trusted: Option<CertificatePin>, state: String, code_challenge: String) -> Result<String, String> {
+    sign_in::begin_browser(&client(&url, None, trusted)?, &state, &code_challenge).await
 }
 
 /// Finish a browser sign-in with the address the browser was sent to.
-pub async fn finish_browser_sign_in(url: String, redirect: String, attempt: BrowserSignIn) -> Result<SignedIn, String> {
-    let session = sign_in::finish_browser(&client(&url, None)?, &redirect, &attempt).await?;
+pub async fn finish_browser_sign_in(url: String, trusted: Option<CertificatePin>, redirect: String, attempt: BrowserSignIn) -> Result<SignedIn, String> {
+    let session = sign_in::finish_browser(&client(&url, None, trusted)?, &redirect, &attempt).await?;
     Ok(SignedIn { credential: Credential::Session(session.token), account: Some(session.account) })
 }
 
-pub async fn sign_in_with_password(url: String, email: String, password: String) -> Result<SignedIn, String> {
-    let session = sign_in::password_session(&client(&url, None)?, &email, &password).await?;
+pub async fn sign_in_with_password(url: String, trusted: Option<CertificatePin>, email: String, password: String) -> Result<SignedIn, String> {
+    let session = sign_in::password_session(&client(&url, None, trusted)?, &email, &password).await?;
     Ok(SignedIn { credential: Credential::Session(session.token), account: Some(session.account) })
 }
 
-pub async fn sign_in_with_api_key(url: String, key: String) -> Result<SignedIn, String> {
+pub async fn sign_in_with_api_key(url: String, trusted: Option<CertificatePin>, key: String) -> Result<SignedIn, String> {
     let credential = Credential::ApiKey(key.trim().to_owned());
-    sign_in::check_api_key(&client(&url, Some(&credential))?).await?;
+    sign_in::check_api_key(&client(&url, Some(&credential), trusted)?).await?;
     Ok(SignedIn { credential, account: None })
+}
+
+/// The certificate trusted for `url`, where it is the server signed in to: so a certificate that changed since says so
+/// as Connect checks it again.
+pub fn trusted_certificate_for(url: &str) -> Option<CertificatePin> {
+    let config = Config::from_toml(&config_text(&Paths::from_environment()).ok()?).ok()?;
+    let same = |address: &str| address.trim().trim_end_matches('/').to_owned();
+    config.server_url.filter(|server| same(server) == same(url)).and(config.server_certificate)
+}
+
+/// Trust `certificate` for the server signed in to, in place of the one trusted before (or none): the person's answer
+/// to the question about a certificate that changed, or that the system does not trust. The service and the window
+/// connect with it from their next start.
+pub fn trust_certificate(certificate: CertificatePin) -> Result<(), String> {
+    let paths = Paths::from_environment();
+    let text = settings::set_value(&config_text(&paths)?, settings::CERTIFICATE_KEY, &certificate.to_string()).map_err(|error| error.to_string())?;
+    write_config(&paths, &text)
+}
+
+/// Forget the certificate trusted for the server (Preferences, Account): the next connection asks again, unless the
+/// system trusts the server's certificate by then.
+pub fn forget_certificate() -> Result<(), String> {
+    let paths = Paths::from_environment();
+    let text = settings::unset_value(&config_text(&paths)?, settings::CERTIFICATE_KEY).map_err(|error| error.to_string())?;
+    write_config(&paths, &text)
+}
+
+/// The question about a certificate the system did not trust, in the person's language: what the window shows.
+pub struct CertificateQuestion {
+    pub heading: String,
+    pub body: String,
+    /// The certificate's details: its fingerprint first.
+    pub details: Vec<CertificateDetail>,
+    pub cancel: String,
+    pub trust: String,
+}
+
+/// One line of a certificate's details.
+pub struct CertificateDetail {
+    pub title: String,
+    pub value: String,
+    /// A fingerprint, shown in a fixed-width font to compare pair by pair.
+    pub fingerprint: bool,
+}
+
+/// A fingerprint in lines of `pairs` pairs, so it breaks between pairs rather than inside one.
+pub fn fingerprint_lines(certificate: CertificatePin, pairs: usize) -> String {
+    let text = certificate.to_string();
+    let all: Vec<&str> = text.split(':').collect();
+    all.chunks(pairs.max(1)).map(|line| line.join(":")).collect::<Vec<_>>().join("\n")
+}
+
+/// What the window asks when `host`'s certificate was refused: whether to trust it, with what to compare. A changed
+/// certificate is asked about more strongly. `now` tells an expired one.
+pub fn certificate_question(refusal: &immich_api::CertificateRefusal, host: &str, now: chrono::DateTime<chrono::Utc>) -> CertificateQuestion {
+    let certificate = &refusal.certificate;
+    let compare = tr("Trust it only if this fingerprint is your server's: on the server, “openssl x509 -noout -fingerprint -sha256 -in” with its certificate file shows it.");
+    let (heading, opening) = if refusal.changed() {
+        (
+            tr("The Server's Certificate Changed"),
+            tr("{host} presented another certificate than the one you trusted for it. If its certificate was renewed or replaced, that is expected; if not, someone between Verso and the server may be pretending to be it. Verso sends nothing to it until you decide."),
+        )
+    } else {
+        (
+            tr("Trust This Server's Certificate?"),
+            tr("The certificate {host} presented is not one this computer trusts. A server at home often has a certificate of its own, but anyone between Verso and the server could also be pretending to be it."),
+        )
+    };
+    let day = |moment: chrono::DateTime<chrono::Utc>| crate::text::day(moment.date_naive());
+    let mut body = opening.replace("{host}", host);
+    let reason = match (&refusal.reason, certificate.valid_until, certificate.valid_from) {
+        (_, Some(until), _) if until < now => Some(tr("It expired on {date}.").replace("{date}", &day(until))),
+        (_, _, Some(from)) if from > now => Some(tr("It is not valid before {date}.").replace("{date}", &day(from))),
+        (immich_api::RefusalReason::NotValidForName, _, _) => Some(tr("It was not made for {host}.").replace("{host}", host)),
+        _ => None,
+    };
+    for sentence in reason.iter().map(String::as_str).chain([compare]) {
+        body.push(' ');
+        body.push_str(sentence);
+    }
+    let unknown = || tr("Not stated").to_owned();
+    let or_unknown = |text: &str| if text.trim().is_empty() { unknown() } else { text.to_owned() };
+    let line = |title: &str, value: String| CertificateDetail { title: title.to_owned(), value, fingerprint: false };
+    // Four lines of eight pairs fit the question's width.
+    let fingerprint = |title: &str, certificate: CertificatePin| CertificateDetail { title: title.to_owned(), value: fingerprint_lines(certificate, 8), fingerprint: true };
+    let mut details = vec![
+        fingerprint(tr("Fingerprint (SHA-256)"), certificate.sha256),
+        line(tr("Issued To"), or_unknown(&certificate.subject)),
+        line(tr("Issued By"), if certificate.self_signed { tr("Itself (self-signed)").to_owned() } else { or_unknown(&certificate.issuer) }),
+        line(tr("Valid From"), certificate.valid_from.map(day).unwrap_or_else(unknown)),
+        line(tr("Valid Until"), certificate.valid_until.map(day).unwrap_or_else(unknown)),
+    ];
+    if let Some(trusted) = refusal.trusted {
+        details.push(fingerprint(tr("Trusted Until Now"), trusted));
+    }
+    CertificateQuestion { heading: heading.to_owned(), body, details, cancel: tr("Cancel").to_owned(), trust: tr("Trust This Certificate").to_owned() }
 }
 
 /// Keep the credential where the daemon will read it (a configured `credential.file`; else the keyring, or the
 /// private file without one), remember the server, and enable the user service so the mount comes at the next login
 /// even if setup is left unfinished. Starting it is [`apply_setup`]'s job. Returns where the credential went.
-pub async fn save(url: String, credential: Credential) -> Result<String, String> {
-    let place = store_credential(url, credential).await?;
+pub async fn save(url: String, credential: Credential, trusted: Option<CertificatePin>) -> Result<String, String> {
+    let place = store_credential(url, credential, trusted).await?;
     let _ = Command::new("systemctl").args(["--user", "enable", &verso_linux::service::user_service()]).output();
     Ok(place)
 }
 
-/// [`save`] without the user service: the credential and the server only, where the daemon will find them once the
-/// drive is set up. Immich Gallery signs in this way, so signing in to browse never starts a mount.
-pub async fn store_credential(url: String, credential: Credential) -> Result<String, String> {
+/// [`save`] without the user service: the credential and the server, with the certificate trusted for it (or none),
+/// where the daemon will find them once the drive is set up. Immich Gallery signs in this way, so signing in to
+/// browse never starts a mount.
+pub async fn store_credential(url: String, credential: Credential, trusted: Option<CertificatePin>) -> Result<String, String> {
     let paths = Paths::from_environment();
     let configured_file = config_text(&paths).ok().and_then(|text| Config::from_toml(&text).ok()).and_then(|config| config.credential_file);
     let place = match configured_file {
@@ -179,7 +281,7 @@ pub async fn store_credential(url: String, credential: Credential) -> Result<Str
             Err(error) => return Err(error.to_string()),
         },
     };
-    remember_server(&paths, &url)?;
+    remember_server(&paths, &url, trusted)?;
     Ok(place)
 }
 
@@ -241,12 +343,16 @@ fn config_text(paths: &Paths) -> Result<String, String> {
     }
 }
 
-fn remember_server(paths: &Paths, url: &str) -> Result<(), String> {
+/// Keep the server signed in to, with the certificate trusted for it, or none: a certificate trusted for another
+/// server is never kept for this one.
+fn remember_server(paths: &Paths, url: &str, trusted: Option<CertificatePin>) -> Result<(), String> {
     let updated = settings::set_value(&config_text(paths)?, "server.url", url).map_err(|error| error.to_string())?;
-    std::fs::create_dir_all(&paths.config_directory).map_err(|error| error.to_string())?;
-    let temporary = paths.config_file().with_extension("toml.tmp");
-    std::fs::write(&temporary, updated).map_err(|error| error.to_string())?;
-    std::fs::rename(&temporary, paths.config_file()).map_err(|error| error.to_string())
+    let updated = match trusted {
+        Some(certificate) => settings::set_value(&updated, settings::CERTIFICATE_KEY, &certificate.to_string()),
+        None => settings::unset_value(&updated, settings::CERTIFICATE_KEY),
+    }
+    .map_err(|error| error.to_string())?;
+    write_config(paths, &updated)
 }
 
 /// Enable Verso's service and restart it, so the tray (and the drive, when it is on) comes now and at every login,
@@ -338,7 +444,8 @@ pub async fn take_over_immich_mount(url: String) -> Result<String, String> {
     };
     let own = match credential {
         Credential::Session(_) => {
-            let made = client(&url, Some(&credential))?.create_session("Verso", "Linux", None).await.map_err(|error| match error {
+            // Immich Mount trusts the certificates the system trusts, and no other.
+            let made = client(&url, Some(&credential), None)?.create_session("Verso", "Linux", None).await.map_err(|error| match error {
                 immich_api::ApiError::Unauthorized => tr("Immich no longer accepts Immich Mount's sign-in; sign in instead.").to_owned(),
                 error => error.to_string(),
             })?;
@@ -346,7 +453,7 @@ pub async fn take_over_immich_mount(url: String) -> Result<String, String> {
         }
         key @ Credential::ApiKey(_) => key,
     };
-    let place = store_credential(url, own).await?;
+    let place = store_credential(url, own, None).await?;
     let paths = Paths::from_environment();
     write_config(&paths, &taken_over_settings(&text, &config_text(&paths)?)?)?;
     Ok(place)
@@ -358,7 +465,7 @@ pub async fn take_over_immich_mount(url: String) -> Result<String, String> {
 fn taken_over_settings(theirs: &str, ours: &str) -> Result<String, String> {
     let mut ours = ours.to_owned();
     for (key, value) in settings::stored_values(theirs).map_err(|error| error.to_string())? {
-        if !matches!(key, "server.url" | "mount.enabled" | "mount.path" | "mount.name" | "credential.file" | "mount.at_login" | "updates.check") {
+        if !matches!(key, "server.url" | settings::CERTIFICATE_KEY | "mount.enabled" | "mount.path" | "mount.name" | "credential.file" | "mount.at_login" | "updates.check") {
             ours = settings::set_value(&ours, key, &value).map_err(|error| error.to_string())?;
         }
     }
@@ -563,6 +670,58 @@ pub fn disconnect() -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn refusal(trusted: Option<CertificatePin>, valid_until: &str) -> immich_api::CertificateRefusal {
+        let moment = |text: &str| chrono::DateTime::parse_from_rfc3339(text).unwrap().with_timezone(&chrono::Utc);
+        immich_api::CertificateRefusal {
+            certificate: immich_api::CertificateDetails {
+                sha256: CertificatePin::of(b"presented"),
+                subject: "photos.home.arpa".to_owned(),
+                issuer: "photos.home.arpa".to_owned(),
+                valid_from: Some(moment("2025-03-01T00:00:00Z")),
+                valid_until: Some(moment(valid_until)),
+                self_signed: true,
+            },
+            reason: immich_api::RefusalReason::UnknownIssuer,
+            trusted,
+        }
+    }
+
+    #[test]
+    fn a_fingerprint_breaks_between_its_pairs() {
+        let pin = CertificatePin::of(b"presented");
+        let lines = fingerprint_lines(pin, 8);
+        assert_eq!(lines.lines().count(), 4);
+        assert!(lines.lines().all(|line| line.len() == 8 * 3 - 1), "{lines}");
+        assert_eq!(lines.replace('\n', ":"), pin.to_string());
+        assert_eq!(fingerprint_lines(pin, 16).lines().count(), 2);
+    }
+
+    #[test]
+    fn the_question_shows_the_certificate_and_how_to_check_it() {
+        let now = chrono::DateTime::parse_from_rfc3339("2026-11-23T12:00:00Z").unwrap().with_timezone(&chrono::Utc);
+        let question = certificate_question(&refusal(None, "2035-02-28T00:00:00Z"), "photos.home.arpa", now);
+        assert_eq!(question.heading, "Trust This Server's Certificate?");
+        assert!(question.body.contains("photos.home.arpa") && question.body.contains("openssl x509 -noout -fingerprint -sha256"), "{}", question.body);
+        assert!(!question.body.contains("expired"), "{}", question.body);
+        let titles: Vec<&str> = question.details.iter().map(|detail| detail.title.as_str()).collect();
+        assert_eq!(titles, ["Fingerprint (SHA-256)", "Issued To", "Issued By", "Valid From", "Valid Until"]);
+        assert!(question.details[0].fingerprint && !question.details[1].fingerprint);
+        assert_eq!(question.details[0].value.replace('\n', ":"), CertificatePin::of(b"presented").to_string());
+        assert_eq!(question.details[2].value, "Itself (self-signed)");
+        assert_eq!(question.trust, "Trust This Certificate");
+    }
+
+    #[test]
+    fn a_changed_or_expired_certificate_says_so() {
+        let now = chrono::DateTime::parse_from_rfc3339("2026-11-23T12:00:00Z").unwrap().with_timezone(&chrono::Utc);
+        let earlier = CertificatePin::of(b"trusted before");
+        let question = certificate_question(&refusal(Some(earlier), "2026-01-31T00:00:00Z"), "photos.home.arpa", now);
+        assert_eq!(question.heading, "The Server's Certificate Changed");
+        assert!(question.body.contains("It expired on"), "{}", question.body);
+        let last = question.details.last().unwrap();
+        assert_eq!((last.title.as_str(), last.value.replace('\n', ":"), last.fingerprint), ("Trusted Until Now", earlier.to_string(), true));
+    }
 
     fn attempt_text(attempt: &BrowserSignIn) -> String {
         format!("https://photos.example.org\n{}\n{}\n{}\n", attempt.state, attempt.code_verifier, attempt.code_challenge)

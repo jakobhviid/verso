@@ -113,6 +113,10 @@ impl Resend {
     }
 
     pub(crate) fn retries_transport(self, error: &reqwest::Error) -> bool {
+        // A refused certificate is refused again: it waits for the person, not for time.
+        if crate::certificate::is_certificate_failure(error) {
+            return false;
+        }
         match self {
             Resend::Freely => is_retryable_transport(error),
             Resend::OnlyUnsent => error.is_connect(),

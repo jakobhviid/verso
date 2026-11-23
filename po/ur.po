@@ -10,88 +10,96 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: linux/verso-service/src/commands.rs:467
-#: linux/verso-linux/src/daemon.rs:506
+#: linux/verso-service/src/commands.rs:471
+#: linux/verso-linux/src/daemon.rs:508
 msgid "Verso Drive is not mounted"
 msgstr "Verso Drive ماؤنٹ نہیں ہے"
 
-#: linux/verso-service/src/commands.rs:467
-#: linux/verso-linux/src/daemon.rs:506
+#: linux/verso-service/src/commands.rs:471
+#: linux/verso-linux/src/daemon.rs:508
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "Verso کی ترجیحات میں ڈرائیو آن کریں، پھر لنک دوبارہ کھولیں۔"
 
-#: linux/verso-service/src/online.rs:448
+#: linux/verso-service/src/online.rs:543
 msgid "The keyring stayed locked. Open {app}, or run “{command}”, to try again."
 msgstr "کی رِنگ مقفل رہی۔ دوبارہ کوشش کرنے کے لیے {app} کھولیں، یا “{command}” چلائیں۔"
 
-#: linux/verso-service/src/online.rs:449
+#: linux/verso-service/src/online.rs:544
 msgid "Immich is not mounted"
 msgstr "Immich ماؤنٹ نہیں ہے"
 
-#: linux/verso-linux/src/daemon.rs:505
+#: linux/verso-linux/src/daemon.rs:507
 msgid "Links from other apps are off"
 msgstr "دوسری ایپس کے لنک بند ہیں"
 
-#: linux/verso-linux/src/daemon.rs:505
+#: linux/verso-linux/src/daemon.rs:507
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "دوسری ایپس جس کا لنک دیتی ہیں اسے دکھانے کے لیے Verso کی ترتیبات میں Immich Crosslink آن کریں۔"
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:509
 msgid "A link from another app cannot be opened"
 msgstr "کسی دوسری ایپ کا لنک نہیں کھل سکتا"
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:509
 msgid "It is not a valid Immich link."
 msgstr "یہ درست Immich لنک نہیں ہے۔"
 
-#: linux/verso-linux/src/daemon.rs:508
-#: linux/verso-linux/src/daemon.rs:512
+#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:514
 msgid "Nothing to show"
 msgstr "دکھانے کے لیے کچھ نہیں"
 
-#: linux/verso-linux/src/daemon.rs:508
+#: linux/verso-linux/src/daemon.rs:510
 msgid "Verso Drive has no place for what this link points to."
 msgstr "یہ لنک جس چیز کی طرف اشارہ کرتا ہے، اس کے لیے Verso Drive میں کوئی جگہ نہیں۔"
 
-#: linux/verso-linux/src/daemon.rs:509
+#: linux/verso-linux/src/daemon.rs:511
 msgid "Not signed in to {host}"
 msgstr "{host} میں سائن ان نہیں"
 
-#: linux/verso-linux/src/daemon.rs:509
+#: linux/verso-linux/src/daemon.rs:511
 msgid "Verso is signed in to another Immich server."
 msgstr "Verso کسی دوسرے Immich سرور میں سائن ان ہے۔"
 
-#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:512
 msgid "Another Immich account"
 msgstr "کوئی دوسرا Immich اکاؤنٹ"
 
-#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:512
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "یہ لنک کسی دوسرے اکاؤنٹ کے لیے ہے، اس اکاؤنٹ کے لیے نہیں جس سے Verso سائن ان ہے۔"
 
-#: linux/verso-linux/src/daemon.rs:513
+#: linux/verso-linux/src/daemon.rs:515
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "ڈرائیو یہ نہیں دکھاتی۔ ہو سکتا ہے یہ چھپا ہوا ہو، کسی بند حصے میں ہو، یا آپ کے ساتھ شیئر نہ کیا گیا ہو۔"
 
-#: linux/verso-linux/src/daemon.rs:515
-#: linux/verso-linux/src/daemon.rs:591
+#: linux/verso-linux/src/daemon.rs:517
+#: linux/verso-linux/src/daemon.rs:603
 msgid "Immich is unreachable"
 msgstr "Immich تک رسائی ممکن نہیں"
 
-#: linux/verso-linux/src/daemon.rs:515
+#: linux/verso-linux/src/daemon.rs:517
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "Immich سرور تک رسائی ممکن نہیں۔ بعد میں لنک دوبارہ آزمائیں۔"
 
-#: linux/verso-linux/src/daemon.rs:592
+#: linux/verso-linux/src/daemon.rs:599
+msgid "Immich's certificate is not trusted"
+msgstr "Immich کا سرٹیفکیٹ قابلِ اعتماد نہیں"
+
+#: linux/verso-linux/src/daemon.rs:600
+msgid "The Immich server presented a certificate {app} does not trust, so nothing is sent to it. Open {app} to check the certificate. Files you opened before stay available."
+msgstr "Immich سرور نے ایسا سرٹیفکیٹ پیش کیا جس پر {app} بھروسا نہیں کرتا، اس لیے اسے کچھ نہیں بھیجا جاتا۔ سرٹیفکیٹ جانچنے کے لیے {app} کھولیں۔ پہلے کھولی گئی فائلیں دستیاب رہتی ہیں۔"
+
+#: linux/verso-linux/src/daemon.rs:604
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "Immich سرور تک رسائی ممکن نہیں۔ پہلے کھولی گئی فائلیں دستیاب رہیں گی۔"
 
-#: linux/verso-linux/src/daemon.rs:595
+#: linux/verso-linux/src/daemon.rs:607
 #: linux/verso-linux/src/tray.rs:128
 msgid "Signed out of Immich"
 msgstr "Immich سے سائن آؤٹ ہو گیا"
 
-#: linux/verso-linux/src/daemon.rs:596
+#: linux/verso-linux/src/daemon.rs:608
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "Immich اب یہ سائن ان قبول نہیں کرتا۔ دوبارہ سائن ان کرنے کے لیے {app} کھولیں۔"
 
@@ -112,12 +120,12 @@ msgid "Files not uploaded: {count}"
 msgstr "اپ لوڈ نہ ہونے والی فائلیں: {count}"
 
 #: linux/verso-linux/src/folders.rs:213
-#: shared/verso-core/src/settings.rs:225
+#: shared/verso-core/src/settings.rs:232
 msgid "Make Albums"
 msgstr "البم بنائیں"
 
 #: linux/verso-linux/src/folders.rs:213
-#: shared/verso-core/src/settings.rs:224
+#: shared/verso-core/src/settings.rs:231
 msgid "Timeline Only"
 msgstr "صرف ٹائم لائن"
 
@@ -198,7 +206,7 @@ msgid "{drive} cannot open “{name}”"
 msgstr "{drive} میں “{name}” نہیں کھل سکتی"
 
 #: linux/verso-linux/src/notify.rs:73
-#: shared/verso-core/src/settings.rs:246
+#: shared/verso-core/src/settings.rs:253
 msgid "Verso Drive"
 msgstr "Verso Drive"
 
@@ -393,101 +401,173 @@ msgstr "فائلوں کے نام"
 #: linux/verso-desktop/src/preferences.rs:128
 #: linux/verso-desktop/src/preferences.rs:128
 #: linux/verso-desktop/src/preferences.rs:128
-#: shared/verso-core/src/settings.rs:131
+#: shared/verso-core/src/settings.rs:136
 msgid "Open in Immich and Copy Immich Link"
 msgstr "Immich میں کھولیں اور Immich لنک کاپی کریں"
 
-#: linux/verso-desktop/src/session.rs:60
+#: linux/verso-desktop/src/session.rs:61
 msgid "Online"
 msgstr "آن لائن"
 
-#: linux/verso-desktop/src/session.rs:61
+#: linux/verso-desktop/src/session.rs:62
 msgid "Server unreachable; files you opened before stay available"
 msgstr "سرور تک رسائی ممکن نہیں؛ پہلے کھولی گئی فائلیں دستیاب رہیں گی"
 
-#: linux/verso-desktop/src/session.rs:62
+#: linux/verso-desktop/src/session.rs:63
 msgid "Signed out; sign in again"
 msgstr "سائن آؤٹ ہو گیا؛ دوبارہ سائن ان کریں"
 
-#: linux/verso-desktop/src/session.rs:64
-#: linux/verso-desktop/src/session.rs:74
+#: linux/verso-desktop/src/session.rs:65
+#: linux/verso-desktop/src/session.rs:75
 msgid "Not running"
 msgstr "نہیں چل رہا"
 
-#: linux/verso-desktop/src/session.rs:71
+#: linux/verso-desktop/src/session.rs:72
 msgid "{used} of {limit}"
 msgstr "{limit} میں سے {used}"
 
-#: linux/verso-desktop/src/session.rs:88
+#: linux/verso-desktop/src/session.rs:89
 msgid "writing"
 msgstr "لکھی جا رہی ہے"
 
-#: linux/verso-desktop/src/session.rs:88
+#: linux/verso-desktop/src/session.rs:89
 msgid "uploading"
 msgstr "اپ لوڈ ہو رہی ہے"
 
-#: linux/verso-desktop/src/session.rs:89
+#: linux/verso-desktop/src/session.rs:90
 msgid "{name}, {phase}"
 msgstr "{name}، {phase}"
 
-#: linux/verso-desktop/src/session.rs:92
+#: linux/verso-desktop/src/session.rs:93
 msgid "{name} and {count} more"
 msgstr "{name} اور مزید {count}"
 
-#: linux/verso-desktop/src/session.rs:118
+#: linux/verso-desktop/src/session.rs:122
 msgid "That address cannot be used: {error}"
 msgstr "یہ پتہ استعمال نہیں کیا جا سکتا: {error}"
 
-#: linux/verso-desktop/src/session.rs:166
-#: linux/verso-desktop/src/session.rs:176
-#: linux/verso-desktop/src/session.rs:510
-#: linux/verso-desktop/src/session.rs:513
+#: linux/verso-desktop/src/session.rs:207
+msgid "Trust it only if this fingerprint is your server's: on the server, “openssl x509 -noout -fingerprint -sha256 -in” with its certificate file shows it."
+msgstr "اس پر صرف تب بھروسا کریں جب یہ فنگرپرنٹ آپ کے سرور کا ہو: سرور پر، اس کی سرٹیفکیٹ فائل کے ساتھ “openssl x509 -noout -fingerprint -sha256 -in” اسے دکھاتا ہے۔"
+
+#: linux/verso-desktop/src/session.rs:210
+msgid "The Server's Certificate Changed"
+msgstr "سرور کا سرٹیفکیٹ بدل گیا"
+
+#: linux/verso-desktop/src/session.rs:211
+msgid "{host} presented another certificate than the one you trusted for it. If its certificate was renewed or replaced, that is expected; if not, someone between Verso and the server may be pretending to be it. Verso sends nothing to it until you decide."
+msgstr "{host} نے اس سرٹیفکیٹ کے بجائے دوسرا سرٹیفکیٹ پیش کیا جس پر آپ نے اس کے لیے بھروسا کیا تھا۔ اگر اس کا سرٹیفکیٹ تجدید ہوا یا بدلا گیا تو یہ متوقع ہے؛ ورنہ Verso اور سرور کے درمیان کوئی سرور ہونے کا ڈھونگ رچا رہا ہو سکتا ہے۔ آپ کے فیصلہ کرنے تک Verso اسے کچھ نہیں بھیجتا۔"
+
+#: linux/verso-desktop/src/session.rs:215
+msgid "Trust This Server's Certificate?"
+msgstr "اس سرور کے سرٹیفکیٹ پر بھروسا کریں؟"
+
+#: linux/verso-desktop/src/session.rs:216
+msgid "The certificate {host} presented is not one this computer trusts. A server at home often has a certificate of its own, but anyone between Verso and the server could also be pretending to be it."
+msgstr "{host} نے جو سرٹیفکیٹ پیش کیا وہ ان میں سے نہیں جن پر یہ کمپیوٹر بھروسا کرتا ہے۔ گھر کے سرور کا اکثر اپنا سرٹیفکیٹ ہوتا ہے، لیکن Verso اور سرور کے درمیان کوئی بھی سرور ہونے کا ڈھونگ رچا سکتا ہے۔"
+
+#: linux/verso-desktop/src/session.rs:222
+msgid "It expired on {date}."
+msgstr "اس کی میعاد {date} کو ختم ہو گئی۔"
+
+#: linux/verso-desktop/src/session.rs:223
+msgid "It is not valid before {date}."
+msgstr "یہ {date} سے پہلے درست نہیں۔"
+
+#: linux/verso-desktop/src/session.rs:224
+msgid "It was not made for {host}."
+msgstr "یہ {host} کے لیے نہیں بنایا گیا تھا۔"
+
+#: linux/verso-desktop/src/session.rs:231
+msgid "Not stated"
+msgstr "درج نہیں"
+
+#: linux/verso-desktop/src/session.rs:237
+msgid "Fingerprint (SHA-256)"
+msgstr "فنگرپرنٹ (SHA-256)"
+
+#: linux/verso-desktop/src/session.rs:238
+msgid "Issued To"
+msgstr "کسے جاری کیا گیا"
+
+#: linux/verso-desktop/src/session.rs:239
+msgid "Issued By"
+msgstr "کس نے جاری کیا"
+
+#: linux/verso-desktop/src/session.rs:239
+msgid "Itself (self-signed)"
+msgstr "خود (خود دستخط شدہ)"
+
+#: linux/verso-desktop/src/session.rs:240
+msgid "Valid From"
+msgstr "کب سے درست"
+
+#: linux/verso-desktop/src/session.rs:241
+msgid "Valid Until"
+msgstr "کب تک درست"
+
+#: linux/verso-desktop/src/session.rs:244
+msgid "Trusted Until Now"
+msgstr "اب تک قابلِ اعتماد"
+
+#: linux/verso-desktop/src/session.rs:246
+msgid "Cancel"
+msgstr "منسوخ کریں"
+
+#: linux/verso-desktop/src/session.rs:246
+msgid "Trust This Certificate"
+msgstr "اس سرٹیفکیٹ پر بھروسا کریں"
+
+#: linux/verso-desktop/src/session.rs:268
+#: linux/verso-desktop/src/session.rs:278
+#: linux/verso-desktop/src/session.rs:617
+#: linux/verso-desktop/src/session.rs:620
 msgid "Kept in {file}"
 msgstr "{file} میں محفوظ"
 
-#: linux/verso-desktop/src/session.rs:171
-#: linux/verso-desktop/src/session.rs:515
+#: linux/verso-desktop/src/session.rs:273
+#: linux/verso-desktop/src/session.rs:622
 msgid "Kept in the keyring"
 msgstr "کی رِنگ میں محفوظ"
 
-#: linux/verso-desktop/src/session.rs:178
+#: linux/verso-desktop/src/session.rs:280
 msgid "The keyring stayed locked, so nothing was saved."
 msgstr "کی رِنگ مقفل رہی، اس لیے کچھ محفوظ نہیں ہوا۔"
 
-#: linux/verso-desktop/src/session.rs:256
+#: linux/verso-desktop/src/session.rs:362
 msgid "Verso shows its icon in the top bar while you are signed in."
 msgstr "جب تک آپ سائن ان ہیں، Verso ٹاپ بار میں اپنا آئیکن دکھاتا ہے۔"
 
-#: linux/verso-desktop/src/session.rs:257
-#: linux/verso-desktop/src/session.rs:261
+#: linux/verso-desktop/src/session.rs:363
+#: linux/verso-desktop/src/session.rs:367
 msgid "Signed in, but the background service did not start: {error}"
 msgstr "سائن ان ہو گیا، لیکن بیک گراؤنڈ سروس شروع نہیں ہوئی: {error}"
 
-#: linux/verso-desktop/src/session.rs:260
+#: linux/verso-desktop/src/session.rs:366
 msgid "Signed in, but the background service cannot start: {error}."
 msgstr "سائن ان ہو گیا، لیکن بیک گراؤنڈ سروس شروع نہیں ہو سکتی: {error}۔"
 
-#: linux/verso-desktop/src/session.rs:290
+#: linux/verso-desktop/src/session.rs:396
 msgid "Verso Drive is not part of this version of Verso."
 msgstr "Verso Drive، Verso کے اس ورژن کا حصہ نہیں ہے۔"
 
-#: linux/verso-desktop/src/session.rs:296
+#: linux/verso-desktop/src/session.rs:402
 msgid "The background service did not restart: {error}"
 msgstr "بیک گراؤنڈ سروس دوبارہ شروع نہیں ہوئی: {error}"
 
-#: linux/verso-desktop/src/session.rs:337
+#: linux/verso-desktop/src/session.rs:443
 msgid "Immich Mount is no longer signed in."
 msgstr "Immich Mount اب سائن ان نہیں ہے۔"
 
-#: linux/verso-desktop/src/session.rs:342
+#: linux/verso-desktop/src/session.rs:449
 msgid "Immich no longer accepts Immich Mount's sign-in; sign in instead."
 msgstr "Immich اب Immich Mount کا سائن ان قبول نہیں کرتا؛ اس کے بجائے سائن ان کریں۔"
 
-#: linux/verso-desktop/src/session.rs:391
+#: linux/verso-desktop/src/session.rs:498
 msgid "Signed in, but the mount cannot start: {error}."
 msgstr "سائن ان ہو گیا، لیکن ماؤنٹ شروع نہیں ہو سکتا: {error}۔"
 
-#: linux/verso-desktop/src/session.rs:395
+#: linux/verso-desktop/src/session.rs:502
 msgid "Signed in, but the mount did not start: {error}"
 msgstr "سائن ان ہو گیا، لیکن ماؤنٹ شروع نہیں ہوا: {error}"
 
@@ -597,7 +677,7 @@ msgid "Picture"
 msgstr "تصویر"
 
 #: linux/verso/src/drive_preferences.rs:212
-#: shared/verso-core/src/settings.rs:233
+#: shared/verso-core/src/settings.rs:240
 msgid "Paper"
 msgstr "کاغذ"
 
@@ -655,216 +735,220 @@ msgstr "{app} اب انسٹال نہیں ہے۔"
 msgid "Verso could not open {app}: {error}"
 msgstr "Verso {app} نہیں کھول سکا: {error}"
 
-#: shared/verso-core/src/settings.rs:106
+#: shared/verso-core/src/settings.rs:110
 msgid "The Immich server; /api is added"
 msgstr "Immich سرور؛ ‎/api خود بخود شامل ہو جاتا ہے"
 
-#: shared/verso-core/src/settings.rs:107
+#: shared/verso-core/src/settings.rs:111
+msgid "The SHA-256 fingerprint of the server's own certificate, trusted where the system does not trust it"
+msgstr "سرور کے اپنے سرٹیفکیٹ کا SHA-256 فنگرپرنٹ، جس پر وہاں بھروسا کیا جاتا ہے جہاں سسٹم اس پر بھروسا نہیں کرتا"
+
+#: shared/verso-core/src/settings.rs:112
 msgid "Show the library as a drive in the file manager"
 msgstr "لائبریری کو فائل مینیجر میں ڈرائیو کے طور پر دکھائیں"
 
-#: shared/verso-core/src/settings.rs:108
+#: shared/verso-core/src/settings.rs:113
 msgid "Where the mount appears"
 msgstr "ماؤنٹ کہاں ظاہر ہوتا ہے"
 
-#: shared/verso-core/src/settings.rs:109
+#: shared/verso-core/src/settings.rs:114
 msgid "The drive's name in the sidebar"
 msgstr "سائیڈ بار میں ڈرائیو کا نام"
 
-#: shared/verso-core/src/settings.rs:110
+#: shared/verso-core/src/settings.rs:115
 msgid "Mount when the session starts"
 msgstr "سیشن شروع ہونے پر ماؤنٹ کریں"
 
-#: shared/verso-core/src/settings.rs:111
+#: shared/verso-core/src/settings.rs:116
 msgid "List the drive in Files' sidebar as a drive, with its unmount button; off, as a bookmark"
 msgstr "ڈرائیو کو “فائلیں” کی سائیڈ بار میں ان ماؤنٹ بٹن کے ساتھ ڈرائیو کے طور پر دکھائیں؛ بند ہو تو بک مارک کے طور پر"
 
-#: shared/verso-core/src/settings.rs:112
+#: shared/verso-core/src/settings.rs:117
 msgid "Show the Photos section"
 msgstr "Photos حصہ دکھائیں"
 
-#: shared/verso-core/src/settings.rs:113
+#: shared/verso-core/src/settings.rs:118
 msgid "Show the Albums section"
 msgstr "Albums حصہ دکھائیں"
 
-#: shared/verso-core/src/settings.rs:114
+#: shared/verso-core/src/settings.rs:119
 msgid "Show the People section"
 msgstr "People حصہ دکھائیں"
 
-#: shared/verso-core/src/settings.rs:115
+#: shared/verso-core/src/settings.rs:120
 msgid "Show the Places section"
 msgstr "Places حصہ دکھائیں"
 
-#: shared/verso-core/src/settings.rs:116
+#: shared/verso-core/src/settings.rs:121
 msgid "Show the Favorites section"
 msgstr "Favorites حصہ دکھائیں"
 
-#: shared/verso-core/src/settings.rs:117
+#: shared/verso-core/src/settings.rs:122
 msgid "Show the Archive section"
 msgstr "Archive حصہ دکھائیں"
 
-#: shared/verso-core/src/settings.rs:118
+#: shared/verso-core/src/settings.rs:123
 msgid "Day folders inside months"
 msgstr "مہینوں کے اندر دن کے فولڈرز"
 
-#: shared/verso-core/src/settings.rs:119
+#: shared/verso-core/src/settings.rs:124
 msgid "Year and month folders inside albums"
 msgstr "البمز کے اندر سال اور مہینے کے فولڈرز"
 
-#: shared/verso-core/src/settings.rs:120
+#: shared/verso-core/src/settings.rs:125
 msgid "Year and month folders inside people"
 msgstr "افراد کے اندر سال اور مہینے کے فولڈرز"
 
-#: shared/verso-core/src/settings.rs:121
+#: shared/verso-core/src/settings.rs:126
 msgid "Year and month folders inside cities"
 msgstr "شہروں کے اندر سال اور مہینے کے فولڈرز"
 
-#: shared/verso-core/src/settings.rs:122
+#: shared/verso-core/src/settings.rs:127
 msgid "Year and month folders inside favorites"
 msgstr "پسندیدہ کے اندر سال اور مہینے کے فولڈرز"
 
-#: shared/verso-core/src/settings.rs:123
+#: shared/verso-core/src/settings.rs:128
 msgid "Year and month folders inside the archive"
 msgstr "آرکائیو کے اندر سال اور مہینے کے فولڈرز"
 
-#: shared/verso-core/src/settings.rs:124
+#: shared/verso-core/src/settings.rs:129
 msgid "How album folders are named and grouped"
 msgstr "البم فولڈرز کے نام اور گروہ بندی کا طریقہ"
 
-#: shared/verso-core/src/settings.rs:125
+#: shared/verso-core/src/settings.rs:130
 msgid "How files are named"
 msgstr "فائلوں کے نام رکھنے کا طریقہ"
 
-#: shared/verso-core/src/settings.rs:126
+#: shared/verso-core/src/settings.rs:131
 msgid "The content cache's size limit"
 msgstr "مواد کے کیشے کی سائز کی حد"
 
-#: shared/verso-core/src/settings.rs:127
+#: shared/verso-core/src/settings.rs:132
 msgid "Show the Upload folder, and upload what is copied into it"
 msgstr "Upload فولڈر دکھائیں، اور اس میں کاپی کی گئی چیزیں اپ لوڈ کریں"
 
-#: shared/verso-core/src/settings.rs:128
+#: shared/verso-core/src/settings.rs:133
 msgid "Folders copied into Upload"
 msgstr "Upload میں کاپی کیے گئے فولڈرز"
 
-#: shared/verso-core/src/settings.rs:129
+#: shared/verso-core/src/settings.rs:134
 msgid "Also seed 1024 px thumbnails from the preview"
 msgstr "پیش منظر سے 1024 px تھمب نیلز بھی تیار کریں"
 
-#: shared/verso-core/src/settings.rs:130
+#: shared/verso-core/src/settings.rs:135
 msgid "Refuse thumbnailer reads of originals"
 msgstr "تھمب نیل بنانے والے پروگراموں کو اصل فائلیں پڑھنے سے روکیں"
 
-#: shared/verso-core/src/settings.rs:132
+#: shared/verso-core/src/settings.rs:137
 msgid "What a double click on Verso's top bar icon opens"
 msgstr "Verso کے ٹاپ بار آئیکن پر ڈبل کلک سے کیا کھلتا ہے"
 
-#: shared/verso-core/src/settings.rs:133
+#: shared/verso-core/src/settings.rs:138
 msgid "Verso's top bar icon in colour: the lens's five colours, grey while the server cannot be reached"
 msgstr "Verso کا ٹاپ بار آئیکن رنگین: لینز کے پانچ رنگ، اور جب سرور تک رسائی ممکن نہ ہو تو سرمئی"
 
-#: shared/verso-core/src/settings.rs:134
+#: shared/verso-core/src/settings.rs:139
 msgid "Verso's app icon in the light style: the picture on its print, its paper and its lens"
 msgstr "ہلکے انداز میں Verso کا ایپ آئیکن: اس کے پرنٹ پر تصویر، اس کا کاغذ اور اس کا لینز"
 
-#: shared/verso-core/src/settings.rs:135
+#: shared/verso-core/src/settings.rs:140
 msgid "Verso's app icon in the dark style: the picture on its print, its paper and its lens"
 msgstr "گہرے انداز میں Verso کا ایپ آئیکن: اس کے پرنٹ پر تصویر، اس کا کاغذ اور اس کا لینز"
 
-#: shared/verso-core/src/settings.rs:136
+#: shared/verso-core/src/settings.rs:141
 msgid "Show what other apps link to (Immich Crosslink)"
 msgstr "دوسری ایپس جس کا لنک دیتی ہیں اسے دکھائیں (Immich Crosslink)"
 
-#: shared/verso-core/src/settings.rs:137
+#: shared/verso-core/src/settings.rs:142
 msgid "Verso: take part as Verso Gallery, so other apps show items in it"
 msgstr "Verso: بطور Verso Gallery شریک ہوں، تاکہ دوسری ایپس اس میں آئٹمز دکھائیں"
 
-#: shared/verso-core/src/settings.rs:138
+#: shared/verso-core/src/settings.rs:143
 msgid "Verso: take part as Verso Drive, so other apps show items in Files while the drive is on"
 msgstr "Verso: بطور Verso Drive شریک ہوں، تاکہ جب تک ڈرائیو آن ہو، دوسری ایپس “فائلیں” میں آئٹمز دکھائیں"
 
-#: shared/verso-core/src/settings.rs:139
+#: shared/verso-core/src/settings.rs:144
 msgid "Apps left out of Show in, by their desktop entry or bundle id, separated by ;"
 msgstr "\"دکھائیں\" سے نکالی گئی ایپس، ڈیسک ٹاپ اندراج یا بنڈل آئی ڈی کے مطابق، ; سے الگ"
 
-#: shared/verso-core/src/settings.rs:140
+#: shared/verso-core/src/settings.rs:145
 msgid "Tell me when a new version is out"
 msgstr "نیا ورژن آنے پر مجھے بتائیں"
 
-#: shared/verso-core/src/settings.rs:141
+#: shared/verso-core/src/settings.rs:146
 msgid "Headless only: a 0600 file holding the credential"
 msgstr "صرف ہیڈ لیس کے لیے: اسناد رکھنے والی 0600 فائل"
 
-#: shared/verso-core/src/settings.rs:215
+#: shared/verso-core/src/settings.rs:222
 msgid "Never"
 msgstr "کبھی نہیں"
 
-#: shared/verso-core/src/settings.rs:216
+#: shared/verso-core/src/settings.rs:223
 msgid "From 500 Items"
 msgstr "500 آئٹمز سے"
 
-#: shared/verso-core/src/settings.rs:217
+#: shared/verso-core/src/settings.rs:224
 msgid "Always"
 msgstr "ہمیشہ"
 
-#: shared/verso-core/src/settings.rs:218
+#: shared/verso-core/src/settings.rs:225
 msgid "Year in the Name (2023 - Trip)"
 msgstr "نام میں سال (2023 - سفر)"
 
-#: shared/verso-core/src/settings.rs:219
+#: shared/verso-core/src/settings.rs:226
 msgid "Year Folders (2023/Trip)"
 msgstr "سال کے فولڈرز (2023/سفر)"
 
-#: shared/verso-core/src/settings.rs:220
+#: shared/verso-core/src/settings.rs:227
 msgid "Name Only (Trip)"
 msgstr "صرف نام (سفر)"
 
-#: shared/verso-core/src/settings.rs:221
+#: shared/verso-core/src/settings.rs:228
 msgid "Date and Time Taken"
 msgstr "تصویر کھینچنے کی تاریخ اور وقت"
 
-#: shared/verso-core/src/settings.rs:222
+#: shared/verso-core/src/settings.rs:229
 msgid "Original File Names"
 msgstr "اصل فائل نام"
 
-#: shared/verso-core/src/settings.rs:223
+#: shared/verso-core/src/settings.rs:230
 msgid "Ask Each Time"
 msgstr "ہر بار پوچھیں"
 
-#: shared/verso-core/src/settings.rs:227
-#: shared/verso-core/src/settings.rs:247
+#: shared/verso-core/src/settings.rs:234
+#: shared/verso-core/src/settings.rs:254
 msgid "Verso"
 msgstr "Verso"
 
-#: shared/verso-core/src/settings.rs:228
+#: shared/verso-core/src/settings.rs:235
 msgid "Verso Drive in Files"
 msgstr "“فائلیں” میں Verso Drive"
 
-#: shared/verso-core/src/settings.rs:229
+#: shared/verso-core/src/settings.rs:236
 msgid "Preferences"
 msgstr "ترجیحات"
 
-#: shared/verso-core/src/settings.rs:230
+#: shared/verso-core/src/settings.rs:237
 msgid "Mist"
 msgstr "دھند"
 
-#: shared/verso-core/src/settings.rs:231
+#: shared/verso-core/src/settings.rs:238
 msgid "Sand"
 msgstr "ریت"
 
-#: shared/verso-core/src/settings.rs:232
+#: shared/verso-core/src/settings.rs:239
 msgid "Dark"
 msgstr "گہرا"
 
-#: shared/verso-core/src/settings.rs:234
+#: shared/verso-core/src/settings.rs:241
 msgid "Frame"
 msgstr "فریم"
 
-#: shared/verso-core/src/settings.rs:235
+#: shared/verso-core/src/settings.rs:242
 msgid "Slate"
 msgstr "سلیٹ"
 
-#: shared/verso-core/src/settings.rs:236
+#: shared/verso-core/src/settings.rs:243
 msgid "Sky"
 msgstr "آسمان"
 

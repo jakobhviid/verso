@@ -7,6 +7,9 @@
 //! it could not be reached, a request waiting long (a network dropped without a word), a change of network (GLib's
 //! network monitor), the service's own state changing (`StateChanged` on its D-Bus interface), and Try Now; while it
 //! cannot be reached, every few seconds.
+//!
+//! A server whose certificate is refused (not trusted, or not the one trusted for it) is out of reach the same way,
+//! and the banner says that instead, with a button that asks about the certificate; the window asks once by itself.
 
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
@@ -14,7 +17,7 @@ use std::time::{Duration, Instant};
 
 use adw::prelude::*;
 use gtk::{gio, glib};
-use immich_api::Client;
+use immich_api::{CertificateRefusal, Client};
 use verso_linux::i18n::tr;
 
 /// How often the window looks at its requests.
@@ -47,10 +50,18 @@ impl Asking {
     }
 }
 
+/// What the window does with a certificate refused while the library shows: ask the person, and whether they asked to
+/// be asked (the banner's button) rather than the check finding it.
+type CertificateRefused = Box<dyn Fn(&CertificateRefusal, bool)>;
+
 pub struct Connectivity {
     client: Client,
     host: String,
     reachable: Cell<bool>,
+    /// The certificate the server presented the last time it was asked, when it was refused: it is not unreachable,
+    /// it is not trusted, which the banner says, offering to look at it.
+    refused: RefCell<Option<CertificateRefusal>>,
+    certificate_refused: CertificateRefused,
     asking: RefCell<Asking>,
     /// Something failed to load because the server could not be reached: it loads again when the server is back.
     missed: Cell<bool>,
@@ -67,13 +78,16 @@ pub struct Connectivity {
 }
 
 impl Connectivity {
-    /// Watch the server `client` talks to; `back` runs when it answers again after something failed to load.
-    pub fn new(client: Client, back: impl Fn() + 'static) -> Rc<Connectivity> {
+    /// Watch the server `client` talks to; `back` runs when it answers again after something failed to load, and
+    /// `certificate_refused` when its certificate is refused (ARCHITECTURE.md, "A certificate of the server's own").
+    pub fn new(client: Client, back: impl Fn() + 'static, certificate_refused: impl Fn(&CertificateRefusal, bool) + 'static) -> Rc<Connectivity> {
         client.set_reachable(true);
         let connectivity = Rc::new(Connectivity {
             host: client.api_url().host_str().unwrap_or_default().to_owned(),
             client,
             reachable: Cell::new(true),
+            refused: RefCell::default(),
+            certificate_refused: Box::new(certificate_refused),
             asking: RefCell::default(),
             missed: Cell::new(false),
             last_toast: Cell::new(None),
@@ -143,12 +157,40 @@ impl Connectivity {
         }
         let client = self.client.clone();
         let weak = Rc::downgrade(self);
-        crate::tasks::run(async move { client.ping().await.is_ok() }, move |answered| {
+        crate::tasks::run(async move { client.ping().await }, move |answer| {
             if let Some(connectivity) = weak.upgrade() {
                 connectivity.asking.borrow_mut().waiting = false;
-                connectivity.answered(answered);
+                let refused = answer.as_ref().err().and_then(immich_api::ApiError::certificate_refusal).cloned();
+                connectivity.set_refused(refused.clone());
+                connectivity.answered(answer.is_ok());
+                if let Some(refusal) = refused {
+                    (connectivity.certificate_refused)(&refusal, false);
+                }
             }
         });
+    }
+
+    /// Keep the certificate refused (or none), and say it in the banners: a server whose certificate is not trusted
+    /// is not asked to be reached again, it is asked about.
+    fn set_refused(&self, refused: Option<CertificateRefusal>) {
+        let certificate = refused.is_some();
+        if self.refused.replace(refused).is_some() == certificate {
+            return;
+        }
+        for banner in self.banners.borrow().iter().filter_map(glib::WeakRef::upgrade) {
+            self.word_banner(&banner);
+        }
+    }
+
+    /// A banner's words for the server's state: not reachable, or its certificate not trusted.
+    fn word_banner(&self, banner: &adw::Banner) {
+        if self.refused.borrow().is_some() {
+            banner.set_title(&tr("{host}'s certificate is not trusted, so Verso does not connect to it.").replace("{host}", &self.host));
+            banner.set_button_label(Some(tr("Check Certificate…")));
+        } else {
+            banner.set_title(&tr("{host} is not reachable. Verso keeps trying.").replace("{host}", &self.host));
+            banner.set_button_label(Some(tr("Try Now")));
+        }
     }
 
     fn answered(&self, reachable: bool) {
@@ -231,15 +273,15 @@ impl Connectivity {
             pages.push(page.downgrade());
         }
         let Some(toolbar) = toolbar_of(page.upcast_ref()) else { return };
-        let banner = adw::Banner::builder()
-            .title(tr("{host} is not reachable. Verso keeps trying.").replace("{host}", &self.host))
-            .button_label(tr("Try Now"))
-            .revealed(!self.reachable.get())
-            .build();
+        let banner = adw::Banner::builder().revealed(!self.reachable.get()).build();
+        self.word_banner(&banner);
         let weak = Rc::downgrade(self);
         banner.connect_button_clicked(move |_| {
-            if let Some(connectivity) = weak.upgrade() {
-                connectivity.try_now();
+            let Some(connectivity) = weak.upgrade() else { return };
+            let refused = connectivity.refused.borrow().clone();
+            match refused {
+                Some(refusal) => (connectivity.certificate_refused)(&refusal, true),
+                None => connectivity.try_now(),
             }
         });
         toolbar.add_top_bar(&banner);

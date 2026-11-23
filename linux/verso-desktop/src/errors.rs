@@ -1,7 +1,7 @@
 //! What a person reads when Immich did not do what the gallery asked: the server's own reason when it turned the
 //! request down (a 400 or a 409 with its words, `ApiError::refusal`), rather than "unexpected answer from the Immich
 //! server: HTTP 400: …"; a plain sentence for the other kinds. An unreachable server keeps its wording, which the
-//! window recognises (`immich_api::is_offline_text`) to show its banner instead.
+//! window recognises (`immich_api::is_offline_text`) to show its banner instead, and so does a refused certificate.
 
 use immich_api::ApiError;
 use verso_linux::i18n::tr;
@@ -9,7 +9,9 @@ use verso_linux::i18n::tr;
 /// The error as a person reads it, without a trailing full stop, so it can follow "Adding to the album failed: ".
 pub fn said(error: &ApiError) -> String {
     match error {
-        ApiError::Offline(_) | ApiError::LocalFile(_) | ApiError::RangeNotSatisfiable => error.to_string(),
+        // A refused certificate keeps its wording too, which the window recognises (`immich_api::is_certificate_text`)
+        // to ask about the certificate.
+        ApiError::Offline(_) | ApiError::LocalFile(_) | ApiError::RangeNotSatisfiable | ApiError::UntrustedCertificate(_) | ApiError::CertificateChanged(_) => error.to_string(),
         ApiError::Unauthorized => tr("Immich no longer accepts this sign-in").to_owned(),
         ApiError::Forbidden { missing_permission: Some(permission) } => tr("this sign-in may not do that in Immich (it needs the permission {permission})").replace("{permission}", permission),
         ApiError::Forbidden { missing_permission: None } => tr("this sign-in may not do that in Immich").to_owned(),

@@ -17,7 +17,7 @@ use verso_desktop::arrangement::GridPage;
 use verso_desktop::{albums, links, text};
 use verso_core::links::ImmichItem;
 use verso_core::sign_in::BrowserSignIn;
-use verso_desktop::session::{self, ServerOffer, SignedIn};
+use verso_desktop::session::{self, ServerOffer, SignInError, SignedIn};
 use verso_linux::i18n::tr;
 
 use crate::grid::Grid;
@@ -128,6 +128,11 @@ mod imp {
         /// Whether the session's server can be reached, and the banner that says when it cannot (`connectivity`).
         pub connectivity: RefCell<Option<Rc<crate::connectivity::Connectivity>>>,
         pub offer: RefCell<Option<ServerOffer>>,
+        /// The certificate the person trusted as they signed in, with the address it was presented for: every step of
+        /// signing in to that address trusts it, and it is kept with the server once signed in.
+        pub accepted_certificate: RefCell<Option<(String, immich_api::CertificatePin)>>,
+        /// The certificate last asked about while the library showed, so the question comes once, not at every check.
+        pub asked_certificate: std::cell::Cell<Option<immich_api::CertificatePin>>,
         /// Immich Mount's server, while its account is offered.
         pub immich_mount_server: RefCell<Option<String>>,
         /// What waits for the window to have its account or its sign-in (`Window::when_ready`).
@@ -394,6 +399,13 @@ impl Window {
     /// A message at the window's foot. A failure because the server could not be reached says so once in a while,
     /// as the banner does, rather than once per failure.
     pub fn toast(&self, message: &str) {
+        // A refused certificate: the banner says so, and the person is asked about it once.
+        if immich_api::is_certificate_text(message) {
+            let connectivity = self.imp().connectivity.borrow().clone();
+            if let Some(connectivity) = connectivity {
+                return connectivity.failed();
+            }
+        }
         if immich_api::is_offline_text(message) {
             let connectivity = self.imp().connectivity.borrow().clone();
             if let Some(connectivity) = connectivity {
@@ -416,7 +428,7 @@ impl Window {
     /// A page could not read what it shows. When the server could not be reached, the banner says so and the page is
     /// read again once it answers; any other failure is a toast.
     pub fn load_failed(&self, message: &str) {
-        if immich_api::is_offline_text(message) {
+        if immich_api::is_offline_text(message) || immich_api::is_certificate_text(message) {
             let connectivity = self.imp().connectivity.borrow().clone();
             if let Some(connectivity) = connectivity {
                 return connectivity.failed();
@@ -585,7 +597,8 @@ impl Window {
         let address = session::normalised_address(&imp.server_row.text());
         imp.connect_button.set_sensitive(false);
         let window = self.clone();
-        crate::tasks::run(session::probe(address), move |outcome| {
+        let trusted = self.trusted_for(&address);
+        crate::tasks::run(session::probe(address.clone(), trusted), move |outcome| {
             let imp = window.imp();
             imp.connect_button.set_sensitive(true);
             match outcome {
@@ -598,9 +611,109 @@ impl Window {
                     imp.offer.replace(Some(offer));
                     imp.navigation.push_by_tag("sign-in");
                 }
-                Err(message) => window.toast(&message),
+                // Asked, and on Trust checked again with that certificate trusted for this address alone.
+                Err(SignInError::Certificate(refusal)) => window.ask_about_certificate(&refusal, &host_of(&address), move |window, certificate| {
+                    window.imp().accepted_certificate.replace(Some((address.clone(), certificate)));
+                    window.connect_to_server();
+                }),
+                Err(SignInError::Failed(message)) => window.toast(&message),
             }
         });
+    }
+
+    /// The certificate trusted for `url` as one signs in to it: the one the person trusted just now for this address,
+    /// else the one kept for it, where it is the server signed in to.
+    fn trusted_for(&self, url: &str) -> Option<immich_api::CertificatePin> {
+        let accepted = self.imp().accepted_certificate.borrow().as_ref().filter(|(address, _)| address == url).map(|(_, certificate)| *certificate);
+        accepted.or_else(|| session::trusted_certificate_for(url))
+    }
+
+    /// Ask whether to trust a certificate the system refused, in Adwaita's own question: what it is, why that matters,
+    /// and how to check it; Cancel is the default, and Trust This Certificate runs `on_trust` with its fingerprint.
+    pub fn ask_about_certificate(&self, refusal: &immich_api::CertificateRefusal, host: &str, on_trust: impl Fn(&Window, immich_api::CertificatePin) + 'static) {
+        let question = session::certificate_question(refusal, host, chrono::Utc::now());
+        let dialog = adw::AlertDialog::new(Some(&question.heading), Some(&question.body));
+        dialog.set_prefer_wide_layout(true);
+        let list = gtk::ListBox::builder().selection_mode(gtk::SelectionMode::None).css_classes(["boxed-list"]).build();
+        for detail in &question.details {
+            let row = adw::ActionRow::builder()
+                .title(glib::markup_escape_text(&detail.title))
+                .subtitle(glib::markup_escape_text(&detail.value))
+                .subtitle_selectable(true)
+                .css_classes(["property"])
+                .build();
+            // The fingerprints, to compare pair by pair.
+            if detail.fingerprint {
+                row.add_css_class("monospace");
+            }
+            list.append(&row);
+        }
+        dialog.set_extra_child(Some(&list));
+        dialog.add_responses(&[("cancel", &question.cancel), ("trust", &question.trust)]);
+        dialog.set_response_appearance("trust", adw::ResponseAppearance::Destructive);
+        dialog.set_default_response(Some("cancel"));
+        dialog.set_close_response("cancel");
+        let (weak, certificate) = (self.downgrade(), refusal.certificate.sha256);
+        dialog.connect_response(Some("trust"), move |_, _| {
+            if let Some(window) = weak.upgrade() {
+                on_trust(&window, certificate);
+            }
+        });
+        // Over Preferences where it is open, else it would sit hidden under it.
+        match self.preferences_window() {
+            Some(preferences) => dialog.present(Some(&preferences)),
+            None => dialog.present(Some(self)),
+        }
+    }
+
+    /// The server's certificate was refused while the library showed: ask about it the first time this certificate
+    /// is presented (`asked` is the person's own request, from the banner, which asks again). Trusting it keeps it for
+    /// the server, restarts the service with it, and connects again.
+    fn certificate_refused(&self, refusal: &immich_api::CertificateRefusal, asked: bool) {
+        let presented = refusal.certificate.sha256;
+        if !asked && self.imp().asked_certificate.replace(Some(presented)) == Some(presented) {
+            return;
+        }
+        let host = self.session().map(|session| host_of(&session.connection.server)).unwrap_or_default();
+        self.ask_about_certificate(refusal, &host, |window, certificate| window.trust_and_reconnect(certificate));
+    }
+
+    /// Trust `certificate` for the server signed in to, restart the service with it, and open the library again.
+    fn trust_and_reconnect(&self, certificate: immich_api::CertificatePin) {
+        self.reconnect(move || session::trust_certificate(certificate));
+    }
+
+    /// Forget the certificate trusted for the server (Preferences, Account), and connect again: the person is asked
+    /// at once, unless the system trusts the server's certificate by now.
+    pub fn forget_certificate(&self) {
+        self.imp().asked_certificate.set(None);
+        self.reconnect(session::forget_certificate);
+    }
+
+    /// Change what is trusted for the server with `change`, restart the service with it, and open the library again.
+    fn reconnect(&self, change: impl FnOnce() -> Result<(), String> + Send + 'static) {
+        self.set_busy(true);
+        let window = self.clone();
+        crate::tasks::run(
+            async move {
+                change()?;
+                let started = session::start_service();
+                connection::connect().await.map(|connection| (connection, started))
+            },
+            move |outcome| {
+                window.set_busy(false);
+                match outcome {
+                    Ok((Some(connection), started)) => {
+                        if let Err(message) = started {
+                            window.toast(&message);
+                        }
+                        window.start_session(connection);
+                    }
+                    Ok((None, _)) => window.signed_out(),
+                    Err(message) => window.toast(&message),
+                }
+            },
+        );
     }
 
     fn server_url(&self) -> Option<String> {
@@ -616,7 +729,8 @@ impl Window {
         let (state, challenge) = (attempt.state.clone(), attempt.code_challenge.clone());
         self.imp().attempt.replace(Some(attempt));
         let window = self.clone();
-        crate::tasks::run(session::begin_browser_sign_in(url, state, challenge), move |outcome| match outcome {
+        let trusted = self.trusted_for(&url);
+        crate::tasks::run(session::begin_browser_sign_in(url, trusted, state, challenge), move |outcome| match outcome {
             Ok(address) => {
                 claim_redirect();
                 gtk::UriLauncher::new(&address).launch(Some(&window), gio::Cancellable::NONE, |_| {});
@@ -633,7 +747,8 @@ impl Window {
         };
         let window = self.clone();
         self.set_busy(true);
-        crate::tasks::run(session::finish_browser_sign_in(url, address.to_owned(), attempt), move |outcome| window.finish_sign_in(outcome));
+        let trusted = self.trusted_for(&url);
+        crate::tasks::run(session::finish_browser_sign_in(url, trusted, address.to_owned(), attempt), move |outcome| window.finish_sign_in(outcome));
     }
 
     fn sign_in_with_password(&self) {
@@ -645,7 +760,8 @@ impl Window {
         }
         self.set_busy(true);
         let window = self.clone();
-        crate::tasks::run(session::sign_in_with_password(url, email, password), move |outcome| window.finish_sign_in(outcome));
+        let trusted = self.trusted_for(&url);
+        crate::tasks::run(session::sign_in_with_password(url, trusted, email, password), move |outcome| window.finish_sign_in(outcome));
     }
 
     fn sign_in_with_api_key(&self) {
@@ -656,7 +772,8 @@ impl Window {
         }
         self.set_busy(true);
         let window = self.clone();
-        crate::tasks::run(session::sign_in_with_api_key(url, key), move |outcome| window.finish_sign_in(outcome));
+        let trusted = self.trusted_for(&url);
+        crate::tasks::run(session::sign_in_with_api_key(url, trusted, key), move |outcome| window.finish_sign_in(outcome));
     }
 
     fn set_busy(&self, busy: bool) {
@@ -676,10 +793,12 @@ impl Window {
         let Some(url) = self.server_url() else { return self.set_busy(false) };
         self.imp().password_row.set_text("");
         self.imp().api_key_row.set_text("");
+        let trusted = self.trusted_for(&url);
+        self.imp().accepted_certificate.replace(None);
         let window = self.clone();
         crate::tasks::run(
             async move {
-                session::store_credential(url, signed_in.credential).await?;
+                session::store_credential(url, signed_in.credential, trusted).await?;
                 let started = session::start_service();
                 connection::connect().await.map(|connection| (connection, started))
             },
@@ -701,12 +820,20 @@ impl Window {
 
     fn start_session(&self, connection: Connection) {
         let (client, answered) = (connection.client.clone(), connection.account.is_some());
-        let weak = self.downgrade();
-        let connectivity = crate::connectivity::Connectivity::new(client, move || {
-            if let Some(window) = weak.upgrade() {
-                window.refresh();
-            }
-        });
+        let (weak, refused) = (self.downgrade(), self.downgrade());
+        let connectivity = crate::connectivity::Connectivity::new(
+            client,
+            move || {
+                if let Some(window) = weak.upgrade() {
+                    window.refresh();
+                }
+            },
+            move |refusal, asked| {
+                if let Some(window) = refused.upgrade() {
+                    window.certificate_refused(refusal, asked);
+                }
+            },
+        );
         // Started without an answer from the server: find out at once whether it can be reached.
         if !answered {
             connectivity.ask();
@@ -715,7 +842,7 @@ impl Window {
         let cache = Cache::new(connection.cache_directory(), connection.client.clone());
         let trimmed = cache.clone();
         crate::tasks::runtime().spawn_blocking(move || trimmed.trim());
-        let host = connection.server.trim_start_matches("https://").trim_start_matches("http://").split('/').next().unwrap_or_default().to_owned();
+        let host = host_of(&connection.server);
         let bell = crate::notifications::Bell::new(self, connection.client.clone(), connection.account_key(), host);
         self.imp().bell.replace(Some(bell));
         let session = Rc::new(Session { textures: Textures::new(cache), connection });
@@ -725,6 +852,9 @@ impl Window {
         self.fill_sidebar();
         self.fill_account_footer();
         self.imp().navigation.replace_with_tags(&["library"]);
+        // A new session's pages, over its client: a session started again (a certificate trusted) shows none of the
+        // earlier one's.
+        self.imp().shown.replace(String::new());
         self.select_section("library");
         self.now_ready();
         self.refresh_albums();
@@ -1075,7 +1205,7 @@ impl Window {
         }
         let name = if account.name.trim().is_empty() { account.email.clone() } else { account.name.clone() };
         let avatar = adw::Avatar::new(28, Some(&name), true);
-        let host = session.connection.server.trim_start_matches("https://").trim_start_matches("http://").split('/').next().unwrap_or_default().to_owned();
+        let host = host_of(&session.connection.server);
         let labels = gtk::Box::builder().orientation(gtk::Orientation::Vertical).valign(gtk::Align::Center).build();
         labels.append(&gtk::Label::builder().label(&name).xalign(0.0).ellipsize(gtk::pango::EllipsizeMode::End).build());
         labels.append(&gtk::Label::builder().label(&host).xalign(0.0).ellipsize(gtk::pango::EllipsizeMode::End).css_classes(["caption", "dim-label"]).build());
@@ -2086,6 +2216,11 @@ fn free_name(folder: &std::path::Path, name: &str) -> PathBuf {
         _ => (name.clone(), String::new()),
     };
     (2..).map(|number| folder.join(format!("{stem} ({number}){extension}"))).find(|path| !path.exists()).unwrap_or(first)
+}
+
+/// A server address's host, with its port: `photos.example.org` for `https://photos.example.org/`.
+fn host_of(server: &str) -> String {
+    server.trim_start_matches("https://").trim_start_matches("http://").split('/').next().unwrap_or_default().to_owned()
 }
 
 /// Make the gallery the handler of `app.immich`, so the browser's redirect comes back to it.

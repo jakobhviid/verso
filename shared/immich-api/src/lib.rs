@@ -29,6 +29,7 @@ pub mod asset; // the Asset model, `GET /assets/{id}`
 pub mod asset_change; // changing Assets: dates, place, rating, visibility, trash, edits, metadata, jobs
 pub mod asset_info; // one Asset read whole, OCR, key-value metadata, counts
 pub mod auth; // password and OIDC sign-in, sign-out
+pub mod certificate; // a server's own certificate: the pin that trusts it, and what a person sees to decide
 pub mod client; // the client: URL, credential, request plumbing
 pub mod composed; // requests an app composes itself, answered as they came (Verso's Mac edition)
 pub mod content; // ranged originals, HEAD, thumbnails
@@ -81,12 +82,13 @@ pub use asset::{Asset, AssetKind, Visibility};
 pub use asset_change::{AssetChanges, AssetEdit, AssetJob, CopyOptions, MirrorAxis};
 pub use asset_info::{AssetDetails, AssetStatistics, Exif, MetadataEntry, OcrText, StackSummary, StatisticsFilter};
 pub use auth::LoginResponse;
+pub use certificate::{CertificateDetails, CertificatePin, CertificateRefusal, RefusalReason};
 pub use client::{Client, Credential, Fetched, Media};
 pub use composed::{Answer, ComposedRequest};
 pub use content::{RangeResponse, ThumbnailSize};
 pub use download::{DownloadPlan, DownloadSource, PlannedArchive};
 pub use duplicate::{DuplicateGroup, DuplicateResolution};
-pub use error::{is_offline_text, ApiError};
+pub use error::{is_certificate_text, is_offline_text, ApiError};
 pub use face::{Face, FaceSource, NewFace};
 pub use map::{MapMarker, MapQuery, Place};
 pub use memory::{Memory, MemoryChanges, MemoryData, MemoryFilter, MemoryKind, MemoryOrder, NewMemory};

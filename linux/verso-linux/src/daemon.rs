@@ -393,11 +393,11 @@ where
 /// Serve without a drive (Verso's, until it is switched on, `mount.enabled`, or once it was unmounted, `unmounted`,
 /// when the tray offers to mount it): the D-Bus interface, so the app finds the daemon and how the server is, and the
 /// tray, until stopped, or the program is upgraded or uninstalled. `check` asks the server how it is, as the change
-/// polling does with a drive.
+/// polling does with a drive, and whether it is out of reach because its certificate was refused.
 pub fn serve_without_drive<Check, Answer>(server: ServerInfo, check: Check, runtime: &tokio::runtime::Runtime, unmounted: bool) -> StopReason
 where
     Check: Fn() -> Answer + Send + 'static,
-    Answer: std::future::Future<Output = State> + Send,
+    Answer: std::future::Future<Output = (State, bool)> + Send,
 {
     let state = Arc::new(std::sync::Mutex::new(if server.version.is_some() { State::Online } else { State::Offline }));
     let version = server.version.clone().unwrap_or_default();
@@ -431,12 +431,14 @@ where
         async move {
             let mut interval = tokio::time::interval(CHANGE_POLL);
             interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
+            let mut refused = false;
             loop {
                 next_poll(&mut interval).await;
                 let previous = *state.lock().expect("state lock");
-                let current = check().await;
-                if current != previous {
-                    changed_state(&state, current, connection.as_ref()).await;
+                let (current, certificate) = check().await;
+                if current != previous || certificate != refused {
+                    refused = certificate;
+                    changed_state(&state, current, certificate, connection.as_ref()).await;
                 }
             }
         }
@@ -534,6 +536,8 @@ async fn follow_changes<Source, Names>(
     // A poll can take up to its 25-second limit; the next one then waits a full interval, rather than following at
     // once to catch up.
     interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
+    // Whether the server is out of reach because its certificate was refused, which is told apart.
+    let mut refused = false;
     loop {
         next_poll(&mut interval).await;
         let outcome = source.changes(tree.watched()).await;
@@ -544,8 +548,10 @@ async fn follow_changes<Source, Names>(
             Err(SourceError::SignedOut) => State::SignedOut,
             Err(_) => previous,
         };
-        if current != previous {
-            changed_state(&state, current, connection.as_ref()).await;
+        let certificate = outcome.as_ref().err().is_some_and(SourceError::is_certificate);
+        if current != previous || certificate != refused {
+            refused = certificate;
+            changed_state(&state, current, certificate, connection.as_ref()).await;
         }
         match outcome {
             Ok(changes) if !changes.is_empty() => {
@@ -568,11 +574,13 @@ async fn follow_changes<Source, Names>(
     }
 }
 
-/// Keep the connection's new state, and tell D-Bus, the tray and, when something went wrong, the user.
-async fn changed_state(state: &std::sync::Mutex<State>, current: State, connection: Option<&zbus::Connection>) {
+/// Keep the connection's new state, and tell D-Bus, the tray and, when something went wrong, the user. `certificate`:
+/// the server is out of reach because its certificate is not trusted, or not the one trusted for it.
+async fn changed_state(state: &std::sync::Mutex<State>, current: State, certificate: bool, connection: Option<&zbus::Connection>) {
     *state.lock().expect("state lock") = current;
     let product = verso_core::product::current().name;
     let message = match current {
+        State::Offline if certificate => format!("The Immich server presented a certificate {product} does not trust, so nothing is sent to it. Open {product} to check the certificate. Files you opened before stay available."),
         State::Offline => "The Immich server cannot be reached. Files you opened before stay available.".to_owned(),
         State::SignedOut => format!("Immich no longer accepts this sign-in. Open {product} to sign in again."),
         State::Online | State::Connecting => "Connected to Immich.".to_owned(),
@@ -587,6 +595,10 @@ async fn changed_state(state: &std::sync::Mutex<State>, current: State, connecti
     }
     // The log and D-Bus keep the message in English; the notification says it in the user's language.
     match current {
+        State::Offline if certificate => crate::notify::notify_in_background(
+            tr("Immich's certificate is not trusted").to_owned(),
+            tr("The Immich server presented a certificate {app} does not trust, so nothing is sent to it. Open {app} to check the certificate. Files you opened before stay available.").replace("{app}", product),
+        ),
         State::Offline => crate::notify::notify_in_background(
             tr("Immich is unreachable").to_owned(),
             tr("The Immich server cannot be reached. Files you opened before stay available.").to_owned(),

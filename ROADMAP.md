@@ -636,8 +636,9 @@ Agreed with the maintainer; each item's detail is where it points.
 2. The Swift twins into the Rust core (M9, step 8), an area at a time.
 3. iPad, before the first release (M10, step 5).
 4. The app icon's looks: each design by day and by night, in colour or in greys, picked for light and dark mode.
-5. Trusting a self-signed server certificate, for homelabs without a private CA in the system store: never silently,
-   only after the person accepts that certificate, shown with its fingerprint, and asked again when it changes.
+5. Trusting a self-signed server certificate on the Mac and the iPhone: done in the core and on Linux (ARCHITECTURE.md,
+   "A certificate of the server's own", which has the Apple step's plan); left, the pin in the App Group's config and
+   the bridge's clients, the question in SwiftUI, and the app's own URLSession and AVPlayer requests.
 6. Linux's map from the Immich server's own map setting (`mapLightStyleUrl`, `mapDarkStyleUrl`; Immich's own
    `tiles.immich.cloud` unless its admin chose another), drawn by libshumate's vector renderer (in Fedora 44's 1.6.3),
    in place of OpenStreetMap's servers, whose usage policy forbids an app's traffic. Apple's systems keep Apple's maps.

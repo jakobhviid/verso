@@ -63,6 +63,11 @@ enum Command {
         /// The server's address, such as https://photos.example.org (default: the configured one)
         #[arg(long, value_name = "URL")]
         server: Option<String>,
+        /// Trust the server's own certificate, which this computer does not trust, by its SHA-256 fingerprint (as
+        /// `openssl x509 -noout -fingerprint -sha256` prints it); refused unless it is the one the server presents.
+        /// Without it, a terminal asks
+        #[arg(long, value_name = "SHA256")]
+        trust_certificate: Option<immich_api::CertificatePin>,
     },
     /// Show the connection, the server, the mount and the cache
     Status,
@@ -138,7 +143,7 @@ fn main() -> ExitCode {
     let paths = Paths::from_environment();
     let json = cli.json;
     match cli.command {
-        Some(Command::Login { password, api_key, server }) => finish(run_login(&paths, password, api_key, server, json)),
+        Some(Command::Login { password, api_key, server, trust_certificate }) => finish(run_login(&paths, password, api_key, server, trust_certificate, json)),
         Some(Command::Status) => finish(online::status(&paths).map(|report| {
             if json {
                 print_json(&report);
@@ -270,13 +275,13 @@ fn main() -> ExitCode {
     }
 }
 
-fn run_login(paths: &Paths, password: bool, api_key: bool, server: Option<String>, json: bool) -> anyhow::Result<()> {
+fn run_login(paths: &Paths, password: bool, api_key: bool, server: Option<String>, trust_certificate: Option<immich_api::CertificatePin>, json: bool) -> anyhow::Result<()> {
     let method = match (password, api_key) {
         (true, _) => online::LoginMethod::Password,
         (_, true) => online::LoginMethod::ApiKey,
         _ => online::LoginMethod::Browser,
     };
-    let report = online::login(paths, method, server)?;
+    let report = online::login(paths, method, server, trust_certificate)?;
     // A daemon already running holds the credential it started with; it starts again with this one (`try-restart`
     // leaves a stopped service alone), unless a copy into Upload is in flight, which a restart would cut short.
     let uploading = tokio::runtime::Builder::new_current_thread()
@@ -302,6 +307,9 @@ fn run_login(paths: &Paths, password: bool, api_key: bool, server: Option<String
     } else {
         let user = report.user.as_deref().map(|user| format!(" as {user}")).unwrap_or_default();
         println!("✓ signed in to {} (Immich {}){user} with {}, kept in {}", report.server, report.server_version, report.method, report.stored_in);
+        if let Some(certificate) = &report.certificate {
+            println!("  trusting its own certificate, SHA-256 {certificate}");
+        }
         // A logout turns the user service off; say how to turn it on, unless it already is.
         let unit = verso_linux::service::user_service();
         let enabled = std::process::Command::new("systemctl")

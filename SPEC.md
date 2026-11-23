@@ -521,6 +521,37 @@ part in Immich Crosslink, which shows it there: from Verso Drive's menu in Files
   failed https only for a server on the local network (a private or link-local address, Tailscale's 100.64.0.0/10,
   this device, a name without a dot, or one under `.local`, `.lan`, `.home`, `.home.arpa`, `.internal` or
   `.localdomain`), never after a certificate's error, which says to type `http://` to connect without encryption.
+- **A certificate of the server's own** (ARCHITECTURE.md, "A certificate of the server's own"). A certificate the
+  system trusts needs nothing. One it does not (self-signed, or from a private authority not in the system's trust
+  store) is refused, nothing is sent, and Verso asks:
+  - **On Linux**, a question, **Trust This Server's Certificate?**: the certificate the server presented is not one
+    this computer trusts; a server at home often has its own, but anyone between Verso and the server could be
+    pretending to be it; trust it only if the fingerprint is the server's, which `openssl x509 -noout -fingerprint
+    -sha256 -in <its certificate file>` shows on the server. Below, the certificate: **Fingerprint (SHA-256)** in pairs
+    (`AB:CD:…`), **Issued To**, **Issued By** (**Itself (self-signed)** for a self-signed one), **Valid From** and
+    **Valid Until**, and a sentence when it has expired, is not valid yet, or was made for another name. **Cancel** is
+    the default; **Trust This Certificate** (in red) checks the server again trusting that certificate, for that
+    address alone, and signing in keeps it with the server (`server.certificate_sha256`).
+  - **Another certificate** from a server whose certificate was trusted is refused, never trusted by itself: **The
+    Server's Certificate Changed**, saying that a renewed or replaced certificate is expected, that otherwise someone
+    may be pretending to be the server, and that Verso sends nothing to it until the person decides, with the new
+    fingerprint and the one trusted until now (**Trusted Until Now**), and the same two buttons. While the library
+    shows, its banner says "*host*'s certificate is not trusted, so Verso does not connect to it", with **Check
+    Certificate…**, and the question comes by itself once per certificate. Trusting it keeps it in place of the old one
+    and restarts the service with it.
+  - **Preferences, Account** shows **Trusted Certificate (SHA-256)** while one is kept, with **Forget…**, which asks,
+    then forgets it and connects again: the question comes again, unless the system trusts the server's certificate
+    by then.
+  - **The service** tells once, in a notification ("Immich's certificate is not trusted"), and Verso Drive serves what
+    it holds, as while the server cannot be reached.
+  - **`verso-service login`** shows the same on a terminal and asks "Trust this certificate? [y/N]". `--trust-certificate
+    <SHA-256>` trusts it without asking, only when it is the certificate the server presents; without a terminal and
+    without the flag, it stops, printing the certificate and the command with its fingerprint. A certificate kept for
+    the server is trusted again without asking.
+  - An expired certificate may be trusted, and a trusted certificate stays trusted after its end date: it is still the
+    certificate the person chose.
+  - The Flatpak does the same, keeping the certificate in its own config. The Mac, the iPhone and the iPad refuse such
+    a server, and ask nothing (ROADMAP.md, "Next, in order", has their step).
 - **Taking Immich Mount's account over.** Where Immich Mount is signed in on the computer (its
   `~/.config/immich-mount/config.toml` names a server, and its keyring item or credential file holds a sign-in), the
   window's first page offers **Use Immich Mount's Account**. Verso then signs in to Immich Mount's server with a
@@ -581,8 +612,9 @@ settings window"). Verso's Preferences show them on these pages:
 - Under **Verso Drive:** **Status** (the drive's switch), **Drive** (its location and name, a bookmark instead of a
   drive, the cache's size, sharp thumbnails) and **Folders** (each section with its date folders, Upload, album and
   file names).
-- No page shows the server (signing in sets it), the apps left out of Show in (each app's switch sets them), the
-  headless credential file or `thumbnails.safety_net`: those are for `config.toml` and `verso-service configure`.
+- No page shows the server (signing in sets it), the certificate trusted for it (signing in sets it, and the Account
+  page shows it), the apps left out of Show in (each app's switch sets them), the headless credential file or
+  `thumbnails.safety_net`: those are for `config.toml` and `verso-service configure`.
 
 A change to the drive's settings restarts the service when its page is left or Preferences closes. Verso as a Flatpak
 hides the drive's switch, place, name, bookmark, cache size and sharp thumbnails, and the app icon's two looks, and
@@ -591,6 +623,7 @@ reads none of them.
 | Key | Values | Default | Meaning |
 |---|---|---|---|
 | `server.url` | URL | none | The Immich server; `/api` is added |
+| `server.certificate_sha256` | a SHA-256 fingerprint: 64 hexadecimal digits, in pairs separated by colons or not | none | The certificate trusted for `server.url` where the system does not trust the server's own ("A certificate of the server's own"). Set by Trust This Certificate and by `login`, written or removed whenever signing in sets `server.url`, and removed by Forget… on the Account page; signing out keeps it with the server's address, as it keeps the other settings. Linux only |
 | `mount.enabled` | bool | `false` | Verso Drive's switch (Switching it on). Off, the service runs the top bar icon alone |
 | `mount.path` | path | `~/Verso` | Where the drive is mounted. Linux only |
 | `mount.name` | `verso`, `verso-drive`, `immich` | `verso` | The drive's name: "Verso", "Verso Drive" or "Immich" in Files' sidebar, and the location's name in Finder. The mount point stays `mount.path`. (Immich Mount's `immich-mount` and `immich-drive` are accepted too) |
@@ -631,7 +664,7 @@ One program: Verso's service and its command line. The window is `verso`, instal
 | `verso-service` | Opens Verso's window where there is a display (as `verso-service app`); prints this help where there is none |
 | `verso-service app [link]` | Opens Verso's window (`verso`), handing it what it was given. An `immich-crosslink:` link is shown by Verso Drive instead (`ShowLink`), without opening the window: Verso Drive's participant runs this, and with no service answering, a notification says the drive is not mounted |
 | `verso-service daemon` | Runs the service in the foreground (what the user service starts): the top bar icon and the D-Bus interface, and the drive while it is on. Once the program it was started from is replaced by an upgrade and nothing on the drive is open or uploading, it unmounts and exits with status 75, on which the user service starts the new version. Once the program has been gone for two minutes (uninstalled), it unmounts, turns off the service that started it, takes the drive's bookmark out of Files' sidebar, removes the GVfs drop-in, its seeded thumbnails and Verso's Crosslink entries, and exits 0 |
-| `verso-service login [--password \| --api-key] [--server URL]` | Signs in; prompts only on a terminal. A running service restarts with the new sign-in, unless a copy into Upload is in flight |
+| `verso-service login [--password \| --api-key] [--server URL] [--trust-certificate SHA256]` | Signs in; prompts only on a terminal. A server certificate the system does not trust is asked about, or trusted with `--trust-certificate` when it is the one presented ("A certificate of the server's own"). A running service restarts with the new sign-in, unless a copy into Upload is in flight |
 | `verso-service logout` | Ends the session on the server, unmounts, stops the service, then removes the seeded thumbnails, the drive's bookmark and GVfs drop-in, Verso's Crosslink entries, the credential (every keyring item of Verso's, and the credential file) and every cache, the window's included; and turns the user service off. Settings and files not uploaded are kept |
 | `verso-service mount` / `unmount` | Mounts: refused while the drive is off; else starts the user service (writing it first where no install brought one, and enabling it), or restarts it where it runs without the drive, and waits up to 15 s for the mount. Unmounts: the service goes on without the drive until Mount or the next login. When something keeps the mount busy, such as a file manager window showing it, `unmount` detaches it lazily (`fusermount3 -uz`), unless a copy into Upload is in flight: then it refuses, naming the file ("… is still uploading") |
 | `verso-service status` | Connection state, server and its version, account, credential, mount point, cache usage |
@@ -947,7 +980,8 @@ first.
   Folders (a folder); under Server, for an admin, Administration (a server, `verso-server-symbolic`). General, Crosslink
   and the drive's pages show the settings ("Configuration"). In a Flatpak, one Verso Drive page says the drive is not
   part of it, and where to get it.
-  - **Account:** the server, whom it is signed in as and with what (a session or an API key); the profile: its picture
+  - **Account:** the server, whom it is signed in as and with what (a session or an API key), and the certificate
+    trusted for the server, with Forget… ("A certificate of the server's own"); the profile: its picture
     (Choose Picture…, Remove), its name and the storage used; for a session, Change Password… (where the account has a
     password, optionally signing the other devices out), Devices (where the account is signed in, with Sign Out Others…,
     after asking) and API Keys (New Key…, whose secret shows once, and deleting one, after asking); Sign Out….
@@ -1269,6 +1303,7 @@ Linux's alone: neither app keeps the choice in `config.toml`.
 | Condition | Error code | Service behaviour |
 |---|---|---|
 | Server unreachable | Cached answer if any (a folder visited before lists as it was, after a restart too, and also when the server stops answering mid-request), otherwise `EIO` at once | State `offline` and one notification; requests fail fast until the next change poll succeeds |
+| The server's certificate not trusted, or not the one trusted for it | As when the server is unreachable | State `offline` and one notification, "Immich's certificate is not trusted"; nothing is sent until the certificate is trusted in Verso or with `login` |
 | Signed out (401) | `EACCES` | State `signed-out`; one notification |
 | Missing permission (403) | `EACCES` | `status` and `doctor` name the missing permission |
 | Asset gone (404, or 400 `Not found`) | A read fails with `EIO` (the kernel reports any failed page read so, though the service answers `ENOENT`); looking it up again fails with `ENOENT` | The folder it was read from is listed again on its next visit, without it |

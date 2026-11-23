@@ -45,8 +45,15 @@ Problems in the Immich server itself belong to the Immich project:
 - **Its network use:** it talks to the Immich server you sign in to, over https unless you choose otherwise: an
   address typed without `https://` or `http://` is tried with https, and with plain http after that only for a server
   on your local network and never after a certificate's error (on Linux, never), so nobody on the way can turn a
-  connection to a server elsewhere into an unencrypted one. An address typed with `http://` is reached as typed. The
-  map's tiles come from OpenStreetMap's tile
+  connection to a server elsewhere into an unencrypted one. An address typed with `http://` is reached as typed.
+  Verso trusts the certificates your system trusts (its trust store, where you can add a private authority). A
+  server's own certificate the system does not trust (self-signed, or from a private authority) is never accepted by
+  itself: on Linux Verso shows it, with its SHA-256 fingerprint to compare with the server's, and trusts exactly that
+  certificate, for that server alone, only once you choose Trust This Certificate (or give its fingerprint to
+  `verso-service login`). The fingerprint is kept with the server's address in `config.toml`. A certificate the server
+  presents later that is not that one is refused and asked about again, and nothing is sent to the server until you
+  decide; Preferences, Account forgets it. Verso never accepts every certificate, nor trusts an authority for you. The
+  Mac, the iPhone and the iPad refuse such a server, and ask nothing. The map's tiles come from OpenStreetMap's tile
   servers on Linux and from Apple's maps on the Mac, the iPhone and the iPad, where a place search when you adjust a
   photo's location also sends the words you type to Apple's maps (Linux searches through your Immich server). On the
   iPhone and the iPad, **Look Up Place Names with Apple Maps** (Account, On This iPhone; off until you switch it on)

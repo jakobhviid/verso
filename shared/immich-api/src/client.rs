@@ -1,7 +1,8 @@
 //! The HTTP client: the server URL, the credential, and the request plumbing every endpoint module uses.
 //!
 //! Adapted from immich-rs (`client.rs`, `core/execute.rs`), without its Tower stack: one `reqwest::Client`
-//! (rustls with the system trust store, one shared connection pool), a credential header, and a retry loop
+//! (rustls with the system's verification, and the certificate trusted for the server where the system does not
+//! trust it, `crate::certificate`; one shared connection pool), a credential header, and a retry loop
 //! ([`crate::retry`]). Cloning a [`Client`] is cheap and shares the pool.
 //!
 //! Rules every call follows:
@@ -23,6 +24,7 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 use url::Url;
 
+use crate::certificate::CertificatePin;
 use crate::error::{classify, from_transport, ApiError, ErrorResponse, RequestShape};
 use crate::retry::{parse_retry_after, Resend, RetryPolicy};
 
@@ -108,9 +110,17 @@ struct Inner {
     api_url: Url,
     credential: Option<Credential>,
     auth_header: Option<(HeaderName, HeaderValue)>,
+    /// The certificate trusted for the server besides the system's (`crate::certificate`).
+    trusted: Option<CertificatePin>,
     retry: RetryPolicy,
     reach: Arc<Reach>,
 }
+
+/// The TLS configuration a client is built over; nothing without TLS.
+#[cfg(feature = "tls")]
+pub(crate) type TlsConfig = rustls::ClientConfig;
+#[cfg(not(feature = "tls"))]
+pub(crate) type TlsConfig = ();
 
 /// Whether the server can be reached, as the app watching it last found ([`Client::set_reachable`]), and the
 /// requests waiting for an answer. Shared by every client made from one, as their connection pool is.
@@ -178,26 +188,34 @@ fn same_origin_only(attempt: reqwest::redirect::Attempt<'_>) -> reqwest::redirec
     }
 }
 
-/// The TLS configuration every client made after it is set uses (`set_tls_config`); without one, reqwest's, with the
-/// trusted roots `rustls-native-certs` lists.
-#[cfg(feature = "tls")]
-static TLS_CONFIG: std::sync::OnceLock<rustls::ClientConfig> = std::sync::OnceLock::new();
-
-/// Hand every client made after this the TLS configuration the platform wants: the Apple bridge gives the system's
-/// own certificate verifier, since iOS lets no program list its trusted roots. Only the first call counts.
-#[cfg(feature = "tls")]
-pub fn set_tls_config(mut config: rustls::ClientConfig) {
-    // reqwest offers HTTP/2 and HTTP/1.1 on a configuration it builds itself; a configuration handed over says so.
-    config.alpn_protocols = vec![b"h2".to_vec(), b"http/1.1".to_vec()];
-    let _ = TLS_CONFIG.set(config);
-}
-
 impl Client {
-    /// A client for the server at `server_url`, which may or may not end in `/api`.
+    /// A client for the server at `server_url`, which may or may not end in `/api`, trusting the certificates the
+    /// system trusts.
     ///
     /// The URL is normalised: whitespace and trailing slashes are trimmed, and `/api` is added once. No request is
     /// made. `user_agent` is sent with every request (`verso-service/<version>`).
     pub fn new(server_url: &str, credential: Option<Credential>, user_agent: &str) -> Result<Client, ApiError> {
+        Client::trusting(server_url, credential, user_agent, None)
+    }
+
+    /// [`Client::new`], also trusting the certificate `trusted` names for this server when the system does not trust
+    /// it (`crate::certificate`): the one a person chose to trust, kept with the server's address.
+    pub fn trusting(server_url: &str, credential: Option<Credential>, user_agent: &str, trusted: Option<CertificatePin>) -> Result<Client, ApiError> {
+        #[cfg(feature = "tls")]
+        let tls = Some(crate::certificate::tls_config(trusted)?);
+        #[cfg(not(feature = "tls"))]
+        let tls = None;
+        Client::with_tls(server_url, credential, user_agent, trusted, tls)
+    }
+
+    /// A client over a TLS configuration of its own, `None` without TLS.
+    pub(crate) fn with_tls(
+        server_url: &str,
+        credential: Option<Credential>,
+        user_agent: &str,
+        trusted: Option<CertificatePin>,
+        #[cfg_attr(not(feature = "tls"), allow(unused_variables))] tls: Option<TlsConfig>,
+    ) -> Result<Client, ApiError> {
         let api_url = normalise_server_url(server_url)?;
         let builder = reqwest::Client::builder()
             .user_agent(user_agent)
@@ -207,8 +225,8 @@ impl Client {
             .http2_keep_alive_timeout(KEEP_ALIVE)
             .redirect(reqwest::redirect::Policy::custom(same_origin_only));
         #[cfg(feature = "tls")]
-        let builder = match TLS_CONFIG.get() {
-            Some(config) => builder.use_preconfigured_tls(config.clone()),
+        let builder = match tls {
+            Some(config) => builder.use_preconfigured_tls(config),
             None => builder,
         };
         let http = builder
@@ -221,10 +239,16 @@ impl Client {
                 api_url,
                 credential,
                 auth_header,
+                trusted,
                 retry: RetryPolicy::default(),
                 reach: Arc::new(Reach::new()),
             }),
         })
+    }
+
+    /// The certificate trusted for this server besides those the system trusts ([`Client::trusting`]).
+    pub fn trusted_certificate(&self) -> Option<CertificatePin> {
+        self.inner.trusted
     }
 
     /// The same server and connection pool with another credential, for example the session a sign-in returned.
@@ -236,6 +260,7 @@ impl Client {
                 api_url: self.inner.api_url.clone(),
                 credential,
                 auth_header,
+                trusted: self.inner.trusted,
                 retry: self.inner.retry,
                 reach: self.inner.reach.clone(),
             }),
@@ -250,6 +275,7 @@ impl Client {
                 api_url: self.inner.api_url.clone(),
                 credential: self.inner.credential.clone(),
                 auth_header: self.inner.auth_header.clone(),
+                trusted: self.inner.trusted,
                 retry,
                 reach: self.inner.reach.clone(),
             }),

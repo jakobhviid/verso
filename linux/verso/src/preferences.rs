@@ -453,6 +453,9 @@ fn account_page(window: &Window) -> adw::PreferencesPage {
         }
         let kind = if connection.with_api_key { tr("An API key") } else { tr("A session, from signing in") };
         group.add(&adw::ActionRow::builder().title(tr("Signed In With")).subtitle(kind).css_classes(["property"]).build());
+        if let Some(certificate) = connection.client.trusted_certificate() {
+            group.add(&trusted_certificate_row(window, certificate));
+        }
     }
     page.add(&group);
     page.add(&crate::account_settings::profile_group(window));
@@ -479,6 +482,40 @@ fn account_page(window: &Window) -> adw::PreferencesPage {
     sign_out_group.add(&sign_out);
     page.add(&sign_out_group);
     page
+}
+
+/// The certificate trusted for the server where the system does not trust it (ARCHITECTURE.md, "A certificate of the
+/// server's own"), and forgetting it: the next connection asks again, unless the system trusts the server by then.
+fn trusted_certificate_row(window: &Window, certificate: immich_api::CertificatePin) -> adw::ActionRow {
+    let row = adw::ActionRow::builder()
+        .title(tr("Trusted Certificate (SHA-256)"))
+        .subtitle(verso_desktop::session::fingerprint_lines(certificate, 16))
+        .subtitle_selectable(true)
+        .css_classes(["property", "monospace"])
+        .build();
+    let forget = gtk::Button::builder().label(tr("Forget…")).valign(gtk::Align::Center).css_classes(["flat"]).build();
+    let weak_window = window.downgrade();
+    forget.connect_clicked(move |button| {
+        let Some(window) = weak_window.upgrade() else { return };
+        let Some(preferences) = button.root().and_downcast::<adw::Window>() else { return };
+        let shown = window.clone();
+        let closing = preferences.downgrade();
+        crate::dialogs::confirm(
+            &preferences,
+            tr("Forget the Certificate?"),
+            tr("Verso stops trusting this certificate and connects again, asking about the server's certificate, unless this computer trusts it."),
+            tr("Forget"),
+            true,
+            move || {
+                if let Some(preferences) = closing.upgrade() {
+                    preferences.close();
+                }
+                shown.forget_certificate();
+            },
+        );
+    });
+    row.add_suffix(&forget);
+    row
 }
 
 /// The devices signed in to the account, and signing the others out.

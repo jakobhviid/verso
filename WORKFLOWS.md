@@ -93,6 +93,30 @@ verso-service login --server https://photos.example.org --password     # prompts
 printf '%s' "$KEY" | verso-service login --server https://photos.example.org --api-key   # key from stdin
 ```
 
+**A server with a certificate of its own** (self-signed, or from a private authority this computer does not trust):
+Verso shows the certificate and asks before it sends anything (SPEC.md, "Signing in and credentials"). Before you
+trust it, compare its fingerprint with the server's own, on the server:
+
+```sh
+openssl x509 -noout -fingerprint -sha256 -in /path/to/the/server/certificate.pem
+# sha256 Fingerprint=AB:CD:…   is what Verso's Fingerprint (SHA-256) must show, pair for pair
+```
+
+In Verso, **Trust This Certificate** goes on, and the certificate is kept with the server; Preferences, Account shows
+it, and **Forget…** removes it. On a terminal, `login` shows the same and asks; a script gives the fingerprint, which
+must be the one the server presents:
+
+```sh
+printf '%s' "$KEY" | verso-service login --server https://photos.home.arpa --api-key \
+  --trust-certificate AB:CD:…                                          # the fingerprint, with colons or without
+```
+
+If the server's certificate is later replaced, Verso says so and asks again; nothing reaches the server meanwhile. A
+server that renews its certificate often (Caddy's `tls internal`, every 12 hours) asks at each renewal: add its
+authority to this computer's trust store instead (on Fedora and its atomic desktops `sudo trust anchor
+<authority.crt>`; on Debian and Ubuntu, copy it into `/usr/local/share/ca-certificates/` and run `sudo
+update-ca-certificates`), which Verso follows with no question at its next sign-in.
+
 Without a terminal, `login` never prompts. Browser sign-in still prints the address to open on stderr, and reads
 the address the browser ends on from stdin; the other methods read their secrets from stdin. For Verso Drive, an API
 key needs `album.read`, `asset.read`, `asset.view`, `asset.download` and `person.read`, plus `asset.upload` for
@@ -205,7 +229,7 @@ verso-service status --json
 {
   "state": "online",
   "detail": null,
-  "server": { "url": "https://photos.example.org", "version": "3.3.5" },
+  "server": { "url": "https://photos.example.org", "version": "3.3.5", "certificate": null },
   "account": { "email": "me@example.org", "credential": "session" },
   "change_feed": "sync-stream",
   "mount": { "path": "/home/me/Verso", "mounted": true, "stale": false },
@@ -218,8 +242,11 @@ verso-service status --json
 answers): what browsing has cost the network. Opening a folder costs a few range requests per file; opening a file
 fetches it.
 
-`state` is one of `unconfigured`, `online`, `offline`, `signed-out`, `missing-permission` or `unmounted` (signed in,
-with the drive off or not mounted); `detail` says why when it is not `online`.
+`state` is one of `unconfigured`, `online`, `offline`, `untrusted-certificate` (the server presents a certificate that
+is neither trusted by this computer nor the one trusted for the server), `signed-out`, `missing-permission` or
+`unmounted` (signed in, with the drive off or not mounted); `detail` says why when it is not `online`, with the
+presented certificate's fingerprint for `untrusted-certificate`. `server.certificate` is the certificate trusted for
+the server, where this computer does not trust its own (`server.certificate_sha256`), else `null`.
 `change_feed` is `sync-stream` (signed in with a session) or `polling` (an API key); either way, changes show
 within about 10 seconds. `account.email` appears only when the credential may read it.
 
@@ -312,6 +339,7 @@ in another language once: `LANGUAGE=da verso`. The folders in the drive keep the
 | Verso does not open from the app grid, or says it needs GNOME 49 or newer | The system's GNOME libraries are older than Verso's (section 1); `verso` in a terminal says which it found. Install the Flatpak instead, which runs without Verso Drive |
 | The keyring prompt appeared at login | Unlock it. If it was dismissed, Verso's service did not start (a notification says so): open Verso, or run `systemctl --user start verso` |
 | "Signed out of Immich" notification | Open Verso (the top bar menu's **Sign In…**) and sign in again. Caches are kept |
+| "Immich's certificate is not trusted" notification, or **Check Certificate…** in Verso | The server presents another certificate than the one trusted for it. If it was renewed or replaced, compare the new fingerprint with the server's (section 2) and trust it in Verso, or with `verso-service login --trust-certificate`; if not, do not: someone may be pretending to be the server |
 | The top bar icon does not show | Stock GNOME has no tray: turn on the AppIndicator extension. Verso and its drive work without it; Preferences, Verso Drive, Status shows the drive's state |
 | An app under Apps That Take Part is not wanted, or reads Not found | Switch it off in Preferences, Crosslink, to leave it out of Show in; an installed app stays listed while it is installed. One that reads **Not found** (removed, moved, or its program gone) has **Forget**, which removes it now; otherwise it goes by itself after 30 days |
 | A change made in Immich does not show in an open folder | The drive has it within about 10 seconds, but Files does not redraw an open folder on its own: press F5, or open the folder again |

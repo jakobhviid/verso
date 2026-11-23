@@ -104,7 +104,7 @@ clock) come in through traits.
 
 | Area | Crates |
 |---|---|
-| Core | `tokio`, `reqwest` (in `immich-api`; rustls with the system's root certificates), `serde`, `redb` (pure Rust), `sha1`, `toml_edit`, `log`, `thiserror` |
+| Core | `tokio`, `reqwest` (in `immich-api`; rustls with the system's root certificates, and the certificate trusted for the server), `serde`, `redb` (pure Rust), `sha1`, `sha2`, `toml_edit`, `log`, `thiserror` |
 | Linux adapter | `fuser` (pure Rust, mounts through `fusermount3` with no libfuse), `zbus`, `oo7`, `image` + `png` |
 | Command line | `clap` (with `clap_complete` and `clap_mangen`), `anyhow` |
 | Window | `gtk4`, `libadwaita`, `libshumate` |
@@ -296,6 +296,92 @@ and the form says so.
 
 The core holds the Immich side of sign-in (`verso_core::sign_in`). Catching the redirect is per platform: a scheme
 handler on Linux, and `ASWebAuthenticationSession` on macOS.
+
+### A certificate of the server's own
+
+A home server often presents a certificate of its own: self-signed, or from a private authority the system does not
+know. Verso connects to one only after the person has looked at that certificate and chosen to trust it, never by
+itself (the maintainer's rule). SPEC.md, "Signing in and credentials", has what the person sees.
+
+**Trust is a pin: one certificate, for one server.** The pin is the SHA-256 of the leaf certificate's DER, kept with
+the server's address (on Linux `server.certificate_sha256` beside `server.url`, SPEC.md, "Configuration"). Signing in
+to a server writes its pin or removes the one there, so a pin never vouches for another server.
+
+**The verifier** (`immich_api::certificate`) is in every client's TLS configuration:
+1. The system's own verification runs first, as for any server: on Linux webpki over the roots `rustls-native-certs`
+   lists, read afresh for each client, so an authority installed in the system's trust store counts at the next sign-in;
+   on the Mac and iOS the system's own verifier (`rustls-platform-verifier`, which the bridge hands over with
+   `certificate::set_system_verifier`). A certificate the system trusts is trusted, whatever is pinned.
+2. Only a refusal that a server's own certificate gives can be overruled: an issuer the system does not trust (webpki's
+   `UnknownIssuer`; its `CaUsedAsEndEntity` for openssl's default self-signed certificate, which marks itself an
+   authority; Apple's "not trusted"), a certificate made for another name, or one outside its dates. A certificate
+   that cannot be read, or that its authority revoked, is refused whatever is pinned.
+3. Then the leaf's fingerprint is compared with the pin. Equal, the certificate is accepted. Otherwise it is refused,
+   and what the person needs to decide travels inside rustls' error to the client's (`CertificateRefusal`: the
+   fingerprint, subject, issuer, validity, whether it is self-signed, and the pin compared with):
+   `ApiError::UntrustedCertificate` with nothing pinned, `ApiError::CertificateChanged` with another certificate
+   pinned.
+4. The handshake's signatures are still verified with the presented certificate's key (rustls'
+   `verify_tls12_signature` and `verify_tls13_signature`, with the provider's algorithms), so a server that presents
+   the pinned certificate must hold its key.
+
+A refused certificate is not retried (`retry.rs`), and no request reaches the server: the handshake ends first.
+
+**An expired certificate is still that certificate.** A pin trusts the exact bytes the person accepted, and the dates
+of a certificate no authority vouches for are only what its maker wrote; a home server's own certificate also tends to
+outlive its dates unnoticed. So the question shows the dates and says when one has expired, and a pinned certificate
+stays trusted past its end date. A renewed certificate is another certificate, and is asked about.
+
+**A pin never follows a change by itself.** Another certificate from the same server is refused as changed, with a
+stronger warning, until the person trusts the new one, which then replaces the pin. A server that renews often asks
+at every renewal (Caddy's `tls internal` gives a leaf 12 hours): for one like that, its authority belongs in the
+system's trust store, which Verso follows (SECURITY.md).
+
+**Every connection on Linux takes the pin:**
+
+| What connects | How it takes the pin |
+|---|---|
+| The window's sign-in: the server check, the browser sign-in, email and password, an API key | `verso_desktop::session`'s steps over a client trusting the certificate accepted for that address (`Window::trusted_for`), else the one kept for it; `store_credential` keeps it with the server |
+| The window's library: pages, thumbnails, previews, originals, downloads, imports, edits, the account, notifications, and videos | `connection::connect` builds the window's one client from `server.url` and `server.certificate_sha256`. Videos and Live Photos are downloaded through it into the cache and played from the file, so GStreamer never connects |
+| The service: Verso Drive's listings, reads and uploads, the sync stream, and the tray's state | `online::daemon` builds its client from the same keys, at its start; the window restarts it once a certificate is trusted or forgotten |
+| The command line: `login`, `status`, `doctor`, and `logout`'s ending of the session | `online::client` with the kept pin; `login` asks on a terminal, or takes `--trust-certificate` |
+| Not the server: the map's tiles (OpenStreetMap, through libshumate), the update check (the download page), and Open in Immich (the browser, which asks its own question) | The system's trust alone |
+
+Verso opens no websocket to the server.
+
+**What the person sees** is the platform's own: on Linux an Adwaita question with the certificate's details, Cancel
+first, and Trust This Certificate as the destructive choice; in the library, a banner and the same question when the
+certificate changes, and the trusted certificate with Forget on Preferences' Account page; a notification from the
+service, whose drive serves what it holds meanwhile, as while the server cannot be reached; a question on the
+terminal from `login`. The wording lives in `verso_desktop::session::certificate_question`, translated.
+
+**Not chosen:**
+- **Accepting every certificate** (a switch that skips verification): anyone on the way, a hotel's network or a
+  hacked router, would read the password, the session and every photo.
+- **Trusting a whole authority** for Verso alone: an authority signs for any name, so one decision would vouch for
+  every server it ever signs for. The system's trust store already does that, deliberately, for those who want it.
+- **Trusting the first certificate seen** (trust on first use, without asking): the first connection is exactly the one
+  someone in between can catch, and a silent pin would hide it.
+- **Pinning the public key** rather than the certificate: it would survive a renewal with the same key, but a person
+  cannot compare a key's hash with what `openssl x509 -fingerprint` shows them, and it trusts every certificate ever
+  made for that key.
+
+**Flatpak impact:** none. The pin lives in the sandbox's own `config.toml`, the verifier runs in Verso's process, and
+no permission is added; the host's trust store is read as the runtime has it.
+
+**The Apple step** (ROADMAP.md) plugs into the same core. The bridge already hands the system's verifier to
+`set_system_verifier`, so the bridge's clients (Verso Drive's extension, the gallery's `ApiConnection`, the backup)
+refuse an untrusted certificate with the same `CertificateRefusal`. What remains:
+- keep the pin with the account, as `server.certificate_sha256` in the App Group's `config.toml`, which the extensions
+  read too, and build the bridge's clients with it (`Client::trusting`);
+- carry the refusal across uniffi (a `BridgeError` with its details), so the sign-in asks the same question in SwiftUI,
+  and the library shows the same banner;
+- the app's own requests (`ImmichClient`'s `URLSession`, the image pipeline, the server check) answer the session's
+  server-trust challenge as the verifier does: `SecTrustEvaluateWithError` first, then the leaf's SHA-256
+  (`SecTrustCopyCertificateChain`, `SecCertificateCopyData`) against the pin, accepted with `URLCredential(trust:)`;
+- AVPlayer streams through `AVURLAsset`, outside the app's session: its resource loader's delegate answers the same
+  challenge, or where AVFoundation does not ask it, the video comes through a scheme of the app's own, served by the
+  app's session.
 
 ### The tree
 
@@ -1591,13 +1677,14 @@ which opens the page) for as long as it runs. It sends nothing but the request a
 - **Cache directories** are 0700 and cleared on disconnect. They are not encrypted at rest; full-disk encryption is the
   user's layer.
 - **TLS:** rustls with the system's root certificates (`rustls-native-certs`), so private CAs added to the system trust
-  store (with `update-ca-trust`, say) work. Plain `http://` is allowed for LAN servers. Nothing silently downgrades from
-  https to http.
+  store (with `update-ca-trust`, say) work. A certificate the system does not trust is trusted only once the person
+  has chosen to trust that certificate for that server ("A certificate of the server's own"). Plain `http://` is
+  allowed for LAN servers. Nothing silently downgrades from https to http.
   - **On macOS and iOS the system judges each certificate** (`rustls-platform-verifier`, which the Apple bridge hands
-    `immich-api` through `client::set_tls_config` before its first client): iOS lets no program list its trusted roots,
-    so with `rustls-native-certs` every server is refused there ("UnknownIssuer"), and the system's verifier also
-    follows the trust settings the user and their profiles give, a private CA installed with a profile among them.
-    `immich-api` holds no platform code for it: the bridge chooses.
+    `immich-api` through `certificate::set_system_verifier` before its first client): iOS lets no program list its
+    trusted roots, so with `rustls-native-certs` every server is refused there ("UnknownIssuer"), and the system's
+    verifier also follows the trust settings the user and their profiles give, a private CA installed with a profile
+    among them. `immich-api` holds no platform code for it: the bridge chooses.
 - **Places are named from Immich** (the asset's city, else its state, else its country), on iOS as on the Mac and
   Linux. Apple's reverse geocoding (`MKReverseGeocodingRequest`), which names landmarks and parks as Photos does, runs
   on iOS only once the person switches on Look Up Place Names with Apple Maps, a setting of the device's own
