@@ -21,14 +21,14 @@ each icon and how it is built; the platforms' own guidelines (GNOME's, Apple's) 
 
 | Where | What | Source |
 |---|---|---|
-| Linux: the launcher, About, the window | The app icon: a print as the square, edge to edge as Linux shows app icons, the lens with its five-colour ring in its picture, Verso written by hand on its strip, its corner turned over to show the back. Its picture is Mist, the first of the picture's designs (below), or the one chosen in Preferences | `linux/packaging/icons/dev.hviid.Verso.svg`, drawn by `linux/packaging/icons/sources/app-icon.py`, made into `dev.hviid.Verso.png` and `hicolor/<size>/dev.hviid.Verso.png` by `linux/packaging/icons/linux-app-icon.py`; the other designs `dev.hviid.Verso-<design>.svg`, by the same script |
+| Linux: the launcher, About, the window | The app icon: a print as the square, edge to edge as Linux shows app icons, the lens with its five-colour ring in its picture, Verso written by hand on its strip, its corner turned over to show the back. It is Mist on Day paper with its lens in colour, the first of the picture's looks (below), or the looks chosen in Preferences for the light and the dark style | `linux/packaging/icons/dev.hviid.Verso.svg`, drawn by `linux/packaging/icons/sources/app-icon.py`, made into `dev.hviid.Verso.png` and `hicolor/<size>/dev.hviid.Verso.png` by `linux/packaging/icons/linux-app-icon.py`; the other looks `dev.hviid.Verso-<look>.svg`, by the same script |
 | Linux: Verso Drive on its folder, in a dock and in other apps' Show in | The app icon with a drive's badge in its corner, so the drive is not taken for the app | `hicolor/<size>/dev.hviid.Verso.Drive.png` (`linux-app-icon.py`) |
 | Linux: the top bar, notifications, Verso Drive in Files' sidebar and in Preferences | The symbolic icon: the print as one solid shape, with the lens's ring in five segments and its centre, the line on its strip and the turned corner cut out. In the top bar it shows the state as the sync apps do: faded and struck through while the server cannot be reached, faded with a key while signed out, a pause badge while the drive is unmounted; in one colour by default, or in colour (`tray.colour`: the lens's five colours, lost while faded) | `linux/packaging/icons/dev.hviid.Verso-symbolic.svg`, `dev.hviid.Verso-<state>-symbolic.svg`, `dev.hviid.Verso-tray[-<state>].svg`, drawn by `linux/packaging/icons/sources/symbolic.py` and `states.py` |
 | Linux: the window's own symbols | Where Adwaita has none, or none that fits: the date scroller, a favorite's heart, a memory's keep, a Live Photo, Add Photos, sharing's reach (private, people, a link with a password, a public link) and the others named `verso-*` | `linux/packaging/icons/verso-*-symbolic.svg`; the heart, the keep, the Live Photo, Add Photos and sharing's reach but the public link drawn by the scripts in `linux/packaging/icons/sources/`, the others by hand |
-| Mac: Dock, Finder, System Settings, About | Verso's print in Apple's rounded square, on Apple's grid (the square 824 wide on a 1024 canvas): the picture's corners rounder, to follow the square's; the square's corner beyond the fold grey (what the print lies on; macOS 26 fills the whole square), darker in the dark appearance; the turned corner's tip rounded by half the square's corner; at 16 and 32 px the word in a broader pen. On macOS 26 and later an Icon Composer document: the paper as the background, light and dark, the lens's glass a glass layer, tinted and clear the system's. The Dev build's icon is the release's in every colour but the turned corner's back, which is blue with DEV stamped on it in white (the maintainer's choice); the grey beneath the corner stays the release's, as a shadow does. Another design chosen in Settings, General, is the icon in the Dock and the app switcher while Verso runs, as the drawing for macOS 15 has it | `mac/Verso/Verso/AppIcon.icon`, `AppIconDev.icon`, and `Assets.xcassets/AppIcon.appiconset` and `AppIconDev.appiconset` for macOS 15, in Mist (`mac/Verso/make-icons.py`, `--dev` for the Dev build's); the other designs `Assets.xcassets/AppIcon-<Design>.appiconset` and `AppIconDev-<Design>.appiconset` (`--design <design>`) |
+| Mac: Dock, Finder, System Settings, About | Verso's print in Apple's rounded square, on Apple's grid (the square 824 wide on a 1024 canvas): the picture's corners rounder, to follow the square's; the square's corner beyond the fold grey (what the print lies on; macOS 26 fills the whole square), darker in the dark appearance; the turned corner's tip rounded by half the square's corner; at 16 and 32 px the word in a broader pen. On macOS 26 and later an Icon Composer document: the paper as the background, its light appearance Mist's Day look and its dark appearance Mist's Night look, the lens's glass a glass layer, tinted and clear the system's. The Dev build's icon is the release's in every colour but the turned corner's back, which is blue with DEV stamped on it in white (the maintainer's choice); the grey beneath the corner stays the release's, as a shadow does. The looks chosen in Settings, General, for light and for dark mode are the icon in the Dock and the app switcher while Verso runs, as the drawing for macOS 15 has them | `mac/Verso/Verso/AppIcon.icon`, `AppIconDev.icon`, and `Assets.xcassets/AppIcon.appiconset` and `AppIconDev.appiconset` for macOS 15, in Mist (`mac/Verso/make-icons.py`, `--dev` for the Dev build's); the other looks `Assets.xcassets/AppIcon-<Look>.appiconset` and `AppIconDev-<Look>.appiconset` (`AppIcon-SandNightGraphite`; `--design <design>`, `--graphite`) |
 | Mac: the menu bar item | The app icon's lens alone (the maintainer's choice). By default in one colour, as menu bar icons are: a template image, which macOS draws in the menu bar's black or white, the lens as Finder's sidebar symbol draws it. In colour where Settings, General, says so (Show the Menu Bar Icon in Color, off by default, as Linux's `tray.colour`): its five colours round its glass. The Linux top bar's states as their own images: a pause badge while the drive is unmounted, faded (in colour, the colours gone) and struck through while the server cannot be reached, faded with a key badge while signed out. What a state adds is cut clear of the lens; in colour it is mid-grey with white on it, so it shows on a light menu bar and a dark one. The same in the Dev build: its app icon and name tell the two apart | `Assets.xcassets/MenuBarIcon[<Unmounted, Offline, SignedOut>].imageset`, and the same names with `Colour` after them in colour; PNGs at 1x and 2x (`mac/Verso/make-menu-bar-icon.py`, run by `make-icons.py`) |
 | Mac: Verso Drive in Finder's sidebar, and the Verso Drive tab in Settings | The lens as a symbol: its ring in five segments with a gap at the top, and inside it the glass's rim with the light on it (the maintainer's choice). Each segment is a layer that asks for its colour (red, pink, yellow, blue and green, the system's nearest the ring's; the glass the accent) where macOS draws a symbol in colour; Finder's sidebar draws its locations in one colour, where it is the same shape. The same in the Dev build | `Assets.xcassets/SidebarSymbol.symbolset` (`mac/Verso/make-symbol.py`, run by `make-icons.py`) |
-| iPhone and iPad: the Home Screen, Spotlight and Settings, and the picture of the icon on the sign-in page, in About and in App Icon | The Mac's icon, from the same Icon Composer documents. Another design chosen in App Icon is an alternate icon: the print edge to edge as one picture, light and dark, which iOS rounds and makes its tinted and clear looks from. The picture in the app is the icon's square, light and dark, of the design in use, as reading an app icon back is no API and can fail inside UIKit | `mac/Verso/Verso/AppIcon.icon`, `AppIconDev.icon`; `ios/Verso/Assets.xcassets/AppIcon-<Design>.appiconset` and `AppIconDev-<Design>.appiconset`; `AppIconImage.imageset`, `AppIconDevImage.imageset` and the same with `-<Design>` before `Image` (`mac/Verso/make-icons.py`, `--design <design>` for another design's) |
+| iPhone and iPad: the Home Screen, Spotlight and Settings, and the picture of the icon on the sign-in page, in About and in App Icon | The Mac's icon, from the same Icon Composer documents. Another design or the graphite lens chosen in App Icon is an alternate icon: the print edge to edge as one picture, its Day look as its light appearance and its Night look as its dark one, which iOS rounds and makes its tinted and clear looks from. The picture in the app is the icon's square, Day and Night, of the design and lens in use, as reading an app icon back is no API and can fail inside UIKit | `mac/Verso/Verso/AppIcon.icon`, `AppIconDev.icon`; `ios/Verso/Assets.xcassets/AppIcon-<Design>[Graphite].appiconset` and `AppIconDev-<Design>[Graphite].appiconset`; `AppIconImage.imageset`, `AppIconDevImage.imageset` and the same with `-<Design>[Graphite]` before `Image` (`mac/Verso/make-icons.py`, `--design <design>` and `--graphite` for another's) |
 | iPhone and iPad: Messages' list of apps | The lens alone, its five colours round its glass, filling the circle Messages shows its apps' icons in, on the barrel's own dark (the maintainer's choice); 4:3 where Messages asks, square where Settings and the App Store do; opaque, its corners the system's. The same in the Dev build | `ios/Messages/Assets.xcassets/MessagesIcon.stickersiconset` (`mac/Verso/make-icons.py`) |
 | iPhone and iPad: backing up's Live Activity, on the Lock Screen and in the Dynamic Island | The lens alone, its five colours round its glass, without the barrel's dark rim (the Dynamic Island's black would swallow it), a point inside a ring of the activity's own that fills as the run goes. The same in the Dev build | `ios/Widgets/Assets.xcassets/Lens.imageset` (`mac/Verso/make-icons.py`, or `--lens` for it alone) |
 
@@ -43,17 +43,28 @@ maintainer.
 
 ### The picture's designs
 
-The print's picture comes in seven designs, all kept (the maintainer's choice, 2026-11-22). **Mist** is the app icon
-on every platform; the others are drawn beside it, as `linux/packaging/icons/dev.hviid.Verso-<design>.svg`. On Linux,
-Preferences, General, offers all seven as **App Icon**, each by its icon and its name (`app.icon`), for the launcher,
-the dash, the window, About and the sign-in page; Verso Drive's icon and the top bar icon stay as they are. The iPhone
-and the iPad offer them as **App Icon** in the account's sheet, for the Home Screen, and the Mac in Settings, General,
-for the Dock while Verso runs; Verso Dev offers its own drawings of them, with the blue DEV corner. Each is a
-gradient, top to bottom. A light picture has a line one unit wide just inside its edge, which holds it apart from the
-paper, and its lens's barrel lightened (rim `#5d5867`, inside `#45405a`), so the barrel is not the heaviest thing on
-it; a dark picture keeps the lens's own dark barrel. The glass and the five colours are the same on every design.
+The print's picture comes in seven designs, all kept (the maintainer's choice, 2026-11-22), and each design in four
+looks: on **Day** or **Night** paper, with its lens in **Colour** or in **Graphite** (the maintainer's choice), 28 in
+all. **Mist** on Day paper in colour is the app icon on every platform, and Mist on Night paper its dark appearance
+where the platform's icon has one; the others are drawn beside it, as
+`linux/packaging/icons/dev.hviid.Verso-<look>.svg`, the look named by its design with `-night` and `-graphite` after
+it as they apply (`sand`, `sand-night`, `sand-graphite`, `sand-night-graphite`). Where they are offered:
+- **Linux:** Preferences, General, **App Icon**: a look for the desktop's light style and one for its dark style, each
+  any of the 28 (`app.icon`, `app.icon_dark`), for the launcher, the dash, the window, About and the sign-in page;
+  Mist in Day and Night by default.
+- **The Mac:** Settings, General, **App Icon**: a look for light mode and one for dark mode, each any of the 28, for
+  the Dock and the app switcher while Verso runs.
+- **The iPhone and the iPad:** **App Icon** in the account's sheet: a design and a lens, its Day look as its light
+  appearance and its Night look as its dark one, as an iOS icon set holds one picture for each; the Home Screen shows
+  the dark one where its icons are set to Dark (its Customize menu, always or in dark mode).
+- Verso Dev offers its own drawings of them, with the blue DEV corner. Verso Drive's icon and the top bar icon stay
+  as they are.
 
-| Design | Picture | The line inside its edge | Lens barrel |
+**Day** is the white print. Each picture is a gradient, top to bottom. A light picture has a line one unit wide just
+inside its edge, which holds it apart from the paper, and its lens's barrel lightened, so the barrel is not the
+heaviest thing on it; a dark picture keeps the lens's own dark barrel.
+
+| Design | Day picture | The line inside its edge | Lens barrel |
 |---|---|---|---|
 | Mist (the app icon) | `#e6edf5` to `#c4d0de` | `#000000` at 0.08 | Lightened |
 | Sand | `#f0e8d8` to `#d9cbb0` | `#000000` at 0.08 | Lightened |
@@ -63,6 +74,39 @@ it; a dark picture keeps the lens's own dark barrel. The glass and the five colo
 | Slate | `#727b92` to `#4a5165` | None | Its own |
 | Sky | `#d3e3f3` to `#9db5ce` | `#000000` at 0.08 | Lightened |
 
+**Night** is the print in the dark: its paper charcoal, the word a light grey, the back of its turned corner a dark
+warm grey, and its picture a darker shade of the design's own, so Mist is a deep blue-grey, Sand a dark umber, Slate
+an indigo and Sky a deep blue. Where the picture is close to the paper, a light line inside its edge holds it apart.
+Every Night picture is dark, so its lens keeps its own barrel.
+
+| Design | Night picture | The line inside its edge |
+|---|---|---|
+| Mist (the app icon's dark appearance) | `#414d5c` to `#262d37` | `#ffffff` at 0.08 |
+| Sand | `#574a39` to `#382e22` | `#ffffff` at 0.08 |
+| Dark | `#2c3044` to `#141319` | None |
+| Paper | `#38363a` to `#262528` | `#ffffff` at 0.10 |
+| Frame | `#403f43` to `#353438` | `#a39e94` at 0.55 |
+| Slate | `#454a66` to `#272a3d` | None |
+| Sky | `#2f4a66` to `#1b2b40` | `#ffffff` at 0.08 |
+
+| Paper | Face, top to bottom | Back of the turned corner | Ink | The print's edge |
+|---|---|---|---|---|
+| Day | `#ffffff` to `#e6e4e0` | `#f6efdf` to `#d8ccb0` | `#6f7486` | `#000000` at 0.08 |
+| Night | `#4a4a4f` to `#2f2f33` | `#6f6858` to `#4b4539` | `#c4c8d4` | `#ffffff` at 0.12, so it holds on a dark background |
+
+**Colour** is the lens as it is: Immich's five colours round a blue glass. **Graphite** is a monochrome lens, for
+those who want no colour: the ring's five segments in five greys, in the order of the colours' own lightness (amber
+the lightest, then pink, green, blue and red), lighter on Night paper so the ring still reads against the dark; the
+glass a neutral dark grey with its highlight; the barrel a neutral grey. The picture keeps its design's colour.
+
+| Lens | Barrel, rim and inside (lightened on a light picture) | Glass, centre to edge | The ring, clockwise from the top |
+|---|---|---|---|
+| Colour | `#3d3846`, `#241f31` (`#5d5867`, `#45405a`) | `#2d5c9e`, `#18294a`, `#0f0d16` | `#fa2921`, `#ed79b5`, `#ffb400`, `#1e83f7`, `#18c249` |
+| Graphite | `#3c3c3f`, `#232325` (`#5c5c60`, `#444448`) | `#5b5d63`, `#2c2d31`, `#121214` | Day `#76767b`, `#d0d0d3`, `#efeff0`, `#909095`, `#b2b2b6`; Night `#8c8c91`, `#dadadd`, `#f4f4f5`, `#a6a6ab`, `#c4c4c8` |
+
+`python3 linux/packaging/icons/linux-app-icon.py --sheet <file.png>` draws the 28 side by side, large and at 48 and
+16 pixels, on a light and a dark background, for looking at a change to them.
+
 Rules:
 - **A platform's icon only where that platform is meant:** its download, its screenshots, its entry in a list of
   platforms.
@@ -71,15 +115,16 @@ Rules:
 - **Change an icon at its source** and run its generator: a script in `linux/packaging/icons/sources/` for the app
   icon's drawing (`app-icon.py`) and the symbols it draws (each writes its icons into the folder given,
   `linux/packaging/icons`; most need Shapely), `linux/packaging/icons/linux-app-icon.py` for the Linux app icon's and
-  Verso Drive's PNGs (it needs Pillow), `mac/Verso/make-icons.py` (`--dev` for the Dev build's, `--design` for another
-  design's) for the Mac's, which runs `make-symbol.py` and `make-menu-bar-icon.py`. Never edit exported PNGs, nor a
+  Verso Drive's PNGs (it needs Pillow), `mac/Verso/make-icons.py` for the Mac's and the iPhone's (`--all` for every
+  look of both builds after a change to the drawing; `--dev` for the Dev build's, `--design` and `--graphite` for
+  another design and lens), which runs `make-symbol.py` and `make-menu-bar-icon.py`. Never edit exported PNGs, nor a
   drawn icon by hand.
 - **The small icons are the lens alone,** taken from the app icon's drawing on a dark picture (the `lens` group in
   `linux/packaging/icons/dev.hviid.Verso-dark.svg`), its barrel the lens's own dark, since a light picture lightens it
   only against itself: the Mac's menu bar icons and sidebar symbol, Messages' icon, and the lens in backing up's Live
   Activity on the iPhone (`ios/Widgets/Assets.xcassets/Lens.imageset`, on nothing, at the largest size it is drawn, as a
   Live Activity's images may be no larger). A change to the lens changes them all; a menu bar state follows the Linux
-  tray's colour icon of that state (`dev.hviid.Verso-tray-<state>.svg`). They are the same for every design, and only
+  tray's colour icon of that state (`dev.hviid.Verso-tray-<state>.svg`). They are the same for every look, and only
   the app icon has a Dev variant.
 
 ## Colours
@@ -90,13 +135,14 @@ The palette is the app icon's own, by part (`linux/packaging/icons/dev.hviid.Ver
 |---|---|---|
 | Paper | `#ffffff` to `#e6e4e0` | The print's face, top to bottom |
 | Back | `#f6efdf` to `#d8ccb0` | The turned corner, the back of the print |
-| Picture | `#e6edf5` to `#c4d0de` | The photo on the print, top to bottom: Mist (the other designs in "The picture's designs") |
+| Picture | `#e6edf5` to `#c4d0de` | The photo on the print, top to bottom: Mist on Day paper (the other looks in "The picture's designs") |
 | Ink | `#6f7486` | The word on the strip |
 | Lens rim, lens, lens deep | `#3d3846`, `#241f31`, `#0f0d16` | The lens barrel, its own; on a light picture the rim and lens are `#5d5867` and `#45405a` |
 | Glass, glass mid | `#2d5c9e`, `#18294a` | The lens glass, darkening to lens deep at its edge |
 | The ring, clockwise from the top | `#fa2921`, `#ed79b5`, `#ffb400`, `#1e83f7`, `#18c249` | Immich's five colours |
 
-The Mac's dark appearance has a paper, back and ink of its own, and the Dev build a blue turned corner (`PALETTE` in
+The Night look has a paper, back and ink of its own, the dark appearance of the Mac's and the iPhone's icon, and the
+Graphite lens greys of its own ("The picture's designs"); the Dev build has a blue turned corner (`DEV_BACK` in
 `mac/Verso/make-icons.py`).
 
 Rules:
@@ -163,15 +209,20 @@ sections, the pages, the viewer's info), drawn with each platform's own toolkit:
   (a sidebar as on Linux is planned: ROADMAP.md, "Verso on the Mac"). Each page shows only what means something on
   that platform, with short titles, a line under a row where its title says too little, and each kind of setting as
   the platform shows it.
-- **App Icon shows each design by its icon and its name,** as each platform shows such a choice. On Linux, a combo row
-  in Preferences, General, showing the design chosen, whose list holds the seven with a check on that one. On the iPhone
-  and the iPad, a row under On This iPhone in the account's sheet, the design in use as its value, opens a page of the
-  seven in a grid, four to a row on a phone and in the iPad's sheet alike, as Settings shows Light and Dark: the icon at
-  64 points with a hairline round it, so a light one keeps its edge on the white row, its name under it, and a circle
-  under that, ticked in the accent for the one in use; a line under the grid says where the icon shows. On the Mac, in
-  Settings, General, the seven side by side at 48 points after the row's title, the chosen one ringed in the accent
-  round its square as System Settings marks its Appearance, its name in the text's colour and the others' in grey, and
-  under them the line that the Dock and the app switcher show it while Verso runs and Finder and Launchpad keep Mist.
+- **App Icon shows each design by its icon and its name,** drawn in the paper and lens around it, as each platform shows
+  such a choice; the paper (Day or Night) and the lens (Colour or Graphite) are two-way switches of the platform's own.
+  On Linux, in Preferences, General, a row for the light style and one for the dark style, each with the look's icon and
+  its name ("Sand, Night, Graphite"), which opens to a combo row of the seven designs with a check on the one chosen,
+  and Paper and Lens as toggle groups. On the iPhone and the iPad, a row under On This iPhone in the account's sheet,
+  the design and lens in use as its value, opens a page with Color and Graphite as a segmented control over the seven in
+  a grid, four to a row on a phone and in the iPad's sheet alike, as Settings shows Light and Dark: the icon at 64
+  points with a hairline round it, so a light one keeps its edge on the white row, its name under it, and a circle under
+  that, ticked in the accent for the one in use; a line under the grid says where the icon shows and that dark icons on
+  the Home Screen show its night version. On the Mac, in Settings, General, under App Icon, a row for Light Mode and one
+  for Dark Mode, each the seven side by side at 48 points, the chosen one ringed in the accent round its square as
+  System Settings marks its Appearance, its name in the text's colour and the others' in grey, and under them Day and
+  Night and Color and Graphite as small segmented controls; under the rows the line that the Dock and the app switcher
+  show them while Verso runs and Finder and Launchpad keep Mist.
 - **Destructive actions ask first,** in the platform's own alert, with its destructive button style.
 - **About** carries the non-affiliation notice, the credits and the AI disclosure.
 - **The toolbar's places,** in Verso on every page (the maintainer's rule, after Apple's toolbar

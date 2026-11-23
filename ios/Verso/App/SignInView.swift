@@ -648,9 +648,10 @@ private struct NonAffiliationNotice: View {
 }
 
 extension UIImage {
-    /// The picture of the app's icon as the Home Screen shows it, light and dark: the design chosen in App Icon, in this
-    /// build's drawing (AppIconImage for Mist, AppIconDevImage in Verso Dev; AccountAppIconPage.swift). The icon itself
-    /// is an Icon Composer document, which UIImage(named:) has no API to read back, and doing so can fail inside UIKit.
+    /// The picture of the app's icon as the Home Screen shows it, Day in light mode and Night in dark mode: the design
+    /// and lens chosen in App Icon, in this build's drawing (AppIconImage for Mist in color, AppIconDevImage in Verso
+    /// Dev; AccountAppIconPage.swift). The icon itself is an Icon Composer document, which UIImage(named:) has no API to
+    /// read back, and doing so can fail inside UIKit.
     @MainActor static var versoAppIcon: UIImage? {
         appIconPicture(.current) ?? UIImage(named: "AppIconImage")
     }

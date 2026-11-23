@@ -74,14 +74,14 @@ pub fn configure_set(paths: &Paths, key: &str, value: &str) -> Result<SettingRow
     let updated = settings::set_value(&config_text(paths)?, key, value)?;
     write_config(paths, &updated)?;
     mount_at_login(paths, key, value);
-    app_icon(paths, key, value);
+    app_icon(paths, key);
     configure_get(paths, key)
 }
 
-/// The app icon's design is named in the launcher's entry at once, as Preferences names it.
-fn app_icon(paths: &Paths, key: &str, value: &str) {
-    if key == "app.icon" {
-        verso_linux::app_icon::apply(paths, value);
+/// The app icon's look for the desktop's style now is named in the launcher's entry at once, as Preferences names it.
+fn app_icon(paths: &Paths, key: &str) {
+    if key == "app.icon" || key == "app.icon_dark" {
+        verso_linux::app_icon::apply(paths, verso_linux::app_icon::prefers_dark_now());
     }
 }
 
@@ -102,7 +102,7 @@ pub fn configure_unset(paths: &Paths, key: &str) -> Result<SettingRow> {
     let updated = settings::unset_value(&config_text(paths)?, key)?;
     write_config(paths, &updated)?;
     mount_at_login(paths, key, "true");
-    app_icon(paths, key, settings::DEFAULT_APP_ICON);
+    app_icon(paths, key);
     configure_get(paths, key)
 }
 

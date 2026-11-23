@@ -11,12 +11,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: linux/verso-service/src/commands.rs:467
-#: linux/verso-linux/src/daemon.rs:498
+#: linux/verso-linux/src/daemon.rs:506
 msgid "Verso Drive is not mounted"
 msgstr "Verso Drive bağlı değil"
 
 #: linux/verso-service/src/commands.rs:467
-#: linux/verso-linux/src/daemon.rs:498
+#: linux/verso-linux/src/daemon.rs:506
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "Sürücüyü Verso Tercihleri’nde etkinleştirin, ardından bağlantıyı yeniden açın."
 
@@ -28,70 +28,70 @@ msgstr "Anahtarlık kilitli kaldı. Yeniden denemek için {app}’u açın veya 
 msgid "Immich is not mounted"
 msgstr "Immich bağlı değil"
 
-#: linux/verso-linux/src/daemon.rs:497
+#: linux/verso-linux/src/daemon.rs:505
 msgid "Links from other apps are off"
 msgstr "Başka uygulamalardan gelen bağlantılar kapalı"
 
-#: linux/verso-linux/src/daemon.rs:497
+#: linux/verso-linux/src/daemon.rs:505
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "Başka uygulamaların bağlantı verdiği öğeleri göstermek için Verso ayarlarında Immich Crosslink’i açın."
 
-#: linux/verso-linux/src/daemon.rs:499
+#: linux/verso-linux/src/daemon.rs:507
 msgid "A link from another app cannot be opened"
 msgstr "Başka bir uygulamadan gelen bağlantı açılamıyor"
 
-#: linux/verso-linux/src/daemon.rs:499
+#: linux/verso-linux/src/daemon.rs:507
 msgid "It is not a valid Immich link."
 msgstr "Geçerli bir Immich bağlantısı değil."
 
-#: linux/verso-linux/src/daemon.rs:500
-#: linux/verso-linux/src/daemon.rs:504
+#: linux/verso-linux/src/daemon.rs:508
+#: linux/verso-linux/src/daemon.rs:512
 msgid "Nothing to show"
 msgstr "Gösterilecek bir şey yok"
 
-#: linux/verso-linux/src/daemon.rs:500
+#: linux/verso-linux/src/daemon.rs:508
 msgid "Verso Drive has no place for what this link points to."
 msgstr "Verso Drive’ta bu bağlantının gösterdiği şey için bir yer yok."
 
-#: linux/verso-linux/src/daemon.rs:501
+#: linux/verso-linux/src/daemon.rs:509
 msgid "Not signed in to {host}"
 msgstr "{host} sunucusunda oturum açık değil"
 
-#: linux/verso-linux/src/daemon.rs:501
+#: linux/verso-linux/src/daemon.rs:509
 msgid "Verso is signed in to another Immich server."
 msgstr "Verso başka bir Immich sunucusunda oturum açmış."
 
-#: linux/verso-linux/src/daemon.rs:502
+#: linux/verso-linux/src/daemon.rs:510
 msgid "Another Immich account"
 msgstr "Başka bir Immich hesabı"
 
-#: linux/verso-linux/src/daemon.rs:502
+#: linux/verso-linux/src/daemon.rs:510
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "Bağlantı, Verso’un oturum açtığı hesaptan farklı bir hesap için."
 
-#: linux/verso-linux/src/daemon.rs:505
+#: linux/verso-linux/src/daemon.rs:513
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "Sürücü bunu göstermiyor. Gizlenmiş, kapatılmış bir bölümde ya da sizinle paylaşılmamış olabilir."
 
-#: linux/verso-linux/src/daemon.rs:507
-#: linux/verso-linux/src/daemon.rs:583
+#: linux/verso-linux/src/daemon.rs:515
+#: linux/verso-linux/src/daemon.rs:591
 msgid "Immich is unreachable"
 msgstr "Immich’e ulaşılamıyor"
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:515
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "Immich sunucusuna ulaşılamıyor. Bağlantıyı daha sonra yeniden deneyin."
 
-#: linux/verso-linux/src/daemon.rs:584
+#: linux/verso-linux/src/daemon.rs:592
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "Immich sunucusuna ulaşılamıyor. Daha önce açtığınız dosyalar kullanılabilir kalır."
 
-#: linux/verso-linux/src/daemon.rs:587
+#: linux/verso-linux/src/daemon.rs:595
 #: linux/verso-linux/src/tray.rs:128
 msgid "Signed out of Immich"
 msgstr "Immich oturumu kapatıldı"
 
-#: linux/verso-linux/src/daemon.rs:588
+#: linux/verso-linux/src/daemon.rs:596
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "Immich artık bu oturum açma işlemini kabul etmiyor. Yeniden oturum açmak için {app} uygulamasını açın."
 
@@ -112,12 +112,12 @@ msgid "Files not uploaded: {count}"
 msgstr "Yüklenmeyen dosyalar: {count}"
 
 #: linux/verso-linux/src/folders.rs:213
-#: shared/verso-core/src/settings.rs:174
+#: shared/verso-core/src/settings.rs:225
 msgid "Make Albums"
 msgstr "Albüm oluştur"
 
 #: linux/verso-linux/src/folders.rs:213
-#: shared/verso-core/src/settings.rs:173
+#: shared/verso-core/src/settings.rs:224
 msgid "Timeline Only"
 msgstr "Yalnızca zaman tüneli"
 
@@ -198,7 +198,7 @@ msgid "{drive} cannot open “{name}”"
 msgstr "{drive}, “{name}” dosyasını açamıyor"
 
 #: linux/verso-linux/src/notify.rs:73
-#: shared/verso-core/src/settings.rs:195
+#: shared/verso-core/src/settings.rs:246
 msgid "Verso Drive"
 msgstr "Verso Drive"
 
@@ -274,119 +274,126 @@ msgstr "{app} {version} kullanılabilir"
 msgid "Get it from jakob.hviid.phd/verso."
 msgstr "jakob.hviid.phd/verso adresinden indirin."
 
-#: linux/verso-desktop/src/preferences.rs:169
+#: linux/verso-desktop/src/preferences.rs:180
 msgid "Custom ({size})"
 msgstr "Özel ({size})"
 
-#: linux/verso-desktop/src/preferences.rs:182
+#: linux/verso-desktop/src/preferences.rs:193
 msgid "Apps that take part are found by themselves. Turn one off to leave it out of Show in. One not found stays listed for 30 days, so it stays off if it comes back; Forget removes it now."
 msgstr "Katılan uygulamalar kendiliğinden bulunur. Bir uygulamayı “… uygulamasında göster” menüsünün dışında bırakmak için kapatın. Bulunamayan bir uygulama 30 gün listede kalır, böylece geri gelirse kapalı kalır; “Unut” onu hemen kaldırır."
 
-#: linux/verso-desktop/src/preferences.rs:187
+#: linux/verso-desktop/src/preferences.rs:198
 msgid "Apps That Take Part"
 msgstr "Katılan Uygulamalar"
 
-#: linux/verso-desktop/src/preferences.rs:197
+#: linux/verso-desktop/src/preferences.rs:208
 msgid "Open photos, albums, people and places in Immich's web app in your browser, or copy their address."
 msgstr "Fotoğrafları, albümleri, kişileri ve yerleri tarayıcınızda Immich’in web uygulamasında açın veya adreslerini kopyalayın."
 
-#: linux/verso-desktop/src/preferences.rs:198
+#: linux/verso-desktop/src/preferences.rs:209
 msgid "Show photos, albums, people and places in other apps that take part, and show what they send in Verso."
 msgstr "Fotoğrafları, albümleri, kişileri ve yerleri katılan diğer uygulamalarda gösterin ve bu uygulamaların gönderdiklerini Verso’da gösterin."
 
-#: linux/verso-desktop/src/preferences.rs:200
+#: linux/verso-desktop/src/preferences.rs:211
 msgid "Other apps can show photos, albums, people and places in the gallery."
 msgstr "Diğer uygulamalar fotoğrafları, albümleri, kişileri ve yerleri galeride gösterebilir."
 
-#: linux/verso-desktop/src/preferences.rs:201
+#: linux/verso-desktop/src/preferences.rs:212
 msgid "Other apps can show them in Files, while the drive is on."
 msgstr "Diğer uygulamalar, sürücü açıkken bunları Dosyalar’da gösterebilir."
 
-#: linux/verso-desktop/src/preferences.rs:204
-msgid "The picture on Verso's icon in the app grid, the dash and its windows. The app grid shows a new one from the next login."
-msgstr "Uygulama ızgarasında, Dash’te ve Verso pencerelerinde Verso simgesindeki resim. Uygulama ızgarası yenisini bir sonraki oturum açışından itibaren gösterir."
-
-#: linux/verso-desktop/src/preferences.rs:240
+#: linux/verso-desktop/src/preferences.rs:248
 msgid "Double-Click Opens"
 msgstr "Çift Tıklamayla Açılan"
 
-#: linux/verso-desktop/src/preferences.rs:241
+#: linux/verso-desktop/src/preferences.rs:249
+#: linux/verso/src/drive_preferences.rs:185
+#: linux/verso/src/drive_preferences.rs:214
 msgid "Colour"
 msgstr "Renk"
 
-#: linux/verso-desktop/src/preferences.rs:242
-msgid "App Icon"
-msgstr "Uygulama simgesi"
+#: linux/verso-desktop/src/preferences.rs:251
+#: linux/verso-desktop/src/preferences.rs:50
+#: linux/verso-desktop/src/preferences.rs:50
+#: linux/verso-desktop/src/preferences.rs:50
+msgid "Light Style"
+msgstr "Açık stil"
 
-#: linux/verso-desktop/src/preferences.rs:56
-#: linux/verso-desktop/src/preferences.rs:56
-#: linux/verso-desktop/src/preferences.rs:56
+#: linux/verso-desktop/src/preferences.rs:252
+#: linux/verso-desktop/src/preferences.rs:50
+#: linux/verso-desktop/src/preferences.rs:50
+msgid "Dark Style"
+msgstr "Koyu stil"
+
+#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:67
 msgid "Location"
 msgstr "Konum"
 
-#: linux/verso-desktop/src/preferences.rs:57
-#: linux/verso-desktop/src/preferences.rs:57
-#: linux/verso-desktop/src/preferences.rs:57
+#: linux/verso-desktop/src/preferences.rs:68
+#: linux/verso-desktop/src/preferences.rs:68
+#: linux/verso-desktop/src/preferences.rs:68
 msgid "Name in the Sidebar"
 msgstr "Kenar Çubuğundaki Ad"
 
-#: linux/verso-desktop/src/preferences.rs:66
-#: linux/verso-desktop/src/preferences.rs:66
-#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:77
+#: linux/verso-desktop/src/preferences.rs:77
+#: linux/verso-desktop/src/preferences.rs:77
 msgid "Cache Size"
 msgstr "Önbellek Boyutu"
 
-#: linux/verso-desktop/src/preferences.rs:67
-#: linux/verso-desktop/src/preferences.rs:67
-#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:78
+#: linux/verso-desktop/src/preferences.rs:78
+#: linux/verso-desktop/src/preferences.rs:78
 msgid "Sharp Thumbnails"
 msgstr "Keskin Küçük Resimler"
 
-#: linux/verso-desktop/src/preferences.rs:74
-#: linux/verso-desktop/src/preferences.rs:74
-#: linux/verso-desktop/src/preferences.rs:74
+#: linux/verso-desktop/src/preferences.rs:85
+#: linux/verso-desktop/src/preferences.rs:85
+#: linux/verso-desktop/src/preferences.rs:85
 msgid "Check for Updates"
 msgstr "Güncellemeleri Denetle"
 
-#: linux/verso-desktop/src/preferences.rs:89
-#: linux/verso-desktop/src/preferences.rs:89
+#: linux/verso-desktop/src/preferences.rs:100
+#: linux/verso-desktop/src/preferences.rs:100
 msgid "Day Folders"
 msgstr "Gün Klasörleri"
 
-#: linux/verso-desktop/src/preferences.rs:90
-#: linux/verso-desktop/src/preferences.rs:91
-#: linux/verso-desktop/src/preferences.rs:92
-#: linux/verso-desktop/src/preferences.rs:93
-#: linux/verso-desktop/src/preferences.rs:94
-#: linux/verso-desktop/src/preferences.rs:90
-#: linux/verso-desktop/src/preferences.rs:91
-#: linux/verso-desktop/src/preferences.rs:92
-#: linux/verso-desktop/src/preferences.rs:93
-#: linux/verso-desktop/src/preferences.rs:94
+#: linux/verso-desktop/src/preferences.rs:101
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:103
+#: linux/verso-desktop/src/preferences.rs:104
+#: linux/verso-desktop/src/preferences.rs:105
+#: linux/verso-desktop/src/preferences.rs:101
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:103
+#: linux/verso-desktop/src/preferences.rs:104
+#: linux/verso-desktop/src/preferences.rs:105
 msgid "Year and Month Folders"
 msgstr "Yıl ve Ay Klasörleri"
 
-#: linux/verso-desktop/src/preferences.rs:95
-#: linux/verso-desktop/src/preferences.rs:95
+#: linux/verso-desktop/src/preferences.rs:106
+#: linux/verso-desktop/src/preferences.rs:106
 msgid "Folders Copied Into Upload"
 msgstr "Upload’a Kopyalanan Klasörler"
 
-#: linux/verso-desktop/src/preferences.rs:102
-#: linux/verso-desktop/src/preferences.rs:102
-#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:113
+#: linux/verso-desktop/src/preferences.rs:113
+#: linux/verso-desktop/src/preferences.rs:113
 msgid "Album Folders"
 msgstr "Albüm Klasörleri"
 
-#: linux/verso-desktop/src/preferences.rs:102
-#: linux/verso-desktop/src/preferences.rs:102
-#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:113
+#: linux/verso-desktop/src/preferences.rs:113
+#: linux/verso-desktop/src/preferences.rs:113
 msgid "File Names"
 msgstr "Dosya Adları"
 
-#: linux/verso-desktop/src/preferences.rs:117
-#: linux/verso-desktop/src/preferences.rs:117
-#: linux/verso-desktop/src/preferences.rs:117
-#: shared/verso-core/src/settings.rs:82
+#: linux/verso-desktop/src/preferences.rs:128
+#: linux/verso-desktop/src/preferences.rs:128
+#: linux/verso-desktop/src/preferences.rs:128
+#: shared/verso-core/src/settings.rs:131
 msgid "Open in Immich and Copy Immich Link"
 msgstr "Immich’te Aç ve Immich Bağlantısını Kopyala"
 
@@ -484,102 +491,142 @@ msgstr "Oturum açıldı ancak bağlama başlatılamıyor: {error}."
 msgid "Signed in, but the mount did not start: {error}"
 msgstr "Oturum açıldı ancak bağlama başlamadı: {error}"
 
-#: linux/verso-desktop/src/preferences.rs:48
+#: linux/verso-desktop/src/preferences.rs:59
 msgid "General"
 msgstr "Genel"
 
-#: linux/verso-desktop/src/preferences.rs:82
+#: linux/verso-desktop/src/preferences.rs:93
 msgid "Folders"
 msgstr "Klasörler"
 
-#: linux/verso-desktop/src/preferences.rs:110
+#: linux/verso-desktop/src/preferences.rs:121
 msgid "Other Apps"
 msgstr "Diğer uygulamalar"
 
-#: linux/verso-desktop/src/preferences.rs:52
+#: linux/verso-desktop/src/preferences.rs:48
+msgid "App Icon"
+msgstr "Uygulama simgesi"
+
+#: linux/verso-desktop/src/preferences.rs:49
+msgid "Verso's icon in the app grid, the dash and its windows, one for the desktop's light style and one for its dark style. The app grid shows a new one from the next login."
+msgstr "Uygulama ızgarasında, Dash’te ve Verso pencerelerinde Verso simgesi; biri masaüstünün açık stili, biri koyu stili için. Uygulama ızgarası yenisini bir sonraki oturum açışından itibaren gösterir."
+
+#: linux/verso-desktop/src/preferences.rs:63
 msgid "Drive"
 msgstr "Sürücü"
 
-#: linux/verso-desktop/src/preferences.rs:58
+#: linux/verso-desktop/src/preferences.rs:69
 msgid "GVfs leaves the drive out of Files' sidebar, and a bookmark takes its place: no unmount button, but a plain folder icon."
 msgstr "GVfs sürücüyü Dosyalar’ın kenar çubuğunda göstermez, yerini bir yer imi alır: ayırma düğmesi olmaz ama simgesi sade bir klasördür."
 
-#: linux/verso-desktop/src/preferences.rs:63
+#: linux/verso-desktop/src/preferences.rs:74
 msgid "Storage"
 msgstr "Depolama"
 
-#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:77
 msgid "Opened originals are kept on this computer up to this size."
 msgstr "Açılan özgün dosyalar bu bilgisayarda bu boyuta kadar tutulur."
 
-#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:78
 msgid "Also download larger previews, for big icon sizes. Uses more data."
 msgstr "Büyük simgeler için daha büyük önizlemeleri de indir. Daha fazla veri kullanır."
 
-#: linux/verso-desktop/src/preferences.rs:72
+#: linux/verso-desktop/src/preferences.rs:83
 msgid "Updates"
 msgstr "Güncellemeler"
 
-#: linux/verso-desktop/src/preferences.rs:74
+#: linux/verso-desktop/src/preferences.rs:85
 msgid "Tell me when a new version is out."
 msgstr "Yeni bir sürüm çıktığında bana bildir."
 
-#: linux/verso-desktop/src/preferences.rs:86
+#: linux/verso-desktop/src/preferences.rs:97
 msgid "Sections"
 msgstr "Bölümler"
 
-#: linux/verso-desktop/src/preferences.rs:87
+#: linux/verso-desktop/src/preferences.rs:98
 msgid "The folders the drive shows, and how each splits its photos by date."
 msgstr "Sürücünün gösterdiği klasörler ve her birinin fotoğraflarını tarihe göre nasıl ayırdığı."
 
-#: linux/verso-desktop/src/preferences.rs:89
+#: linux/verso-desktop/src/preferences.rs:100
 msgid "The timeline, by year and month"
 msgstr "Yıl ve aya göre zaman çizelgesi"
 
-#: linux/verso-desktop/src/preferences.rs:95
+#: linux/verso-desktop/src/preferences.rs:106
 msgid "What is copied into it is uploaded"
 msgstr "İçine kopyalanan yüklenir"
 
-#: linux/verso-desktop/src/preferences.rs:100
+#: linux/verso-desktop/src/preferences.rs:111
 msgid "Names"
 msgstr "Adlar"
 
-#: linux/verso-desktop/src/preferences.rs:115
+#: linux/verso-desktop/src/preferences.rs:126
 msgid "Immich Web App"
 msgstr "Immich Web Uygulaması"
 
-#: linux/verso-desktop/src/preferences.rs:55
-#: linux/verso-desktop/src/preferences.rs:55
+#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:66
 msgid "Mount at Login"
 msgstr "Oturum Açılınca Bağla"
 
-#: linux/verso-desktop/src/preferences.rs:58
-#: linux/verso-desktop/src/preferences.rs:58
+#: linux/verso-desktop/src/preferences.rs:69
+#: linux/verso-desktop/src/preferences.rs:69
 msgid "Bookmark Instead of Drive"
 msgstr "Sürücü Yerine Yer İmi"
 
-#: linux/verso/src/drive_preferences.rs:267
-#: linux/verso/src/drive_preferences.rs:271
+#: linux/verso/src/drive_preferences.rs:182
+msgid "{picture}, {paper}, {lens}"
+msgstr "{picture}, {paper}, {lens}"
+
+#: linux/verso/src/drive_preferences.rs:184
+#: linux/verso/src/drive_preferences.rs:211
+msgid "Night"
+msgstr "Gece"
+
+#: linux/verso/src/drive_preferences.rs:184
+#: linux/verso/src/drive_preferences.rs:211
+msgid "Day"
+msgstr "Gündüz"
+
+#: linux/verso/src/drive_preferences.rs:185
+#: linux/verso/src/drive_preferences.rs:214
+msgid "Graphite"
+msgstr "Grafit"
+
+#: linux/verso/src/drive_preferences.rs:206
+msgid "Picture"
+msgstr "Resim"
+
+#: linux/verso/src/drive_preferences.rs:212
+#: shared/verso-core/src/settings.rs:233
+msgid "Paper"
+msgstr "Kâğıt"
+
+#: linux/verso/src/drive_preferences.rs:215
+msgid "Lens"
+msgstr "Mercek"
+
+#: linux/verso/src/drive_preferences.rs:330
+#: linux/verso/src/drive_preferences.rs:334
 msgid "Choose a Folder"
 msgstr "Bir Klasör Seçin"
 
-#: linux/verso/src/drive_preferences.rs:302
+#: linux/verso/src/drive_preferences.rs:365
 msgid "Learn More"
 msgstr "Daha Fazla Bilgi"
 
-#: linux/verso/src/drive_preferences.rs:337
+#: linux/verso/src/drive_preferences.rs:400
 msgid "Not found"
 msgstr "Bulunamadı"
 
-#: linux/verso/src/drive_preferences.rs:338
+#: linux/verso/src/drive_preferences.rs:401
 msgid "Forget"
 msgstr "Unut"
 
-#: linux/verso/src/drive_preferences.rs:365
+#: linux/verso/src/drive_preferences.rs:428
 msgid "No other app that takes part is installed."
 msgstr "Katılan başka bir uygulama yüklü değil."
 
-#: linux/verso/src/drive_preferences.rs:366
+#: linux/verso/src/drive_preferences.rs:429
 msgid "Find Apps That Take Part"
 msgstr "Katılan Uygulamaları Bul"
 
@@ -608,216 +655,216 @@ msgstr "{app} artık yüklü değil."
 msgid "Verso could not open {app}: {error}"
 msgstr "Verso {app} uygulamasını açamadı: {error}"
 
-#: shared/verso-core/src/settings.rs:57
+#: shared/verso-core/src/settings.rs:106
 msgid "The Immich server; /api is added"
 msgstr "Immich sunucusu; /api eklenir"
 
-#: shared/verso-core/src/settings.rs:58
+#: shared/verso-core/src/settings.rs:107
 msgid "Show the library as a drive in the file manager"
 msgstr "Kitaplığı dosya yöneticisinde bir sürücü olarak göster"
 
-#: shared/verso-core/src/settings.rs:59
+#: shared/verso-core/src/settings.rs:108
 msgid "Where the mount appears"
 msgstr "Sürücünün görüneceği yer"
 
-#: shared/verso-core/src/settings.rs:60
+#: shared/verso-core/src/settings.rs:109
 msgid "The drive's name in the sidebar"
 msgstr "Sürücünün kenar çubuğundaki adı"
 
-#: shared/verso-core/src/settings.rs:61
+#: shared/verso-core/src/settings.rs:110
 msgid "Mount when the session starts"
 msgstr "Oturum başladığında bağla"
 
-#: shared/verso-core/src/settings.rs:62
+#: shared/verso-core/src/settings.rs:111
 msgid "List the drive in Files' sidebar as a drive, with its unmount button; off, as a bookmark"
 msgstr "Sürücüyü Dosyalar’ın kenar çubuğunda ayırma düğmesiyle bir sürücü olarak listele; kapalıysa yer imi olarak"
 
-#: shared/verso-core/src/settings.rs:63
+#: shared/verso-core/src/settings.rs:112
 msgid "Show the Photos section"
 msgstr "Photos bölümünü göster"
 
-#: shared/verso-core/src/settings.rs:64
+#: shared/verso-core/src/settings.rs:113
 msgid "Show the Albums section"
 msgstr "Albums bölümünü göster"
 
-#: shared/verso-core/src/settings.rs:65
+#: shared/verso-core/src/settings.rs:114
 msgid "Show the People section"
 msgstr "People bölümünü göster"
 
-#: shared/verso-core/src/settings.rs:66
+#: shared/verso-core/src/settings.rs:115
 msgid "Show the Places section"
 msgstr "Places bölümünü göster"
 
-#: shared/verso-core/src/settings.rs:67
+#: shared/verso-core/src/settings.rs:116
 msgid "Show the Favorites section"
 msgstr "Favorites bölümünü göster"
 
-#: shared/verso-core/src/settings.rs:68
+#: shared/verso-core/src/settings.rs:117
 msgid "Show the Archive section"
 msgstr "Archive bölümünü göster"
 
-#: shared/verso-core/src/settings.rs:69
+#: shared/verso-core/src/settings.rs:118
 msgid "Day folders inside months"
 msgstr "Ayların içinde gün klasörleri"
 
-#: shared/verso-core/src/settings.rs:70
+#: shared/verso-core/src/settings.rs:119
 msgid "Year and month folders inside albums"
 msgstr "Albümlerin içinde yıl ve ay klasörleri"
 
-#: shared/verso-core/src/settings.rs:71
+#: shared/verso-core/src/settings.rs:120
 msgid "Year and month folders inside people"
 msgstr "Kişilerin içinde yıl ve ay klasörleri"
 
-#: shared/verso-core/src/settings.rs:72
+#: shared/verso-core/src/settings.rs:121
 msgid "Year and month folders inside cities"
 msgstr "Şehirlerin içinde yıl ve ay klasörleri"
 
-#: shared/verso-core/src/settings.rs:73
+#: shared/verso-core/src/settings.rs:122
 msgid "Year and month folders inside favorites"
 msgstr "Favorilerin içinde yıl ve ay klasörleri"
 
-#: shared/verso-core/src/settings.rs:74
+#: shared/verso-core/src/settings.rs:123
 msgid "Year and month folders inside the archive"
 msgstr "Arşivin içinde yıl ve ay klasörleri"
 
-#: shared/verso-core/src/settings.rs:75
+#: shared/verso-core/src/settings.rs:124
 msgid "How album folders are named and grouped"
 msgstr "Albüm klasörlerinin nasıl adlandırılıp gruplanacağı"
 
-#: shared/verso-core/src/settings.rs:76
+#: shared/verso-core/src/settings.rs:125
 msgid "How files are named"
 msgstr "Dosyaların nasıl adlandırılacağı"
 
-#: shared/verso-core/src/settings.rs:77
+#: shared/verso-core/src/settings.rs:126
 msgid "The content cache's size limit"
 msgstr "İçerik önbelleğinin boyut sınırı"
 
-#: shared/verso-core/src/settings.rs:78
+#: shared/verso-core/src/settings.rs:127
 msgid "Show the Upload folder, and upload what is copied into it"
 msgstr "Upload klasörünü göster ve içine kopyalananları yükle"
 
-#: shared/verso-core/src/settings.rs:79
+#: shared/verso-core/src/settings.rs:128
 msgid "Folders copied into Upload"
 msgstr "Upload’a kopyalanan klasörler"
 
-#: shared/verso-core/src/settings.rs:80
+#: shared/verso-core/src/settings.rs:129
 msgid "Also seed 1024 px thumbnails from the preview"
 msgstr "Önizlemeden 1024 piksellik küçük resimler de oluştur"
 
-#: shared/verso-core/src/settings.rs:81
+#: shared/verso-core/src/settings.rs:130
 msgid "Refuse thumbnailer reads of originals"
 msgstr "Küçük resim oluşturucuların özgün dosyaları okumasını reddet"
 
-#: shared/verso-core/src/settings.rs:83
+#: shared/verso-core/src/settings.rs:132
 msgid "What a double click on Verso's top bar icon opens"
 msgstr "Verso’nun üst çubuk simgesine çift tıklayınca ne açılacağı"
 
-#: shared/verso-core/src/settings.rs:84
+#: shared/verso-core/src/settings.rs:133
 msgid "Verso's top bar icon in colour: the lens's five colours, grey while the server cannot be reached"
 msgstr "Verso’nun üst çubuk simgesi renkli: merceğin beş rengi, sunucuya ulaşılamazken gri"
 
-#: shared/verso-core/src/settings.rs:85
-msgid "Verso's app icon, by the picture on its print"
-msgstr "Verso’nun uygulama simgesi, baskısındaki resme göre"
+#: shared/verso-core/src/settings.rs:134
+msgid "Verso's app icon in the light style: the picture on its print, its paper and its lens"
+msgstr "Açık stilde Verso’nun uygulama simgesi: baskısındaki resim, kâğıdı ve merceği"
 
-#: shared/verso-core/src/settings.rs:86
+#: shared/verso-core/src/settings.rs:135
+msgid "Verso's app icon in the dark style: the picture on its print, its paper and its lens"
+msgstr "Koyu stilde Verso’nun uygulama simgesi: baskısındaki resim, kâğıdı ve merceği"
+
+#: shared/verso-core/src/settings.rs:136
 msgid "Show what other apps link to (Immich Crosslink)"
 msgstr "Başka uygulamaların bağlantı verdiği öğeleri göster (Immich Crosslink)"
 
-#: shared/verso-core/src/settings.rs:87
+#: shared/verso-core/src/settings.rs:137
 msgid "Verso: take part as Verso Gallery, so other apps show items in it"
 msgstr "Verso: Verso Gallery olarak katıl, böylece diğer uygulamalar öğeleri orada gösterebilsin"
 
-#: shared/verso-core/src/settings.rs:88
+#: shared/verso-core/src/settings.rs:138
 msgid "Verso: take part as Verso Drive, so other apps show items in Files while the drive is on"
 msgstr "Verso: Verso Drive olarak katıl, böylece diğer uygulamalar sürücü açıkken öğeleri Dosyalar’da gösterebilsin"
 
-#: shared/verso-core/src/settings.rs:89
+#: shared/verso-core/src/settings.rs:139
 msgid "Apps left out of Show in, by their desktop entry or bundle id, separated by ;"
 msgstr "Göster menüsünden çıkarılan uygulamalar, masaüstü girdisi veya paket kimliğiyle, ; ile ayrılmış"
 
-#: shared/verso-core/src/settings.rs:90
+#: shared/verso-core/src/settings.rs:140
 msgid "Tell me when a new version is out"
 msgstr "Yeni bir sürüm çıktığında bana bildir"
 
-#: shared/verso-core/src/settings.rs:91
+#: shared/verso-core/src/settings.rs:141
 msgid "Headless only: a 0600 file holding the credential"
 msgstr "Yalnızca masaüstü olmadan: kimlik bilgisini tutan 0600 izinli bir dosya"
 
-#: shared/verso-core/src/settings.rs:164
+#: shared/verso-core/src/settings.rs:215
 msgid "Never"
 msgstr "Asla"
 
-#: shared/verso-core/src/settings.rs:165
+#: shared/verso-core/src/settings.rs:216
 msgid "From 500 Items"
 msgstr "500 öğeden itibaren"
 
-#: shared/verso-core/src/settings.rs:166
+#: shared/verso-core/src/settings.rs:217
 msgid "Always"
 msgstr "Her zaman"
 
-#: shared/verso-core/src/settings.rs:167
+#: shared/verso-core/src/settings.rs:218
 msgid "Year in the Name (2023 - Trip)"
 msgstr "Yıl adda (2023 - Gezi)"
 
-#: shared/verso-core/src/settings.rs:168
+#: shared/verso-core/src/settings.rs:219
 msgid "Year Folders (2023/Trip)"
 msgstr "Yıl klasörleri (2023/Gezi)"
 
-#: shared/verso-core/src/settings.rs:169
+#: shared/verso-core/src/settings.rs:220
 msgid "Name Only (Trip)"
 msgstr "Yalnızca ad (Gezi)"
 
-#: shared/verso-core/src/settings.rs:170
+#: shared/verso-core/src/settings.rs:221
 msgid "Date and Time Taken"
 msgstr "Çekim tarihi ve saati"
 
-#: shared/verso-core/src/settings.rs:171
+#: shared/verso-core/src/settings.rs:222
 msgid "Original File Names"
 msgstr "Özgün dosya adları"
 
-#: shared/verso-core/src/settings.rs:172
+#: shared/verso-core/src/settings.rs:223
 msgid "Ask Each Time"
 msgstr "Her seferinde sor"
 
-#: shared/verso-core/src/settings.rs:176
-#: shared/verso-core/src/settings.rs:196
+#: shared/verso-core/src/settings.rs:227
+#: shared/verso-core/src/settings.rs:247
 msgid "Verso"
 msgstr "Verso"
 
-#: shared/verso-core/src/settings.rs:177
+#: shared/verso-core/src/settings.rs:228
 msgid "Verso Drive in Files"
 msgstr "Dosyalar’da Verso Drive"
 
-#: shared/verso-core/src/settings.rs:178
+#: shared/verso-core/src/settings.rs:229
 msgid "Preferences"
 msgstr "Tercihler"
 
-#: shared/verso-core/src/settings.rs:179
+#: shared/verso-core/src/settings.rs:230
 msgid "Mist"
 msgstr "Sis"
 
-#: shared/verso-core/src/settings.rs:180
+#: shared/verso-core/src/settings.rs:231
 msgid "Sand"
 msgstr "Kum"
 
-#: shared/verso-core/src/settings.rs:181
+#: shared/verso-core/src/settings.rs:232
 msgid "Dark"
 msgstr "Koyu"
 
-#: shared/verso-core/src/settings.rs:182
-msgid "Paper"
-msgstr "Kâğıt"
-
-#: shared/verso-core/src/settings.rs:183
+#: shared/verso-core/src/settings.rs:234
 msgid "Frame"
 msgstr "Çerçeve"
 
-#: shared/verso-core/src/settings.rs:184
+#: shared/verso-core/src/settings.rs:235
 msgid "Slate"
 msgstr "Arduvaz"
 
-#: shared/verso-core/src/settings.rs:185
+#: shared/verso-core/src/settings.rs:236
 msgid "Sky"
 msgstr "Gökyüzü"
 

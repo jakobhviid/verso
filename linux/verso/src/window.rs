@@ -86,9 +86,11 @@ mod imp {
         pub bell: RefCell<Option<Rc<crate::notifications::Bell>>>,
         #[template_child]
         pub navigation: TemplateChild<adw::NavigationView>,
-        /// The sign-in's first page, with the app icon chosen.
+        /// The sign-in's first page, with the app icon chosen for the style.
         #[template_child]
         pub welcome: TemplateChild<adw::StatusPage>,
+        /// The sign-in's first page following libadwaita's style, once it was shown.
+        pub welcome_follows_style: RefCell<Option<glib::SignalHandlerId>>,
         #[template_child]
         pub server_row: TemplateChild<adw::EntryRow>,
         #[template_child]
@@ -329,7 +331,22 @@ impl Window {
 
     /// The first page, asking for the server; with the offer of Immich Mount's account where it is signed in here.
     fn show_connect(&self) {
-        self.imp().welcome.set_icon_name(Some(&verso_desktop::preferences::app_icon_name()));
+        self.imp().welcome.set_icon_name(Some(&crate::app_icon_name()));
+        // The look chosen for the style, while the page is shown and the style changes.
+        if self.imp().welcome_follows_style.borrow().is_none() {
+            let welcome = self.imp().welcome.downgrade();
+            let following = adw::StyleManager::default().connect_dark_notify(move |_| {
+                if let Some(welcome) = welcome.upgrade() {
+                    welcome.set_icon_name(Some(&crate::app_icon_name()));
+                }
+            });
+            self.imp().welcome_follows_style.replace(Some(following));
+            self.connect_destroy(|window| {
+                if let Some(following) = window.imp().welcome_follows_style.take() {
+                    adw::StyleManager::default().disconnect(following);
+                }
+            });
+        }
         self.imp().navigation.replace_with_tags(&["connect"]);
         self.now_ready();
         let window = self.clone();

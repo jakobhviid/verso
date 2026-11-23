@@ -141,11 +141,11 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         CODE_SIGN_ENTITLEMENTS: Config/Verso.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: $(APP_ICON)
-        # The app icon's six other designs as alternate icons (Verso/Assets.xcassets, AppIcon-Sand, or AppIconDev-Sand
-        # in Verso Dev), which the Info.plist then lists under CFBundleAlternateIcons and App Icon in the account's
-        # sheet sets (AccountAppIconPage.swift). Only the sets named are compiled, so a release carries none of Verso
-        # Dev's.
-        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: $(APP_ICON)-Sand $(APP_ICON)-Dark $(APP_ICON)-Paper $(APP_ICON)-Frame $(APP_ICON)-Slate $(APP_ICON)-Sky
+        # The app icon's 13 other designs and lenses as alternate icons, each its Day look with its Night look as the
+        # dark appearance (Verso/Assets.xcassets, AppIcon-Sand and AppIcon-SandGraphite, or AppIconDev-Sand in Verso
+        # Dev), which the Info.plist then lists under CFBundleAlternateIcons and App Icon in the account's sheet sets
+        # (AccountAppIconPage.swift). Only the sets named are compiled, so a release carries none of Verso Dev's.
+        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: $(APP_ICON)-MistGraphite $(APP_ICON)-Sand $(APP_ICON)-SandGraphite $(APP_ICON)-Dark $(APP_ICON)-DarkGraphite $(APP_ICON)-Paper $(APP_ICON)-PaperGraphite $(APP_ICON)-Frame $(APP_ICON)-FrameGraphite $(APP_ICON)-Slate $(APP_ICON)-SlateGraphite $(APP_ICON)-Sky $(APP_ICON)-SkyGraphite
         ENABLE_PREVIEWS: YES
     dependencies:
       - target: VersoCore

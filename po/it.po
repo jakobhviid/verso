@@ -11,12 +11,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: linux/verso-service/src/commands.rs:467
-#: linux/verso-linux/src/daemon.rs:498
+#: linux/verso-linux/src/daemon.rs:506
 msgid "Verso Drive is not mounted"
 msgstr "Verso Drive non è montato"
 
 #: linux/verso-service/src/commands.rs:467
-#: linux/verso-linux/src/daemon.rs:498
+#: linux/verso-linux/src/daemon.rs:506
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "Attiva l’unità nelle Preferenze di Verso, poi apri di nuovo il link."
 
@@ -28,70 +28,70 @@ msgstr "Il portachiavi è rimasto bloccato. Apri {app} o esegui «{command}» pe
 msgid "Immich is not mounted"
 msgstr "Immich non è montato"
 
-#: linux/verso-linux/src/daemon.rs:497
+#: linux/verso-linux/src/daemon.rs:505
 msgid "Links from other apps are off"
 msgstr "I link da altre app sono disattivati"
 
-#: linux/verso-linux/src/daemon.rs:497
+#: linux/verso-linux/src/daemon.rs:505
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "Attiva Immich Crosslink nelle impostazioni di Verso per mostrare ciò a cui rimandano altre app."
 
-#: linux/verso-linux/src/daemon.rs:499
+#: linux/verso-linux/src/daemon.rs:507
 msgid "A link from another app cannot be opened"
 msgstr "Impossibile aprire un link da un’altra app"
 
-#: linux/verso-linux/src/daemon.rs:499
+#: linux/verso-linux/src/daemon.rs:507
 msgid "It is not a valid Immich link."
 msgstr "Non è un link di Immich valido."
 
-#: linux/verso-linux/src/daemon.rs:500
-#: linux/verso-linux/src/daemon.rs:504
+#: linux/verso-linux/src/daemon.rs:508
+#: linux/verso-linux/src/daemon.rs:512
 msgid "Nothing to show"
 msgstr "Niente da mostrare"
 
-#: linux/verso-linux/src/daemon.rs:500
+#: linux/verso-linux/src/daemon.rs:508
 msgid "Verso Drive has no place for what this link points to."
 msgstr "Verso Drive non ha un posto per ciò a cui rimanda questo link."
 
-#: linux/verso-linux/src/daemon.rs:501
+#: linux/verso-linux/src/daemon.rs:509
 msgid "Not signed in to {host}"
 msgstr "Accesso non effettuato su {host}"
 
-#: linux/verso-linux/src/daemon.rs:501
+#: linux/verso-linux/src/daemon.rs:509
 msgid "Verso is signed in to another Immich server."
 msgstr "Verso ha effettuato l’accesso a un altro server Immich."
 
-#: linux/verso-linux/src/daemon.rs:502
+#: linux/verso-linux/src/daemon.rs:510
 msgid "Another Immich account"
 msgstr "Un altro account Immich"
 
-#: linux/verso-linux/src/daemon.rs:502
+#: linux/verso-linux/src/daemon.rs:510
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "Il link è per un account diverso da quello con cui Verso ha effettuato l’accesso."
 
-#: linux/verso-linux/src/daemon.rs:505
+#: linux/verso-linux/src/daemon.rs:513
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "L’unità non mostra questo elemento. Potrebbe essere nascosto, in una sezione disattivata o non condiviso con te."
 
-#: linux/verso-linux/src/daemon.rs:507
-#: linux/verso-linux/src/daemon.rs:583
+#: linux/verso-linux/src/daemon.rs:515
+#: linux/verso-linux/src/daemon.rs:591
 msgid "Immich is unreachable"
 msgstr "Immich non è raggiungibile"
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:515
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "Il server Immich non è raggiungibile. Riprova il link più tardi."
 
-#: linux/verso-linux/src/daemon.rs:584
+#: linux/verso-linux/src/daemon.rs:592
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "Il server Immich non è raggiungibile. I file aperti in precedenza restano disponibili."
 
-#: linux/verso-linux/src/daemon.rs:587
+#: linux/verso-linux/src/daemon.rs:595
 #: linux/verso-linux/src/tray.rs:128
 msgid "Signed out of Immich"
 msgstr "Disconnesso da Immich"
 
-#: linux/verso-linux/src/daemon.rs:588
+#: linux/verso-linux/src/daemon.rs:596
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "Immich non accetta più questo accesso. Apri {app} per accedere di nuovo."
 
@@ -112,12 +112,12 @@ msgid "Files not uploaded: {count}"
 msgstr "File non caricati: {count}"
 
 #: linux/verso-linux/src/folders.rs:213
-#: shared/verso-core/src/settings.rs:174
+#: shared/verso-core/src/settings.rs:225
 msgid "Make Albums"
 msgstr "Crea album"
 
 #: linux/verso-linux/src/folders.rs:213
-#: shared/verso-core/src/settings.rs:173
+#: shared/verso-core/src/settings.rs:224
 msgid "Timeline Only"
 msgstr "Solo timeline"
 
@@ -198,7 +198,7 @@ msgid "{drive} cannot open “{name}”"
 msgstr "{drive} non può aprire «{name}»"
 
 #: linux/verso-linux/src/notify.rs:73
-#: shared/verso-core/src/settings.rs:195
+#: shared/verso-core/src/settings.rs:246
 msgid "Verso Drive"
 msgstr "Verso Drive"
 
@@ -274,119 +274,126 @@ msgstr "{app} {version} è disponibile"
 msgid "Get it from jakob.hviid.phd/verso."
 msgstr "Scaricala da jakob.hviid.phd/verso."
 
-#: linux/verso-desktop/src/preferences.rs:169
+#: linux/verso-desktop/src/preferences.rs:180
 msgid "Custom ({size})"
 msgstr "Personalizzata ({size})"
 
-#: linux/verso-desktop/src/preferences.rs:182
+#: linux/verso-desktop/src/preferences.rs:193
 msgid "Apps that take part are found by themselves. Turn one off to leave it out of Show in. One not found stays listed for 30 days, so it stays off if it comes back; Forget removes it now."
 msgstr "Le app che partecipano vengono trovate da sole. Disattivane una per escluderla da Mostra in. Un’app non trovata resta nell’elenco per 30 giorni, così resta disattivata se torna; Dimentica la rimuove subito."
 
-#: linux/verso-desktop/src/preferences.rs:187
+#: linux/verso-desktop/src/preferences.rs:198
 msgid "Apps That Take Part"
 msgstr "App che partecipano"
 
-#: linux/verso-desktop/src/preferences.rs:197
+#: linux/verso-desktop/src/preferences.rs:208
 msgid "Open photos, albums, people and places in Immich's web app in your browser, or copy their address."
 msgstr "Apri foto, album, persone e luoghi nella web app di Immich nel browser, o copiane l’indirizzo."
 
-#: linux/verso-desktop/src/preferences.rs:198
+#: linux/verso-desktop/src/preferences.rs:209
 msgid "Show photos, albums, people and places in other apps that take part, and show what they send in Verso."
 msgstr "Mostra foto, album, persone e luoghi in altre app che partecipano, e mostra in Verso ciò che inviano."
 
-#: linux/verso-desktop/src/preferences.rs:200
+#: linux/verso-desktop/src/preferences.rs:211
 msgid "Other apps can show photos, albums, people and places in the gallery."
 msgstr "Altre app possono mostrare foto, album, persone e luoghi nella galleria."
 
-#: linux/verso-desktop/src/preferences.rs:201
+#: linux/verso-desktop/src/preferences.rs:212
 msgid "Other apps can show them in Files, while the drive is on."
 msgstr "Altre app possono mostrarli in File, finché l’unità è attiva."
 
-#: linux/verso-desktop/src/preferences.rs:204
-msgid "The picture on Verso's icon in the app grid, the dash and its windows. The app grid shows a new one from the next login."
-msgstr "L’immagine sull’icona di Verso nella griglia delle app, nella dash e nelle sue finestre. La griglia delle app mostra quella nuova dal prossimo accesso."
-
-#: linux/verso-desktop/src/preferences.rs:240
+#: linux/verso-desktop/src/preferences.rs:248
 msgid "Double-Click Opens"
 msgstr "Il doppio clic apre"
 
-#: linux/verso-desktop/src/preferences.rs:241
+#: linux/verso-desktop/src/preferences.rs:249
+#: linux/verso/src/drive_preferences.rs:185
+#: linux/verso/src/drive_preferences.rs:214
 msgid "Colour"
 msgstr "Colore"
 
-#: linux/verso-desktop/src/preferences.rs:242
-msgid "App Icon"
-msgstr "Icona dell’app"
+#: linux/verso-desktop/src/preferences.rs:251
+#: linux/verso-desktop/src/preferences.rs:50
+#: linux/verso-desktop/src/preferences.rs:50
+#: linux/verso-desktop/src/preferences.rs:50
+msgid "Light Style"
+msgstr "Stile chiaro"
 
-#: linux/verso-desktop/src/preferences.rs:56
-#: linux/verso-desktop/src/preferences.rs:56
-#: linux/verso-desktop/src/preferences.rs:56
+#: linux/verso-desktop/src/preferences.rs:252
+#: linux/verso-desktop/src/preferences.rs:50
+#: linux/verso-desktop/src/preferences.rs:50
+msgid "Dark Style"
+msgstr "Stile scuro"
+
+#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:67
 msgid "Location"
 msgstr "Posizione"
 
-#: linux/verso-desktop/src/preferences.rs:57
-#: linux/verso-desktop/src/preferences.rs:57
-#: linux/verso-desktop/src/preferences.rs:57
+#: linux/verso-desktop/src/preferences.rs:68
+#: linux/verso-desktop/src/preferences.rs:68
+#: linux/verso-desktop/src/preferences.rs:68
 msgid "Name in the Sidebar"
 msgstr "Nome nella barra laterale"
 
-#: linux/verso-desktop/src/preferences.rs:66
-#: linux/verso-desktop/src/preferences.rs:66
-#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:77
+#: linux/verso-desktop/src/preferences.rs:77
+#: linux/verso-desktop/src/preferences.rs:77
 msgid "Cache Size"
 msgstr "Dimensione della cache"
 
-#: linux/verso-desktop/src/preferences.rs:67
-#: linux/verso-desktop/src/preferences.rs:67
-#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:78
+#: linux/verso-desktop/src/preferences.rs:78
+#: linux/verso-desktop/src/preferences.rs:78
 msgid "Sharp Thumbnails"
 msgstr "Miniature nitide"
 
-#: linux/verso-desktop/src/preferences.rs:74
-#: linux/verso-desktop/src/preferences.rs:74
-#: linux/verso-desktop/src/preferences.rs:74
+#: linux/verso-desktop/src/preferences.rs:85
+#: linux/verso-desktop/src/preferences.rs:85
+#: linux/verso-desktop/src/preferences.rs:85
 msgid "Check for Updates"
 msgstr "Controlla aggiornamenti"
 
-#: linux/verso-desktop/src/preferences.rs:89
-#: linux/verso-desktop/src/preferences.rs:89
+#: linux/verso-desktop/src/preferences.rs:100
+#: linux/verso-desktop/src/preferences.rs:100
 msgid "Day Folders"
 msgstr "Cartelle dei giorni"
 
-#: linux/verso-desktop/src/preferences.rs:90
-#: linux/verso-desktop/src/preferences.rs:91
-#: linux/verso-desktop/src/preferences.rs:92
-#: linux/verso-desktop/src/preferences.rs:93
-#: linux/verso-desktop/src/preferences.rs:94
-#: linux/verso-desktop/src/preferences.rs:90
-#: linux/verso-desktop/src/preferences.rs:91
-#: linux/verso-desktop/src/preferences.rs:92
-#: linux/verso-desktop/src/preferences.rs:93
-#: linux/verso-desktop/src/preferences.rs:94
+#: linux/verso-desktop/src/preferences.rs:101
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:103
+#: linux/verso-desktop/src/preferences.rs:104
+#: linux/verso-desktop/src/preferences.rs:105
+#: linux/verso-desktop/src/preferences.rs:101
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:103
+#: linux/verso-desktop/src/preferences.rs:104
+#: linux/verso-desktop/src/preferences.rs:105
 msgid "Year and Month Folders"
 msgstr "Cartelle di anni e mesi"
 
-#: linux/verso-desktop/src/preferences.rs:95
-#: linux/verso-desktop/src/preferences.rs:95
+#: linux/verso-desktop/src/preferences.rs:106
+#: linux/verso-desktop/src/preferences.rs:106
 msgid "Folders Copied Into Upload"
 msgstr "Cartelle copiate in Upload"
 
-#: linux/verso-desktop/src/preferences.rs:102
-#: linux/verso-desktop/src/preferences.rs:102
-#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:113
+#: linux/verso-desktop/src/preferences.rs:113
+#: linux/verso-desktop/src/preferences.rs:113
 msgid "Album Folders"
 msgstr "Cartelle degli album"
 
-#: linux/verso-desktop/src/preferences.rs:102
-#: linux/verso-desktop/src/preferences.rs:102
-#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:113
+#: linux/verso-desktop/src/preferences.rs:113
+#: linux/verso-desktop/src/preferences.rs:113
 msgid "File Names"
 msgstr "Nomi dei file"
 
-#: linux/verso-desktop/src/preferences.rs:117
-#: linux/verso-desktop/src/preferences.rs:117
-#: linux/verso-desktop/src/preferences.rs:117
-#: shared/verso-core/src/settings.rs:82
+#: linux/verso-desktop/src/preferences.rs:128
+#: linux/verso-desktop/src/preferences.rs:128
+#: linux/verso-desktop/src/preferences.rs:128
+#: shared/verso-core/src/settings.rs:131
 msgid "Open in Immich and Copy Immich Link"
 msgstr "Apri in Immich e Copia link di Immich"
 
@@ -484,102 +491,142 @@ msgstr "Accesso effettuato, ma il montaggio non può avviarsi: {error}."
 msgid "Signed in, but the mount did not start: {error}"
 msgstr "Accesso effettuato, ma il montaggio non si è avviato: {error}"
 
-#: linux/verso-desktop/src/preferences.rs:48
+#: linux/verso-desktop/src/preferences.rs:59
 msgid "General"
 msgstr "Generali"
 
-#: linux/verso-desktop/src/preferences.rs:82
+#: linux/verso-desktop/src/preferences.rs:93
 msgid "Folders"
 msgstr "Cartelle"
 
-#: linux/verso-desktop/src/preferences.rs:110
+#: linux/verso-desktop/src/preferences.rs:121
 msgid "Other Apps"
 msgstr "Altre app"
 
-#: linux/verso-desktop/src/preferences.rs:52
+#: linux/verso-desktop/src/preferences.rs:48
+msgid "App Icon"
+msgstr "Icona dell’app"
+
+#: linux/verso-desktop/src/preferences.rs:49
+msgid "Verso's icon in the app grid, the dash and its windows, one for the desktop's light style and one for its dark style. The app grid shows a new one from the next login."
+msgstr "L’icona di Verso nella griglia delle app, nella dash e nelle sue finestre, una per lo stile chiaro del desktop e una per quello scuro. La griglia delle app mostra quella nuova dal prossimo accesso."
+
+#: linux/verso-desktop/src/preferences.rs:63
 msgid "Drive"
 msgstr "Unità"
 
-#: linux/verso-desktop/src/preferences.rs:58
+#: linux/verso-desktop/src/preferences.rs:69
 msgid "GVfs leaves the drive out of Files' sidebar, and a bookmark takes its place: no unmount button, but a plain folder icon."
 msgstr "GVfs esclude l’unità dalla barra laterale di File e al suo posto c’è un segnalibro: nessun pulsante per smontare, ma una semplice icona di cartella."
 
-#: linux/verso-desktop/src/preferences.rs:63
+#: linux/verso-desktop/src/preferences.rs:74
 msgid "Storage"
 msgstr "Archiviazione"
 
-#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:77
 msgid "Opened originals are kept on this computer up to this size."
 msgstr "Gli originali aperti restano su questo computer fino a questa dimensione."
 
-#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:78
 msgid "Also download larger previews, for big icon sizes. Uses more data."
 msgstr "Scarica anche anteprime più grandi, per le icone grandi. Usa più dati."
 
-#: linux/verso-desktop/src/preferences.rs:72
+#: linux/verso-desktop/src/preferences.rs:83
 msgid "Updates"
 msgstr "Aggiornamenti"
 
-#: linux/verso-desktop/src/preferences.rs:74
+#: linux/verso-desktop/src/preferences.rs:85
 msgid "Tell me when a new version is out."
 msgstr "Avvisami quando esce una nuova versione."
 
-#: linux/verso-desktop/src/preferences.rs:86
+#: linux/verso-desktop/src/preferences.rs:97
 msgid "Sections"
 msgstr "Sezioni"
 
-#: linux/verso-desktop/src/preferences.rs:87
+#: linux/verso-desktop/src/preferences.rs:98
 msgid "The folders the drive shows, and how each splits its photos by date."
 msgstr "Le cartelle che l’unità mostra, e come ciascuna divide le foto per data."
 
-#: linux/verso-desktop/src/preferences.rs:89
+#: linux/verso-desktop/src/preferences.rs:100
 msgid "The timeline, by year and month"
 msgstr "La cronologia, per anno e mese"
 
-#: linux/verso-desktop/src/preferences.rs:95
+#: linux/verso-desktop/src/preferences.rs:106
 msgid "What is copied into it is uploaded"
 msgstr "Ciò che vi si copia viene caricato"
 
-#: linux/verso-desktop/src/preferences.rs:100
+#: linux/verso-desktop/src/preferences.rs:111
 msgid "Names"
 msgstr "Nomi"
 
-#: linux/verso-desktop/src/preferences.rs:115
+#: linux/verso-desktop/src/preferences.rs:126
 msgid "Immich Web App"
 msgstr "Web app di Immich"
 
-#: linux/verso-desktop/src/preferences.rs:55
-#: linux/verso-desktop/src/preferences.rs:55
+#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:66
 msgid "Mount at Login"
 msgstr "Monta all’accesso"
 
-#: linux/verso-desktop/src/preferences.rs:58
-#: linux/verso-desktop/src/preferences.rs:58
+#: linux/verso-desktop/src/preferences.rs:69
+#: linux/verso-desktop/src/preferences.rs:69
 msgid "Bookmark Instead of Drive"
 msgstr "Segnalibro invece dell’unità"
 
-#: linux/verso/src/drive_preferences.rs:267
-#: linux/verso/src/drive_preferences.rs:271
+#: linux/verso/src/drive_preferences.rs:182
+msgid "{picture}, {paper}, {lens}"
+msgstr "{picture}, {paper}, {lens}"
+
+#: linux/verso/src/drive_preferences.rs:184
+#: linux/verso/src/drive_preferences.rs:211
+msgid "Night"
+msgstr "Notte"
+
+#: linux/verso/src/drive_preferences.rs:184
+#: linux/verso/src/drive_preferences.rs:211
+msgid "Day"
+msgstr "Giorno"
+
+#: linux/verso/src/drive_preferences.rs:185
+#: linux/verso/src/drive_preferences.rs:214
+msgid "Graphite"
+msgstr "Grafite"
+
+#: linux/verso/src/drive_preferences.rs:206
+msgid "Picture"
+msgstr "Immagine"
+
+#: linux/verso/src/drive_preferences.rs:212
+#: shared/verso-core/src/settings.rs:233
+msgid "Paper"
+msgstr "Carta"
+
+#: linux/verso/src/drive_preferences.rs:215
+msgid "Lens"
+msgstr "Obiettivo"
+
+#: linux/verso/src/drive_preferences.rs:330
+#: linux/verso/src/drive_preferences.rs:334
 msgid "Choose a Folder"
 msgstr "Scegli una cartella"
 
-#: linux/verso/src/drive_preferences.rs:302
+#: linux/verso/src/drive_preferences.rs:365
 msgid "Learn More"
 msgstr "Scopri di più"
 
-#: linux/verso/src/drive_preferences.rs:337
+#: linux/verso/src/drive_preferences.rs:400
 msgid "Not found"
 msgstr "Non trovata"
 
-#: linux/verso/src/drive_preferences.rs:338
+#: linux/verso/src/drive_preferences.rs:401
 msgid "Forget"
 msgstr "Dimentica"
 
-#: linux/verso/src/drive_preferences.rs:365
+#: linux/verso/src/drive_preferences.rs:428
 msgid "No other app that takes part is installed."
 msgstr "Nessun’altra app che partecipa è installata."
 
-#: linux/verso/src/drive_preferences.rs:366
+#: linux/verso/src/drive_preferences.rs:429
 msgid "Find Apps That Take Part"
 msgstr "Trova app che partecipano"
 
@@ -608,216 +655,216 @@ msgstr "{app} non è più installata."
 msgid "Verso could not open {app}: {error}"
 msgstr "Verso non ha potuto aprire {app}: {error}"
 
-#: shared/verso-core/src/settings.rs:57
+#: shared/verso-core/src/settings.rs:106
 msgid "The Immich server; /api is added"
 msgstr "Il server Immich; /api viene aggiunto"
 
-#: shared/verso-core/src/settings.rs:58
+#: shared/verso-core/src/settings.rs:107
 msgid "Show the library as a drive in the file manager"
 msgstr "Mostra la libreria come unità nel gestore di file"
 
-#: shared/verso-core/src/settings.rs:59
+#: shared/verso-core/src/settings.rs:108
 msgid "Where the mount appears"
 msgstr "Dove compare l’unità"
 
-#: shared/verso-core/src/settings.rs:60
+#: shared/verso-core/src/settings.rs:109
 msgid "The drive's name in the sidebar"
 msgstr "Il nome dell’unità nella barra laterale"
 
-#: shared/verso-core/src/settings.rs:61
+#: shared/verso-core/src/settings.rs:110
 msgid "Mount when the session starts"
 msgstr "Monta all’avvio della sessione"
 
-#: shared/verso-core/src/settings.rs:62
+#: shared/verso-core/src/settings.rs:111
 msgid "List the drive in Files' sidebar as a drive, with its unmount button; off, as a bookmark"
 msgstr "Mostra l’unità nella barra laterale di File come unità, con il pulsante per smontarla; disattivato, come segnalibro"
 
-#: shared/verso-core/src/settings.rs:63
+#: shared/verso-core/src/settings.rs:112
 msgid "Show the Photos section"
 msgstr "Mostra la sezione Photos"
 
-#: shared/verso-core/src/settings.rs:64
+#: shared/verso-core/src/settings.rs:113
 msgid "Show the Albums section"
 msgstr "Mostra la sezione Albums"
 
-#: shared/verso-core/src/settings.rs:65
+#: shared/verso-core/src/settings.rs:114
 msgid "Show the People section"
 msgstr "Mostra la sezione People"
 
-#: shared/verso-core/src/settings.rs:66
+#: shared/verso-core/src/settings.rs:115
 msgid "Show the Places section"
 msgstr "Mostra la sezione Places"
 
-#: shared/verso-core/src/settings.rs:67
+#: shared/verso-core/src/settings.rs:116
 msgid "Show the Favorites section"
 msgstr "Mostra la sezione Favorites"
 
-#: shared/verso-core/src/settings.rs:68
+#: shared/verso-core/src/settings.rs:117
 msgid "Show the Archive section"
 msgstr "Mostra la sezione Archive"
 
-#: shared/verso-core/src/settings.rs:69
+#: shared/verso-core/src/settings.rs:118
 msgid "Day folders inside months"
 msgstr "Cartelle dei giorni nei mesi"
 
-#: shared/verso-core/src/settings.rs:70
+#: shared/verso-core/src/settings.rs:119
 msgid "Year and month folders inside albums"
 msgstr "Cartelle di anni e mesi negli album"
 
-#: shared/verso-core/src/settings.rs:71
+#: shared/verso-core/src/settings.rs:120
 msgid "Year and month folders inside people"
 msgstr "Cartelle di anni e mesi nelle persone"
 
-#: shared/verso-core/src/settings.rs:72
+#: shared/verso-core/src/settings.rs:121
 msgid "Year and month folders inside cities"
 msgstr "Cartelle di anni e mesi nelle città"
 
-#: shared/verso-core/src/settings.rs:73
+#: shared/verso-core/src/settings.rs:122
 msgid "Year and month folders inside favorites"
 msgstr "Cartelle di anni e mesi nei preferiti"
 
-#: shared/verso-core/src/settings.rs:74
+#: shared/verso-core/src/settings.rs:123
 msgid "Year and month folders inside the archive"
 msgstr "Cartelle di anni e mesi nell'archivio"
 
-#: shared/verso-core/src/settings.rs:75
+#: shared/verso-core/src/settings.rs:124
 msgid "How album folders are named and grouped"
 msgstr "Come vengono nominate e raggruppate le cartelle degli album"
 
-#: shared/verso-core/src/settings.rs:76
+#: shared/verso-core/src/settings.rs:125
 msgid "How files are named"
 msgstr "Come vengono nominati i file"
 
-#: shared/verso-core/src/settings.rs:77
+#: shared/verso-core/src/settings.rs:126
 msgid "The content cache's size limit"
 msgstr "Il limite di dimensione della cache dei contenuti"
 
-#: shared/verso-core/src/settings.rs:78
+#: shared/verso-core/src/settings.rs:127
 msgid "Show the Upload folder, and upload what is copied into it"
 msgstr "Mostra la cartella Upload e carica ciò che vi viene copiato"
 
-#: shared/verso-core/src/settings.rs:79
+#: shared/verso-core/src/settings.rs:128
 msgid "Folders copied into Upload"
 msgstr "Cartelle copiate in Upload"
 
-#: shared/verso-core/src/settings.rs:80
+#: shared/verso-core/src/settings.rs:129
 msgid "Also seed 1024 px thumbnails from the preview"
 msgstr "Genera anche miniature da 1024 px dall’anteprima"
 
-#: shared/verso-core/src/settings.rs:81
+#: shared/verso-core/src/settings.rs:130
 msgid "Refuse thumbnailer reads of originals"
 msgstr "Impedisci ai generatori di miniature di leggere gli originali"
 
-#: shared/verso-core/src/settings.rs:83
+#: shared/verso-core/src/settings.rs:132
 msgid "What a double click on Verso's top bar icon opens"
 msgstr "Cosa apre un doppio clic sull’icona di Verso nella barra superiore"
 
-#: shared/verso-core/src/settings.rs:84
+#: shared/verso-core/src/settings.rs:133
 msgid "Verso's top bar icon in colour: the lens's five colours, grey while the server cannot be reached"
 msgstr "L’icona di Verso nella barra superiore a colori: i cinque colori dell’obiettivo, grigia finché il server non è raggiungibile"
 
-#: shared/verso-core/src/settings.rs:85
-msgid "Verso's app icon, by the picture on its print"
-msgstr "L’icona dell’app Verso, secondo l’immagine sulla sua stampa"
+#: shared/verso-core/src/settings.rs:134
+msgid "Verso's app icon in the light style: the picture on its print, its paper and its lens"
+msgstr "L’icona dell’app Verso nello stile chiaro: l’immagine sulla sua stampa, la sua carta e il suo obiettivo"
 
-#: shared/verso-core/src/settings.rs:86
+#: shared/verso-core/src/settings.rs:135
+msgid "Verso's app icon in the dark style: the picture on its print, its paper and its lens"
+msgstr "L’icona dell’app Verso nello stile scuro: l’immagine sulla sua stampa, la sua carta e il suo obiettivo"
+
+#: shared/verso-core/src/settings.rs:136
 msgid "Show what other apps link to (Immich Crosslink)"
 msgstr "Mostra ciò a cui rimandano altre app (Immich Crosslink)"
 
-#: shared/verso-core/src/settings.rs:87
+#: shared/verso-core/src/settings.rs:137
 msgid "Verso: take part as Verso Gallery, so other apps show items in it"
 msgstr "Verso: partecipa come Verso Gallery, così altre app mostrano elementi nella galleria"
 
-#: shared/verso-core/src/settings.rs:88
+#: shared/verso-core/src/settings.rs:138
 msgid "Verso: take part as Verso Drive, so other apps show items in Files while the drive is on"
 msgstr "Verso: partecipa come Verso Drive, così altre app mostrano elementi in File finché l’unità è attiva"
 
-#: shared/verso-core/src/settings.rs:89
+#: shared/verso-core/src/settings.rs:139
 msgid "Apps left out of Show in, by their desktop entry or bundle id, separated by ;"
 msgstr "App escluse da Mostra in, per id della voce desktop o del bundle, separate da ;"
 
-#: shared/verso-core/src/settings.rs:90
+#: shared/verso-core/src/settings.rs:140
 msgid "Tell me when a new version is out"
 msgstr "Avvisami quando esce una nuova versione"
 
-#: shared/verso-core/src/settings.rs:91
+#: shared/verso-core/src/settings.rs:141
 msgid "Headless only: a 0600 file holding the credential"
 msgstr "Solo senza interfaccia grafica: un file 0600 che contiene le credenziali"
 
-#: shared/verso-core/src/settings.rs:164
+#: shared/verso-core/src/settings.rs:215
 msgid "Never"
 msgstr "Mai"
 
-#: shared/verso-core/src/settings.rs:165
+#: shared/verso-core/src/settings.rs:216
 msgid "From 500 Items"
 msgstr "Da 500 elementi"
 
-#: shared/verso-core/src/settings.rs:166
+#: shared/verso-core/src/settings.rs:217
 msgid "Always"
 msgstr "Sempre"
 
-#: shared/verso-core/src/settings.rs:167
+#: shared/verso-core/src/settings.rs:218
 msgid "Year in the Name (2023 - Trip)"
 msgstr "Anno nel nome (2023 - Viaggio)"
 
-#: shared/verso-core/src/settings.rs:168
+#: shared/verso-core/src/settings.rs:219
 msgid "Year Folders (2023/Trip)"
 msgstr "Cartelle per anno (2023/Viaggio)"
 
-#: shared/verso-core/src/settings.rs:169
+#: shared/verso-core/src/settings.rs:220
 msgid "Name Only (Trip)"
 msgstr "Solo nome (Viaggio)"
 
-#: shared/verso-core/src/settings.rs:170
+#: shared/verso-core/src/settings.rs:221
 msgid "Date and Time Taken"
 msgstr "Data e ora di scatto"
 
-#: shared/verso-core/src/settings.rs:171
+#: shared/verso-core/src/settings.rs:222
 msgid "Original File Names"
 msgstr "Nomi file originali"
 
-#: shared/verso-core/src/settings.rs:172
+#: shared/verso-core/src/settings.rs:223
 msgid "Ask Each Time"
 msgstr "Chiedi ogni volta"
 
-#: shared/verso-core/src/settings.rs:176
-#: shared/verso-core/src/settings.rs:196
+#: shared/verso-core/src/settings.rs:227
+#: shared/verso-core/src/settings.rs:247
 msgid "Verso"
 msgstr "Verso"
 
-#: shared/verso-core/src/settings.rs:177
+#: shared/verso-core/src/settings.rs:228
 msgid "Verso Drive in Files"
 msgstr "Verso Drive in File"
 
-#: shared/verso-core/src/settings.rs:178
+#: shared/verso-core/src/settings.rs:229
 msgid "Preferences"
 msgstr "Preferenze"
 
-#: shared/verso-core/src/settings.rs:179
+#: shared/verso-core/src/settings.rs:230
 msgid "Mist"
 msgstr "Foschia"
 
-#: shared/verso-core/src/settings.rs:180
+#: shared/verso-core/src/settings.rs:231
 msgid "Sand"
 msgstr "Sabbia"
 
-#: shared/verso-core/src/settings.rs:181
+#: shared/verso-core/src/settings.rs:232
 msgid "Dark"
 msgstr "Scuro"
 
-#: shared/verso-core/src/settings.rs:182
-msgid "Paper"
-msgstr "Carta"
-
-#: shared/verso-core/src/settings.rs:183
+#: shared/verso-core/src/settings.rs:234
 msgid "Frame"
 msgstr "Cornice"
 
-#: shared/verso-core/src/settings.rs:184
+#: shared/verso-core/src/settings.rs:235
 msgid "Slate"
 msgstr "Ardesia"
 
-#: shared/verso-core/src/settings.rs:185
+#: shared/verso-core/src/settings.rs:236
 msgid "Sky"
 msgstr "Cielo"
 

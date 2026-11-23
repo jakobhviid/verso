@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Verso: the other side of a photo. A print is the app's square, edge to edge as Linux shows icons: in its picture
+       the lens whose ring carries Immich's five colours (its colours, never its shapes), on its strip Verso written by
+       hand, and its corner turned over to show the back. Drawn for this project, MIT like the rest of it. -->
+<defs>
+  <radialGradient id="glass" cx="0.42" cy="0.38" r="0.75">
+    <stop offset="0" stop-color="#5b5d63"/><stop offset="0.6" stop-color="#2c2d31"/><stop offset="1" stop-color="#121214"/>
+  </radialGradient>
+  <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#4a4a4f"/><stop offset="1" stop-color="#2f2f33"/>
+  </linearGradient>
+  <linearGradient id="back" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#6f6858"/><stop offset="1" stop-color="#4b4539"/>
+  </linearGradient>
+  <linearGradient id="curl" x1="0" y1="1" x2="1" y2="0">
+    <stop offset="0" stop-color="#fbf5e8"/><stop offset="0.45" stop-color="#e9dfc6"/><stop offset="1" stop-color="#bfb294"/>
+  </linearGradient>
+  <linearGradient id="photo" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#2f4a66"/><stop offset="1" stop-color="#1b2b40"/>
+  </linearGradient>
+  <linearGradient id="light" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#e9f0f8"/><stop offset="1" stop-color="#c9d6e6"/>
+  </linearGradient>
+  <filter id="flapshadow" x="-40%" y="-40%" width="180%" height="180%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="1.6"/><feOffset dx="-1.2" dy="-1.2"/>
+    <feComponentTransfer><feFuncA type="linear" slope="0.30"/></feComponentTransfer>
+    <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  
+<g id="lens">
+  <circle r="30" fill="#3c3c3f"/>
+  <circle r="28" fill="#232325"/>
+  <path d="M 1.03 -23.68 A 23.7 23.7 0 0 1 22.20 -8.30" stroke="#8c8c91" stroke-width="7.8" fill="none"/>
+  <path d="M 22.84 -6.33 A 23.7 23.7 0 0 1 14.75 18.55" stroke="#dadadd" stroke-width="7.8" fill="none"/>
+  <path d="M 13.08 19.76 A 23.7 23.7 0 0 1 -13.08 19.76" stroke="#f4f4f5" stroke-width="7.8" fill="none"/>
+  <path d="M -14.75 18.55 A 23.7 23.7 0 0 1 -22.84 -6.33" stroke="#a6a6ab" stroke-width="7.8" fill="none"/>
+  <path d="M -22.20 -8.30 A 23.7 23.7 0 0 1 -1.03 -23.68" stroke="#c4c4c8" stroke-width="7.8" fill="none"/>
+  <circle r="18" fill="url(#glass)"/>
+  <circle r="11.16" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="1.44"/>
+  <ellipse cx="-5.76" cy="-6.48" rx="5.4" ry="3.24" transform="rotate(-35 -5.76 -6.48)" fill="#ffffff" opacity="0.75"/>
+  <circle cx="6.84" cy="5.4" r="1.44" fill="#ffffff" opacity="0.45"/>
+</g>
+</defs>
+<g transform="translate(-9.142857 -9.142857) scale(1.142857)"><path d="M30,8 H98 Q120,8 120,30 V88 L88,120 H30 Q8,120 8,98 V30 Q8,8 30,8 Z" fill="url(#paper)"/>
+<path d="M30,8 H98 Q120,8 120,30 V88 L88,120 H30 Q8,120 8,98 V30 Q8,8 30,8 Z" fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1"/>
+<rect x="18" y="18" width="92" height="76" rx="10" fill="url(#photo)"/><rect x="18.5" y="18.5" width="91" height="75" rx="9.5" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/><use xlink:href="#lens" transform="translate(64 56) scale(1.1) "/>
+<g transform="translate(22 94.3) scale(0.64)" fill="none" stroke="#c4c8d4" stroke-width="2.34375" stroke-linecap="round" stroke-linejoin="round"><path d="M2,7 C3.5,3.5 7.5,3.8 9,8.5 C10.6,14 12.3,22.5 14,30 C17.5,22 21.5,12 25.5,5 C26.6,3.2 28.6,3.4 28.2,5.6"/><path d="M26.4,26.6 C30,26.3 34,23.8 33.6,20.8 C33.2,18 28.8,19.2 28.4,23.8 C28,28.4 31.2,30.4 34.8,28.8 C36.6,28 37.8,26.6 38.8,24.6 C39.8,22.6 40.6,20.4 41.2,18.8 C42.4,19.8 43.6,19.8 45,18.8 C45.2,21 45.4,23 46.6,24 C48.4,24.6 50,21.4 51.4,19 C53.4,22.4 56,25 54.4,28.2 C52.8,31 49,30.6 48.4,28.4 M54.8,28.8 C56.8,28.6 57.8,27.6 58.4,26 C59.4,22.6 61.8,19 64.6,19.2 C67.8,19.4 67.4,24.6 64.8,27.8 C62.6,30.6 58.8,30.2 59,26.4 C59.2,23.4 62.6,21.6 66,21.4 C68.6,21.2 71.4,20.2 73.6,18.4"/></g>
+<path d="M120,88 L88,120 L88,94 Q88,88 94,88 Z" fill="url(#back)" filter="url(#flapshadow)"/>
+</g>
+</svg>

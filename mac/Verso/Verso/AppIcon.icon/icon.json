@@ -22,8 +22,8 @@
       "appearance": "dark",
       "value": {
         "linear-gradient": [
-          "srgb:0.32157,0.31765,0.33333,1.00000",
-          "srgb:0.20000,0.19608,0.21176,1.00000"
+          "srgb:0.29020,0.29020,0.30980,1.00000",
+          "srgb:0.18431,0.18431,0.20000,1.00000"
         ],
         "orientation": {
           "start": {
@@ -75,7 +75,15 @@
         },
         {
           "name": "Ring",
-          "image-name": "lens-ring.svg",
+          "image-name-specializations": [
+            {
+              "value": "lens-ring.svg"
+            },
+            {
+              "appearance": "dark",
+              "value": "lens-ring-dark.svg"
+            }
+          ],
           "glass": false
         }
       ],
@@ -107,7 +115,15 @@
         },
         {
           "name": "Picture",
-          "image-name": "photo.svg",
+          "image-name-specializations": [
+            {
+              "value": "photo.svg"
+            },
+            {
+              "appearance": "dark",
+              "value": "photo-dark.svg"
+            }
+          ],
           "glass": false
         }
       ],

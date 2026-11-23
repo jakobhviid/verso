@@ -8,7 +8,7 @@ use std::cell::Cell;
 use std::rc::Rc;
 
 use adw::prelude::*;
-use verso_core::settings::Kind;
+use verso_core::settings::{AppIconLook, Kind, APP_ICON_DESIGNS};
 use verso_desktop::preferences::{
     apps_description, apps_heading, cache_size_label, cache_sizes, caption, change, choice_label, crosslink_apps, current_value, forget_app,
     link, setting, show_app, switch_on, switch_value, title, Page, Row, PARTICIPANTS_PAGE,
@@ -67,7 +67,7 @@ fn widget(row: &'static Row, context: &Context, window: &gtk::Window) -> gtk::Wi
     if let Some((inner, _)) = row.inner {
         return section_row(row, inner, context);
     }
-    if row.key == "app.icon" {
+    if row.key == "app.icon" || row.key == "app.icon_dark" {
         return app_icon_row(row.key, context).upcast();
     }
     match shown.kind {
@@ -172,31 +172,93 @@ fn whole_labels(combo: &adw::ComboRow) -> gtk::SignalListItemFactory {
     factory
 }
 
-/// The app icon (`app.icon`): each design by its icon and its name, the row showing the one chosen. A choice is named in
-/// the launcher's entry at once (`change`), and in the windows.
-fn app_icon_row(key: &'static str, context: &Context) -> adw::ComboRow {
-    let words = verso_core::settings::choices(setting(key));
-    let combo = adw::ComboRow::builder().title(title(setting(key))).build();
-    if let Some(line) = caption(setting(key)) {
-        combo.set_subtitle(line);
-    }
-    combo.set_factory(Some(&designs(&combo, 32, false)));
-    combo.set_list_factory(Some(&designs(&combo, 48, true)));
-    combo.set_model(Some(&gtk::StringList::new(words)));
-    let current = current_value(setting(key));
-    combo.set_selected(words.iter().position(|word| *word == current).unwrap_or(0) as u32);
-    let context = context.clone();
-    combo.connect_selected_notify(move |combo| {
-        let Some(word) = words.get(combo.selected() as usize) else { return };
-        context.outcome(change(key, word));
-        gtk::Window::set_default_icon_name(&verso_desktop::preferences::app_icon_name());
-    });
-    combo
+/// A look's icon, among the app's own icons (`dev.hviid.Verso-sand-night`).
+fn look_icon(look: AppIconLook) -> String {
+    verso_core::product::current().app_icon(look.word())
 }
 
-/// The app icon's designs as a choice shows them, each by its icon `size` pixels wide and its name; in the list it
-/// drops down (`listed`), with the checkmark on the one chosen.
-fn designs(combo: &adw::ComboRow, size: i32, listed: bool) -> gtk::SignalListItemFactory {
+/// A look by its parts, as the row names it: "Sand, Night, Graphite".
+fn look_label(look: AppIconLook) -> String {
+    tr("{picture}, {paper}, {lens}")
+        .replace("{picture}", choice_label(look.design))
+        .replace("{paper}", if look.night { tr("Night") } else { tr("Day") })
+        .replace("{lens}", if look.graphite { tr("Graphite") } else { tr("Colour") })
+}
+
+/// A choice of two, as a group of toggles beside a row's title: the first (`first`) or the second, by name.
+fn two_toggles(first: (&'static str, &'static str), second: (&'static str, &'static str), second_on: bool) -> adw::ToggleGroup {
+    let toggles = adw::ToggleGroup::builder().valign(gtk::Align::Center).build();
+    toggles.add(adw::Toggle::builder().name(first.0).label(tr(first.1)).build());
+    toggles.add(adw::Toggle::builder().name(second.0).label(tr(second.1)).build());
+    toggles.set_active_name(Some(if second_on { second.0 } else { first.0 }));
+    toggles
+}
+
+/// The app icon's look in one of the desktop's styles (`app.icon`, `app.icon_dark`): a row with the look's icon and its
+/// name, which opens to its three parts: the picture, each design by its icon in this row's paper and lens; the paper,
+/// Day or Night; and the lens, Colour or Graphite. Each change is kept at once and named in the launcher's entry
+/// (`change`), and the windows show the look chosen for their style.
+fn app_icon_row(key: &'static str, context: &Context) -> adw::ExpanderRow {
+    let look = Rc::new(Cell::new(AppIconLook::parse(&current_value(setting(key)))));
+    let expander = adw::ExpanderRow::builder().title(title(setting(key))).subtitle(look_label(look.get())).build();
+    let icon = gtk::Image::builder().icon_name(look_icon(look.get())).pixel_size(32).build();
+    expander.add_prefix(&icon);
+    let pictures = adw::ComboRow::builder().title(tr("Picture")).build();
+    pictures.set_factory(Some(&designs(&pictures, &look, 32, false)));
+    pictures.set_list_factory(Some(&designs(&pictures, &look, 48, true)));
+    pictures.set_model(Some(&gtk::StringList::new(APP_ICON_DESIGNS)));
+    pictures.set_selected(APP_ICON_DESIGNS.iter().position(|design| *design == look.get().design).unwrap_or(0) as u32);
+    let paper = two_toggles(("day", "Day"), ("night", "Night"), look.get().night);
+    let paper_row = adw::ActionRow::builder().title(tr("Paper")).build();
+    paper_row.add_suffix(&paper);
+    let lens = two_toggles(("colour", "Colour"), ("graphite", "Graphite"), look.get().graphite);
+    let lens_row = adw::ActionRow::builder().title(tr("Lens")).build();
+    lens_row.add_suffix(&lens);
+    expander.add_row(&pictures);
+    expander.add_row(&paper_row);
+    expander.add_row(&lens_row);
+    // Keep a new look, and show it: the row's icon and name, and the pictures drawn again in its paper and lens.
+    let keep: Rc<dyn Fn(AppIconLook)> = {
+        let (look, expander, icon, pictures, context) = (look.clone(), expander.downgrade(), icon.downgrade(), pictures.downgrade(), context.clone());
+        Rc::new(move |chosen: AppIconLook| {
+            if chosen == look.get() {
+                return;
+            }
+            let redraw = (chosen.night, chosen.graphite) != (look.get().night, look.get().graphite);
+            look.set(chosen);
+            context.outcome(change(key, chosen.word()));
+            gtk::Window::set_default_icon_name(&crate::app_icon_name());
+            if let Some(expander) = expander.upgrade() {
+                expander.set_subtitle(&look_label(chosen));
+            }
+            if let Some(icon) = icon.upgrade() {
+                icon.set_icon_name(Some(&look_icon(chosen)));
+            }
+            if let (true, Some(pictures)) = (redraw, pictures.upgrade()) {
+                pictures.set_factory(Some(&designs(&pictures, &look, 32, false)));
+                pictures.set_list_factory(Some(&designs(&pictures, &look, 48, true)));
+            }
+        })
+    };
+    let (chosen, kept) = (look.clone(), keep.clone());
+    pictures.connect_selected_notify(move |pictures| {
+        let Some(design) = APP_ICON_DESIGNS.get(pictures.selected() as usize) else { return };
+        kept(AppIconLook { design, ..chosen.get() });
+    });
+    let (chosen, kept) = (look.clone(), keep.clone());
+    paper.connect_active_name_notify(move |paper| {
+        kept(AppIconLook { night: paper.active_name().as_deref() == Some("night"), ..chosen.get() });
+    });
+    let (chosen, kept) = (look, keep);
+    lens.connect_active_name_notify(move |lens| {
+        kept(AppIconLook { graphite: lens.active_name().as_deref() == Some("graphite"), ..chosen.get() });
+    });
+    expander
+}
+
+/// The app icon's designs as a choice shows them, each by its icon `size` pixels wide, drawn in the paper and lens of
+/// `look`, and its name; in the list it drops down (`listed`), with the checkmark on the one chosen.
+fn designs(combo: &adw::ComboRow, look: &Rc<Cell<AppIconLook>>, size: i32, listed: bool) -> gtk::SignalListItemFactory {
     let factory = gtk::SignalListItemFactory::new();
     let shown_by = combo.downgrade();
     factory.connect_setup(move |_, item| {
@@ -219,13 +281,14 @@ fn designs(combo: &adw::ComboRow, size: i32, listed: bool) -> gtk::SignalListIte
         }
         item.set_child(Some(&line));
     });
-    let shown_by = combo.downgrade();
+    let (shown_by, look) = (combo.downgrade(), look.clone());
     factory.connect_bind(move |_, item| {
         let Some(item) = item.downcast_ref::<gtk::ListItem>() else { return };
         let Some(line) = item.child().and_downcast::<gtk::Box>() else { return };
         let Some(word) = item.item().and_downcast::<gtk::StringObject>().map(|text| text.string()) else { return };
         if let Some(icon) = line.first_child().and_downcast::<gtk::Image>() {
-            icon.set_icon_name(Some(&verso_core::product::current().app_icon(&word)));
+            let design = AppIconLook::parse(&word).design;
+            icon.set_icon_name(Some(&look_icon(AppIconLook { design, ..look.get() })));
         }
         if let Some(label) = line.first_child().and_then(|icon| icon.next_sibling()).and_downcast::<gtk::Label>() {
             label.set_label(choice_label(&word));

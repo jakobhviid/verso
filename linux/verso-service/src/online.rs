@@ -468,10 +468,13 @@ pub fn daemon(paths: &Paths) -> Result<Option<StopReason>> {
         }
     };
     let mount_point = paths.expand(&config.mount_path);
-    // Verso's participants in Immich Crosslink, as the settings want them; and the app icon chosen, in the launcher's
-    // entry, which an upgrade replaces with the install's own.
+    // Verso's participants in Immich Crosslink, as the settings want them; and the app icon chosen for the desktop's
+    // style, in the launcher's entry, which an upgrade replaces with the install's own, named again at each change of
+    // colour scheme while the service runs. A Flatpak cannot reach its entry.
     verso_linux::participants::sync(paths, &config);
-    verso_linux::app_icon::apply(paths, config.app_icon);
+    if !verso_core::product::current().sandboxed {
+        runtime.spawn(verso_linux::app_icon::follow_style(paths.clone()));
+    }
     if !config.mount_enabled {
         return daemon_without_drive(paths, &config, &mount_point, server_url, version, &client, &runtime, Without::Off);
     }

@@ -33,8 +33,8 @@ const GENERAL: Page = Page {
     title: "General",
     icon: "preferences-system-symbolic",
     groups: &[
-        // Not in a Flatpak, which hides the setting: its launcher is the Flatpak's to export.
-        Group { title: None, description: None, rows: &[Row { key: "app.icon", title: "App Icon", subtitle: None, inner: None }], apps: false },
+        // The app icon by day and by night; not in a Flatpak, which hides both settings.
+        verso_desktop::preferences::APP_ICON_GROUP,
         Group {
             title: Some("Immich Web App"),
             description: None,

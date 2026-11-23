@@ -1,18 +1,23 @@
 # Verso's app icon: the other side of a photo. A print is the square, edge to edge as Linux shows app icons; in its
 # picture the lens, whose ring carries Immich's five colours (from Immich Mount's icon; Immich's colours, never its
 # shapes); on its strip Verso written by hand; its corner turned over to show the back. The print is drawn on 8 to 120
-# of the 128 grid and scaled out to its edges. The picture comes in seven designs (DESIGNS), a file each: Mist, the
-# app's icon, as dev.hviid.Verso.svg, and the others, which Preferences offers, as dev.hviid.Verso-<design>.svg. Writes
-# them into the folder given:
+# of the 128 grid and scaled out to its edges.
+#
+# The picture comes in seven designs (DESIGNS), and each design in four looks: Day or Night paper, and a Colour or a
+# Graphite lens. Day is the white print; Night the print in the dark, its paper charcoal, the word light grey, its back
+# a dark warm grey, and its picture a darker shade of the design's own (NIGHT). Graphite turns the lens monochrome:
+# the ring's five segments five greys, the glass and the barrel neutral greys. A file each: Mist on Day paper in
+# colour, the app's icon, as dev.hviid.Verso.svg, and the others as dev.hviid.Verso-<look>.svg, where a look is the
+# design's name with -night and -graphite after it as they apply (sand, sand-night, sand-graphite,
+# sand-night-graphite). Writes them into the folder given:
 # python3 linux/packaging/icons/sources/app-icon.py linux/packaging/icons
 # linux-app-icon.py then makes the PNGs from Mist's, and mac/Verso/make-icons.py the Mac's and iOS's icons.
 import sys, pathlib
-out = pathlib.Path(sys.argv[1])
 
-# The picture's designs, by name, Mist first (the maintainer's choice, 2026-11-22): its gradient, top to bottom, and the
-# line inside its edge, by colour and opacity, that holds a light picture apart from the paper. A light picture, one
-# with that line, lightens the lens's barrel (LIGHT_BARREL), so the barrel is not the heaviest thing on it; the glass
-# and the five colours are the same on every design.
+# The picture's designs, by name, Mist first (the maintainer's choice, 2026-11-22), on Day paper: its gradient, top to
+# bottom, and the line inside its edge, by colour and opacity, that holds a light picture apart from the paper. A light
+# picture, one with that line, lightens the lens's barrel (BARREL), so the barrel is not the heaviest thing on it; the
+# glass and the five colours are the same on every design.
 DESIGNS = {
     "mist": ("#e6edf5", "#c4d0de", ("#000000", "0.08")),
     "sand": ("#f0e8d8", "#d9cbb0", ("#000000", "0.08")),
@@ -22,19 +27,49 @@ DESIGNS = {
     "slate": ("#727b92", "#4a5165", None),
     "sky": ("#d3e3f3", "#9db5ce", ("#000000", "0.08")),
 }
+# The same designs on Night paper: a darker shade of each design's own picture, and the line inside its edge, light,
+# where the picture is close to the charcoal paper. Every Night picture is dark, so the lens keeps its own dark barrel.
+NIGHT = {
+    "mist": ("#414d5c", "#262d37", ("#ffffff", "0.08")),
+    "sand": ("#574a39", "#382e22", ("#ffffff", "0.08")),
+    "dark": ("#2c3044", "#141319", None),
+    "paper": ("#38363a", "#262528", ("#ffffff", "0.10")),
+    "frame": ("#403f43", "#353438", ("#a39e94", "0.55")),
+    "slate": ("#454a66", "#272a3d", None),
+    "sky": ("#2f4a66", "#1b2b40", ("#ffffff", "0.08")),
+}
 DEFAULT = "mist"
-# The barrel's rim and its inside (the lens's two outer circles, #3d3846 and #241f31) on a light picture.
-LIGHT_BARREL = ("#5d5867", "#45405a")
+# The print's own colours on Day and on Night paper: its face (top, bottom), the back of the turned corner (from the
+# fold to its tip), the word's ink, and the faint edge that holds the print on a background of its own colour.
+PAPERS = {
+    "day": {"paper": ("#ffffff", "#e6e4e0"), "back": ("#f6efdf", "#d8ccb0"), "ink": "#6f7486",
+            "edge": ("#000000", "0.08")},
+    "night": {"paper": ("#4a4a4f", "#2f2f33"), "back": ("#6f6858", "#4b4539"), "ink": "#c4c8d4",
+              "edge": ("#ffffff", "0.12")},
+}
+# The lens in colour and in graphite: its barrel's rim and inside (its own, and lightened on a light picture), its
+# glass from the centre out, and the ring's five segments clockwise from the top (Immich's five colours, or five greys
+# in the order of the colours' own lightness: amber lightest, then pink, green, blue and red). On Night paper the
+# greys are lighter, so the ring still reads.
+LENSES = {
+    "colour": {"barrel": ("#3d3846", "#241f31"), "light barrel": ("#5d5867", "#45405a"),
+               "glass": ("#2d5c9e", "#18294a", "#0f0d16"),
+               "ring": {"day": ("#FA2921", "#ED79B5", "#FFB400", "#1E83F7", "#18C249")}},
+    "graphite": {"barrel": ("#3c3c3f", "#232325"), "light barrel": ("#5c5c60", "#444448"),
+                 "glass": ("#5b5d63", "#2c2d31", "#121214"),
+                 "ring": {"day": ("#76767b", "#d0d0d3", "#efeff0", "#909095", "#b2b2b6"),
+                          "night": ("#8c8c91", "#dadadd", "#f4f4f5", "#a6a6ab", "#c4c4c8")}},
+}
 
 LENS = '''
 <g id="lens">
-  <circle r="30" fill="#3d3846"/>
-  <circle r="28" fill="#241f31"/>
-  <path d="M 1.03 -23.68 A 23.7 23.7 0 0 1 22.20 -8.30" stroke="#FA2921" stroke-width="7.8" fill="none"/>
-  <path d="M 22.84 -6.33 A 23.7 23.7 0 0 1 14.75 18.55" stroke="#ED79B5" stroke-width="7.8" fill="none"/>
-  <path d="M 13.08 19.76 A 23.7 23.7 0 0 1 -13.08 19.76" stroke="#FFB400" stroke-width="7.8" fill="none"/>
-  <path d="M -14.75 18.55 A 23.7 23.7 0 0 1 -22.84 -6.33" stroke="#1E83F7" stroke-width="7.8" fill="none"/>
-  <path d="M -22.20 -8.30 A 23.7 23.7 0 0 1 -1.03 -23.68" stroke="#18C249" stroke-width="7.8" fill="none"/>
+  <circle r="30" fill="BARREL_RIM"/>
+  <circle r="28" fill="BARREL_INSIDE"/>
+  <path d="M 1.03 -23.68 A 23.7 23.7 0 0 1 22.20 -8.30" stroke="RING_0" stroke-width="7.8" fill="none"/>
+  <path d="M 22.84 -6.33 A 23.7 23.7 0 0 1 14.75 18.55" stroke="RING_1" stroke-width="7.8" fill="none"/>
+  <path d="M 13.08 19.76 A 23.7 23.7 0 0 1 -13.08 19.76" stroke="RING_2" stroke-width="7.8" fill="none"/>
+  <path d="M -14.75 18.55 A 23.7 23.7 0 0 1 -22.84 -6.33" stroke="RING_3" stroke-width="7.8" fill="none"/>
+  <path d="M -22.20 -8.30 A 23.7 23.7 0 0 1 -1.03 -23.68" stroke="RING_4" stroke-width="7.8" fill="none"/>
   <circle r="18" fill="url(#glass)"/>
   <circle r="11.16" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="1.44"/>
   <ellipse cx="-5.76" cy="-6.48" rx="5.4" ry="3.24" transform="rotate(-35 -5.76 -6.48)" fill="#ffffff" opacity="0.75"/>
@@ -44,13 +79,13 @@ LENS = '''
 DEFS = '''
 <defs>
   <radialGradient id="glass" cx="0.42" cy="0.38" r="0.75">
-    <stop offset="0" stop-color="#2d5c9e"/><stop offset="0.6" stop-color="#18294a"/><stop offset="1" stop-color="#0f0d16"/>
+    <stop offset="0" stop-color="GLASS_0"/><stop offset="0.6" stop-color="GLASS_1"/><stop offset="1" stop-color="GLASS_2"/>
   </radialGradient>
   <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e6e4e0"/>
+    <stop offset="0" stop-color="PAPER_TOP"/><stop offset="1" stop-color="PAPER_BOTTOM"/>
   </linearGradient>
   <linearGradient id="back" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="#f6efdf"/><stop offset="1" stop-color="#d8ccb0"/>
+    <stop offset="0" stop-color="BACK_TOP"/><stop offset="1" stop-color="BACK_BOTTOM"/>
   </linearGradient>
   <linearGradient id="curl" x1="0" y1="1" x2="1" y2="0">
     <stop offset="0" stop-color="#fbf5e8"/><stop offset="0.45" stop-color="#e9dfc6"/><stop offset="1" stop-color="#bfb294"/>
@@ -95,28 +130,47 @@ def verso_word(x, y, scale, colour="#6f7486", width=1.8):
             f'stroke-linecap="round" stroke-linejoin="round"><path d="{V}"/><path d="{ERSO}"/></g>')
 
 # The print: a rounded square of photo paper with its bottom right corner folded, and a faint edge so it holds on a
-# light background. Drawn on 8 to 120 and scaled by 128 / 112 to fill the square.
+# background of its own colour. Drawn on 8 to 120 and scaled by 128 / 112 to fill the square.
 PRINT = "M30,8 H98 Q120,8 120,30 V88 L88,120 H30 Q8,120 8,98 V30 Q8,8 30,8 Z"
 
-def icon(design):
-    """The icon with the picture of `design`."""
-    top, bottom, outline = DESIGNS[design]
-    body = LENS
-    if outline:
-        body = body.replace('<circle r="30" fill="#3d3846"/>', f'<circle r="30" fill="{LIGHT_BARREL[0]}"/>')
-        body = body.replace('<circle r="28" fill="#241f31"/>', f'<circle r="28" fill="{LIGHT_BARREL[1]}"/>')
+def look_name(design, night=False, graphite=False):
+    """A look's name, as `app.icon` stores it and its file is named: sand, sand-night, sand-graphite,
+    sand-night-graphite."""
+    return design + ("-night" if night else "") + ("-graphite" if graphite else "")
+
+# Every look, design by design: Day in colour, Night in colour, Day in graphite, Night in graphite.
+LOOKS = [(design, night, graphite) for design in DESIGNS for graphite in (False, True) for night in (False, True)]
+
+def icon(design, night=False, graphite=False):
+    """The icon with the picture of `design`, on Day or Night paper, its lens in colour or in graphite."""
+    top, bottom, outline = (NIGHT if night else DESIGNS)[design]
+    paper = PAPERS["night" if night else "day"]
+    lens_colours = LENSES["graphite" if graphite else "colour"]
+    # A light picture lightens the barrel; every Night picture is dark.
+    rim, inside = lens_colours["light barrel" if outline and not night else "barrel"]
+    ring = lens_colours["ring"].get("night" if night else "day", lens_colours["ring"]["day"])
+    body = LENS.replace("BARREL_RIM", rim).replace("BARREL_INSIDE", inside)
+    for index, colour in enumerate(ring):
+        body = body.replace(f"RING_{index}", colour)
     defs = DEFS.replace("PHOTO_TOP", top).replace("PHOTO_BOTTOM", bottom).replace("LENS_HERE", body)
+    defs = defs.replace("PAPER_TOP", paper["paper"][0]).replace("PAPER_BOTTOM", paper["paper"][1])
+    defs = defs.replace("BACK_TOP", paper["back"][0]).replace("BACK_BOTTOM", paper["back"][1])
+    for index, colour in enumerate(lens_colours["glass"]):
+        defs = defs.replace(f"GLASS_{index}", colour)
     edge = (f'<rect x="18.5" y="18.5" width="91" height="75" rx="9.5" fill="none" stroke="{outline[0]}" '
             f'stroke-opacity="{outline[1]}" stroke-width="1"/>' if outline else "")
     return svg(defs, f'''
 <g transform="translate(-9.142857 -9.142857) scale(1.142857)"><path d="{PRINT}" fill="url(#paper)"/>
-<path d="{PRINT}" fill="none" stroke="#000000" stroke-opacity="0.08" stroke-width="1"/>
+<path d="{PRINT}" fill="none" stroke="{paper["edge"][0]}" stroke-opacity="{paper["edge"][1]}" stroke-width="1"/>
 <rect x="18" y="18" width="92" height="76" rx="10" fill="url(#photo)"/>{edge}{lens(64, 56, 1.1)}
-{verso_word(22, 94.3, 0.64, width=1.5)}
+{verso_word(22, 94.3, 0.64, colour=paper["ink"], width=1.5)}
 <path d="M120,88 L88,120 L88,94 Q88,88 94,88 Z" fill="url(#back)" filter="url(#flapshadow)"/>
 </g>
 ''')
 
-for design in DESIGNS:
-    name = "dev.hviid.Verso.svg" if design == DEFAULT else f"dev.hviid.Verso-{design}.svg"
-    (out / name).write_text(icon(design))
+if __name__ == "__main__":
+    out = pathlib.Path(sys.argv[1])
+    for design, night, graphite in LOOKS:
+        look = look_name(design, night, graphite)
+        name = "dev.hviid.Verso.svg" if look == DEFAULT else f"dev.hviid.Verso-{look}.svg"
+        (out / name).write_text(icon(design, night, graphite))

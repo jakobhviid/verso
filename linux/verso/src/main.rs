@@ -129,9 +129,23 @@ fn load_style() {
             gtk::IconTheme::for_display(&display).add_search_path(icons);
         }
     }
-    // The app icon chosen (`app.icon`): its windows', and the launcher's entry, which an upgrade may have replaced.
-    gtk::Window::set_default_icon_name(&verso_desktop::preferences::app_icon_name());
-    std::thread::spawn(verso_desktop::preferences::apply_app_icon);
+    // The app icon chosen for the style (`app.icon`, `app.icon_dark`): its windows', and the launcher's entry, which an
+    // upgrade may have replaced; again whenever libadwaita's style turns light or dark.
+    let style = adw::StyleManager::default();
+    show_app_icon(style.is_dark());
+    style.connect_dark_notify(|style| show_app_icon(style.is_dark()));
+}
+
+/// The icon the windows, About and the sign-in page show, the look chosen for the window's style now.
+pub fn app_icon_name() -> String {
+    verso_desktop::preferences::app_icon_name(adw::StyleManager::default().is_dark())
+}
+
+/// The look chosen for the style (`dark`) as the windows' icon, and in the launcher's entry, off the main thread.
+fn show_app_icon(dark: bool) {
+    verso_linux::app_icon::set_dark_style(dark);
+    gtk::Window::set_default_icon_name(&verso_desktop::preferences::app_icon_name(dark));
+    std::thread::spawn(move || verso_desktop::preferences::apply_app_icon(dark));
 }
 
 /// The app's keyboard shortcuts: its action, what it does, and its keys. The dialog lists exactly these.
@@ -188,7 +202,7 @@ fn window_of(application: &adw::Application) -> window::Window {
 fn show_about(application: &adw::Application) {
     let about = adw::AboutDialog::builder()
         .application_name("Verso")
-        .application_icon(verso_desktop::preferences::app_icon_name())
+        .application_icon(app_icon_name())
         .developer_name("Jakob Hviid")
         .version(verso_core::product::VERSION)
         .comments(format!("{}\n\n{}", tr("Your Immich photos and videos, on your desktop."), tr(NOTICE)))
@@ -207,6 +221,19 @@ fn show_about(application: &adw::Application) {
         gtk::License::Custom,
         Some(tr("Parts of this project were written with the assistance of AI coding agents. All changes are reviewed by the maintainer.")),
     );
+    // Its icon follows the style while it is open.
+    let style = adw::StyleManager::default();
+    let shown = about.downgrade();
+    let following = std::cell::Cell::new(Some(style.connect_dark_notify(move |_| {
+        if let Some(about) = shown.upgrade() {
+            about.set_application_icon(&app_icon_name());
+        }
+    })));
+    about.connect_closed(move |_| {
+        if let Some(handler) = following.take() {
+            style.disconnect(handler);
+        }
+    });
     about.present(application.active_window().as_ref());
 }
 

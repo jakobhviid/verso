@@ -83,10 +83,10 @@ pub const VERSO: Product = Product {
 pub const WINDOW: &str = "verso";
 
 /// Verso built as a Flatpak (`--features flatpak` on both programs): the same app, names and folders, with what a
-/// sandbox cannot reach left out. The drive is off for good, its settings unread; the app icon is its own, as a
-/// sandboxed app cannot change its launcher.
+/// sandbox cannot reach left out. The drive is off for good, its settings unread; the app icon is its own (Mist, and
+/// Mist Night in the dark style), as a sandboxed app cannot change its launcher.
 pub const VERSO_FLATPAK: Product = Product {
-    hidden_settings: &["mount.enabled", "mount.at_login", "mount.path", "mount.name", "mount.unmount_button", "cache.limit", "thumbnails.sharp", "updates.check", "app.icon"],
+    hidden_settings: &["mount.enabled", "mount.at_login", "mount.path", "mount.name", "mount.unmount_button", "cache.limit", "thumbnails.sharp", "updates.check", "app.icon", "app.icon_dark"],
     sandboxed: true,
     ..VERSO
 };
@@ -119,10 +119,10 @@ impl Product {
         format!("{}-symbolic", self.id)
     }
 
-    /// The app icon of one of its designs (`app.icon`): the product's own for the default, Mist, else the design's
-    /// beside it (`dev.hviid.Verso-sand`).
-    pub fn app_icon(&self, design: &str) -> String {
-        if design == crate::settings::DEFAULT_APP_ICON { self.id.to_owned() } else { format!("{}-{design}", self.id) }
+    /// The app icon of one of its looks (`app.icon`, `app.icon_dark`): the product's own for Mist's Day look in colour,
+    /// else the look's beside it (`dev.hviid.Verso-sand`, `dev.hviid.Verso-mist-night`).
+    pub fn app_icon(&self, look: &str) -> String {
+        if look == crate::settings::DEFAULT_APP_ICON { self.id.to_owned() } else { format!("{}-{look}", self.id) }
     }
 
     /// Whether its windows show the setting `key`.

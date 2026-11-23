@@ -11,12 +11,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: linux/verso-service/src/commands.rs:467
-#: linux/verso-linux/src/daemon.rs:498
+#: linux/verso-linux/src/daemon.rs:506
 msgid "Verso Drive is not mounted"
 msgstr "Verso Drive మౌంట్ చేయబడలేదు"
 
 #: linux/verso-service/src/commands.rs:467
-#: linux/verso-linux/src/daemon.rs:498
+#: linux/verso-linux/src/daemon.rs:506
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "Verso ప్రాధాన్యతలలో డ్రైవ్‌ను ఆన్ చేసి, ఆపై లింక్‌ను మళ్లీ తెరవండి."
 
@@ -28,70 +28,70 @@ msgstr "కీరింగ్ లాక్ అయ్యే ఉంది. మళ�
 msgid "Immich is not mounted"
 msgstr "Immich మౌంట్ చేయబడలేదు"
 
-#: linux/verso-linux/src/daemon.rs:497
+#: linux/verso-linux/src/daemon.rs:505
 msgid "Links from other apps are off"
 msgstr "ఇతర యాప్‌ల నుండి లింక్‌లు ఆఫ్‌లో ఉన్నాయి"
 
-#: linux/verso-linux/src/daemon.rs:497
+#: linux/verso-linux/src/daemon.rs:505
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "ఇతర యాప్‌లు లింక్ చేసేవాటిని చూపించడానికి Verso సెట్టింగ్‌లలో Immich Crosslink ఆన్ చేయండి."
 
-#: linux/verso-linux/src/daemon.rs:499
+#: linux/verso-linux/src/daemon.rs:507
 msgid "A link from another app cannot be opened"
 msgstr "మరొక యాప్ నుండి వచ్చిన లింక్‌ను తెరవడం సాధ్యం కాదు"
 
-#: linux/verso-linux/src/daemon.rs:499
+#: linux/verso-linux/src/daemon.rs:507
 msgid "It is not a valid Immich link."
 msgstr "ఇది చెల్లుబాటు అయ్యే Immich లింక్ కాదు."
 
-#: linux/verso-linux/src/daemon.rs:500
-#: linux/verso-linux/src/daemon.rs:504
+#: linux/verso-linux/src/daemon.rs:508
+#: linux/verso-linux/src/daemon.rs:512
 msgid "Nothing to show"
 msgstr "చూపించడానికి ఏమీ లేదు"
 
-#: linux/verso-linux/src/daemon.rs:500
+#: linux/verso-linux/src/daemon.rs:508
 msgid "Verso Drive has no place for what this link points to."
 msgstr "ఈ లింక్ సూచించే దానికి Verso Driveలో స్థానం లేదు."
 
-#: linux/verso-linux/src/daemon.rs:501
+#: linux/verso-linux/src/daemon.rs:509
 msgid "Not signed in to {host}"
 msgstr "{host}కు సైన్ ఇన్ చేయలేదు"
 
-#: linux/verso-linux/src/daemon.rs:501
+#: linux/verso-linux/src/daemon.rs:509
 msgid "Verso is signed in to another Immich server."
 msgstr "Verso మరొక Immich సర్వర్‌కు సైన్ ఇన్ అయి ఉంది."
 
-#: linux/verso-linux/src/daemon.rs:502
+#: linux/verso-linux/src/daemon.rs:510
 msgid "Another Immich account"
 msgstr "మరొక Immich ఖాతా"
 
-#: linux/verso-linux/src/daemon.rs:502
+#: linux/verso-linux/src/daemon.rs:510
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "ఈ లింక్ Verso సైన్ ఇన్ అయిన ఖాతాకు కాదు, మరొక ఖాతాకు చెందినది."
 
-#: linux/verso-linux/src/daemon.rs:505
+#: linux/verso-linux/src/daemon.rs:513
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "డ్రైవ్ దీన్ని చూపించడం లేదు. ఇది దాచబడి ఉండవచ్చు, ఆఫ్ చేసిన విభాగంలో ఉండవచ్చు, లేదా మీతో షేర్ చేయబడకపోవచ్చు."
 
-#: linux/verso-linux/src/daemon.rs:507
-#: linux/verso-linux/src/daemon.rs:583
+#: linux/verso-linux/src/daemon.rs:515
+#: linux/verso-linux/src/daemon.rs:591
 msgid "Immich is unreachable"
 msgstr "Immich అందుబాటులో లేదు"
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:515
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "Immich సర్వర్ అందుబాటులో లేదు. తర్వాత లింక్‌ను మళ్లీ ప్రయత్నించండి."
 
-#: linux/verso-linux/src/daemon.rs:584
+#: linux/verso-linux/src/daemon.rs:592
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "Immich సర్వర్ అందుబాటులో లేదు. మీరు ఇంతకు ముందు తెరిచిన ఫైల్‌లు అందుబాటులో ఉంటాయి."
 
-#: linux/verso-linux/src/daemon.rs:587
+#: linux/verso-linux/src/daemon.rs:595
 #: linux/verso-linux/src/tray.rs:128
 msgid "Signed out of Immich"
 msgstr "Immich నుండి సైన్ అవుట్ అయ్యారు"
 
-#: linux/verso-linux/src/daemon.rs:588
+#: linux/verso-linux/src/daemon.rs:596
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "Immich ఇకపై ఈ సైన్-ఇన్‌ను అంగీకరించడం లేదు. మళ్లీ సైన్ ఇన్ చేయడానికి {app}ను తెరవండి."
 
@@ -112,12 +112,12 @@ msgid "Files not uploaded: {count}"
 msgstr "అప్‌లోడ్ కాని ఫైల్‌లు: {count}"
 
 #: linux/verso-linux/src/folders.rs:213
-#: shared/verso-core/src/settings.rs:174
+#: shared/verso-core/src/settings.rs:225
 msgid "Make Albums"
 msgstr "ఆల్బమ్‌లను సృష్టించండి"
 
 #: linux/verso-linux/src/folders.rs:213
-#: shared/verso-core/src/settings.rs:173
+#: shared/verso-core/src/settings.rs:224
 msgid "Timeline Only"
 msgstr "టైమ్‌లైన్ మాత్రమే"
 
@@ -198,7 +198,7 @@ msgid "{drive} cannot open “{name}”"
 msgstr "{drive} “{name}”ను తెరవలేకపోయింది"
 
 #: linux/verso-linux/src/notify.rs:73
-#: shared/verso-core/src/settings.rs:195
+#: shared/verso-core/src/settings.rs:246
 msgid "Verso Drive"
 msgstr "Verso Drive"
 
@@ -274,119 +274,126 @@ msgstr "{app} {version} అందుబాటులో ఉంది"
 msgid "Get it from jakob.hviid.phd/verso."
 msgstr "jakob.hviid.phd/verso నుండి డౌన్‌లోడ్ చేయండి."
 
-#: linux/verso-desktop/src/preferences.rs:169
+#: linux/verso-desktop/src/preferences.rs:180
 msgid "Custom ({size})"
 msgstr "అనుకూల ({size})"
 
-#: linux/verso-desktop/src/preferences.rs:182
+#: linux/verso-desktop/src/preferences.rs:193
 msgid "Apps that take part are found by themselves. Turn one off to leave it out of Show in. One not found stays listed for 30 days, so it stays off if it comes back; Forget removes it now."
 msgstr "పాల్గొనే యాప్‌లు వాటంతట అవే కనుగొనబడతాయి. ఒక యాప్‌ను \"…లో చూపించు\" నుండి మినహాయించడానికి దాన్ని ఆఫ్ చేయండి. కనుగొనబడని యాప్ 30 రోజులు జాబితాలో ఉంటుంది, కాబట్టి తిరిగి వచ్చినా ఆఫ్‌లోనే ఉంటుంది; \"మర్చిపో\" దాన్ని ఇప్పుడే తీసివేస్తుంది."
 
-#: linux/verso-desktop/src/preferences.rs:187
+#: linux/verso-desktop/src/preferences.rs:198
 msgid "Apps That Take Part"
 msgstr "పాల్గొనే యాప్‌లు"
 
-#: linux/verso-desktop/src/preferences.rs:197
+#: linux/verso-desktop/src/preferences.rs:208
 msgid "Open photos, albums, people and places in Immich's web app in your browser, or copy their address."
 msgstr "ఫోటోలు, ఆల్బమ్‌లు, వ్యక్తులు, ప్రదేశాలను మీ బ్రౌజర్‌లో Immich వెబ్ యాప్‌లో తెరవండి, లేదా వాటి చిరునామాను కాపీ చేయండి."
 
-#: linux/verso-desktop/src/preferences.rs:198
+#: linux/verso-desktop/src/preferences.rs:209
 msgid "Show photos, albums, people and places in other apps that take part, and show what they send in Verso."
 msgstr "ఫోటోలు, ఆల్బమ్‌లు, వ్యక్తులు, ప్రదేశాలను పాల్గొనే ఇతర యాప్‌లలో చూపించండి, అవి పంపేవాటిని Versoలో చూపించండి."
 
-#: linux/verso-desktop/src/preferences.rs:200
+#: linux/verso-desktop/src/preferences.rs:211
 msgid "Other apps can show photos, albums, people and places in the gallery."
 msgstr "ఇతర యాప్‌లు ఫోటోలు, ఆల్బమ్‌లు, వ్యక్తులు, ప్రదేశాలను గ్యాలరీలో చూపించగలవు."
 
-#: linux/verso-desktop/src/preferences.rs:201
+#: linux/verso-desktop/src/preferences.rs:212
 msgid "Other apps can show them in Files, while the drive is on."
 msgstr "డ్రైవ్ ఆన్‌లో ఉన్నప్పుడు, ఇతర యాప్‌లు వాటిని దస్త్రాలు యాప్‌లో చూపించగలవు."
 
-#: linux/verso-desktop/src/preferences.rs:204
-msgid "The picture on Verso's icon in the app grid, the dash and its windows. The app grid shows a new one from the next login."
-msgstr "యాప్ గ్రిడ్, డాష్, Verso విండోలలో Verso ఐకాన్‌పై ఉన్న చిత్రం. యాప్ గ్రిడ్‌లో కొత్తది తదుపరి లాగిన్ నుండి కనిపిస్తుంది."
-
-#: linux/verso-desktop/src/preferences.rs:240
+#: linux/verso-desktop/src/preferences.rs:248
 msgid "Double-Click Opens"
 msgstr "డబుల్-క్లిక్ చేస్తే తెరిచేది"
 
-#: linux/verso-desktop/src/preferences.rs:241
+#: linux/verso-desktop/src/preferences.rs:249
+#: linux/verso/src/drive_preferences.rs:185
+#: linux/verso/src/drive_preferences.rs:214
 msgid "Colour"
 msgstr "రంగు"
 
-#: linux/verso-desktop/src/preferences.rs:242
-msgid "App Icon"
-msgstr "యాప్ ఐకాన్"
+#: linux/verso-desktop/src/preferences.rs:251
+#: linux/verso-desktop/src/preferences.rs:50
+#: linux/verso-desktop/src/preferences.rs:50
+#: linux/verso-desktop/src/preferences.rs:50
+msgid "Light Style"
+msgstr "లేత శైలి"
 
-#: linux/verso-desktop/src/preferences.rs:56
-#: linux/verso-desktop/src/preferences.rs:56
-#: linux/verso-desktop/src/preferences.rs:56
+#: linux/verso-desktop/src/preferences.rs:252
+#: linux/verso-desktop/src/preferences.rs:50
+#: linux/verso-desktop/src/preferences.rs:50
+msgid "Dark Style"
+msgstr "ముదురు శైలి"
+
+#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:67
 msgid "Location"
 msgstr "స్థానం"
 
-#: linux/verso-desktop/src/preferences.rs:57
-#: linux/verso-desktop/src/preferences.rs:57
-#: linux/verso-desktop/src/preferences.rs:57
+#: linux/verso-desktop/src/preferences.rs:68
+#: linux/verso-desktop/src/preferences.rs:68
+#: linux/verso-desktop/src/preferences.rs:68
 msgid "Name in the Sidebar"
 msgstr "సైడ్‌బార్‌లో పేరు"
 
-#: linux/verso-desktop/src/preferences.rs:66
-#: linux/verso-desktop/src/preferences.rs:66
-#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:77
+#: linux/verso-desktop/src/preferences.rs:77
+#: linux/verso-desktop/src/preferences.rs:77
 msgid "Cache Size"
 msgstr "కాష్ పరిమాణం"
 
-#: linux/verso-desktop/src/preferences.rs:67
-#: linux/verso-desktop/src/preferences.rs:67
-#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:78
+#: linux/verso-desktop/src/preferences.rs:78
+#: linux/verso-desktop/src/preferences.rs:78
 msgid "Sharp Thumbnails"
 msgstr "స్పష్టమైన థంబ్‌నెయిల్‌లు"
 
-#: linux/verso-desktop/src/preferences.rs:74
-#: linux/verso-desktop/src/preferences.rs:74
-#: linux/verso-desktop/src/preferences.rs:74
+#: linux/verso-desktop/src/preferences.rs:85
+#: linux/verso-desktop/src/preferences.rs:85
+#: linux/verso-desktop/src/preferences.rs:85
 msgid "Check for Updates"
 msgstr "నవీకరణల కోసం చూడండి"
 
-#: linux/verso-desktop/src/preferences.rs:89
-#: linux/verso-desktop/src/preferences.rs:89
+#: linux/verso-desktop/src/preferences.rs:100
+#: linux/verso-desktop/src/preferences.rs:100
 msgid "Day Folders"
 msgstr "రోజు ఫోల్డర్‌లు"
 
-#: linux/verso-desktop/src/preferences.rs:90
-#: linux/verso-desktop/src/preferences.rs:91
-#: linux/verso-desktop/src/preferences.rs:92
-#: linux/verso-desktop/src/preferences.rs:93
-#: linux/verso-desktop/src/preferences.rs:94
-#: linux/verso-desktop/src/preferences.rs:90
-#: linux/verso-desktop/src/preferences.rs:91
-#: linux/verso-desktop/src/preferences.rs:92
-#: linux/verso-desktop/src/preferences.rs:93
-#: linux/verso-desktop/src/preferences.rs:94
+#: linux/verso-desktop/src/preferences.rs:101
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:103
+#: linux/verso-desktop/src/preferences.rs:104
+#: linux/verso-desktop/src/preferences.rs:105
+#: linux/verso-desktop/src/preferences.rs:101
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:103
+#: linux/verso-desktop/src/preferences.rs:104
+#: linux/verso-desktop/src/preferences.rs:105
 msgid "Year and Month Folders"
 msgstr "సంవత్సరం, నెల ఫోల్డర్‌లు"
 
-#: linux/verso-desktop/src/preferences.rs:95
-#: linux/verso-desktop/src/preferences.rs:95
+#: linux/verso-desktop/src/preferences.rs:106
+#: linux/verso-desktop/src/preferences.rs:106
 msgid "Folders Copied Into Upload"
 msgstr "Uploadలోకి కాపీ చేసిన ఫోల్డర్‌లు"
 
-#: linux/verso-desktop/src/preferences.rs:102
-#: linux/verso-desktop/src/preferences.rs:102
-#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:113
+#: linux/verso-desktop/src/preferences.rs:113
+#: linux/verso-desktop/src/preferences.rs:113
 msgid "Album Folders"
 msgstr "ఆల్బమ్ ఫోల్డర్‌లు"
 
-#: linux/verso-desktop/src/preferences.rs:102
-#: linux/verso-desktop/src/preferences.rs:102
-#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:113
+#: linux/verso-desktop/src/preferences.rs:113
+#: linux/verso-desktop/src/preferences.rs:113
 msgid "File Names"
 msgstr "ఫైల్ పేర్లు"
 
-#: linux/verso-desktop/src/preferences.rs:117
-#: linux/verso-desktop/src/preferences.rs:117
-#: linux/verso-desktop/src/preferences.rs:117
-#: shared/verso-core/src/settings.rs:82
+#: linux/verso-desktop/src/preferences.rs:128
+#: linux/verso-desktop/src/preferences.rs:128
+#: linux/verso-desktop/src/preferences.rs:128
+#: shared/verso-core/src/settings.rs:131
 msgid "Open in Immich and Copy Immich Link"
 msgstr "Immichలో తెరవండి మరియు Immich లింక్ కాపీ చేయండి"
 
@@ -484,102 +491,142 @@ msgstr "సైన్ ఇన్ అయ్యారు, కానీ మౌంట�
 msgid "Signed in, but the mount did not start: {error}"
 msgstr "సైన్ ఇన్ అయ్యారు, కానీ మౌంట్ ప్రారంభం కాలేదు: {error}"
 
-#: linux/verso-desktop/src/preferences.rs:48
+#: linux/verso-desktop/src/preferences.rs:59
 msgid "General"
 msgstr "సాధారణం"
 
-#: linux/verso-desktop/src/preferences.rs:82
+#: linux/verso-desktop/src/preferences.rs:93
 msgid "Folders"
 msgstr "ఫోల్డర్‌లు"
 
-#: linux/verso-desktop/src/preferences.rs:110
+#: linux/verso-desktop/src/preferences.rs:121
 msgid "Other Apps"
 msgstr "ఇతర యాప్‌లు"
 
-#: linux/verso-desktop/src/preferences.rs:52
+#: linux/verso-desktop/src/preferences.rs:48
+msgid "App Icon"
+msgstr "యాప్ ఐకాన్"
+
+#: linux/verso-desktop/src/preferences.rs:49
+msgid "Verso's icon in the app grid, the dash and its windows, one for the desktop's light style and one for its dark style. The app grid shows a new one from the next login."
+msgstr "యాప్ గ్రిడ్, డాష్, Verso విండోలలో Verso ఐకాన్, డెస్క్‌టాప్ లేత శైలికి ఒకటి, ముదురు శైలికి ఒకటి. యాప్ గ్రిడ్‌లో కొత్తది తదుపరి లాగిన్ నుండి కనిపిస్తుంది."
+
+#: linux/verso-desktop/src/preferences.rs:63
 msgid "Drive"
 msgstr "డ్రైవ్"
 
-#: linux/verso-desktop/src/preferences.rs:58
+#: linux/verso-desktop/src/preferences.rs:69
 msgid "GVfs leaves the drive out of Files' sidebar, and a bookmark takes its place: no unmount button, but a plain folder icon."
 msgstr "GVfs డ్రైవ్‌ను దస్త్రాలు యాప్ సైడ్‌బార్ నుండి తీసివేసి, దాని స్థానంలో ఒక బుక్‌మార్క్‌ను ఉంచుతుంది: అన్‌మౌంట్ బటన్ ఉండదు, కానీ సాధారణ ఫోల్డర్ ఐకాన్ ఉంటుంది."
 
-#: linux/verso-desktop/src/preferences.rs:63
+#: linux/verso-desktop/src/preferences.rs:74
 msgid "Storage"
 msgstr "నిల్వ"
 
-#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:77
 msgid "Opened originals are kept on this computer up to this size."
 msgstr "తెరిచిన అసలు ఫైల్‌లు ఈ కంప్యూటర్‌లో ఈ పరిమాణం వరకు ఉంచబడతాయి."
 
-#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:78
 msgid "Also download larger previews, for big icon sizes. Uses more data."
 msgstr "పెద్ద ఐకాన్‌ల కోసం పెద్ద ప్రివ్యూలను కూడా డౌన్‌లోడ్ చేయి. ఎక్కువ డేటా వాడుతుంది."
 
-#: linux/verso-desktop/src/preferences.rs:72
+#: linux/verso-desktop/src/preferences.rs:83
 msgid "Updates"
 msgstr "అప్‌డేట్‌లు"
 
-#: linux/verso-desktop/src/preferences.rs:74
+#: linux/verso-desktop/src/preferences.rs:85
 msgid "Tell me when a new version is out."
 msgstr "కొత్త వెర్షన్ వచ్చినప్పుడు నాకు తెలియజేయి."
 
-#: linux/verso-desktop/src/preferences.rs:86
+#: linux/verso-desktop/src/preferences.rs:97
 msgid "Sections"
 msgstr "విభాగాలు"
 
-#: linux/verso-desktop/src/preferences.rs:87
+#: linux/verso-desktop/src/preferences.rs:98
 msgid "The folders the drive shows, and how each splits its photos by date."
 msgstr "డ్రైవ్ చూపించే ఫోల్డర్‌లు, ఒక్కొక్కటి తన ఫోటోలను తేదీ ప్రకారం ఎలా విభజిస్తుందో."
 
-#: linux/verso-desktop/src/preferences.rs:89
+#: linux/verso-desktop/src/preferences.rs:100
 msgid "The timeline, by year and month"
 msgstr "టైమ్‌లైన్, సంవత్సరం, నెల వారీగా"
 
-#: linux/verso-desktop/src/preferences.rs:95
+#: linux/verso-desktop/src/preferences.rs:106
 msgid "What is copied into it is uploaded"
 msgstr "ఇందులోకి కాపీ చేసినవి అప్‌లోడ్ అవుతాయి"
 
-#: linux/verso-desktop/src/preferences.rs:100
+#: linux/verso-desktop/src/preferences.rs:111
 msgid "Names"
 msgstr "పేర్లు"
 
-#: linux/verso-desktop/src/preferences.rs:115
+#: linux/verso-desktop/src/preferences.rs:126
 msgid "Immich Web App"
 msgstr "Immich వెబ్ యాప్"
 
-#: linux/verso-desktop/src/preferences.rs:55
-#: linux/verso-desktop/src/preferences.rs:55
+#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:66
 msgid "Mount at Login"
 msgstr "లాగిన్ సమయంలో మౌంట్ చేయి"
 
-#: linux/verso-desktop/src/preferences.rs:58
-#: linux/verso-desktop/src/preferences.rs:58
+#: linux/verso-desktop/src/preferences.rs:69
+#: linux/verso-desktop/src/preferences.rs:69
 msgid "Bookmark Instead of Drive"
 msgstr "డ్రైవ్‌కు బదులుగా బుక్‌మార్క్"
 
-#: linux/verso/src/drive_preferences.rs:267
-#: linux/verso/src/drive_preferences.rs:271
+#: linux/verso/src/drive_preferences.rs:182
+msgid "{picture}, {paper}, {lens}"
+msgstr "{picture}, {paper}, {lens}"
+
+#: linux/verso/src/drive_preferences.rs:184
+#: linux/verso/src/drive_preferences.rs:211
+msgid "Night"
+msgstr "రాత్రి"
+
+#: linux/verso/src/drive_preferences.rs:184
+#: linux/verso/src/drive_preferences.rs:211
+msgid "Day"
+msgstr "పగలు"
+
+#: linux/verso/src/drive_preferences.rs:185
+#: linux/verso/src/drive_preferences.rs:214
+msgid "Graphite"
+msgstr "గ్రాఫైట్"
+
+#: linux/verso/src/drive_preferences.rs:206
+msgid "Picture"
+msgstr "చిత్రం"
+
+#: linux/verso/src/drive_preferences.rs:212
+#: shared/verso-core/src/settings.rs:233
+msgid "Paper"
+msgstr "కాగితం"
+
+#: linux/verso/src/drive_preferences.rs:215
+msgid "Lens"
+msgstr "లెన్స్"
+
+#: linux/verso/src/drive_preferences.rs:330
+#: linux/verso/src/drive_preferences.rs:334
 msgid "Choose a Folder"
 msgstr "ఫోల్డర్‌ను ఎంచుకోండి"
 
-#: linux/verso/src/drive_preferences.rs:302
+#: linux/verso/src/drive_preferences.rs:365
 msgid "Learn More"
 msgstr "మరింత తెలుసుకోండి"
 
-#: linux/verso/src/drive_preferences.rs:337
+#: linux/verso/src/drive_preferences.rs:400
 msgid "Not found"
 msgstr "కనబడలేదు"
 
-#: linux/verso/src/drive_preferences.rs:338
+#: linux/verso/src/drive_preferences.rs:401
 msgid "Forget"
 msgstr "మర్చిపో"
 
-#: linux/verso/src/drive_preferences.rs:365
+#: linux/verso/src/drive_preferences.rs:428
 msgid "No other app that takes part is installed."
 msgstr "పాల్గొనే మరే యాప్ ఇన్‌స్టాల్ కాలేదు."
 
-#: linux/verso/src/drive_preferences.rs:366
+#: linux/verso/src/drive_preferences.rs:429
 msgid "Find Apps That Take Part"
 msgstr "పాల్గొనే యాప్‌లను కనుగొనండి"
 
@@ -608,216 +655,216 @@ msgstr "{app} ఇకపై ఇన్‌స్టాల్ అయి లేదు
 msgid "Verso could not open {app}: {error}"
 msgstr "Verso {app}ను తెరవలేకపోయింది: {error}"
 
-#: shared/verso-core/src/settings.rs:57
+#: shared/verso-core/src/settings.rs:106
 msgid "The Immich server; /api is added"
 msgstr "Immich సర్వర్; /api జోడించబడుతుంది"
 
-#: shared/verso-core/src/settings.rs:58
+#: shared/verso-core/src/settings.rs:107
 msgid "Show the library as a drive in the file manager"
 msgstr "లైబ్రరీని ఫైల్ మేనేజర్‌లో డ్రైవ్‌గా చూపించు"
 
-#: shared/verso-core/src/settings.rs:59
+#: shared/verso-core/src/settings.rs:108
 msgid "Where the mount appears"
 msgstr "మౌంట్ ఎక్కడ కనిపిస్తుంది"
 
-#: shared/verso-core/src/settings.rs:60
+#: shared/verso-core/src/settings.rs:109
 msgid "The drive's name in the sidebar"
 msgstr "సైడ్‌బార్‌లో డ్రైవ్ పేరు"
 
-#: shared/verso-core/src/settings.rs:61
+#: shared/verso-core/src/settings.rs:110
 msgid "Mount when the session starts"
 msgstr "సెషన్ ప్రారంభమైనప్పుడు మౌంట్ చేయి"
 
-#: shared/verso-core/src/settings.rs:62
+#: shared/verso-core/src/settings.rs:111
 msgid "List the drive in Files' sidebar as a drive, with its unmount button; off, as a bookmark"
 msgstr "దస్త్రాలు యాప్ సైడ్‌బార్‌లో డ్రైవ్‌ను అన్‌మౌంట్ బటన్‌తో డ్రైవ్‌గా చూపించు; ఆఫ్ చేస్తే, బుక్‌మార్క్‌గా"
 
-#: shared/verso-core/src/settings.rs:63
+#: shared/verso-core/src/settings.rs:112
 msgid "Show the Photos section"
 msgstr "Photos విభాగాన్ని చూపించు"
 
-#: shared/verso-core/src/settings.rs:64
+#: shared/verso-core/src/settings.rs:113
 msgid "Show the Albums section"
 msgstr "Albums విభాగాన్ని చూపించు"
 
-#: shared/verso-core/src/settings.rs:65
+#: shared/verso-core/src/settings.rs:114
 msgid "Show the People section"
 msgstr "People విభాగాన్ని చూపించు"
 
-#: shared/verso-core/src/settings.rs:66
+#: shared/verso-core/src/settings.rs:115
 msgid "Show the Places section"
 msgstr "Places విభాగాన్ని చూపించు"
 
-#: shared/verso-core/src/settings.rs:67
+#: shared/verso-core/src/settings.rs:116
 msgid "Show the Favorites section"
 msgstr "Favorites విభాగాన్ని చూపించు"
 
-#: shared/verso-core/src/settings.rs:68
+#: shared/verso-core/src/settings.rs:117
 msgid "Show the Archive section"
 msgstr "Archive విభాగాన్ని చూపించు"
 
-#: shared/verso-core/src/settings.rs:69
+#: shared/verso-core/src/settings.rs:118
 msgid "Day folders inside months"
 msgstr "నెలల లోపల రోజు ఫోల్డర్‌లు"
 
-#: shared/verso-core/src/settings.rs:70
+#: shared/verso-core/src/settings.rs:119
 msgid "Year and month folders inside albums"
 msgstr "ఆల్బమ్‌ల లోపల సంవత్సరం, నెల ఫోల్డర్‌లు"
 
-#: shared/verso-core/src/settings.rs:71
+#: shared/verso-core/src/settings.rs:120
 msgid "Year and month folders inside people"
 msgstr "వ్యక్తుల లోపల సంవత్సరం, నెల ఫోల్డర్‌లు"
 
-#: shared/verso-core/src/settings.rs:72
+#: shared/verso-core/src/settings.rs:121
 msgid "Year and month folders inside cities"
 msgstr "నగరాల లోపల సంవత్సరం, నెల ఫోల్డర్‌లు"
 
-#: shared/verso-core/src/settings.rs:73
+#: shared/verso-core/src/settings.rs:122
 msgid "Year and month folders inside favorites"
 msgstr "ఇష్టమైనవాటి లోపల సంవత్సరం, నెల ఫోల్డర్‌లు"
 
-#: shared/verso-core/src/settings.rs:74
+#: shared/verso-core/src/settings.rs:123
 msgid "Year and month folders inside the archive"
 msgstr "ఆర్కైవ్ లోపల సంవత్సరం, నెల ఫోల్డర్‌లు"
 
-#: shared/verso-core/src/settings.rs:75
+#: shared/verso-core/src/settings.rs:124
 msgid "How album folders are named and grouped"
 msgstr "ఆల్బమ్ ఫోల్డర్‌లకు పేర్లు ఎలా పెట్టాలి, ఎలా గ్రూప్ చేయాలి"
 
-#: shared/verso-core/src/settings.rs:76
+#: shared/verso-core/src/settings.rs:125
 msgid "How files are named"
 msgstr "ఫైల్‌లకు పేర్లు ఎలా పెట్టాలి"
 
-#: shared/verso-core/src/settings.rs:77
+#: shared/verso-core/src/settings.rs:126
 msgid "The content cache's size limit"
 msgstr "కంటెంట్ కాష్ పరిమాణ పరిమితి"
 
-#: shared/verso-core/src/settings.rs:78
+#: shared/verso-core/src/settings.rs:127
 msgid "Show the Upload folder, and upload what is copied into it"
 msgstr "Upload ఫోల్డర్‌ను చూపించు, అందులోకి కాపీ చేసిన వాటిని అప్‌లోడ్ చేయి"
 
-#: shared/verso-core/src/settings.rs:79
+#: shared/verso-core/src/settings.rs:128
 msgid "Folders copied into Upload"
 msgstr "Uploadలోకి కాపీ చేసిన ఫోల్డర్‌లు"
 
-#: shared/verso-core/src/settings.rs:80
+#: shared/verso-core/src/settings.rs:129
 msgid "Also seed 1024 px thumbnails from the preview"
 msgstr "ప్రివ్యూ నుండి 1024 px థంబ్‌నెయిల్‌లను కూడా సృష్టించు"
 
-#: shared/verso-core/src/settings.rs:81
+#: shared/verso-core/src/settings.rs:130
 msgid "Refuse thumbnailer reads of originals"
 msgstr "థంబ్‌నెయిలర్‌లు ఒరిజినల్‌లను చదవడాన్ని నిరాకరించు"
 
-#: shared/verso-core/src/settings.rs:83
+#: shared/verso-core/src/settings.rs:132
 msgid "What a double click on Verso's top bar icon opens"
 msgstr "Verso టాప్ బార్ ఐకాన్‌పై డబుల్-క్లిక్ చేస్తే తెరిచేది"
 
-#: shared/verso-core/src/settings.rs:84
+#: shared/verso-core/src/settings.rs:133
 msgid "Verso's top bar icon in colour: the lens's five colours, grey while the server cannot be reached"
 msgstr "Verso టాప్ బార్ ఐకాన్ రంగులో: లెన్స్ యొక్క ఐదు రంగులు, సర్వర్ అందుబాటులో లేనప్పుడు బూడిద రంగు"
 
-#: shared/verso-core/src/settings.rs:85
-msgid "Verso's app icon, by the picture on its print"
-msgstr "Verso యాప్ ఐకాన్, దాని ప్రింట్‌పై ఉన్న చిత్రం ప్రకారం"
+#: shared/verso-core/src/settings.rs:134
+msgid "Verso's app icon in the light style: the picture on its print, its paper and its lens"
+msgstr "లేత శైలిలో Verso యాప్ ఐకాన్: దాని ప్రింట్‌పై ఉన్న చిత్రం, కాగితం, లెన్స్"
 
-#: shared/verso-core/src/settings.rs:86
+#: shared/verso-core/src/settings.rs:135
+msgid "Verso's app icon in the dark style: the picture on its print, its paper and its lens"
+msgstr "ముదురు శైలిలో Verso యాప్ ఐకాన్: దాని ప్రింట్‌పై ఉన్న చిత్రం, కాగితం, లెన్స్"
+
+#: shared/verso-core/src/settings.rs:136
 msgid "Show what other apps link to (Immich Crosslink)"
 msgstr "ఇతర యాప్‌లు లింక్ చేసేవాటిని చూపించు (Immich Crosslink)"
 
-#: shared/verso-core/src/settings.rs:87
+#: shared/verso-core/src/settings.rs:137
 msgid "Verso: take part as Verso Gallery, so other apps show items in it"
 msgstr "Verso: Verso Galleryగా పాల్గొను, తద్వారా ఇతర యాప్‌లు అందులో అంశాలను చూపించగలవు"
 
-#: shared/verso-core/src/settings.rs:88
+#: shared/verso-core/src/settings.rs:138
 msgid "Verso: take part as Verso Drive, so other apps show items in Files while the drive is on"
 msgstr "Verso: Verso Driveగా పాల్గొను, తద్వారా డ్రైవ్ ఆన్‌లో ఉన్నప్పుడు ఇతర యాప్‌లు దస్త్రాలు యాప్‌లో అంశాలను చూపించగలవు"
 
-#: shared/verso-core/src/settings.rs:89
+#: shared/verso-core/src/settings.rs:139
 msgid "Apps left out of Show in, by their desktop entry or bundle id, separated by ;"
 msgstr "\"చూపించు\" నుండి మినహాయించిన యాప్‌లు, డెస్క్‌టాప్ ఎంట్రీ లేదా బండిల్ ఐడితో, ; తో వేరుచేసి"
 
-#: shared/verso-core/src/settings.rs:90
+#: shared/verso-core/src/settings.rs:140
 msgid "Tell me when a new version is out"
 msgstr "కొత్త వెర్షన్ వచ్చినప్పుడు నాకు తెలియజేయి"
 
-#: shared/verso-core/src/settings.rs:91
+#: shared/verso-core/src/settings.rs:141
 msgid "Headless only: a 0600 file holding the credential"
 msgstr "హెడ్‌లెస్ మాత్రమే: క్రెడెన్షియల్‌ను కలిగి ఉండే 0600 ఫైల్"
 
-#: shared/verso-core/src/settings.rs:164
+#: shared/verso-core/src/settings.rs:215
 msgid "Never"
 msgstr "ఎప్పుడూ వద్దు"
 
-#: shared/verso-core/src/settings.rs:165
+#: shared/verso-core/src/settings.rs:216
 msgid "From 500 Items"
 msgstr "500 అంశాల నుండి"
 
-#: shared/verso-core/src/settings.rs:166
+#: shared/verso-core/src/settings.rs:217
 msgid "Always"
 msgstr "ఎల్లప్పుడూ"
 
-#: shared/verso-core/src/settings.rs:167
+#: shared/verso-core/src/settings.rs:218
 msgid "Year in the Name (2023 - Trip)"
 msgstr "పేరులో సంవత్సరం (2023 - ప్రయాణం)"
 
-#: shared/verso-core/src/settings.rs:168
+#: shared/verso-core/src/settings.rs:219
 msgid "Year Folders (2023/Trip)"
 msgstr "సంవత్సరం ఫోల్డర్‌లు (2023/ప్రయాణం)"
 
-#: shared/verso-core/src/settings.rs:169
+#: shared/verso-core/src/settings.rs:220
 msgid "Name Only (Trip)"
 msgstr "పేరు మాత్రమే (ప్రయాణం)"
 
-#: shared/verso-core/src/settings.rs:170
+#: shared/verso-core/src/settings.rs:221
 msgid "Date and Time Taken"
 msgstr "తీసిన తేదీ, సమయం"
 
-#: shared/verso-core/src/settings.rs:171
+#: shared/verso-core/src/settings.rs:222
 msgid "Original File Names"
 msgstr "అసలు ఫైల్ పేర్లు"
 
-#: shared/verso-core/src/settings.rs:172
+#: shared/verso-core/src/settings.rs:223
 msgid "Ask Each Time"
 msgstr "ప్రతిసారి అడగండి"
 
-#: shared/verso-core/src/settings.rs:176
-#: shared/verso-core/src/settings.rs:196
+#: shared/verso-core/src/settings.rs:227
+#: shared/verso-core/src/settings.rs:247
 msgid "Verso"
 msgstr "Verso"
 
-#: shared/verso-core/src/settings.rs:177
+#: shared/verso-core/src/settings.rs:228
 msgid "Verso Drive in Files"
 msgstr "దస్త్రాలు యాప్‌లో Verso Drive"
 
-#: shared/verso-core/src/settings.rs:178
+#: shared/verso-core/src/settings.rs:229
 msgid "Preferences"
 msgstr "ప్రాధాన్యతలు"
 
-#: shared/verso-core/src/settings.rs:179
+#: shared/verso-core/src/settings.rs:230
 msgid "Mist"
 msgstr "పొగమంచు"
 
-#: shared/verso-core/src/settings.rs:180
+#: shared/verso-core/src/settings.rs:231
 msgid "Sand"
 msgstr "ఇసుక"
 
-#: shared/verso-core/src/settings.rs:181
+#: shared/verso-core/src/settings.rs:232
 msgid "Dark"
 msgstr "ముదురు"
 
-#: shared/verso-core/src/settings.rs:182
-msgid "Paper"
-msgstr "కాగితం"
-
-#: shared/verso-core/src/settings.rs:183
+#: shared/verso-core/src/settings.rs:234
 msgid "Frame"
 msgstr "ఫ్రేమ్"
 
-#: shared/verso-core/src/settings.rs:184
+#: shared/verso-core/src/settings.rs:235
 msgid "Slate"
 msgstr "స్లేట్"
 
-#: shared/verso-core/src/settings.rs:185
+#: shared/verso-core/src/settings.rs:236
 msgid "Sky"
 msgstr "ఆకాశం"
 

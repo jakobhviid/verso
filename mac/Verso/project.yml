@@ -88,10 +88,10 @@ targets:
         # Empty in a development build, signed automatically.
         PROVISIONING_PROFILE_SPECIFIER: $(APP_PROFILE)
         ASSETCATALOG_COMPILER_APPICON_NAME: $(APP_ICON)
-        # The app icon's six other designs, the PNG sets of this build's own (AppIcon-Sand, or AppIconDev-Sand in
-        # Verso Dev), which Settings puts in the Dock while Verso runs (AppIconChoice.swift). Only the sets named are
-        # compiled, so a release carries none of Verso Dev's.
-        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: $(APP_ICON)-Sand $(APP_ICON)-Dark $(APP_ICON)-Paper $(APP_ICON)-Frame $(APP_ICON)-Slate $(APP_ICON)-Sky
+        # The app icon's 27 other looks, the PNG sets of this build's own (AppIcon-SandNight, or AppIconDev-SandNight
+        # in Verso Dev), which Settings puts in the Dock while Verso runs (AppIconChoice.swift). Only the sets named
+        # are compiled, so a release carries none of Verso Dev's.
+        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: $(APP_ICON)-MistNight $(APP_ICON)-MistGraphite $(APP_ICON)-MistNightGraphite $(APP_ICON)-Sand $(APP_ICON)-SandNight $(APP_ICON)-SandGraphite $(APP_ICON)-SandNightGraphite $(APP_ICON)-Dark $(APP_ICON)-DarkNight $(APP_ICON)-DarkGraphite $(APP_ICON)-DarkNightGraphite $(APP_ICON)-Paper $(APP_ICON)-PaperNight $(APP_ICON)-PaperGraphite $(APP_ICON)-PaperNightGraphite $(APP_ICON)-Frame $(APP_ICON)-FrameNight $(APP_ICON)-FrameGraphite $(APP_ICON)-FrameNightGraphite $(APP_ICON)-Slate $(APP_ICON)-SlateNight $(APP_ICON)-SlateGraphite $(APP_ICON)-SlateNightGraphite $(APP_ICON)-Sky $(APP_ICON)-SkyNight $(APP_ICON)-SkyGraphite $(APP_ICON)-SkyNightGraphite
         COMBINE_HIDPI_IMAGES: YES
         ENABLE_PREVIEWS: YES
     dependencies:

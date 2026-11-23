@@ -196,6 +196,11 @@ JPEGs: `fixtures`, then `open <name> <dir>` (cold cache, settle, screenshot, who
   `new-window`).
 - **Harmless noise:** "Error registering session with GDM", and `xdg-desktop-portal` failing because
   `graphical-session.target` is inactive.
+- **The light and dark style need the portal,** which does not start there: without it libadwaita does not follow
+  `gsettings set org.gnome.desktop.interface color-scheme prefer-dark`, and Verso's service hears no change of colour
+  scheme (`app.icon_dark`). Start it by hand in the session, `run-in-session.sh -d
+  /usr/libexec/xdg-desktop-portal-gnome` then `run-in-session.sh -d /usr/libexec/xdg-desktop-portal --replace`, before
+  Verso; a window started earlier keeps its style.
 
 ## README screenshots
 

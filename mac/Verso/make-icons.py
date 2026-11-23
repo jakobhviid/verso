@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""Verso's macOS app icon, from Verso's own drawing (linux/packaging/icons/dev.hviid.Verso.svg, Mist, the app's design):
-the print, the lens with its five-colour ring in its picture, Verso written by hand on its strip and its corner turned
-over, filling Apple's rounded square. Writes, beside this script:
+"""Verso's macOS app icon, from Verso's own drawing (linux/packaging/icons/dev.hviid.Verso.svg, Mist on Day paper in
+colour, the app's look, and dev.hviid.Verso-mist-night.svg, its Night look): the print, the lens with its five-colour
+ring in its picture, Verso written by hand on its strip and its corner turned over, filling Apple's rounded square.
+The light appearance is the Day look, the dark appearance the Night look. Writes, beside this script:
 
 - Verso/Assets.xcassets/AppIcon.appiconset: every size its Contents.json lists, for macOS 14 and 15, on Apple's 1024
   grid (the square 824 wide at 100, 100, with the drop shadow macOS icons carry), rendered with rsvg-convert
+- Verso/Assets.xcassets/AppIcon-MistNight.appiconset: the same of the Night look, which Settings puts in the Dock
+  where the bundle's own icon does not show it (AppIconChoice.swift)
 - Verso/AppIcon.icon: the Icon Composer document macOS 26 and later show, the same drawing in layers the system
-  lights, with a light and a dark appearance; tinted and clear are the system's, made from these
+  lights, with a light appearance, Day, and a dark one, Night; tinted and clear are the system's, made from these
 - Verso/Assets.xcassets/SidebarSymbol.symbolset: Finder's sidebar symbol for Verso Drive, the lens (make-symbol.py)
 - Verso/Assets.xcassets/MenuBarIcon*.imageset: the menu bar icon in each of its states, the lens in colour
   (make-menu-bar-icon.py)
@@ -27,18 +30,21 @@ over, filling Apple's rounded square. Writes, beside this script:
   which is blue with DEV on it in white, into AppIconDev.appiconset, AppIconDev.icon and AppIconDevImage.imageset.
   The small icons, the lens alone (the sidebar symbol, the menu bar's, Messages'), are the same in the Dev build: its
   app icon and its name tell the two apart
-- with --design <name>, the app icon with another of the picture's designs (DESIGNS, drawn by
-  linux/packaging/icons/sources/app-icon.py as dev.hviid.Verso-<name>.svg), release or Dev, an alternate icon of the
-  apps (ARCHITECTURE.md, "The app icon's designs on the Mac, the iPhone and the iPad"), under the same names with
-  -<Name> after them: the Mac's AppIcon-Sand.appiconset, which Settings puts in the Dock; the iOS app's
-  ios/Verso/Assets.xcassets/AppIcon-Sand.appiconset, one opaque 1024 picture edge to edge, light and dark, which iOS
-  rounds and makes its tinted and clear icons from (an Icon Composer document as an alternate icon compiles to three
-  flattened 1024 pictures for each of the iPhone and the iPad, twelve times the size); and AppIcon-SandImage.imageset,
-  the picture the iOS app's choice shows; or AppIconDev-Sand.appiconset and so on with --dev. The small icons are not
-  written: they are the same for every design
-- with --preview <file.png>, a sheet of both icons (of the design given, else Mist) at 1024, 128, 32 and 16 pixels,
-  light and dark, the sidebar symbol, and the menu bar icons on a light and a dark menu bar, for looking at them; it
-  writes nothing else
+- with --design <name>, and --graphite for its monochrome lens, the app icon with another of the picture's designs
+  or lenses (DESIGNS, drawn by linux/packaging/icons/sources/app-icon.py as dev.hviid.Verso-<look>.svg in its Day and
+  Night looks), release or Dev, the apps' alternate icons (ARCHITECTURE.md, "The app icon's designs on the Mac, the
+  iPhone and the iPad"), under the same names with the look's after them: the Mac's PNG set of each look, which
+  Settings puts in the Dock, AppIcon-Sand.appiconset and AppIcon-SandNight.appiconset (AppIcon-SandGraphite and
+  AppIcon-SandNightGraphite with --graphite); the iOS app's ios/Verso/Assets.xcassets/AppIcon-Sand.appiconset, one
+  opaque 1024 picture edge to edge, Day as its light appearance and Night as its dark one, which iOS rounds and makes
+  its tinted and clear icons from (an Icon Composer document as an alternate icon compiles to three flattened 1024
+  pictures for each of the iPhone and the iPad, twelve times the size); and AppIcon-SandImage.imageset, the picture
+  the iOS app's choice shows, Day and Night; or AppIconDev-Sand.appiconset and so on with --dev. The small icons are
+  not written: they are the same for every design
+- with --all, every design in colour and in graphite, release and Dev, and the small icons: the whole family again
+- with --preview <file.png>, a sheet of both icons (of the design and lens given, else Mist in colour) at 1024, 128,
+  32 and 16 pixels, Day and Night, the sidebar symbol, and the menu bar icons on a light and a dark menu bar, for
+  looking at them; it writes nothing else
 
 What changes from the Linux drawing, so the print sits in the Mac's shape:
 - The print takes Apple's rounded square and its corners; the picture's corners grow to stay concentric with them.
@@ -53,10 +59,11 @@ dark as the lens has it on its own: a light picture lightens the barrel only aga
 The PNGs are committed, since the Mac has no SVG renderer to make them. Needs python3 and rsvg-convert (the Fedora
 toolbox has both); run it again when the drawing changes:
 
+    mac/Verso/make-icons.py --all              every icon below, as a change to the drawing needs
     mac/Verso/make-icons.py
     mac/Verso/make-icons.py --dev
-    mac/Verso/make-icons.py --design sand [--dev]
-    mac/Verso/make-icons.py --preview mac/Verso/build/icon-preview.png [--design sand]
+    mac/Verso/make-icons.py --design sand [--graphite] [--dev]
+    mac/Verso/make-icons.py --preview mac/Verso/build/icon-preview.png [--design sand] [--graphite]
     mac/Verso/make-icons.py --lens          the Live Activity's lens alone, as the release run also writes it
 """
 
@@ -76,7 +83,9 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 DRAWINGS = ROOT / "linux" / "packaging" / "icons"
-# The picture's designs, as linux/packaging/icons/sources/app-icon.py draws them: Mist, the app's, first.
+# The picture's designs, as linux/packaging/icons/sources/app-icon.py draws them: Mist, the app's, first. Each comes
+# on Day and Night paper, with its lens in colour or in graphite (a look: sand, sand-night, sand-graphite,
+# sand-night-graphite).
 DESIGNS = ("mist", "sand", "dark", "paper", "frame", "slate", "sky")
 DEFAULT_DESIGN = "mist"
 # The lens of the small icons: a dark picture's, whose barrel is the lens's own dark.
@@ -115,21 +124,13 @@ MESSAGES_IMAGES = (
 LENS_RADIUS = 30
 LENS_COLOURS_RADIUS = 27.6
 
-PALETTE = {
-    # The print's paper, its back, and what it lies on under the turned corner, as gradients (top, bottom).
-    "release": {
-        "light": {"paper": ("#ffffff", "#e6e4e0"), "back": ("#f6efdf", "#d8ccb0"), "under": ("#9a9996", "#c0bfbc"),
-                  "ink": "#6f7486"},
-        "dark": {"paper": ("#525155", "#333236"), "back": ("#b5ab94", "#857a62"), "under": ("#1d1c20", "#2c2b2f"),
-                 "ink": "#c4c8d4"},
-    },
-}
+# What the print lies on, beneath the turned corner, as a gradient (top, bottom), in the light appearance (the Day
+# look) and the dark one (the Night look). The print's own colours, its paper, its back and the word's ink, are the
+# drawing's, Day's or Night's.
+UNDER = {"light": ("#9a9996", "#c0bfbc"), "dark": ("#1d1c20", "#2c2b2f")}
 # The development build is the release in every colour but one (the maintainer's choice): the turned
 # corner's back is blue, with DEV on it in white. What shows beneath the corner and its shadow stay the release's.
-PALETTE["dev"] = {
-    "light": {**PALETTE["release"]["light"], "back": ("#8ec5ff", "#3f8cf0")},
-    "dark": {**PALETTE["release"]["dark"], "back": ("#1f4f99", "#14356b")},
-}
+DEV_BACK = {"light": ("#8ec5ff", "#3f8cf0"), "dark": ("#1f4f99", "#14356b")}
 DEV_LETTERS = "#ffffff"
 # The turned corner's tip, rounded by half the square's corner: rounder than the Linux drawing's, in the Mac's way, but
 # not the whole corner mirrored, which made the flap and what shows beneath it one lemon shape.
@@ -147,6 +148,11 @@ class Drawing:
         self.gradients = {name: re.search(rf'<(linear|radial)Gradient id="{name}".*?</\1Gradient>', defs,
                                           flags=re.S).group(0)
                           for name in ("glass", "photo")}
+        # The print's paper and the back of its turned corner, as their gradients' two stops (Day's or Night's).
+        self.paper, self.back = (
+            re.search(rf'<linearGradient id="{name}"[^>]*>\s*<stop offset="0" stop-color="(#[0-9a-fA-F]+)"/>'
+                      rf'<stop offset="1" stop-color="(#[0-9a-fA-F]+)"/>', defs).groups()
+            for name in ("paper", "back"))
         lens = re.search(r'<g id="lens">(.*?)</g>', defs, flags=re.S).group(1).strip()
         glass_start = lens.index('<circle r="18"')
         self.lens_ring, self.lens_glass = lens[:glass_start], lens[glass_start:]
@@ -167,9 +173,10 @@ class Drawing:
                                source).groups()
         self.lens_x, self.lens_y, self.lens_scale = map(float, lens_place)
         word = re.search(r'<g transform="translate\(([\d.]+) ([\d.]+)\) scale\(([\d.]+)\)" fill="none" '
-                         r'stroke="#[0-9a-fA-F]+" stroke-width="([\d.]+)"[^>]*>(.*?)</g>', source, flags=re.S)
-        self.word_x, self.word_y, self.word_scale, self.word_stroke = map(float, word.groups()[:4])
-        self.word_paths = re.findall(r'<path d="([^"]+)"/>', word.group(5))
+                         r'stroke="(#[0-9a-fA-F]+)" stroke-width="([\d.]+)"[^>]*>(.*?)</g>', source, flags=re.S)
+        self.word_x, self.word_y, self.word_scale = map(float, word.groups()[:3])
+        self.ink, self.word_stroke = word.group(4), float(word.group(5))
+        self.word_paths = re.findall(r'<path d="([^"]+)"/>', word.group(6))
 
     @property
     def side(self):
@@ -186,13 +193,14 @@ def gradient(name, colours, x2=0, y2=1):
 
 
 class Parts:
-    """The icon's parts as SVG, in the drawing's coordinates, for one build (release or dev), appearance (light or
-    dark) and size (small or not)."""
+    """The icon's parts as SVG, in the drawing's coordinates, for one look's drawing, build (release or dev),
+    appearance (light for a Day look, dark for a Night one) and size (small or not)."""
 
     def __init__(self, drawing, build, appearance, small=False):
         self.drawing = drawing
         self.build = build
-        self.colours = PALETTE[build][appearance]
+        self.colours = {"paper": drawing.paper, "back": DEV_BACK[appearance] if build == "dev" else drawing.back,
+                        "under": UNDER[appearance], "ink": drawing.ink}
         self.small = small
         # Apple's corner in the drawing's units: the print is the rounded square.
         self.radius = TILE_RADIUS / TILE_SIDE * drawing.side
@@ -417,19 +425,20 @@ def layer(drawing, defs_and_body):
             f'<g transform="{placement(drawing, 0, CANVAS)}">{body}</g>\n</svg>\n')
 
 
-def composer_assets(drawing, build):
-    """The Icon Composer document's layers, by file name: those that change with the appearance in both."""
+def composer_assets(day, night, build):
+    """The Icon Composer document's layers, by file name: those that change with the appearance in both, Day's in the
+    light and Night's in the dark (the picture, the lens's barrel, which a light picture lightens, the word, the turned
+    corner and what shows beneath it); the lens's glass is the same in both."""
     assets = {}
-    for appearance in ("light", "dark"):
+    for appearance, drawing in (("light", day), ("dark", night)):
         suffix = "" if appearance == "light" else "-dark"
         parts = Parts(drawing, build, appearance)
         assets[f"corner{suffix}.svg"] = layer(drawing, parts.flap(filtered=False))
         assets[f"under{suffix}.svg"] = layer(drawing, parts.under())
         assets[f"word{suffix}.svg"] = layer(drawing, parts.word())
-    parts = Parts(drawing, build, "light")
-    assets["photo.svg"] = layer(drawing, parts.photo())
-    assets["lens-ring.svg"] = layer(drawing, parts.lens("ring"))
-    assets["lens-glass.svg"] = layer(drawing, parts.lens("glass"))
+        assets[f"photo{suffix}.svg"] = layer(drawing, parts.photo())
+        assets[f"lens-ring{suffix}.svg"] = layer(drawing, parts.lens("ring"))
+    assets["lens-glass.svg"] = layer(day, Parts(day, build, "light").lens("glass"))
     return assets
 
 
@@ -443,12 +452,12 @@ def by_appearance(name, file):
         {"value": f"{file}.svg"}, {"appearance": "dark", "value": f"{file}-dark.svg"}], "glass": False}
 
 
-def composer_document(build):
-    """icon.json: the paper is the document's background, in a light and a dark gradient; the turned corner, the
-    lens, the print's picture and word, and what shows beneath the corner are groups over it, front first. The lens's
-    glass is a glass layer, so the system's glass and lighting play on it."""
+def composer_document(day, night):
+    """icon.json: the paper is the document's background, in a light gradient (Day's) and a dark one (Night's); the
+    turned corner, the lens, the print's picture and word, and what shows beneath the corner are groups over it, front
+    first. The lens's glass is a glass layer, so the system's glass and lighting play on it."""
     def paper(appearance):
-        colours = PALETTE[build][appearance]["paper"]
+        colours = (day if appearance == "light" else night).paper
         value = {"linear-gradient": [srgb(colours[0]), srgb(colours[1])],
                  "orientation": {"start": {"x": 0.5, "y": 0}, "stop": {"x": 0.5, "y": 1}}}
         return {"value": value} if appearance == "light" else {"appearance": appearance, "value": value}
@@ -462,14 +471,13 @@ def composer_document(build):
                 "name": "Lens",
                 "layers": [
                     {"name": "Glass", "image-name": "lens-glass.svg", "glass": True},
-                    {"name": "Ring", "image-name": "lens-ring.svg", "glass": False},
+                    by_appearance("Ring", "lens-ring"),
                 ],
                 "lighting": "individual",
                 "shadow": {"kind": "neutral", "opacity": 0.5},
                 "translucency": {"enabled": False, "value": 0.5},
             },
-            {"name": "Print", "layers": [by_appearance("Word", "word"),
-                                         {"name": "Picture", "image-name": "photo.svg", "glass": False}], **flat},
+            {"name": "Print", "layers": [by_appearance("Word", "word"), by_appearance("Picture", "photo")], **flat},
             {"name": "Beneath", "layers": [by_appearance("Beneath", "under")], **flat},
         ],
         "supported-platforms": {"squares": "shared"},  # macOS and iOS
@@ -484,7 +492,8 @@ def render(svg_text, pixels, target):
                        check=True)
 
 
-def write_icon_set(drawing, build, folder):
+def write_icon_set(drawing, build, folder, appearance="light"):
+    """The Mac's PNG set of one look: Day's in the light appearance, Night's in the dark one."""
     if folder.exists():
         shutil.rmtree(folder)
     folder.mkdir(parents=True)
@@ -493,14 +502,15 @@ def write_icon_set(drawing, build, folder):
         for scale in (1, 2):
             pixels = points * scale
             name = f"icon_{points}x{points}{'@2x' if scale == 2 else ''}.png"
-            render(flat_icon(drawing, build, small=pixels <= SMALL_PIXELS), pixels, folder / name)
+            render(flat_icon(drawing, build, appearance, small=pixels <= SMALL_PIXELS), pixels, folder / name)
             images.append({"filename": name, "idiom": "mac", "scale": f"{scale}x", "size": f"{points}x{points}"})
     contents = {"images": images, "info": {"author": "xcode", "version": 1}}
     (folder / "Contents.json").write_text(json.dumps(contents, indent=2) + "\n")
 
 
-def write_picture_set(drawing, build, folder):
-    """The iOS app's picture of its icon, light and dark, at 2x and 3x of the 120 points its welcome shows it at."""
+def write_picture_set(day, night, build, folder):
+    """The iOS app's picture of its icon, light (Day) and dark (Night), at 2x and 3x of the 120 points its welcome
+    shows it at."""
     if folder.exists():
         shutil.rmtree(folder)
     folder.mkdir(parents=True)
@@ -508,7 +518,7 @@ def write_picture_set(drawing, build, folder):
     if not catalog_contents.exists():
         catalog_contents.write_text(json.dumps({"info": {"author": "xcode", "version": 1}}, indent=2) + "\n")
     images = []
-    for appearance in ("light", "dark"):
+    for appearance, drawing in (("light", day), ("dark", night)):
         for scale in (2, 3):
             name = f"{folder.stem}{'-dark' if appearance == 'dark' else ''}@{scale}x.png"
             render(picture(drawing, build, appearance), 120 * scale, folder / name)
@@ -520,14 +530,14 @@ def write_picture_set(drawing, build, folder):
     (folder / "Contents.json").write_text(json.dumps(contents, indent=2) + "\n")
 
 
-def write_alternate_set(drawing, build, folder):
-    """An alternate app icon of the iOS app: one opaque 1024 picture, light and dark, which the system draws at every
-    size and makes its tinted and clear icons from."""
+def write_alternate_set(day, night, build, folder):
+    """An alternate app icon of the iOS app: one opaque 1024 picture, light (Day) and dark (Night), which the system
+    draws at every size and makes its tinted and clear icons from."""
     if folder.exists():
         shutil.rmtree(folder)
     folder.mkdir(parents=True)
     images = []
-    for appearance in ("light", "dark"):
+    for appearance, drawing in (("light", day), ("dark", night)):
         name = f"{folder.stem}{'-dark' if appearance == 'dark' else ''}.png"
         render(alternate_icon(drawing, build, appearance), CANVAS, folder / name)
         write_opaque(folder / name)
@@ -589,13 +599,13 @@ def write_opaque(target):
                        + chunk(b"IEND", b""))
 
 
-def write_composer_document(drawing, build, target):
+def write_composer_document(day, night, build, target):
     if target.exists():
         shutil.rmtree(target)
     (target / "Assets").mkdir(parents=True)
-    for name, text in composer_assets(drawing, build).items():
+    for name, text in composer_assets(day, night, build).items():
         (target / "Assets" / name).write_text(text)
-    (target / "icon.json").write_text(json.dumps(composer_document(build), indent=2) + "\n")
+    (target / "icon.json").write_text(json.dumps(composer_document(day, night), indent=2) + "\n")
 
 
 def write_symbol(folder):
@@ -699,10 +709,10 @@ def symbol_svg(symbol, widths, colour=None):
             f'viewBox="0 0 {fmt(width)} 84">' + "".join(groups) + "</svg>"), width
 
 
-def write_preview(drawing, target):
-    """A sheet for looking at the icons: per build and appearance, the icon at 1024, 128, 32 and 16 pixels (the small
-    ones also enlarged, pixel for pixel); the sidebar symbol's three weights and at the sidebar's size, in one colour
-    and in colour; and the menu bar icons on a light and a dark menu bar."""
+def write_preview(day, night, target):
+    """A sheet for looking at the icons: per build and appearance (Day light, Night dark), the icon at 1024, 128, 32
+    and 16 pixels (the small ones also enlarged, pixel for pixel); the sidebar symbol's three weights and at the
+    sidebar's size, in one colour and in colour; and the menu bar icons on a light and a dark menu bar."""
     with tempfile.TemporaryDirectory() as folder:
         folder = Path(folder)
 
@@ -731,9 +741,9 @@ def write_preview(drawing, target):
                              f'{"Release" if build == "release" else "Dev"}, {appearance}: {source}</text>')
                 for pixels, place_x, place_y in ((1024, 0, 70), (128, 1060, 120), (32, 1220, 120), (16, 1290, 120)):
                     if appearance == "light":
-                        svg_text = flat_icon(drawing, build, small=pixels <= SMALL_PIXELS)
+                        svg_text = flat_icon(day, build, small=pixels <= SMALL_PIXELS)
                     else:
-                        svg_text = composed_appearance(drawing, build, appearance)
+                        svg_text = composed_appearance(night, build, appearance)
                     data = png(svg_text, f"{build}-{appearance}", pixels, pixels)
                     cells.append(image(data, x + place_x, y + place_y, pixels, pixels))
                     if pixels <= 32:
@@ -797,13 +807,56 @@ def write_preview(drawing, target):
         subprocess.run(["rsvg-convert", str(sheet_path), "-o", str(target)], check=True)
 
 
-def design_source(design):
-    """The drawing of one of the picture's designs: Mist's is the app icon's own, the others' carry their names."""
-    return DRAWINGS / ("dev.hviid.Verso.svg" if design == DEFAULT_DESIGN else f"dev.hviid.Verso-{design}.svg")
+def look_name(design, night=False, graphite=False):
+    """A look's name, as linux/packaging/icons/sources/app-icon.py names its drawing: sand-night-graphite."""
+    return design + ("-night" if night else "") + ("-graphite" if graphite else "")
+
+
+def look_source(design, night=False, graphite=False):
+    """The drawing of one look: Mist on Day paper in colour is the app icon's own, the others carry their names."""
+    look = look_name(design, night, graphite)
+    return DRAWINGS / ("dev.hviid.Verso.svg" if look == DEFAULT_DESIGN else f"dev.hviid.Verso-{look}.svg")
+
+
+def icon_name(build, *words):
+    """An icon's name in the asset catalogs: the build's app icon (AppIcon, AppIconDev), with the words of a look, or
+    of a design and its lens, after it (AppIcon-SandNightGraphite); the app icon's own for Mist on Day paper in colour."""
+    base = "AppIconDev" if build == "dev" else "AppIcon"
+    words = [word for word in "-".join(words).split("-") if word]
+    return base if words == [DEFAULT_DESIGN] else base + "-" + "".join(word.title() for word in words)
+
+
+def write_design(design, graphite, build):
+    """One design with its lens in colour or in graphite, in one build: the Mac's PNG set of its Day look and of its
+    Night look; the iOS app's picture of it, Day and Night; and for Mist in colour the app icon's own Icon Composer
+    document, else the iOS app's alternate icon, Day and Night."""
+    day = Drawing(look_source(design, False, graphite).read_text())
+    night = Drawing(look_source(design, True, graphite).read_text())
+    lens = "graphite" if graphite else ""
+    mac_day, mac_night = icon_name(build, design, lens), icon_name(build, design, "night", lens)
+    ios = icon_name(build, design, lens)
+    write_icon_set(day, build, CATALOG / f"{mac_day}.appiconset")
+    write_icon_set(night, build, CATALOG / f"{mac_night}.appiconset", "dark")
+    write_picture_set(day, night, build, IOS_CATALOG / f"{ios}Image.imageset")
+    if ios in ("AppIcon", "AppIconDev"):
+        write_composer_document(day, night, build, HERE / "Verso" / f"{ios}.icon")
+        print(f"wrote {mac_day}.appiconset, {mac_night}.appiconset, {ios}.icon and {ios}Image.imageset")
+    else:
+        # An alternate icon: the Mac's PNG sets for the Dock, the iOS app's own set beside its picture.
+        write_alternate_set(day, night, build, IOS_CATALOG / f"{ios}.appiconset")
+        print(f"wrote {mac_day}.appiconset and {mac_night}.appiconset, the Mac's; {ios}.appiconset and "
+              f"{ios}Image.imageset, the iOS app's")
 
 
 def main():
     arguments = sys.argv[1:]
+    everything = arguments == ["--all"]
+    if everything:
+        for build in ("release", "dev"):
+            for design in DESIGNS:
+                for graphite in (False, True):
+                    write_design(design, graphite, build)
+        arguments = []
     design = DEFAULT_DESIGN
     if "--design" in arguments:
         at = arguments.index("--design")
@@ -811,7 +864,9 @@ def main():
             sys.exit(__doc__)
         design = arguments[at + 1]
         del arguments[at:at + 2]
-    drawing = Drawing(design_source(design).read_text())
+    graphite = "--graphite" in arguments
+    if graphite:
+        arguments.remove("--graphite")
     lens = Drawing(LENS_SOURCE.read_text())
     if arguments == ["--lens"]:
         write_lens_set(lens, WIDGETS_CATALOG / "Lens.imageset")
@@ -819,24 +874,17 @@ def main():
         print("wrote Lens.imageset, the widgets' and the app's")
         return
     if arguments[:1] == ["--preview"] and len(arguments) == 2:
-        write_preview(drawing, Path(arguments[1]).resolve())
+        day = Drawing(look_source(design, False, graphite).read_text())
+        night = Drawing(look_source(design, True, graphite).read_text())
+        write_preview(day, night, Path(arguments[1]).resolve())
         print(f"wrote {arguments[1]}")
         return
     if arguments not in ([], ["--dev"]):
         sys.exit(__doc__)
     build = "dev" if arguments == ["--dev"] else "release"
-    # AppIcon, AppIconDev; another design's with its name after them, AppIcon-Sand.
-    name = ("AppIconDev" if build == "dev" else "AppIcon") + ("" if design == DEFAULT_DESIGN else f"-{design.title()}")
-    write_icon_set(drawing, build, CATALOG / f"{name}.appiconset")
-    write_picture_set(drawing, build, IOS_CATALOG / f"{name}Image.imageset")
-    if design == DEFAULT_DESIGN:
-        write_composer_document(drawing, build, HERE / "Verso" / f"{name}.icon")
-        print(f"wrote {name}.appiconset, {name}.icon and {name}Image.imageset")
-    else:
-        # An alternate icon: the Mac's PNG set for the Dock, the iOS app's own set beside its picture.
-        write_alternate_set(drawing, build, IOS_CATALOG / f"{name}.appiconset")
-        print(f"wrote {name}.appiconset, the Mac's and the iOS app's, and {name}Image.imageset")
-    if build == "release" and design == DEFAULT_DESIGN:
+    if not everything:
+        write_design(design, graphite, build)
+    if build == "release" and design == DEFAULT_DESIGN and not graphite:
         # The small icons, the lens alone, have no Dev variant, and are the same for every design.
         write_symbol(CATALOG / "SidebarSymbol.symbolset")
         write_messages_set(lens, MESSAGES_CATALOG / "MessagesIcon.stickersiconset")

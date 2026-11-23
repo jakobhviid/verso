@@ -248,12 +248,14 @@ verso-service configure set albums.layout year-folders     # Albums/2023/Summer 
 verso-service configure set files.naming original          # IMG_1234.JPG instead of the date and time
 verso-service configure set cache.limit 25GB
 verso-service configure set app.icon sand          # the app icon with Sand's picture, in the app grid and the dash
+verso-service configure set app.icon_dark sand-night-graphite   # and in the dark style: Night paper, a graphite lens
 verso-service configure unset thumbnails.sharp      # back to the default
 ```
 
 Verso's Preferences (Ctrl+, in Verso, or **Preferences…** in the top bar menu) edit the same settings, on the pages in
-its sidebar: **Account**, **General** (the app icon, Open in Immich and Copy Immich Link, the top bar icon's double
-click and colour), **Crosslink**, **Features** (your account's Immich preferences), then under **Verso Drive**: **Status** (the
+its sidebar: **Account**, **General** (the app icon in the light style and in the dark style, each a picture, Day or
+Night paper and a lens in colour or graphite; Open in Immich and Copy Immich Link; the top bar icon's double click and
+colour), **Crosslink**, **Features** (your account's Immich preferences), then under **Verso Drive**: **Status** (the
 switch, Mount, Unmount and Open in Files), **Drive** (location, name, bookmark instead of drive, cache size, sharp
 thumbnails) and **Folders** (each section with its date folders, Upload, album and file names); and for a server's
 admins, **Administration**. A change to the drive's settings reaches it when you leave the page or close Preferences.

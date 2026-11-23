@@ -87,8 +87,8 @@ the answers field by field (the months, albums, people, a photo's details, searc
 account's reads), and with `IMMICH_WRITES=1` makes each change typed and reads it back as a request. Dismissing and
 resolving duplicates are not checked live: neither the demo nor the lab server has any. `check.py` also renders the
 sidebar's import row in every state to `build/import-design/`, the bell's list, light and dark, to
-`build/notifications-design/`, and App Icon in Settings, General, with Mist and with Sand chosen, to
-`build/app-icon-design/`: look at them after changing one.
+`build/notifications-design/`, and App Icon in Settings, General, with the default looks and with two others chosen,
+to `build/app-icon-design/`: look at them after changing one.
 
 **Verso Dev, signed, in the maintainer's session.** Running needs a signed build (the extensions' entitlements), and
 signing cannot happen over SSH: there the login keychain is locked ("User interaction is not allowed"), so codesign

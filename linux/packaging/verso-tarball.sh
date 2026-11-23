@@ -40,13 +40,18 @@ for icon in dev.hviid.Verso-tray dev.hviid.Verso-tray-unmounted dev.hviid.Verso-
     install -D -m 0644 "linux/packaging/icons/$icon.svg" "$stage/hicolor/scalable/apps/$icon.svg"
 done
 # The app's own icons, which it finds in the install's folder: its own, its mark (Verso Drive's page in Preferences),
-# the app icon for its windows wherever the theme has none, and the app icon's other designs (`app.icon`), which the
-# windows show and the launcher's entry names a copy of (`verso_linux::app_icon`).
+# the app icon for its windows wherever the theme has none, and the app icon's 27 other looks (`app.icon`,
+# `app.icon_dark`), which the windows show and the launcher's entry names a copy of (`verso_linux::app_icon`).
 mkdir -p "$stage/icons"
 cp linux/packaging/icons/verso-*-symbolic.svg linux/packaging/icons/dev.hviid.Verso-symbolic.svg linux/packaging/icons/dev.hviid.Verso.png "$stage/icons/"
-for design in sand dark paper frame slate sky; do
-    cp "linux/packaging/icons/dev.hviid.Verso-$design.svg" "$stage/icons/"
+for design in mist sand dark paper frame slate sky; do
+    for look in "$design" "$design-night" "$design-graphite" "$design-night-graphite"; do
+        if [ "$look" != mist ]; then
+            cp "linux/packaging/icons/dev.hviid.Verso-$look.svg" "$stage/icons/"
+        fi
+    done
 done
+test "$(ls "$stage"/icons/dev.hviid.Verso-*.svg | grep -cv symbolic)" -eq 27
 # The service's, the top bar's and Preferences' texts in the person's language: the catalogs compiled where the
 # programs look for them, `share/locale` beside them (`verso_linux::i18n::locale_directory`).
 python3 po/i18n.py mo "$stage/share/locale"

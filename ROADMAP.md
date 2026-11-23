@@ -473,8 +473,9 @@ components without our code, which is the main reason to build on them. Nothing 
 6. **Search's suggestions as glass chips:** people with their faces, places, recent searches; the filters in a sheet.
 7. **The Locked Folder behind Face ID,** with Immich's PIN once per session.
 8. **The app icon is the Mac's Icon Composer document** (`AppIcon.icon`), which has the clear and tinted looks iOS
-   asks for; the picture's six other designs are alternate icons, chosen in App Icon in the account's sheet
-   (ARCHITECTURE, "The app icon's designs on the Mac, the iPhone and the iPad").
+   asks for, and Mist's Night look as its dark appearance; the picture's other designs and the graphite lens are
+   alternate icons, chosen in App Icon in the account's sheet (ARCHITECTURE, "The app icon's designs on the Mac, the
+   iPhone and the iPad").
 9. **Places by name lead to photos:** Map | Places, the countries, a country's cities, a city's photos; a cluster on the
    map opens that area's photos. A pinch or a pan that starts on a pin moves the map, and a tap on one opens that area's
    photos.

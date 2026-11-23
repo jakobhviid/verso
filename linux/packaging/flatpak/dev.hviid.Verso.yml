@@ -68,6 +68,8 @@ modules:
         for size in 16 32 64 128 256 512; do
           install -Dm644 linux/packaging/icons/hicolor/$size/dev.hviid.Verso.png /app/share/icons/hicolor/${size}x${size}/apps/dev.hviid.Verso.png
         done
+      # Mist Night, the app icon its window shows in the dark style; the Flatpak offers no other look.
+      - install -Dm644 linux/packaging/icons/dev.hviid.Verso-mist-night.svg /app/share/icons/hicolor/scalable/apps/dev.hviid.Verso-mist-night.svg
       - install -Dm644 linux/packaging/icons/dev.hviid.Verso-symbolic.svg /app/share/icons/hicolor/symbolic/apps/dev.hviid.Verso-symbolic.svg
       - |
         for state in unmounted offline signed-out; do

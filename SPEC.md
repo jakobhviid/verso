@@ -575,7 +575,8 @@ part in Immich Crosslink, which shows it there: from Verso Drive's menu in Files
 read, and writes preserve comments. One settings table in the Core drives validation, `verso-service configure`,
 Verso's Preferences and the Mac's Settings, where each setting has one place (ARCHITECTURE.md, "One layout for every
 settings window"). Verso's Preferences show them on these pages:
-- **General:** the app icon, Open in Immich and Copy Immich Link, and the top bar icon's double click and colour.
+- **General:** the app icon in the light style and in the dark style, Open in Immich and Copy Immich Link, and the top
+  bar icon's double click and colour.
 - **Crosslink:** Immich Crosslink, Verso Gallery and Verso Drive, and the other apps (Show in other apps).
 - Under **Verso Drive:** **Status** (the drive's switch), **Drive** (its location and name, a bookmark instead of a
   drive, the cache's size, sharp thumbnails) and **Folders** (each section with its date folders, Upload, album and
@@ -584,8 +585,8 @@ settings window"). Verso's Preferences show them on these pages:
   headless credential file or `thumbnails.safety_net`: those are for `config.toml` and `verso-service configure`.
 
 A change to the drive's settings restarts the service when its page is left or Preferences closes. Verso as a Flatpak
-hides the drive's switch, place, name, bookmark, cache size and sharp thumbnails, and the app icon, and reads none of
-them.
+hides the drive's switch, place, name, bookmark, cache size and sharp thumbnails, and the app icon's two looks, and
+reads none of them.
 
 | Key | Values | Default | Meaning |
 |---|---|---|---|
@@ -610,7 +611,8 @@ them.
 | `web.links` | bool | `true` | Open in Immich and Copy Immich Link in Verso's menus, Files' and Finder's (Links to Immich); off, the service gives no web address and the menus offer Show in *app* alone |
 | `tray.double_click` | `gallery`, `drive`, `preferences` | `gallery` | What a double click on the top bar icon opens: Verso, Verso Drive in Files (while it is mounted; else Verso), or Preferences ("Double-Click Opens" in Preferences, General). The Flatpak offers `gallery` and `preferences`. Linux only |
 | `tray.colour` | bool | `false` | The top bar icon in colour, the lens in its five colours, grey while the server cannot be reached; off, in the desktop's one colour. Linux only |
-| `app.icon` | `mist`, `sand`, `dark`, `paper`, `frame`, `slate`, `sky` | `mist` | The app icon, by the picture on its print (DESIGN.md, "The picture's designs"): "App Icon" in Preferences, General, each design shown by its icon and name. Verso's launcher entry names it at once, so the app grid, the dash and the window's place in them show it (Files on disk): on GNOME every icon drawn from then on, the app grid's from the next login, which the row's subtitle says. Verso's windows, About and the sign-in page show it (set with `configure`, from the window's next start), and so does the picture beside a notification's text. Verso Drive's icon, the top bar icon and Verso Gallery's Crosslink entry keep theirs. Not in the Flatpak. Linux only: the Mac and the iPhone keep their own choice ("The app icon on the Mac, the iPhone and the iPad") |
+| `app.icon` | A look: a design (`mist`, `sand`, `dark`, `paper`, `frame`, `slate`, `sky`), with `-night` after it for Night paper and `-graphite` after that for a graphite lens (`sand`, `sand-night`, `sand-graphite`, `sand-night-graphite`): 28 | `mist` | The app icon while the desktop's style is light: the picture on its print, its paper and its lens (DESIGN.md, "The picture's designs"). "Light Style" under App Icon in Preferences, General: a row showing the look's icon and name ("Sand, Night, Graphite"), which opens to Picture (each design by its icon in the row's paper and lens), Paper (Day or Night) and Lens (Colour or Graphite); the group's description says the app grid shows a new icon from the next login. Verso's launcher entry names the look of the desktop's style at once, so the app grid, the dash and the window's place in them show it (Files on disk): on GNOME every icon drawn from then on, the app grid's from the next login. Verso's windows, About and the sign-in page show the look of libadwaita's style, and turn with it while open (set with `configure`, from the window's next start); the picture beside a notification's text is the look of the desktop's style. Verso Drive's icon, the top bar icon and Verso Gallery's Crosslink entry keep theirs. Not in the Flatpak, whose window shows Mist, or Mist Night in the dark style. Linux only: the Mac and the iPhone keep their own choice ("The app icon on the Mac, the iPhone and the iPad") |
+| `app.icon_dark` | A look, as `app.icon` | `mist-night` | The app icon while the desktop's style is dark, as `app.icon` is in the light style: "Dark Style" under App Icon in Preferences, General. The service names it in the launcher entry when the desktop's colour scheme turns dark (the portal's `org.freedesktop.appearance` `color-scheme`), and the light style's look when it turns back. Not in the Flatpak. Linux only |
 | `crosslink.enabled` | bool | `true` | Immich Crosslink: show what another app links to, and offer Show in *app* (Links from other apps). Off, a link from another app to Verso Drive only gets a notification saying so. Labelled "Immich Crosslink", in English in every language, with a link to the protocol |
 | `crosslink.gallery` | bool | `true` | Take part as Verso Gallery, so other apps show items in Verso's window |
 | `crosslink.drive` | bool | `true` | Take part as Verso Drive while the drive is on, so other apps show items in Files |
@@ -733,7 +735,7 @@ systemd scope of its own, so a window it opened outlives the service.
 | The mount point's folder icon in Files | `metadata::custom-icon-name=dev.hviid.Verso.Drive` on the mount point, in gvfsd-metadata's store (`~/.local/share/gvfs-metadata/`), set by the service as it mounts and once mounted |
 | The drive's bookmark in Files' sidebar, with `mount.unmount_button` off | A line `file://<mount point> <drive's name>` in `~/.config/gtk-3.0/bookmarks`: added by the service as it starts after the setting was turned off, taken away after it was turned back on (the last choice noted in `~/.local/state/verso/sidebar-entry`), renamed as it starts when `mount.name` changed (a bookmark the user titled otherwise keeps its title), and removed by `logout` |
 | Verso's Crosslink participants | `~/.local/share/applications/dev.hviid.Verso.Gallery.desktop` and `dev.hviid.Verso.Drive.desktop` (Links from other apps) |
-| The app icon chosen (`app.icon`) | The `Icon` line of the launcher entry `dev.hviid.Verso.desktop` in `~/.local/share/applications/` (Homebrew's cask, the tarball and a build of one's own put it there): `dev.hviid.Verso` for Mist, else the path of a copy of the design's drawing, `~/.local/share/verso/icons/dev.hviid.Verso-<design>.svg`, the only one there. Set by the window as it starts and when the choice changes, by `configure`, and by the service as it starts, so it is back after an upgrade put the install's entry in place. Where the entry is a package's own (in `$XDG_DATA_DIRS`), Verso writes its own copy of it with that line into `~/.local/share/applications/`, first line `# Written by Verso over the installed entry...`, and removes it at Mist or once the package's entry is gone |
+| The app icon chosen (`app.icon`, `app.icon_dark`) | The `Icon` line of the launcher entry `dev.hviid.Verso.desktop` in `~/.local/share/applications/` (Homebrew's cask, the tarball and a build of one's own put it there), naming the look of the desktop's style: `dev.hviid.Verso` for Mist's Day look in colour, else the path of a copy of the look's drawing, `~/.local/share/verso/icons/dev.hviid.Verso-<look>.svg`; that folder holds the copies of the two looks chosen and no other (Mist Night's, with the defaults). Set by the window as it starts, when its style changes and when the choice changes, by `configure`, and by the service as it starts and at each change of the desktop's colour scheme, so it is back after an upgrade put the install's entry in place. Where the entry is a package's own (in `$XDG_DATA_DIRS`), Verso writes its own copy of it with that line into `~/.local/share/applications/`, first line `# Written by Verso over the installed entry...`, and removes it while the line would be the package's own (`dev.hviid.Verso`) or once the package's entry is gone |
 | The apps seen that take part in Immich Crosslink | `~/.local/state/verso/crosslink-seen.json` |
 | The sign-in redirect's handler | `x-scheme-handler/app.immich` in `~/.config/mimeapps.list`, set by Verso as it starts a browser sign-in |
 | Verso's menu in Files, Homebrew's cask | `~/.local/share/nautilus-python/extensions/verso-nautilus.py` |
@@ -1232,23 +1234,35 @@ in Messages").
 
 ## The app icon on the Mac, the iPhone and the iPad
 
-The Apple apps offer the app icon's seven designs as Linux does (DESIGN.md, "The picture's designs"), each by its icon
-and its name, Mist first and the default. Verso Dev offers the same seven in its own drawings, with the blue DEV corner,
-so it stays told apart from a release whatever is chosen. `app.icon` is Linux's alone: neither app keeps the choice in
-`config.toml`.
-- **iPhone and iPad:** **App Icon** under On This iPhone (On This iPad) in the account's sheet, showing the design in
-  use, opens the seven in a grid, four to a row, with a tick under that one. A tap makes it the app's icon on the Home
-  Screen, in Spotlight and in Settings (an alternate icon; Mist is the app icon itself), and iOS says so in a notice of
-  its own ("You have changed the icon for “Verso”."). iOS keeps the choice, across launches and updates; Verso keeps no
-  setting of its own for it, and the app installed again starts at Mist. The picture of the icon on the sign-in page and
-  in About Verso is the design in use. The row is left out where iOS offers no alternate icons.
-- **Mac:** **App Icon** in Settings, General: the seven side by side, the chosen one ringed in the accent colour, and
-  under them "The Dock and the app switcher show it while Verso runs. Finder and Launchpad keep Mist." The design
-  chosen is Verso's icon in the Dock and the app switcher while Verso runs, set as it starts and at once when chosen,
-  and the picture of its icon in the About window, the sign-in window and the heading of Verso's own notifications.
-  Finder, Launchpad, System Settings and the Dock while Verso is not running show Mist. The choice is a user default of
-  the app's, `appIcon.design` (`mist`, `sand`, `dark`, `paper`, `frame`, `slate`, `sky`), as Show the Menu Bar Icon in
-  Color is.
+The Apple apps offer the app icon's seven designs as Linux does, each on Day or Night paper with its lens in colour or
+in graphite (DESIGN.md, "The picture's designs"), each design by its icon and its name, Mist first. By default the icon
+is Mist in colour, the app icon itself, Day as its light appearance and Night as its dark one, which the Mac shows in
+dark mode and the iPhone where the Home Screen's icons are dark. Verso Dev offers the same looks in its own drawings,
+with the blue DEV corner, so it stays told apart from a release whatever is chosen. `app.icon` and `app.icon_dark` are
+Linux's alone: neither app keeps the choice in `config.toml`.
+- **iPhone and iPad:** **App Icon** under On This iPhone (On This iPad) in the account's sheet, showing the design and
+  lens in use ("Sand", "Sand, Graphite"), opens Color and Graphite as a segmented control above the seven in a grid,
+  four to a row, with a tick under the one in use; each picture is the icon, its Night look while the app is in dark
+  mode. A tap on a design, or on the other lens, makes it the app's icon on the Home Screen, in Spotlight and
+  in Settings (an alternate icon; Mist in color is the app icon itself), and iOS says so in a notice of its own ("You
+  have changed the icon for “Verso”."). Under the grid: "Verso's icon on the Home Screen, in Spotlight and in Settings.
+  Where the Home Screen's icons are dark, it shows its night version, on dark paper." Each icon is its design's Day
+  look and, as its dark appearance, its Night look, which the Home Screen shows where its icons are set to Dark (its
+  Customize menu: Dark, always or in dark mode; with Default every icon stays light); the tinted and clear looks are
+  iOS's own. iOS keeps the choice,
+  across launches and updates; Verso keeps no setting of its own for it, and the app installed again starts at Mist.
+  The picture of the icon on the sign-in page and in About Verso is the design and lens in use. The row is left out
+  where iOS offers no alternate icons.
+- **Mac:** **App Icon** in Settings, General: a row for Light Mode and one for Dark Mode, each the seven designs side
+  by side in that row's paper and lens, the chosen one ringed in the accent colour, and under them two small segmented
+  controls, Day or Night and Color or Graphite; any of the 28 looks in either mode. Under the rows: "The Dock and the
+  app switcher show them while Verso runs, as the Mac is in light or dark mode. Finder and Launchpad keep Mist." The
+  look of the system's appearance is Verso's icon in the Dock and the app switcher while Verso runs, set as it starts,
+  at once when chosen, and again when the appearance changes, and the picture of its icon in the About window, the
+  sign-in window and the heading of Verso's own notifications. Finder, Launchpad, System Settings and the Dock while
+  Verso is not running show the bundle's own icon: Mist, Day in light mode and, from macOS 26, Night in dark mode. The
+  choices are user defaults of the app's, `appIcon.light` and `appIcon.dark`, each a look as Linux names it (`mist`,
+  `sand-night`, `sky-night-graphite`; unset, `mist` and `mist-night`), as Show the Menu Bar Icon in Color is.
 
 ## Errors seen by programs using the mount
 

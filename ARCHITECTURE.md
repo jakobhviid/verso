@@ -1607,10 +1607,26 @@ which opens the page) for as long as it runs. It sends nothing but the request a
 
 ### The app icon's designs on Linux
 
-Preferences, General, offers the app icon's seven designs (`app.icon`; DESIGN.md, "The picture's designs"). GNOME
-shows an app's icon from its launcher entry: in the app grid, in the dash, and for its window, which GNOME Shell knows
-by the window's app ID, `dev.hviid.Verso`, as the entry of that name's. So the choice is made in that entry's `Icon`
-line (`verso_linux::app_icon`).
+Preferences, General, offers the app icon's 28 looks (DESIGN.md, "The picture's designs"), freely, one for the
+desktop's light style (`app.icon`, Mist by default) and one for its dark style (`app.icon_dark`, Mist Night): each a
+row that opens to the picture's seven designs, Day or Night paper, and a lens in colour or graphite. GNOME shows an
+app's icon from its launcher entry: in the app grid, in the dash, and for its window, which GNOME Shell knows by the
+window's app ID, `dev.hviid.Verso`, as the entry of that name's. So the choice is made in that entry's `Icon` line
+(`verso_linux::app_icon`), which names the look of the desktop's current style; a desktop entry has one `Icon` and no
+icon per style.
+
+**Two keys, a look each,** rather than one key holding both: each is one choice of the 28 that the settings table
+validates and `configure set` takes as it takes any other key, and a design's name alone is a look of its own (`sand`,
+Sand on Day paper in colour), so an `app.icon` that names a design stays valid. A look is named by its design with
+`-night` and `-graphite` after it as they apply, as its drawing is (`dev.hviid.Verso-sand-night-graphite.svg`).
+
+**Following the style.** The service watches the desktop's colour scheme through the portal
+(`org.freedesktop.portal.Settings`, `org.freedesktop.appearance` `color-scheme`, which GNOME and KDE both provide and
+libadwaita itself reads: 1 is dark; 0, no preference, and 2 are light) and names the look of the new style in the entry
+at each `SettingChanged`, reading the choice again each time; without a portal it names the light style's look. The
+window follows libadwaita's style (`adw::StyleManager`'s `dark`): its own icon, About and the sign-in page turn with it
+while open, and it names the look in the entry too, so the entry follows the style while either runs. The app grid
+catches up at the next login, as for any change of icon (below).
 
 **What Homebrew does with the entry.** The cask installs the entry and the icons into the user's own folders,
 `~/.local/share/applications/dev.hviid.Verso.desktop` and `~/.local/share/icons/hicolor/`, as files it moves there
@@ -1621,29 +1637,30 @@ as it then has nothing to move back.
 
 **What Verso does:**
 - **The install's entry in the user's folder** (Homebrew's, the tarball's, a build of one's own) has its `Icon` line
-  changed and nothing else, written through a file beside it renamed into place, so it is never missing. Mist is named
-  by the name every install puts in the icon theme, `dev.hviid.Verso`. Another design is named by the path of a copy
-  of its drawing in Verso's own folder (`~/.local/share/verso/icons/`), made from the six other drawings the install
-  carries among the app's own icons (`icons/` beside the programs): under Homebrew the install's folder is one
-  version's, gone at the next upgrade.
+  changed and nothing else, written through a file beside it renamed into place, so it is never missing. Mist's Day
+  look in colour is named by the name every install puts in the icon theme, `dev.hviid.Verso`. Another look is named by
+  the path of a copy of its drawing in Verso's own folder (`~/.local/share/verso/icons/`), made from the 27 other
+  drawings the install carries among the app's own icons (`icons/` beside the programs): under Homebrew the install's
+  folder is one version's, gone at the next upgrade. The folder keeps the copies of both looks chosen, so a change of
+  style needs only the `Icon` line, and no other. With the defaults, the dark style names Mist Night's copy.
 - **An upgrade puts the install's entry back,** with Mist. The service, which starts the new version after an upgrade
-  as at every login, names the chosen design again, and so does the window as it starts: the choice outlives upgrades,
+  as at every login, names the chosen look again, and so does the window as it starts: the choice outlives upgrades,
   with Mist in the app grid for the seconds between.
 - **Over a package's entry** (in `$XDG_DATA_DIRS`, as Verso's rpm and deb will have it), Verso writes an entry of its
   own under the same name in the user's folder, which comes first: the package's with the `Icon` line changed, marked
-  as Verso's by its first line, written again at each start so it follows the package's, and removed at Mist or once
-  the package's is gone. Left behind by an uninstall, it shows nowhere: GLib leaves out an entry whose program is not
-  found.
+  as Verso's by its first line, written again at each start so it follows the package's, and removed while the look
+  named is Mist's Day look in colour or once the package's is gone. Left behind by an uninstall, it shows nowhere: GLib
+  leaves out an entry whose program is not found.
 - **GNOME Shell keeps an app icon it has drawn:** its app grid makes each app's icon once and reuses it, and an icon
-  reloads on a change of icon theme from the icon it was made with, not from the entry. So a new design shows at once
+  reloads on a change of icon theme from the icon it was made with, not from the entry. So a new look shows at once
   in every icon drawn after it (a search, the window switcher, the dash once Verso starts again), and in the app grid
-  from the next login, as Preferences says under the row. Verified in a GNOME 50 VM, with the entry as the cask
-  installs it: Sand chosen in Preferences, the shell's app info named Sand's copy at once, a search showed Sand and the
-  grid Mist until the next session; the install's entry put back, as an upgrade does, the window starting named Sand
-  again; `configure set app.icon mist` left the entry as installed, byte for byte, and no copy.
-- **The window** shows the chosen design as its own icon and in About and the sign-in page, by its name among the
-  app's own icons; a notification's picture is the copy. Verso Drive's badged icon, Verso Gallery's Crosslink entry and
-  the top bar icon keep theirs: they are not the app's window.
+  from the next login, as Preferences says above the rows; a change of style likewise. Verified in a GNOME 50 VM, with
+  the entry as the cask installs it: Sand chosen in Preferences, the shell's app info named Sand's copy at once, a
+  search showed Sand and the grid Mist until the next session; the install's entry put back, as an upgrade does, the
+  window starting named Sand again; `configure set app.icon mist` left the entry as installed, byte for byte.
+- **The window** shows the look chosen for its style as its own icon and in About and the sign-in page, by its name
+  among the app's own icons; a notification's picture is the copy of the look of the style last named. Verso Drive's
+  badged icon, Verso Gallery's Crosslink entry and the top bar icon keep theirs: they are not the app's window.
 
 **Not chosen:**
 - **An entry of Verso's own over the install's, in the user's folder:** Homebrew's is already there under the same
@@ -1651,14 +1668,18 @@ as it then has nothing to move back.
 - **The chosen design under the app icon's own name in the icon theme:** those are Homebrew's files, which an upgrade
   puts back, and the cask makes an icon cache of the folder (`gtk-update-icon-cache`), which GTK goes by while the
   theme's folder is no newer than it: a file changed or added further in goes unseen until the cache is made again.
-- **The designs in the icon theme under names of their own** (`dev.hviid.Verso-sand`): the same cache hides them, and
-  the cask would list six files for each design.
-- **An app ID per design:** the app ID is the D-Bus name that keeps the window one instance and brings the browser's
+- **The looks in the icon theme under names of their own** (`dev.hviid.Verso-sand`): the same cache hides them, and
+  the cask would list six files for each look.
+- **An app ID per look:** the app ID is the D-Bus name that keeps the window one instance and brings the browser's
   sign-in back to it.
+- **GNOME's own setting for the style** (`org.gnome.desktop.interface` `color-scheme` in GSettings): GNOME's alone,
+  where the portal's answers on KDE too, and as libadwaita has it.
 
-**Flatpak impact:** not offered. A sandboxed app cannot change the entry its Flatpak exports, so the Flatpak hides the
-row and reads `app.icon` as Mist (`VERSO_FLATPAK`'s `hidden_settings`), and `app_icon::apply` does nothing there. The
-Flatpak ships Mist alone.
+**Flatpak impact:** no choice. A sandboxed app cannot change the entry its Flatpak exports, so the Flatpak hides both
+rows and reads `app.icon` and `app.icon_dark` as Mist and Mist Night (`VERSO_FLATPAK`'s `hidden_settings`), the
+service does not watch the style, and `app_icon::apply` does nothing there. Its window, About and sign-in page show
+Mist, and Mist Night in the dark style: the Flatpak carries that one drawing more, in its icon theme
+(`dev.hviid.Verso-mist-night.svg`), and exports Mist as its icon.
 
 ### Packaging
 
@@ -1684,7 +1705,8 @@ What an install carries:
 - **The user service unit,** `verso.service`, from `linux/packaging/systemd/verso.service.in`; where an install brings
   none, the window writes it ("The daemon's lifecycle").
 - **The icons,** `dev.hviid.Verso`, `dev.hviid.Verso.Drive` and the symbolic ones with the tray's states ("The icon"),
-  and among the app's own icons the six other designs of the app icon ("The app icon's designs on Linux").
+  and among the app's own icons the app icon's 27 other looks ("The app icon's designs on Linux"); the Flatpak, Mist
+  Night alone, in its icon theme.
 - **The translations,** `verso.mo` for each language ("Translations").
 - **The license notices:** `linux/packaging/third-party-licenses.py` writes what a binary package must carry,
   `THIRD-PARTY-NOTICES.md` first, then every crate the package's binaries link (from `cargo tree`) with the license
@@ -2764,50 +2786,67 @@ it is iOS's alone.
 
 ### The app icon's designs on the Mac, the iPhone and the iPad
 
-The Apple apps offer the app icon's seven designs as Linux does ("The app icon's designs on Linux"; DESIGN.md, "The
-picture's designs"), each in the build's own drawings: a release's, or Verso Dev's with the blue DEV corner, so the two
-stay told apart whatever is chosen. `mac/Verso/make-icons.py --design <design> [--dev]` draws them. Mist stays the app
-icon, the Icon Composer document (`AppIcon.icon`, `AppIconDev.icon`). SPEC.md, "The app icon on the Mac, the iPhone and
-the iPad", has what the person sees.
-- **The build names them.** Each project lists the six others as alternate icons after the build's own app icon,
-  `ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: $(APP_ICON)-Sand ...`: AppIcon-Sand in a release, AppIconDev-Sand in
-  Verso Dev. The asset catalog compiler leaves out every app icon set it is not named, so a release carries none of
-  Verso Dev's drawings, nor Verso Dev a release's. The code finds the names the same way, after the app icon the
-  Info.plist names (`CFBundleIconName`, which the compiler writes; `AppIconDesign`), so it needs no `#if DEBUG`.
-  `check.py`'s `app-icon-choice` fails when a name has no set or a project does not list the six.
-- **The iPhone and the iPad: iOS's alternate icons** (`UIApplication.setAlternateIconName`, nil for Mist), the one way
-  an app changes its own icon. The Home Screen, Spotlight and Settings show it, iOS keeps it across launches and
-  updates and says so in a notice of its own, and the icon in use is the choice (`alternateIconName`): Verso keeps no
-  setting for it.
-  - **An alternate is an app icon set of PNGs:** one opaque 1024 picture edge to edge, light and dark
-    (`ios/Verso/Assets.xcassets/AppIcon-Sand.appiconset`), which iOS rounds and makes its tinted and clear looks from.
-    Xcode 27 takes an Icon Composer document as an alternate too, but compiles it into three flattened 1024 pictures
-    (any, dark, tinted) for the iPhone and three for the iPad, about 2.8 MB a design on a device. Measured with `actool`
-    and `assetutil` on the release's catalog: the six PNG sets add 2.9 MB to the universal catalog and 1.4 MB to an
-    iPhone's after the App Store's thinning, and the picker's pictures 1.4 MB and 0.6 MB; as Icon Composer documents the
-    six would add 33 MB and 17 MB. What a PNG set gives up is the document's own rendering: the lens's glass as a glass
-    layer, and tinted and clear made from the layers rather than from the picture.
-  - **The picker's pictures** are image sets of the icon's square, light and dark (`AppIcon-SandImage`), as the
-    sign-in's welcome has for Mist, since reading an app icon back with `UIImage(named:)` is no API. Both builds carry
-    all fourteen, as an image set cannot be left out by the build.
+The Apple apps offer the app icon's seven designs, each on Day or Night paper with its lens in colour or in graphite, as
+Linux does ("The app icon's designs on Linux"; DESIGN.md, "The picture's designs"), each in the build's own drawings: a
+release's, or Verso Dev's with the blue DEV corner, so the two stay told apart whatever is chosen.
+`mac/Verso/make-icons.py --design <design> [--graphite] [--dev]` draws a design and lens in its Day and Night looks, and
+`--all` every one. Mist stays the app icon, the Icon Composer document (`AppIcon.icon`, `AppIconDev.icon`), whose dark
+appearance is Mist's Night look: the picture, the lens's barrel, the word, the turned corner and what shows beneath it
+each have a dark layer of Night's, and the paper a dark gradient of Night's, so the Mac's and the iPhone's dark icon is
+the print in the dark rather than a light picture on dark paper. SPEC.md, "The app icon on the Mac, the iPhone and the
+iPad", has what the person sees.
+- **On the Mac a look is chosen for each mode; on the iPhone a design and its lens.** An iOS app icon set holds one
+  light and one dark picture, which iOS switches itself, by the Home Screen's icon style (its Customize menu: with
+  Default every icon is light, with Dark every icon is dark, always or in dark mode), and an alternate icon is one set:
+  any look for each mode would take a set for each pair, 28 by 28. So the iPhone offers the 14 designs and lenses, each
+  its Day look as the light picture and its Night look as the dark one. The Mac sets the Dock's picture itself, so it
+  takes any of the 28 for either mode, and follows dark mode, as macOS's own icons do with its default icon style.
+- **The build names them.** Each project lists the others as alternate icons after the build's own app icon,
+  `ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: $(APP_ICON)-MistNight ...`: the Mac its 27 other looks
+  (AppIcon-SandNightGraphite), the iPhone its 13 other designs and lenses, by their Day looks (AppIcon-SandGraphite);
+  AppIconDev-... in Verso Dev. The asset catalog compiler leaves out every app icon set it is not named, so a release
+  carries none of Verso Dev's drawings, nor Verso Dev a release's. The code finds the names the same way, after the app
+  icon the Info.plist names (`CFBundleIconName`, which the compiler writes; `AppIconLook`), so it needs no `#if DEBUG`.
+  `check.py`'s `app-icon-choice` fails when a name has no set or a project does not list the others.
+- **The iPhone and the iPad: iOS's alternate icons** (`UIApplication.setAlternateIconName`, nil for Mist in colour),
+  the one way an app changes its own icon. The Home Screen, Spotlight and Settings show it, iOS keeps it across
+  launches and updates and says so in a notice of its own, and the icon in use is the choice (`alternateIconName`):
+  Verso keeps no setting for it.
+  - **An alternate is an app icon set of PNGs:** one opaque 1024 picture edge to edge, its Day look as the light
+    appearance and its Night look as the dark one (`ios/Verso/Assets.xcassets/AppIcon-Sand.appiconset`), which iOS
+    rounds and makes its tinted and clear looks from. Xcode 27 takes an Icon Composer document as an alternate too,
+    but compiles it into three flattened 1024 pictures (any, dark, tinted) for the iPhone and three for the iPad, about
+    2.8 MB a design on a device. Measured with `actool` on the release's catalog, universal and thinned for an iPhone
+    17 Pro as the App Store thins it: the 13 PNG sets add 5.8 MB to the universal catalog and 2.9 MB to an iPhone's,
+    and the picker's pictures 2.9 MB and 1.8 MB; with the Night looks the catalog is 4.4 MB larger universal and 2.4 MB
+    larger on an iPhone than with the seven designs alone. As Icon Composer documents the 13 would add about 37 MB on
+    an iPhone. What a PNG set gives up is the document's own rendering: the lens's glass as a glass layer, and tinted
+    and clear made from the layers rather than from the picture.
+  - **The picker's pictures** are image sets of the icon's square, Day and Night (`AppIcon-SandImage`,
+    `AppIcon-SandGraphiteImage`), as the sign-in's welcome has for Mist, since reading an app icon back with
+    `UIImage(named:)` is no API. Both builds carry all 28, as an image set cannot be left out by the build.
 - **The Mac: the Dock's picture while Verso runs.** macOS has no alternate app icons. The icon Finder and Launchpad
   show, and the Dock while Verso is not running, is the bundle's: a sandboxed app cannot set a custom icon on its own
   bundle (`NSWorkspace.setIcon` writes to the bundle), and a changed bundle breaks its signature. What an app may change
   is its running icon, `NSApplication.applicationIconImage`: the Dock and the app switcher show it while Verso runs, and
   AppKit's About panel and Verso's own pictures of its icon (the sign-in window, the bell's heading) read it. So the
-  choice is a user default of the app's (`appIcon.design`), as the menu bar icon's colour is, applied as Verso starts
-  and when chosen (`AppIconChoice`); Mist sets nil, which gives the Dock the bundle's icon back. Settings says that
-  Finder and Launchpad keep Mist.
-  - **The pictures are the Mac's PNG sets** (`mac/Verso/Verso/Assets.xcassets/AppIcon-Sand.appiconset`, the drawing
-    macOS 15 shows), compiled as alternate icons so that `NSImage(named:)` finds them: 1.9 MB for the six. Compiled from
-    Icon Composer documents, `NSImage(named:)` gives the system's flattened light rendering, a picture alike but for the
-    lens's glass, at 11.4 MB.
+  choices are user defaults of the app's (`appIcon.light`, `appIcon.dark`), as the menu bar icon's colour is, applied
+  as Verso starts, when chosen, and when the system's appearance changes, which the app follows by key-value observing
+  `NSApplication.effectiveAppearance` (`AppIconChoice`). Where the look is what the bundle's icon shows in that
+  appearance (Mist in light mode, and Mist Night in dark mode from macOS 26, whose Icon Composer document has the dark
+  appearance), it sets nil, which gives the Dock the bundle's icon back. Settings says that Finder and Launchpad keep
+  Mist.
+  - **The pictures are the Mac's PNG sets** (`mac/Verso/Verso/Assets.xcassets/AppIcon-SandNight.appiconset`, the
+    drawing macOS 15 shows, a Night look on its dark paper), compiled as alternate icons so that `NSImage(named:)`
+    finds them: 7.7 MB for the 27. Compiled from Icon Composer documents, `NSImage(named:)` gives the system's
+    flattened light rendering, a picture alike but for the lens's glass, at about 1.9 MB a design.
 - **Not chosen:**
   - **Icon Composer documents as alternates,** on either platform: twelve times the size on an iPhone, six on the
     Mac, above.
   - **PNG sets at each size iOS asks for** (the Home Screen's 60 points at 2x and 3x, Spotlight's, Settings' and
-    notifications'), rather than one 1024 picture: 0.1 MB for the six, but the Home Screen's large icons would be
+    notifications'), rather than one 1024 picture: a fraction of the size, but the Home Screen's large icons would be
     scaled up from 180 pixels.
+  - **Any look for each mode on the iPhone:** a set for each pair, 784 of them.
   - **On the Mac, the choice in `config.toml` as `app.icon`:** that file is in the App Group, where Verso Drive's
     extension reads it too, and the icon is the app's alone; the app keeps its own choices as user defaults, as the
     menu bar icon's colour is an app setting rather than `tray.colour`.
@@ -2844,11 +2883,18 @@ flower logo, which would make Verso look official (principle 11), and nothing of
 this project as SVG by a script of our own, and is MIT like the rest. DESIGN.md, "The icon family", has the look.
 - **Its picture comes in seven designs,** all kept, and **Mist** is the app icon on every platform (the maintainer's
   choice): the dark picture made the icon heavy, and a light one reads as a print. The others are drawn by the same
-  script beside it (`dev.hviid.Verso-<design>.svg`), so they stay one drawing with one picture changed. Linux offers
-  them in Preferences ("The app icon's designs on Linux"), the Mac in Settings for the Dock, and the iPhone and the
-  iPad as alternate icons ("The app icon's designs on the Mac, the iPhone and the iPad"). A light picture lightens the
-  lens's barrel against itself; the small icons, the lens alone, keep its own dark barrel, so they are one
-  lens whatever the design (DESIGN.md, "The picture's designs").
+  script beside it, so they stay one drawing with one picture changed. A light picture lightens the lens's barrel
+  against itself; the small icons, the lens alone, keep its own dark barrel, so they are one lens whatever the design
+  (DESIGN.md, "The picture's designs").
+- **Each design in four looks:** on Day or Night paper, its lens in colour or in graphite (the maintainer's choice), 28
+  drawings (`dev.hviid.Verso-<look>.svg`, `sand-night-graphite`). Night is for a dark desktop: a light print with a
+  light picture glares among dark icons, and macOS 26 and iOS darken an icon's background where icons are dark but not a
+  picture drawn on it, so without a dark picture of its own Mist is a light picture on dark paper. Graphite is for those
+  who want no colour, a monochrome lens that still reads as Verso's. Every platform follows the system's light and dark
+  style with the look chosen for each, Mist Day and Mist Night by default: Linux in Preferences, both looks free ("The
+  app icon's designs on Linux"), the Mac in Settings for the Dock, both looks free, and the iPhone and the iPad as
+  alternate icons, a design and its lens, Day and Night ("The app icon's designs on the Mac, the iPhone and the iPad").
+  The looks are drawn by the script, never by hand, so a change to the drawing reaches all 28.
 - **The symbolic icon** is the print as one solid shape with the lens, the line on its strip and the turned corner cut
   out (`dev.hviid.Verso-symbolic.svg`), for the tray, notifications and Files' sidebar. The tray's states are
   variants of it, in one colour and in colour ("When the server cannot be reached"). `linux/packaging/icons/sources/`
@@ -2861,13 +2907,13 @@ this project as SVG by a script of our own, and is MIT like the rest. DESIGN.md,
   the Mac gallery's Live Photo symbol in Verso's rhythm; repeat arrows would say looping rather than a moment.
 - **Flatpak impact:** a Flatpak exports icons named after its own app ID, `dev.hviid.Verso`, so it ships the icon as
   it is.
-- **On the Mac** the same print takes Apple's rounded square (`mac/Verso/make-icons.py`, from the same SVG): the
-  asset catalog's `AppIcon` for macOS before 26, rendered with `rsvg-convert`, and an Icon Composer document
-  (`Verso/AppIcon.icon`), the same drawing in layers the system lights, with a light and a dark appearance, which
-  macOS 26 and later show, with their tinted and clear appearances made from these. Apple publishes no schema of
-  `icon.json`: its keys follow Xcode's own template and documents saved by Icon Composer. The PNGs are committed, since
-  the Mac has no SVG renderer that draws to a given size. The Dev build's icon is the release's but for the turned
-  corner's back, blue with DEV on it in white.
+- **On the Mac** the same print takes Apple's rounded square (`mac/Verso/make-icons.py`, from the same SVG): the asset
+  catalog's `AppIcon` for macOS before 26, rendered with `rsvg-convert`, and an Icon Composer document
+  (`Verso/AppIcon.icon`), the same drawing in layers the system lights, with a light appearance, Mist's Day look, and a
+  dark one, its Night look, which macOS 26 and later show, with their tinted and clear appearances made from these.
+  Apple publishes no schema of `icon.json`: its keys follow Xcode's own template and documents saved by Icon Composer.
+  The PNGs are committed, since the Mac has no SVG renderer that draws to a given size. The Dev build's icon is the
+  release's but for the turned corner's back, blue with DEV on it in white.
   - **Finder's sidebar** shows each location with a one-colour symbol, which the provider names in its extension's
     `CFBundleSymbolName` and ships in its asset catalog, as Nextcloud and OneDrive do (without one, Finder draws a
     generic drive or folder). Verso Drive's is the app icon's lens (`make-symbol.py`): an SF Symbols template (v6.0)

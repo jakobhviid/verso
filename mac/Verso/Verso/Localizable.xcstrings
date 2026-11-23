@@ -11997,12 +11997,82 @@
         }
       }
     },
-    "The Dock and the app switcher show it while Verso runs. Finder and Launchpad keep Mist.": {
+    "Day": {
       "localizations": {
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Il Dock e il selettore delle app la mostrano mentre Verso è in esecuzione. Finder e Launchpad mantengono Foschia."
+            "value": "Giorno"
+          }
+        }
+      }
+    },
+    "Night": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notte"
+          }
+        }
+      }
+    },
+    "Color": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Colore"
+          }
+        }
+      }
+    },
+    "Graphite": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grafite"
+          }
+        }
+      }
+    },
+    "Lens": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obiettivo"
+          }
+        }
+      }
+    },
+    "Light Mode": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modalità chiara"
+          }
+        }
+      }
+    },
+    "Dark Mode": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modalità scura"
+          }
+        }
+      }
+    },
+    "The Dock and the app switcher show them while Verso runs, as the Mac is in light or dark mode. Finder and Launchpad keep Mist.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il Dock e il selettore delle app le mostrano mentre Verso è in esecuzione, secondo la modalità chiara o scura del Mac. Finder e Launchpad mantengono Foschia."
           }
         }
       }

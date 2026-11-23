@@ -40,6 +40,17 @@ const fn section(key: &'static str, title: &'static str, subtitle: Option<&'stat
     Row { key, title, subtitle, inner: Some(inner) }
 }
 
+/// The app icon on Verso's General page: its look in the desktop's light style and in its dark style (`app.icon`,
+/// `app.icon_dark`), each a picture, a paper and a lens. GNOME keeps the icons it has drawn, so its app grid shows
+/// another from the next login (ARCHITECTURE.md, "The app icon's designs on Linux"). Not in a Flatpak, which hides both
+/// settings: its launcher is the Flatpak's to export.
+pub const APP_ICON_GROUP: Group = Group {
+    title: Some("App Icon"),
+    description: Some("Verso's icon in the app grid, the dash and its windows, one for the desktop's light style and one for its dark style. The app grid shows a new one from the next login."),
+    rows: &[row("app.icon", "Light Style", None), row("app.icon_dark", "Dark Style", None)],
+    apps: false,
+};
+
 /// The settings pages, in the sidebar's order after Status (and before Account), as the Mac's Settings window has them.
 pub const PAGES: &[Page] = &[
     Page {
@@ -199,9 +210,6 @@ pub fn caption(setting: &Setting) -> Option<&'static str> {
         // Verso's own participants (`participants`), on its Crosslink page.
         "crosslink.gallery" => Some(tr("Other apps can show photos, albums, people and places in the gallery.")),
         "crosslink.drive" => Some(tr("Other apps can show them in Files, while the drive is on.")),
-        // Verso's General, the first row. GNOME keeps the icons it has drawn, so its app grid shows another from the next
-        // login (ARCHITECTURE.md, "The app icon's designs on Linux").
-        "app.icon" => Some(tr("The picture on Verso's icon in the app grid, the dash and its windows. The app grid shows a new one from the next login.")),
         _ => None,
     }
 }
@@ -239,7 +247,9 @@ pub fn title(setting: &Setting) -> &'static str {
         // Verso's General, under Top Bar Icon.
         "tray.double_click" => return tr("Double-Click Opens"),
         "tray.colour" => return tr("Colour"),
-        "app.icon" => return tr("App Icon"),
+        // Verso's General, under App Icon (`APP_ICON_GROUP`).
+        "app.icon" => return tr("Light Style"),
+        "app.icon_dark" => return tr("Dark Style"),
         _ => {}
     }
     let rows = || PAGES.iter().flat_map(|page| page.groups).flat_map(|group| group.rows);
@@ -358,27 +368,31 @@ pub fn change(key: &str, value: &str) -> Result<bool, String> {
         }
         return Ok(false);
     }
-    // The launcher's entry names the app icon chosen at once; the service needs nothing.
-    if key == "app.icon" {
-        apply_app_icon();
+    // The launcher's entry names the look chosen for the style the window last had, at once; the service needs nothing.
+    if key == "app.icon" || key == "app.icon_dark" {
+        apply_app_icon(verso_linux::app_icon::dark_style());
         return Ok(false);
     }
     Ok(true)
 }
 
-/// The app icon's design (`app.icon`) as this build reads it: Mist in a Flatpak, which offers no choice.
-pub fn app_icon() -> &'static str {
-    settings::Config::from_toml(&config_text(&Paths::from_environment())).map_or(settings::DEFAULT_APP_ICON, |config| config.app_icon)
+/// The app icon's looks, the light style's and the dark style's (`app.icon`, `app.icon_dark`), as this build reads them:
+/// Mist and Mist Night in a Flatpak, which offers no choice.
+pub fn app_icons() -> (&'static str, &'static str) {
+    settings::Config::from_toml(&config_text(&Paths::from_environment()))
+        .map_or((settings::DEFAULT_APP_ICON, settings::DEFAULT_APP_ICON_DARK), |config| (config.app_icon, config.app_icon_dark))
 }
 
-/// The icon the window and About show: the chosen design's (`dev.hviid.Verso-sand`), among the app's own icons.
-pub fn app_icon_name() -> String {
-    verso_core::product::current().app_icon(app_icon())
+/// The icon the window, About and the sign-in page show in the window's style (`dark`): the look chosen for it
+/// (`dev.hviid.Verso-sand`, `dev.hviid.Verso-mist-night`), among the app's own icons.
+pub fn app_icon_name(dark: bool) -> String {
+    let (light, dark_look) = app_icons();
+    verso_core::product::current().app_icon(if dark { dark_look } else { light })
 }
 
-/// Have Verso's launcher entry name the app icon chosen (`verso_linux::app_icon`).
-pub fn apply_app_icon() {
-    verso_linux::app_icon::apply(&Paths::from_environment(), app_icon());
+/// Have Verso's launcher entry name the look chosen for the style (`verso_linux::app_icon`).
+pub fn apply_app_icon(dark: bool) {
+    verso_linux::app_icon::apply(&Paths::from_environment(), dark);
 }
 
 /// Have the service draw its top bar icon again (`RefreshIcon`), off the caller's thread.

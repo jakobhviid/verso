@@ -46,11 +46,60 @@ const GROUPING_CHOICES: &[&str] = &["never", "atLeast500", "always"];
 const MOUNT_NAMES: &[&str] = &["immich-mount", "immich-drive", "immich", "verso-drive", "verso"];
 /// The drive's name when none is chosen.
 pub const DEFAULT_MOUNT_NAME: &str = "Verso";
-/// The app icon's designs, by its picture (DESIGN.md, "The picture's designs"), as `app.icon` stores them: Mist, the
-/// app's own, first.
-pub const APP_ICONS: &[&str] = &["mist", "sand", "dark", "paper", "frame", "slate", "sky"];
-/// The app icon when none is chosen.
+/// The app icon's designs, by its picture (DESIGN.md, "The picture's designs"): Mist, the app's own, first.
+pub const APP_ICON_DESIGNS: &[&str] = &["mist", "sand", "dark", "paper", "frame", "slate", "sky"];
+/// The app icon's looks, as `app.icon` and `app.icon_dark` store them: each design on Day or Night paper, its lens in
+/// colour or in graphite, named by the design with `-night` and `-graphite` after it as they apply, in the order
+/// `linux/packaging/icons/sources/app-icon.py` draws them. A design's name alone is its Day look in colour.
+pub const APP_ICONS: &[&str] = &[
+    "mist", "mist-night", "mist-graphite", "mist-night-graphite",
+    "sand", "sand-night", "sand-graphite", "sand-night-graphite",
+    "dark", "dark-night", "dark-graphite", "dark-night-graphite",
+    "paper", "paper-night", "paper-graphite", "paper-night-graphite",
+    "frame", "frame-night", "frame-graphite", "frame-night-graphite",
+    "slate", "slate-night", "slate-graphite", "slate-night-graphite",
+    "sky", "sky-night", "sky-graphite", "sky-night-graphite",
+];
+/// The app icon in the desktop's light style when none is chosen (`app.icon`): Mist on Day paper, in colour.
 pub const DEFAULT_APP_ICON: &str = "mist";
+/// The app icon in the desktop's dark style when none is chosen (`app.icon_dark`): Mist on Night paper, in colour.
+pub const DEFAULT_APP_ICON_DARK: &str = "mist-night";
+
+/// One of the app icon's looks, by its parts: its design, whether its paper is Night's, and whether its lens is in
+/// graphite.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AppIconLook {
+    pub design: &'static str,
+    pub night: bool,
+    pub graphite: bool,
+}
+
+impl AppIconLook {
+    /// The look a stored word names; Mist's Day look in colour for a word that names none.
+    pub fn parse(word: &str) -> AppIconLook {
+        let (rest, graphite) = word.strip_suffix("-graphite").map_or((word, false), |rest| (rest, true));
+        let (design, night) = rest.strip_suffix("-night").map_or((rest, false), |design| (design, true));
+        match APP_ICON_DESIGNS.iter().find(|known| **known == design) {
+            Some(design) => AppIconLook { design, night, graphite },
+            None => AppIconLook { design: DEFAULT_APP_ICON, night: false, graphite: false },
+        }
+    }
+
+    /// The word that stores it, one of [`APP_ICONS`].
+    pub fn word(self) -> &'static str {
+        let suffix = match (self.night, self.graphite) {
+            (false, false) => "",
+            (true, false) => "-night",
+            (false, true) => "-graphite",
+            (true, true) => "-night-graphite",
+        };
+        APP_ICONS
+            .iter()
+            .copied()
+            .find(|word| word.strip_suffix(suffix).is_some_and(|design| design == self.design))
+            .unwrap_or(DEFAULT_APP_ICON)
+    }
+}
 
 /// Every setting, in display order.
 pub const SETTINGS: &[Setting] = &[
@@ -82,7 +131,8 @@ pub const SETTINGS: &[Setting] = &[
     Setting { key: "web.links", kind: Kind::Bool, description: "Open in Immich and Copy Immich Link", default: "true" },
     Setting { key: "tray.double_click", kind: Kind::Choice(&["gallery", "drive", "preferences"]), description: "What a double click on Verso's top bar icon opens", default: "gallery" },
     Setting { key: "tray.colour", kind: Kind::Bool, description: "Verso's top bar icon in colour: the lens's five colours, grey while the server cannot be reached", default: "false" },
-    Setting { key: "app.icon", kind: Kind::Choice(APP_ICONS), description: "Verso's app icon, by the picture on its print", default: DEFAULT_APP_ICON },
+    Setting { key: "app.icon", kind: Kind::Choice(APP_ICONS), description: "Verso's app icon in the light style: the picture on its print, its paper and its lens", default: DEFAULT_APP_ICON },
+    Setting { key: "app.icon_dark", kind: Kind::Choice(APP_ICONS), description: "Verso's app icon in the dark style: the picture on its print, its paper and its lens", default: DEFAULT_APP_ICON_DARK },
     Setting { key: "crosslink.enabled", kind: Kind::Bool, description: "Show what other apps link to (Immich Crosslink)", default: "true" },
     Setting { key: "crosslink.gallery", kind: Kind::Bool, description: "Verso: take part as Verso Gallery, so other apps show items in it", default: "true" },
     Setting { key: "crosslink.drive", kind: Kind::Bool, description: "Verso: take part as Verso Drive, so other apps show items in Files while the drive is on", default: "true" },
@@ -144,6 +194,7 @@ pub const PANES: &[(&str, Pane)] = &[
     ("tray.double_click", Pane::CommandLine),
     ("tray.colour", Pane::CommandLine),
     ("app.icon", Pane::CommandLine),
+    ("app.icon_dark", Pane::CommandLine),
     ("crosslink.enabled", Pane::OtherApps),
     // Verso's own Crosslink page.
     ("crosslink.gallery", Pane::CommandLine),
@@ -318,8 +369,10 @@ pub struct Config {
     pub tray_double_click: String,
     /// Verso's top bar icon in colour rather than in the desktop's one colour.
     pub tray_colour: bool,
-    /// The app icon's design, one of [`APP_ICONS`] (`app.icon`).
+    /// The app icon's look in the desktop's light style, one of [`APP_ICONS`] (`app.icon`).
     pub app_icon: &'static str,
+    /// The app icon's look in the desktop's dark style, one of [`APP_ICONS`] (`app.icon_dark`).
+    pub app_icon_dark: &'static str,
     /// The apps left out of Show in *app*, by desktop entry or bundle id, separated by `;`.
     pub crosslink_hidden: String,
     /// Verso's participants, Verso Gallery and Verso Drive, each announced while its switch is on (`participants`).
@@ -387,8 +440,12 @@ impl Config {
             tray_double_click: effective("tray.double_click")?,
             tray_colour: flag("tray.colour")?,
             app_icon: {
-                let design = effective("app.icon")?;
-                APP_ICONS.iter().copied().find(|known| *known == design).unwrap_or(DEFAULT_APP_ICON)
+                let look = effective("app.icon")?;
+                APP_ICONS.iter().copied().find(|known| *known == look).unwrap_or(DEFAULT_APP_ICON)
+            },
+            app_icon_dark: {
+                let look = effective("app.icon_dark")?;
+                APP_ICONS.iter().copied().find(|known| *known == look).unwrap_or(DEFAULT_APP_ICON_DARK)
             },
             crosslink_hidden: optional("crosslink.hidden")?.unwrap_or_default(),
             crosslink_gallery: flag("crosslink.gallery")?,
@@ -509,17 +566,33 @@ mod tests {
     }
 
     #[test]
-    fn the_app_icon_is_mist_until_another_design_is_chosen() {
-        assert_eq!(Config::from_toml("").unwrap().app_icon, "mist");
-        assert_eq!(Config::from_toml("[app]\nicon = \"sand\"\n").unwrap().app_icon, "sand");
+    fn the_app_icon_is_mist_by_day_and_by_night_until_others_are_chosen() {
+        let config = Config::from_toml("").unwrap();
+        assert_eq!((config.app_icon, config.app_icon_dark), ("mist", "mist-night"));
+        let chosen = Config::from_toml("[app]\nicon = \"sand\"\nicon_dark = \"slate-night-graphite\"\n").unwrap();
+        assert_eq!((chosen.app_icon, chosen.app_icon_dark), ("sand", "slate-night-graphite"));
         assert!(Config::from_toml("[app]\nicon = \"neon\"\n").is_err());
+        assert!(Config::from_toml("[app]\nicon_dark = \"sand-dusk\"\n").is_err());
         assert_eq!(APP_ICONS[0], DEFAULT_APP_ICON);
-        for design in APP_ICONS {
+        assert_eq!(APP_ICONS.len(), APP_ICON_DESIGNS.len() * 4, "every design in four looks");
+        for design in APP_ICON_DESIGNS {
             assert_ne!(choice_label(design), *design, "{design} has no name");
         }
         // The Flatpak offers no choice, and reads none.
-        let flatpak = Config::from_toml_for("[app]\nicon = \"sand\"\n", &crate::product::VERSO_FLATPAK).unwrap();
-        assert_eq!(flatpak.app_icon, "mist");
+        let flatpak = Config::from_toml_for("[app]\nicon = \"sand\"\nicon_dark = \"sky\"\n", &crate::product::VERSO_FLATPAK).unwrap();
+        assert_eq!((flatpak.app_icon, flatpak.app_icon_dark), ("mist", "mist-night"));
+    }
+
+    #[test]
+    fn a_look_is_its_design_its_paper_and_its_lens() {
+        for word in APP_ICONS {
+            assert_eq!(AppIconLook::parse(word).word(), *word);
+        }
+        assert_eq!(AppIconLook::parse("sand"), AppIconLook { design: "sand", night: false, graphite: false });
+        assert_eq!(AppIconLook::parse("dark-night-graphite"), AppIconLook { design: "dark", night: true, graphite: true });
+        assert_eq!(AppIconLook::parse("sky-graphite"), AppIconLook { design: "sky", night: false, graphite: true });
+        assert_eq!(AppIconLook::parse("neon-night").word(), DEFAULT_APP_ICON, "a word that names no look is Mist's");
+        assert_eq!(AppIconLook { design: "frame", night: true, graphite: false }.word(), "frame-night");
     }
 
     #[test]
