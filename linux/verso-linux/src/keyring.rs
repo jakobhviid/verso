@@ -32,6 +32,11 @@ fn classify(error: oo7::Error) -> KeyringError {
         oo7::Error::DBus(oo7::dbus::Error::Service(oo7::dbus::ServiceError::ZBus(error))) if no_such_service(&error) => {
             KeyringError::Unavailable(error.to_string())
         }
+        // A Secret portal with no keyring behind it (the desktop portal running without GNOME Keyring) hands the
+        // sandbox an empty secret, too short to lock a keyring file with: no keyring either.
+        oo7::Error::File(oo7::file::Error::WeakKey(oo7::file::WeakKeyError::PasswordTooShort(length))) => {
+            KeyringError::Unavailable(format!("the Secret portal gave a secret of {length} bytes"))
+        }
         other => KeyringError::Failed(other.to_string()),
     }
 }
@@ -180,6 +185,12 @@ mod tests {
         assert!(matches!(classify(unknown), KeyringError::Unavailable(_)));
         let unowned = service_error(zbus::fdo::Error::NameHasNoOwner("org.freedesktop.secrets".to_owned()));
         assert!(matches!(classify(unowned), KeyringError::Unavailable(_)));
+    }
+
+    #[test]
+    fn a_secret_portal_without_a_keyring_is_no_keyring() {
+        let empty = oo7::Error::File(oo7::file::Error::WeakKey(oo7::file::WeakKeyError::PasswordTooShort(0)));
+        assert!(matches!(classify(empty), KeyringError::Unavailable(_)));
     }
 
     #[test]
