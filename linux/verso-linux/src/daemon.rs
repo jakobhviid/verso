@@ -122,7 +122,8 @@ pub enum ProgramChange {
 
 /// The program the user service started: the path it ran (`argv[0]`, which systemd gives absolute) and the file this
 /// process runs. A package manager replaces a program by putting a new file in its place, so the path then names a
-/// file other than the running one; an uninstall leaves nothing there. Verso's window watches its own program too.
+/// file other than the running one; an uninstall leaves nothing there. Verso's window watches its own program too, or,
+/// behind the tarball's launcher, the launcher.
 pub struct ProgramWatch {
     path: PathBuf,
     running: (u64, u64),
@@ -130,8 +131,15 @@ pub struct ProgramWatch {
 }
 
 impl ProgramWatch {
-    /// `None` when started by a relative name (from a terminal), where there is no path to watch.
+    /// `None` when started by a relative name (from a terminal), where there is no path to watch. A program in a
+    /// `libexec` folder (the tarball's window) watches the launcher in front of it (`programs::launcher`), the file it
+    /// was when the watch began: the launcher is what was started and what an upgrade replaces, while the program's own
+    /// path is one version's folder under Homebrew, gone after an upgrade.
     pub fn new() -> Option<ProgramWatch> {
+        if let Some(launcher) = crate::programs::launcher() {
+            let file = std::fs::metadata(&launcher).ok()?;
+            return Some(ProgramWatch { path: launcher, running: (file.dev(), file.ino()), missing_since: None });
+        }
         let path = PathBuf::from(std::env::args_os().next()?);
         if !path.is_absolute() {
             return None;

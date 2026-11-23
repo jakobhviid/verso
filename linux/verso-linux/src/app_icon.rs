@@ -18,10 +18,10 @@ use crate::paths::Paths;
 /// the package's entry is gone.
 const WRITTEN: &str = "# Written by Verso over the installed entry, for the app icon chosen in Preferences (app.icon).\n";
 
-/// The folders the app's own icons are in: `icons` beside the program, as the tarball has them, or, run from a
+/// The folders the app's own icons are in: `icons` in the install's folder, as the tarball has them, or, run from a
 /// checkout, beside the sources.
 pub fn icon_folders() -> Vec<PathBuf> {
-    let beside = std::env::current_exe().ok().and_then(|program| Some(program.parent()?.join("icons")));
+    let beside = crate::programs::install_folder().map(|folder| folder.join("icons"));
     let checkout = Path::new(env!("CARGO_MANIFEST_DIR")).join("../packaging/icons");
     beside.into_iter().chain([checkout]).filter(|folder| folder.is_dir()).collect()
 }

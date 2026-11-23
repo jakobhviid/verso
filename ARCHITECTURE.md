@@ -872,11 +872,12 @@ sees.
   switch on, and the service goes on without the drive (the tray, the D-Bus interface), its bookmark and folder kept;
   **Mount** restarts the service, which mounts, and so does the next login.
 - **Upgrades** close the old Verso and open the new one in its place (the service: "The daemon's lifecycle", step
-  6). The window watches its own program the same way (`upgrade`): replaced, it closes, once any import is done, and
-  the new version opens on the page it showed (`verso:show:<page>`), started from a scope of its own once this process
-  has gone, since one started sooner would hand itself to the old one and leave. Uninstalled, the window closes. Not
-  from the cask: Homebrew runs a cask's steps in a sandbox (Landlock, no network, a home of its own), and what they
-  start stays in it. A Flatpak is updated by Flatpak and runs on until closed.
+  6). The window watches its own program the same way (`upgrade`), or, behind the tarball's launcher, the launcher, by
+  the path the desktop starts it by (Homebrew's `bin/verso`; "Packaging"): replaced, it closes, once any import is
+  done, and the new version opens on the page it showed (`verso:show:<page>`), started from a scope of its own once
+  this process has gone, since one started sooner would hand itself to the old one and leave. Uninstalled, the window
+  closes. Not from the cask: Homebrew runs a cask's steps in a sandbox (Landlock, no network, a home of its own), and
+  what they start stays in it. A Flatpak is updated by Flatpak and runs on until closed.
 - **One sign-in.** The window reads the server and the credential the service uses (`config.toml`, then the
   credential file or the keyring, as the daemon looks), and Sign Out signs both out through `verso-service logout`.
   Signing in stores the credential and starts the service (`session::start_service`); opening the window starts it
@@ -1663,10 +1664,11 @@ Flatpak ships Mist alone.
 
 Verso installs as one package with both programs, from two channels today, with a third to come:
 - **The tarball** (`linux/packaging/verso-tarball.sh`, built in the Fedora 44 toolbox for x86_64), which Homebrew's
-  `verso` cask installs: the window, with the libraries a desktop may lack (libshumate, libprotobuf-c) beside it in
-  `lib/` (its run path is `$ORIGIN/lib`); the service; the icons; the catalogs in `share/locale`; the desktop entry
-  made from its template, whose `Exec` the cask writes its own path into; and the Files extension in Python ("Links on
-  Linux, and the Files extension"). The script checks that each program finds every library.
+  `verso` cask installs: `verso`, the launcher in front of the window (below); the window, `libexec/verso`, with the
+  libraries a desktop may lack (libshumate, libprotobuf-c) beside it in `libexec/lib/` (its run path is
+  `$ORIGIN/lib`); the service; the icons; the catalogs in `share/locale`; the desktop entry made from its template,
+  whose `Exec` the cask writes its own path into; and the Files extension in Python ("Links on Linux, and the Files
+  extension"). The script checks that each program finds every library.
 - **The Flatpak** (`linux/packaging/flatpak/`), for our own builds and testing, without the drive ("Verso as a
   Flatpak").
 - **rpm and deb packages** of Verso's own come with releases cut by a tag (ROADMAP, M9, step 6), with the C Files
@@ -1688,8 +1690,43 @@ What an install carries:
   `THIRD-PARTY-NOTICES.md` first, then every crate the package's binaries link (from `cargo tree`) with the license
   files it ships, each distinct text printed once; the tarball carries none yet.
 
-**The window links the system's GTK 4 and libadwaita** (4.18 and 1.8 at least): the tarball needs them on the
-desktop, and the Flatpak brings them in the GNOME runtime.
+**The window links the system's GNOME libraries, GNOME 49's or newer:** libadwaita 1.8 and GTK 4.18 at least (SPEC.md,
+"Supported versions"). Verso is built for the current GNOME: the window uses libadwaita's widgets up to 1.8
+(AdwShortcutsDialog from 1.8, AdwToggleGroup from 1.7, AdwSpinner and AdwButtonRow from 1.6) and GTK 4.16's CSS
+variables. The tarball needs them on the desktop, and the Flatpak brings them in the GNOME runtime.
+
+**The launcher: a script in front of the window,** so that a system whose libraries are too old says why. A Rust
+program binds every symbol as it loads (full RELRO, no PLT), so on Ubuntu 24.04 (libadwaita 1.5, GTK 4.14) the loader
+stops the window before `main` (`symbol lookup error: ... undefined symbol: adw_shortcuts_dialog_add`), and someone
+who opened it from the app grid or a launcher sees nothing. So the tarball's `verso` is a POSIX `sh` script,
+`linux/packaging/verso-launcher.sh`, and the window is `libexec/verso` in the same folder, named so that its process
+is `verso`:
+- It finds its own folder through links (Homebrew's `bin/verso` links to it), then the libadwaita the loader would
+  take: the first in `LD_LIBRARY_PATH`, else the one in the loader's cache (`ldconfig -p`, also from `/sbin` and
+  `/usr/sbin`, which may be off a user's PATH), else one in the usual folders. It is new enough when it holds a
+  function libadwaita 1.8 added, `adw_shortcuts_dialog_new`, whose name `grep` finds in the library's table of symbols
+  with no binutils; libadwaita 1.8 needs GTK 4.18, so the one look covers both.
+- Too old or missing, it says why on stderr (SPEC.md, "Supported versions") and, started without a terminal, in
+  zenity's dialog where zenity is (Ubuntu's GNOME has it), else in a notification (`notify-send`, else `gdbus` to
+  `org.freedesktop.Notifications`), and exits with 1.
+- Otherwise it `exec`s the window with the arguments as given, adding none: no process of its own stays, and the
+  browser sign-in's `app.immich:` redirect and crosslinks arrive as the desktop entry's `%u`.
+- What starts the window by its path starts the launcher: the desktop entry's `Exec` (the cask's `bin/verso`), the
+  tray's Open and `verso-service app` (`programs::find`), and Verso Gallery's Crosslink entry, which the service
+  writes. The window, in `libexec/`, finds its install's programs, icons and catalogs in the folder above
+  (`programs::install_folder`), and watches the launcher for an upgrade (`programs::launcher`, "The window and the
+  service"), as its own path is one version's folder under Homebrew.
+- The service needs none: it loads no toolkit and links no GNOME library, so the loader has nothing to stop it on.
+  On an older system the window, which signs in and sets it up, does not start; its command line is for advanced use.
+- rpm and deb packages (ROADMAP, M9, step 6) state the libraries as dependencies, which keeps them off an older
+  system, so they need no launcher.
+- **Not chosen: lowering the floor to GNOME 46,** Ubuntu 24.04's libraries: it gives up the widgets above for systems
+  the Flatpak serves already, and Verso is built for the current GNOME.
+- **Not chosen: the check inside the window.** It cannot run there: the loader binds every symbol before `main`.
+  Lazy binding, or loading libadwaita by hand (`dlopen`), would change how every widget is linked for one message.
+- **Flatpak impact:** none. The Flatpak runs on GNOME's runtime, always new enough, and installs the window as
+  `/app/bin/verso`, without the launcher. On a system too old for the tarball it is the way to run Verso, without
+  Verso Drive.
 
 **Not chosen: AppImage.** No service or autostart integration, the sign-in scheme handler needs extra desktop
 integration, and bundling GTK 4 and libadwaita drifts from the host look.

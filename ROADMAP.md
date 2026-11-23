@@ -121,7 +121,8 @@ the import panel, Change Password and the profile picture.
      Flatpak; the packages on Linux and the Mac's disk image, signed and notarized on GitHub's Mac runner, join it
      (M9, step 6)
    - `jakobhviid/verso-releases` retired: the releases come from `jakobhviid/verso`, so the cask's `url` and
-     `homepage`, and Preferences' "Installing Verso with Homebrew" link (`preferences.rs`), point there
+     `homepage`, Preferences' "Installing Verso with Homebrew" link (`preferences.rs`) and the requirements' address
+     the tarball's launcher gives (`linux/packaging/verso-launcher.sh`), point there
    - decided with the maintainer:
      - **The history:** cleaned into one commit at the public launch, as Immich Mount's was (M5), tagged `v1.0.0`;
        every earlier tag goes, with this repository's releases. Before the history is rewritten, all of it (every

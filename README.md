@@ -73,6 +73,19 @@ place in another app that takes part, and those apps can show theirs in Verso. W
 
 ## Install on Linux
 
+### Requirements
+
+Verso is built for the current GNOME, so it needs **GNOME 49's libraries or newer** (libadwaita 1.8 and GTK 4.18), on
+x86_64 Linux:
+
+- **New enough:** Fedora 43 and newer, Ubuntu 25.10 and 26.04 LTS, Debian 14, Arch and other rolling distributions.
+- **Too old:** Ubuntu 24.04 LTS and what is built on it (Linux Mint 22, Pop!_OS 24.04, Zorin OS 18), Debian 13,
+  Fedora 42 and anything older. There Verso says so when it starts, and the [Flatpak](#as-a-flatpak-test-build),
+  which brings GNOME's own libraries, runs instead, without Verso Drive.
+
+Verso Drive needs FUSE 3, Verso's menu in Files needs nautilus-python, and the top bar icon needs a tray: on GNOME,
+the AppIndicator extension.
+
 ### With Homebrew
 
 ```sh
@@ -81,13 +94,6 @@ brew install jakobhviid/tap/verso
 
 Open **Verso** from the app grid and sign in. Update with `brew upgrade verso`; remove it with `brew uninstall verso`,
 and add `--zap` to remove its settings and cache too.
-
-It needs:
-
-- x86_64 Linux with GTK 4.18 or later and libadwaita 1.8 or later (Fedora 44 or similar).
-- FUSE 3, for Verso Drive.
-- nautilus-python, for Verso's menu in Files.
-- A tray for the top bar icon: on GNOME, the AppIndicator extension.
 
 ### As a Flatpak (test build)
 
@@ -117,8 +123,9 @@ sudo dnf install gcc cargo rust gtk4-devel libadwaita-devel libshumate-devel blu
 linux/packaging/verso-tarball.sh out
 ```
 
-`out/verso` then holds Verso as the release tarball has it: `verso`, the window, and `verso-service`, the top bar
-icon and the drive, with the icons and the desktop entry. The two programs alone are `cargo build --release -p verso
+`out/verso` then holds Verso as the release tarball has it: `verso`, which opens the window (`libexec/verso`) once it
+has checked the system's libraries, and `verso-service`, the top bar icon and the drive, with the icons and the
+desktop entry. The two programs alone are `cargo build --release -p verso
 -p verso-service`. [`linux/packaging/flatpak/dev.hviid.Verso.yml`](linux/packaging/flatpak/dev.hviid.Verso.yml)
 builds the Flatpak, as its first lines say.
 

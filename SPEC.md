@@ -556,7 +556,15 @@ part in Immich Crosslink, which shows it there: from Verso Drive's menu in Files
 
 - **Immich:** the current and previous minor release; today v3.3 and v3.2, so the floor is v3.2.0. Below the floor,
   sign-in stops, saying which Immich the server runs and that Verso needs v3.2 or later.
-- **GNOME:** the current and previous release; today GNOME 50 and 49. Verso needs GTK 4.18 and libadwaita 1.8.
+- **GNOME:** the current and previous release; today GNOME 50 and 49. Verso's window needs GNOME 49's libraries or
+  newer, libadwaita 1.8 and GTK 4.18: Fedora 43 and newer, Ubuntu 25.10 and 26.04 LTS, Debian 14, Arch and other
+  rolling distributions. On an older system (Ubuntu 24.04 LTS and what is built on it, Debian 13, Fedora 42) the
+  tarball's `verso` does not start the window (ARCHITECTURE.md, "Packaging"): it writes to stderr `error: Verso needs
+  GNOME 49 or newer (libadwaita 1.8 and GTK 4.18), and this system's libraries are older.` (`this system has no
+  libadwaita.` where there is none), the systems new enough, that Verso's Flatpak runs there without Verso Drive, the
+  requirements' address and the library it found; started on a desktop without a terminal, it shows the same in
+  zenity's dialog, or else in a notification that stays until dismissed; and it exits with 1. The Flatpak brings
+  GNOME's own libraries and runs there.
 - **Linux:** a kernel with FUSE protocol 7.31 or later, a setuid `fusermount3`, and access to `/dev/fuse`, for Verso
   Drive.
 - **macOS:** 15 or later.

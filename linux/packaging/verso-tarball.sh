@@ -1,8 +1,10 @@
 #!/bin/bash
-# Build Verso's evaluation tarball for x86_64 Linux into OUT_DIR: the window (`verso`), which finds the libraries a
-# desktop may lack (libshumate, libprotobuf-c) beside it in lib/; the tray and the drive (`verso-service`); the icons;
-# and the desktop entry made from the template, so the browser sign-in's redirect and crosslink links reach the app. Run in the Fedora toolbox, from the repository's
-# root: linux/packaging/verso-tarball.sh OUT_DIR
+# Build Verso's evaluation tarball for x86_64 Linux into OUT_DIR: the launcher (`verso`, from verso-launcher.sh), which
+# runs the window (`libexec/verso`), or says why not on a system whose GNOME libraries are too old; the window, which
+# finds the libraries a desktop may lack (libshumate, libprotobuf-c) beside it in libexec/lib/; the tray and the drive
+# (`verso-service`); the icons; and the desktop entry made from the template, so the browser sign-in's redirect and
+# crosslink links reach the app. Run in the Fedora toolbox, from the repository's root:
+# linux/packaging/verso-tarball.sh OUT_DIR
 set -euo pipefail
 out=${1:?usage: linux/packaging/verso-tarball.sh OUT_DIR}
 # The version it is released as, built in (`verso_core::product::VERSION`).
@@ -13,11 +15,14 @@ CARGO_TARGET_DIR=$target RUSTFLAGS='-C link-arg=-Wl,--disable-new-dtags,-rpath,$
     cargo build --release -p verso -p verso-service
 stage=$out/verso
 rm -rf "$stage"
-mkdir -p "$stage/lib"
-cp "$target/release/verso" "$stage/verso"
+mkdir -p "$stage/libexec/lib"
+# The window behind its launcher, under its own name, so its process is named `verso`; its run path, `$ORIGIN/lib`, is
+# its own folder's lib/.
+cp "$target/release/verso" "$stage/libexec/verso"
+install -m 0755 linux/packaging/verso-launcher.sh "$stage/verso"
 cp "$target/release/verso-service" "$stage/verso-service"
-strip "$stage/verso" "$stage/verso-service"
-cp -L /usr/lib64/libshumate-1.0.so.1 /usr/lib64/libprotobuf-c.so.1 "$stage/lib/"
+strip "$stage/libexec/verso" "$stage/verso-service"
+cp -L /usr/lib64/libshumate-1.0.so.1 /usr/lib64/libprotobuf-c.so.1 "$stage/libexec/lib/"
 # Verso's icon, the print, at the sizes the icon theme wants, edge to edge as Linux shows icons
 # (`linux/packaging/icons/linux-app-icon.py` makes them from `dev.hviid.Verso.svg`), Verso Drive's with its badge, and the
 # symbolic one, with the top bar's states.
@@ -34,9 +39,9 @@ done
 for icon in dev.hviid.Verso-tray dev.hviid.Verso-tray-unmounted dev.hviid.Verso-tray-offline dev.hviid.Verso-tray-signed-out; do
     install -D -m 0644 "linux/packaging/icons/$icon.svg" "$stage/hicolor/scalable/apps/$icon.svg"
 done
-# The app's own icons, which it finds beside itself: its own, its mark (Verso Drive's page in Preferences), the app
-# icon for its windows wherever the theme has none, and the app icon's other designs (`app.icon`), which the windows
-# show and the launcher's entry names a copy of (`verso_linux::app_icon`).
+# The app's own icons, which it finds in the install's folder: its own, its mark (Verso Drive's page in Preferences),
+# the app icon for its windows wherever the theme has none, and the app icon's other designs (`app.icon`), which the
+# windows show and the launcher's entry names a copy of (`verso_linux::app_icon`).
 mkdir -p "$stage/icons"
 cp linux/packaging/icons/verso-*-symbolic.svg linux/packaging/icons/dev.hviid.Verso-symbolic.svg linux/packaging/icons/dev.hviid.Verso.png "$stage/icons/"
 for design in sand dark paper frame slate sky; do
@@ -50,7 +55,7 @@ test -f "$stage/share/locale/da/LC_MESSAGES/verso.mo"
 sed 's|@BINDIR@/||' linux/packaging/desktop/dev.hviid.Verso.desktop.in > "$stage/dev.hviid.Verso.desktop"
 grep -qx 'Exec=verso %u' "$stage/dev.hviid.Verso.desktop"
 grep -q '^MimeType=x-scheme-handler/app.immich;' "$stage/dev.hviid.Verso.desktop"
-for program in verso verso-service; do
+for program in libexec/verso verso-service; do
     if ldd "$stage/$program" | grep -E 'not found'; then
         exit 1
     fi

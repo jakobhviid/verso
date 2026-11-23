@@ -24,11 +24,11 @@ pub fn tr(text: &str) -> &str {
     catalog.get(text).map_or(text, String::as_str)
 }
 
-/// Where the catalogs are, beside the program: `share/locale` next to it (Homebrew's cask keeps everything in one
-/// folder), or in `../share/locale` (`/usr/bin` and `/usr/share/locale`, and a Flatpak's `/app`).
+/// Where the catalogs are, beside the install's programs: `share/locale` in its folder (the tarball, which Homebrew's
+/// cask installs, keeps everything in one folder), or in `../share/locale` (`/usr/bin` and `/usr/share/locale`, and a
+/// Flatpak's `/app`).
 pub fn locale_directory() -> Option<PathBuf> {
-    let program = std::env::current_exe().ok()?;
-    let folder = program.parent()?;
+    let folder = crate::programs::install_folder()?;
     [folder.join("share/locale"), folder.join("../share/locale")].into_iter().find(|candidate| candidate.is_dir())
 }
 

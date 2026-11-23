@@ -538,14 +538,14 @@ pub fn set_mounted(mounted: bool) -> Result<(), String> {
     Ok(())
 }
 
-/// Verso's service and command line (`verso-service`), installed beside the window.
+/// Verso's service and command line (`verso-service`), installed with the window.
 fn daemon_program() -> PathBuf {
     let name = verso_core::product::current().program;
     verso_linux::programs::find(name).unwrap_or_else(|| PathBuf::from(name))
 }
 
 /// Sign out through the command line's `logout`, which unmounts and removes the credential, the caches and the
-/// seeded thumbnails. The two programs ship together, so the command sits next to this one.
+/// seeded thumbnails. The two programs ship together, so the command is found where this one is installed.
 pub fn disconnect() -> Result<(), String> {
     let program = daemon_program();
     let outcome = Command::new(&program).arg("logout").output().map_err(|error| format!("{}: {error}", program.display()))?;

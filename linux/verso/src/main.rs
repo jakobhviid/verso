@@ -123,8 +123,8 @@ fn load_style() {
     provider.load_from_string(include_str!("style.css"));
     if let Some(display) = gdk::Display::default() {
         gtk::style_context_add_provider_for_display(&display, &provider, gtk::STYLE_PROVIDER_PRIORITY_APPLICATION);
-        // Its own icons (the Date Scroller's, the app icon's designs): in `icons` beside the program, as the tarball
-        // has them, or, run from a checkout, beside the sources. The app's icon is installed in the icon theme.
+        // Its own icons (the Date Scroller's, the app icon's designs): in `icons` in the install's folder, as the
+        // tarball has them, or, run from a checkout, beside the sources. The app's icon is installed in the icon theme.
         for icons in verso_linux::app_icon::icon_folders() {
             gtk::IconTheme::for_display(&display).add_search_path(icons);
         }

@@ -36,7 +36,9 @@ expand inside the VM.
 ## Putting Verso in
 
 **The tarball, the usual way:** build it in the toolbox from the repository's root, push it, and unpack it to
-`/opt/verso`, where the window finds `verso-service` and its libraries beside itself:
+`/opt/verso`. There `/opt/verso/verso` is the launcher, which checks the system's libadwaita and runs the window,
+`/opt/verso/libexec/verso`; the window finds `verso-service` in the folder above its own and its libraries in
+`libexec/lib/`:
 
 ```sh
 toolbox run -c verso bash -c 'export CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=cc \
@@ -64,12 +66,12 @@ lab/gnome-vm/run-in-session.sh -d /opt/verso/verso
   empty; the tarball's `hicolor/` holds them, for `~/.local/share/icons/hicolor/`), and Verso's menu in Files,
   `/opt/verso/verso-nautilus.py`, which nautilus-python loads from `~/.local/share/nautilus-python/extensions/`.
   The cask installs all three (the `lab-bazzite-vm` skill).
-- **A missing library:** `ldd /opt/verso/verso | grep 'not found'` in the VM; the tarball carries libshumate and
-  libprotobuf-c, and the VM's GNOME packages carry GTK 4 and libadwaita.
+- **A missing library:** `ldd /opt/verso/libexec/verso | grep 'not found'` in the VM (`/opt/verso/verso` is a
+  script); the tarball carries libshumate and libprotobuf-c, and the VM's GNOME packages carry GTK 4 and libadwaita.
 - **A new build over a running one:** replace `/opt/verso` whole, as above, within two minutes: the service and an
-  open window look at their program's inode every 5 seconds and restart into the new one, as after `brew upgrade`
-  (WORKFLOWS.md, "1. Install", "Upgrades"); a program gone for two minutes counts as uninstalled, and the service turns
-  itself off. Pushing a file over a running program fails with "text file busy".
+  open window look at their program's inode (the window, at the launcher's) every 5 seconds and restart into the new
+  one, as after `brew upgrade` (WORKFLOWS.md, "1. Install", "Upgrades"); a program gone for two minutes counts as
+  uninstalled, and the service turns itself off. Pushing a file over a running program fails with "text file busy".
 - **A stale program wins silently:** with an earlier install on the PATH (a cask's, say), check `command -v verso
   verso-service` in the VM, and the unit's `ExecStart`, when a result looks old.
 

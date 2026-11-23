@@ -7,7 +7,10 @@ it works this way. Where a step is not built yet, it says so.
 
 Verso is one app with two programs, installed together: **Verso** (`verso`), the window you open from the app grid,
 and its service (`verso-service`), which runs the top bar icon and Verso Drive from login, and is the command line.
-Verso runs on x86_64 Linux with GTK 4.18 and libadwaita 1.8 or later (Fedora 44 or similar), made for GNOME.
+Verso is made for the current GNOME, and runs on x86_64 Linux with GNOME 49's libraries or newer, libadwaita 1.8 and
+GTK 4.18: Fedora 43 and newer, Ubuntu 25.10 and 26.04 LTS, Debian 14, Arch and other rolling distributions. On an
+older system (Ubuntu 24.04 LTS and what is built on it, Debian 13, Fedora 42), `verso` says so as it starts, and the
+Flatpak below runs instead, without Verso Drive.
 
 **With Homebrew** (any Linux that has it, such as Bazzite; nothing is layered onto an atomic system):
 
@@ -54,10 +57,10 @@ sed "s|@BINDIR@|$PWD/target/release|" linux/packaging/desktop/dev.hviid.Verso.de
 update-desktop-database ~/.local/share/applications
 ```
 
-`linux/packaging/verso-tarball.sh out` builds what the release tarball holds into `out/verso`: both programs, the
-icons, the desktop entry, Verso's menu in Files (`verso-nautilus.py`) and the third-party licenses. A debug build
-decodes pictures slowly; `cargo build -p verso --config 'profile.dev.package."*".opt-level=2'` optimises the
-dependencies only.
+`linux/packaging/verso-tarball.sh out` builds what the release tarball holds into `out/verso`: both programs (the
+window as `libexec/verso`, behind `verso`, a script that checks the system's libraries first), the icons, the desktop
+entry, Verso's menu in Files (`verso-nautilus.py`) and the third-party licenses. A debug build decodes pictures
+slowly; `cargo build -p verso --config 'profile.dev.package."*".opt-level=2'` optimises the dependencies only.
 
 **Coming:** rpm and deb packages of Verso's own.
 
@@ -304,6 +307,7 @@ in another language once: `LANGUAGE=da verso`. The folders in the drive keep the
 
 | Symptom | What to do |
 |---|---|
+| Verso does not open from the app grid, or says it needs GNOME 49 or newer | The system's GNOME libraries are older than Verso's (section 1); `verso` in a terminal says which it found. Install the Flatpak instead, which runs without Verso Drive |
 | The keyring prompt appeared at login | Unlock it. If it was dismissed, Verso's service did not start (a notification says so): open Verso, or run `systemctl --user start verso` |
 | "Signed out of Immich" notification | Open Verso (the top bar menu's **Sign In…**) and sign in again. Caches are kept |
 | The top bar icon does not show | Stock GNOME has no tray: turn on the AppIndicator extension. Verso and its drive work without it; Preferences, Verso Drive, Status shows the drive's state |

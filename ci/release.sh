@@ -103,8 +103,10 @@ release_text() {
   runtime=$(sed -n "s/^runtime-version: '\(.*\)'$/\1/p" "$tree/linux/packaging/flatpak/dev.hviid.Verso.yml")
   upgrade='Upgrade with `brew upgrade verso`.'
   is_prerelease "$version" && upgrade="A pre-release: Homebrew's cask stays at the last release."
-  printf 'Evaluation build for x86_64 Linux. Needs GTK 4.18 or later and libadwaita 1.8 or later (Fedora 44 or '
-  printf "similar), and FUSE 3 for the drive; Verso Drive's menu in Files needs nautilus-python. %s\n\n" "$upgrade"
+  printf "Evaluation build for x86_64 Linux. Needs GNOME 49's libraries or newer, libadwaita 1.8 and GTK 4.18 "
+  printf '(Fedora 43 and newer, Ubuntu 25.10 and 26.04 LTS, Debian 14, Arch); on an older system Verso says so as it '
+  printf 'starts, and the Flatpak below runs there, without Verso Drive. Verso Drive needs FUSE 3, and its menu in '
+  printf 'Files nautilus-python. %s\n\n' "$upgrade"
   if [ -z "$previous" ]; then
     printf '%s\n\n' "$notes"
   elif [ -n "$notes" ]; then
