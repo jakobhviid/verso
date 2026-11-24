@@ -200,7 +200,10 @@ video bar stay the iPhone's (the Mac's floating video controls are its own nativ
    the app menu alone.
 2. **The sidebar's account row** (`AccountSidebarFooter.swift`) shows the storage used under the name, where the
    server's address is today; the address, the storage and the server's version are in the menu it opens.
-3. **⌘Q quits Verso's gallery, not the menu bar icon:** the windows close and the icon (and Verso Drive's account with
+3. **Verso Drive's `CACHEDIR.TAG` out of sight in Finder:** the tag that keeps backup tools out of the drive shows in
+   its root on the Mac; how to hide it (a hidden flag on the item, a name Finder hides, or no tag where the system
+   already keeps backups out of File Provider locations) is to be settled.
+4. **⌘Q quits Verso's gallery, not the menu bar icon:** the windows close and the icon (and Verso Drive's account with
    it) stays, as Immich Mount's app does; Quit Verso in the icon's menu quits it all.
 
 **Next, with the maintainer at the Mac:** the library and the viewer as they look, the widget, the icons as macOS

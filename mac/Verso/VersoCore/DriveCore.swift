@@ -22,12 +22,14 @@ public enum DriveCore {
     public static func panes() throws -> SettingsPanes { try settingsPanes(config: AppGroup.configText) }
 
     /// The drive's item that shows what a crosslink names (a photo, an album, a person, a place), as a received link
-    /// is followed; nil when the drive keeps no account or has no place for it.
-    public static func item(showing link: String) async -> String? {
-        guard let account = Account.load() else { return nil }
-        let outcome = await showLink(server: account.server, credential: account.credential,
-                                     certificate: account.certificate, config: AppGroup.configText, link: link)
-        return outcome.result == "show" ? outcome.identifier : nil
+    /// is followed: `show_link`'s outcome, "signed-out" when the drive keeps no account. Verso's own Show In asks it
+    /// with links from other apps (`crosslink.enabled`) taken as on, as that setting is about other apps alone.
+    public static func item(showing link: String) async -> ShowLinkOutcome {
+        guard let account = Account.load() else { return ShowLinkOutcome(result: "signed-out", identifier: nil, detail: "") }
+        let config = (try? setPreference(config: AppGroup.configText, key: "crosslink.enabled", value: "true"))
+            ?? AppGroup.configText
+        return await showLink(server: account.server, credential: account.credential,
+                              certificate: account.certificate, config: config, link: link)
     }
 
     /// The server the drive keeps an account for; nil when it keeps none.

@@ -143,15 +143,20 @@ final class VersoDrive {
     /// does (the system may answer "database is locked" while it reads the location again); the location itself
     /// when the drive has no place for it.
     func show(_ link: String) async {
-        guard let manager = NSFileProviderManager(for: domain), let identifier = await DriveCore.item(showing: link) else {
+        let outcome = await DriveCore.item(showing: link)
+        log.notice("show in Verso Drive: \(outcome.result, privacy: .public) \(outcome.identifier ?? "", privacy: .public) \(outcome.detail, privacy: .public)")
+        guard let manager = NSFileProviderManager(for: domain), let identifier = outcome.identifier else {
             await showInFinder()
             return
         }
         let item = NSFileProviderItemIdentifier(identifier)
-        var url = try? await manager.getUserVisibleURL(for: item)
-        if url == nil {
+        var url: URL?
+        do { url = try await manager.getUserVisibleURL(for: item) } catch {
+            log.info("show in Verso Drive: no place yet: \(String(describing: error), privacy: .public)")
             try? await Task.sleep(for: .seconds(2))
-            url = try? await manager.getUserVisibleURL(for: item)
+            do { url = try await manager.getUserVisibleURL(for: item) } catch {
+                log.error("show in Verso Drive: no place: \(String(describing: error), privacy: .public)")
+            }
         }
         guard let url else {
             await showInFinder()
