@@ -94,7 +94,7 @@ struct AlbumSharingSheet: View {
                 Label {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(album.albumName).font(.headline)
-                        Text(AlbumsShareReach.album(people: members.count, links: links).title)
+                        Text(SharingReach.album(people: members.count, links: links).title)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }

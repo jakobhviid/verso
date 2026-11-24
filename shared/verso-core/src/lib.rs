@@ -4,8 +4,8 @@
 //! clashes, membership from Immich, the metadata store and change journal, the content cache, upload logic, the
 //! settings table, and how the gallery arranges what it shows (`overview`, `map`, `duplicates`, `shared_links`,
 //! `people`, `places`, `albums`, a photo page's `grid_options`, the date scroller's `rail` and the `sidebar`, names in
-//! the order the platform gives, `names`), and what the apps keep for each account (the `recent_searches`, Verso's own
-//! `notifications`) (ARCHITECTURE.md, "Crates"). No FUSE, D-Bus, GTK or OS-specific code lives here; platform services
+//! the order the platform gives, `names`), how far an album or a link reaches (`sharing`), and what the apps keep for
+//! each account (the `recent_searches`, Verso's own `notifications`) (ARCHITECTURE.md, "Crates"). No FUSE, D-Bus, GTK or OS-specific code lives here; platform services
 //! come in through traits.
 
 pub mod albums;
@@ -29,6 +29,7 @@ pub mod rail;
 pub mod recent_searches;
 pub mod settings;
 pub mod shared_links;
+pub mod sharing;
 pub mod sidebar;
 pub mod sign_in;
 pub mod source;

@@ -321,11 +321,3 @@ struct AlbumReachChip: View {
         }
     }
 }
-
-extension Album {
-    /// How far the album reaches: the people it is shared with besides its owner, and the account's links to it.
-    func reach(links: [SharedLink]) -> SharingReach {
-        let people = albumUsers.map { $0.filter { $0.role != "owner" }.count } ?? (shared ? 1 : 0)
-        return SharingReach.album(people: people, links: links)
-    }
-}

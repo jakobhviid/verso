@@ -13,7 +13,7 @@ struct AlbumCoverCard: View {
     let album: Album
 
     var body: some View {
-        let reach = AlbumsShareReach.album(album, links: session.sharing.links.filter { $0.album?.id == album.id })
+        let reach = album.reach(links: session.sharing.links.filter { $0.album?.id == album.id })
         VStack(alignment: .leading, spacing: 6) {
             AlbumsThumbnail(pipeline: session.pipeline, assetID: album.albumThumbnailAssetId, size: .preview,
                             placeholderSystemImage: "rectangle.stack")
@@ -51,7 +51,7 @@ struct AlbumCard: View {
 
     var body: some View {
         let others = session.services.albumPreviews.photos(of: album) ?? []
-        let reach = AlbumsShareReach.album(album, links: session.sharing.links.filter { $0.album?.id == album.id })
+        let reach = album.reach(links: session.sharing.links.filter { $0.album?.id == album.id })
         photos(others)
             .aspectRatio(1.3, contentMode: .fit)
             .overlay(alignment: .bottom) { foot }
@@ -123,7 +123,7 @@ struct AlbumCard: View {
         return ([owner].compactMap { $0 } + rest).filter { $0.id != me }
     }
 
-    private func accessibilityValue(_ reach: AlbumsShareReach) -> String {
+    private func accessibilityValue(_ reach: SharingReach) -> String {
         var parts = [facts]
         if reach.isShared { parts.append(reach.title) }
         if !sharedWith.isEmpty { parts.append(sharedWith.map(\.name).formatted(.list(type: .and))) }
@@ -159,7 +159,7 @@ struct SharedWithFaces: View {
 /// How far an album reaches, in a cover's or a card's corner, as its header names it; nothing for a private album,
 /// the usual case.
 struct AlbumReachChip: View {
-    let reach: AlbumsShareReach
+    let reach: SharingReach
 
     var body: some View {
         if reach.isShared {

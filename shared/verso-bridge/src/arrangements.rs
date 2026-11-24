@@ -1,10 +1,11 @@
 //! How the gallery arranges what it shows, worked out in the core for the Mac and the iPhone as for Linux's window
 //! (ARCHITECTURE.md, "Verso on the Mac"): the Library's Years and Months (`verso_core::overview`), the map's clusters
 //! (`verso_core::map`), the Duplicates page's order (`verso_core::duplicates`), which shared links show
-//! (`verso_core::shared_links`), People's filter (`verso_core::people`), Places' groups and order
-//! (`verso_core::places`) and the albums' view settings (`verso_core::albums`). The Swift side names a timeline's
-//! months by their bucket (`2025-03-01`), as its grid does, and gets them back the same way; a choice kept in its
-//! settings goes by its code, the same on Linux, and a list it sorts or filters comes back as the places of its items.
+//! (`verso_core::shared_links`), how far an album or a link reaches (`verso_core::sharing`), People's filter
+//! (`verso_core::people`), Places' groups and order (`verso_core::places`) and the albums' view settings
+//! (`verso_core::albums`). The Swift side names a timeline's months by their bucket (`2025-03-01`), as its grid does,
+//! and gets them back the same way; a choice kept in its settings goes by its code, the same on Linux, and a list it
+//! sorts or filters comes back as the places of its items.
 
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -16,6 +17,7 @@ use immich_api::timeline::YearMonth;
 use immich_api::{ServerVersion, SharedLink, SharedLinkKind};
 use verso_core::duplicates::{self, Measure, SortBy};
 use verso_core::shared_links::{self, Arrangement, Filter};
+use verso_core::sharing::Audience;
 use verso_core::names::caseless;
 use verso_core::{albums, grid_options, map, overview, people, places};
 
@@ -193,6 +195,62 @@ pub fn shared_link_expired(expires_at: Option<SystemTime>) -> bool {
 /// A link with what the filter reads of it.
 fn shared_link(kind: String, expires_at: Option<SystemTime>) -> SharedLink {
     SharedLink { kind: SharedLinkKind::from(kind), expires_at: expires_at.map(DateTime::<Utc>::from), ..SharedLink::default() }
+}
+
+/// How far an album or a link reaches (`verso_core::sharing`'s `Audience`), narrowest first, by the names the Mac and the
+/// iPhone give it; each shows it in its own icon and words.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, uniffi::Enum)]
+pub enum SharingAudience {
+    /// Only its owner.
+    Personal,
+    /// People on the server it is shared with besides its owner.
+    People,
+    /// Anyone with a link and its password.
+    PasswordLink,
+    /// Anyone with a link.
+    PublicLink,
+}
+
+impl From<Audience> for SharingAudience {
+    fn from(audience: Audience) -> SharingAudience {
+        match audience {
+            Audience::Private => SharingAudience::Personal,
+            Audience::People => SharingAudience::People,
+            Audience::Password => SharingAudience::PasswordLink,
+            Audience::Public => SharingAudience::PublicLink,
+        }
+    }
+}
+
+/// A link, as its reach reads it: whether it has a password, and when it stops working (none when it never does).
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+pub struct SharingLink {
+    pub has_password: bool,
+    pub expires_at: Option<SystemTime>,
+}
+
+impl From<&SharingLink> for SharedLink {
+    fn from(link: &SharingLink) -> SharedLink {
+        SharedLink {
+            password: link.has_password.then(|| immich_api::Secret::new("")),
+            expires_at: link.expires_at.map(DateTime::<Utc>::from),
+            ..SharedLink::default()
+        }
+    }
+}
+
+/// An album's reach: shared with `others` people besides its owner, and its `links`, of which those still working
+/// count.
+#[uniffi::export]
+pub fn sharing_album_audience(others: u32, links: Vec<SharingLink>) -> SharingAudience {
+    let links: Vec<SharedLink> = links.iter().map(SharedLink::from).collect();
+    Audience::of_album(others as usize, &links, Utc::now()).into()
+}
+
+/// Whom a link lets in, whether or not it still works: anyone with it, and its password where it has one.
+#[uniffi::export]
+pub fn sharing_link_audience(link: SharingLink) -> SharingAudience {
+    Audience::of_link(&SharedLink::from(&link)).into()
 }
 
 /// The People page's view options: whom it shows, by the code the settings keep it by (`All`, `Favorites` or
@@ -806,6 +864,21 @@ mod tests {
         assert!(shown("individual", true).is_empty());
         assert_eq!(shown("everything", false), [0, 1, 2], "a code it does not know shows all");
         assert!(shared_link_expired(past) && !shared_link_expired(future) && !shared_link_expired(None));
+    }
+
+    #[test]
+    fn an_album_reaches_as_far_as_its_widest_way_still_working_and_a_link_anyone_with_it() {
+        let past = Some(SystemTime::UNIX_EPOCH + Duration::from_secs(1_767_225_600)); // 2026-01-01
+        let future = Some(SystemTime::now() + Duration::from_secs(86_400));
+        let link = |has_password: bool, expires_at: Option<SystemTime>| SharingLink { has_password, expires_at };
+        assert_eq!(sharing_album_audience(0, vec![]), SharingAudience::Personal, "nobody and no link is private");
+        assert_eq!(sharing_album_audience(2, vec![]), SharingAudience::People, "people without a link");
+        assert_eq!(sharing_album_audience(2, vec![link(true, None)]), SharingAudience::PasswordLink, "a password link reaches further than people");
+        assert_eq!(sharing_album_audience(0, vec![link(true, None), link(false, future)]), SharingAudience::PublicLink, "one working public link makes it public");
+        assert_eq!(sharing_album_audience(1, vec![link(false, past)]), SharingAudience::People, "an expired link reaches nobody");
+        assert_eq!(sharing_album_audience(0, vec![link(false, past)]), SharingAudience::Personal, "only expired links is private");
+        assert_eq!((sharing_link_audience(link(true, None)), sharing_link_audience(link(false, None))), (SharingAudience::PasswordLink, SharingAudience::PublicLink));
+        assert_eq!(sharing_link_audience(link(false, past)), SharingAudience::PublicLink, "a link's own reach, expired or not");
     }
 
     fn options(show: &str, include_hidden: bool) -> PeopleOptions {

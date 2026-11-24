@@ -50,7 +50,6 @@ cases = {
     'crosslink': [app('Crosslink'), 'Tests/CrosslinkChecks.swift'],
     'crosslink-navigation': [app('Crosslink'), app('CrosslinkNavigation'), 'Tests/CrosslinkNavigationChecks.swift'],
     'similar-photos': api + [app('SimilarPhotos'), app('SimilarPhotosAnalyzer'), app('SimilarPhotosModel'), app('AssetsStackMutation'), support('ImagePipeline'), support('Formatters'), 'Tests/SimilarPhotosChecks.swift'],
-    'sharing-reach': api + [support('Formatters'), 'Verso/Views/Sharing/SharingReach.swift', 'Tests/SharingReachChecks.swift'],
     'crosslink-page-navigation': [app('Crosslink'), app('CrosslinkNavigation'), 'Verso/Views/PageNavigation.swift', 'Verso/Views/PageNavigation+Crosslink.swift', 'Tests/CrosslinkPageNavigationChecks.swift'],
 }
 

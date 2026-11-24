@@ -319,18 +319,16 @@ Immich Crosslink, the protocol between apps, and the takeover of Immich Mount's 
      filter (`verso_core::people`), Places' groups and order (`verso_core::places`), the albums' view settings and
      collapsed groups (`verso_core::albums`), a photo page's view options (`verso_core::grid_options`), the date
      scroller (`verso_core::rail`; ARCHITECTURE.md, "The date scroller"), the sidebar's layout, kept in each
-     platform's form (`verso_core::sidebar`), and the recent searches and Verso's own notifications, kept the same way
-     (`verso_core::recent_searches`, `verso_core::notifications`). Left: the Mac's rail and Linux's scrubber, tried by
-     hand.
+     platform's form (`verso_core::sidebar`), the recent searches and Verso's own notifications, kept the same way
+     (`verso_core::recent_searches`, `verso_core::notifications`), and how far an album or a link reaches
+     (`verso_core::sharing`). Left: the Mac's rail and Linux's scrubber, tried by hand.
    - Next, in this order, the easiest and most shared first (the Swift files in `mac/Verso/Verso/App/`):
      1. The timeline's query from a photo page's view options: the core makes the query a page reads (the timeline's
         settings, or the search for photos or videos alone, as `arrangement.rs`'s `source` makes Linux's), and
         `AssetGridModel` asks the typed timeline call for it, in place of `GridArrangement.applied(to:)` on the Swift
         `TimelineQuery` that `TypedTimeline` turns back into the core's settings.
-     2. How far an album or a link reaches: the Mac's `SharingReach.swift` (its links' expiry in Swift, checked by
-        `check.py`) and the iPhone's `AlbumsShareReach`, against the window's `sharing.rs` (`Audience`).
-     3. Imports: `UploadQueue.swift` and `uploads.rs`, the largest, around each platform's file access.
-     4. The Immich client's calls: the typed calls (ARCHITECTURE.md, "Typed calls") bring immich-api's models, and
+     2. Imports: `UploadQueue.swift` and `uploads.rs`, the largest, around each platform's file access.
+     3. The Immich client's calls: the typed calls (ARCHITECTURE.md, "Typed calls") bring immich-api's models, and
         the Swift models and `ImmichClient` go as the views take the bridge's records.
 
 **Releases are cut by a tag** (AGENTS.md, "Versioning", has how; ARCHITECTURE, "Verso's releases", why). Not built

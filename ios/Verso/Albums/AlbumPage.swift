@@ -353,11 +353,11 @@ private struct AlbumPageHeader: View {
 
     private var links: [SharedLink] { session.sharing.links.filter { $0.album?.id == album.id } }
 
-    private var reach: AlbumsShareReach {
+    private var reach: SharingReach {
         if let details {
             return .album(people: (details.albumUsers ?? []).filter { $0.role != "owner" }.count, links: links)
         }
-        return .album(album, links: links)
+        return album.reach(links: links)
     }
 
     /// The owner and the people it is shared with, as circles, four and then how many more; for the owner, a plus that

@@ -1614,8 +1614,9 @@ ROADMAP, M8, has its status and what is still to come; DESIGN.md, "The apps' int
   refused sign-in, a missing permission (named), something gone from Immich, and a busy server. An unreachable server
   keeps its words, which the window recognises (`immich_api::is_offline_text`) to show its banner.
 - **Sharing an album** has one way in and one picture (`sharing`). How far an album reaches is the widest of its people
-  and its working links (`Audience`): Private (a padlock), People, a link with a password (the globe with a padlock) and
-  a public link (the globe), each icon the same wherever it shows. The Share dialog has People and Links; after each
+  and its working links (`Audience`, the core's, `verso_core::sharing`, as on the Mac and the iPhone): Private (a
+  padlock), People, a link with a password (the globe with a padlock) and a public link (the globe), each icon the same
+  wherever it shows. The Share dialog has People and Links; after each
   change it reads the album again, and the album's page and the Albums page show the new reach.
 - **People** (`verso_core::people`, which filters for the Mac and the iPhone too), as the Mac gallery's: each face a
   rounded square, as a person is and an account is not (DESIGN.md, "The apps' interfaces"). **A person's page**
@@ -2120,7 +2121,8 @@ to come.
   the three platforms agree, and the core's and the bridge's tests check it on Linux. From the core so far: the
   Library's Years and Months (`verso_core::overview`); the map's clusters, each with the box Immich's timeline takes
   (`verso_core::map`; fitting the map to the photos stays MapKit's, `ExploreMapFit`); the Duplicates page's order and
-  what each group keeps at first; which shared links show, and whether one has expired; People's filter, with what
+  what each group keeps at first; which shared links show, and whether one has expired; how far an album or a link
+  reaches, which each platform shows in its own icon and words (`verso_core::sharing`); People's filter, with what
   Immich v3.3 and later filter themselves; Places' cities alone or by country, by visit or by name
   (`verso_core::places`); the Albums page's filter, groups and order, which groups are collapsed, and a sidebar
   section's first albums (`verso_core::albums`); a photo page's view options, which a page offers and what they mean
@@ -2258,8 +2260,9 @@ to come.
   - **The window keeps a toolbar of its own** (`GlobalToolbar`), which every page adds its items to; its one item,
     Import, is hidden by default. With a toolbar for each page, macOS 27 swapping them as the page changes ends in an
     assertion in AppKit's toolbar layout (`NSToolbarItemViewer minSize`), a crash.
-  - **How far an album or a link reaches** (`SharingReach`) is the widest of its people and its links still working:
-    Private, people, a link with a password or a public link, one icon wherever it shows.
+  - **How far an album or a link reaches** (`SharingReach`, from the core, `verso_core::sharing`) is the widest of its
+    people and its links still working: Private, people, a link with a password or a public link, one icon wherever it
+    shows.
   - **An album's, a person's and a link's statuses and actions are a row under their name** (DESIGN.md, "A page
     header's controls are statuses"); their own top bar items are handed to the grid (`gridPageControls`), which shows
     them after its zoom.

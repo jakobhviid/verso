@@ -1,13 +1,14 @@
 //! Sharing an album, in one place, the Share dialog: the people on the server it is shared with and what each may do,
 //! and its links, which anyone with the address opens, with its password where it has one. How far an album reaches
-//! ([`Audience`]) shows as one icon wherever it shows: its page, its card, a link's card. Only the album's owner
-//! changes who it is shared with; anyone changes the links they made.
+//! ([`Audience`], the core's, `verso_core::sharing`, as on the Mac and the iPhone) shows as one icon wherever it shows:
+//! its page, its card, a link's card. Only the album's owner changes who it is shared with; anyone changes the links
+//! they made.
 
 use std::cell::RefCell;
 use std::rc::Rc;
 
 use adw::prelude::*;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use gtk::{gio, glib};
 use immich_api::{Album, AlbumRole, NewMember, SharedLink, User};
 use verso_desktop::shared_links;
@@ -17,37 +18,20 @@ use crate::window::Window;
 
 const ROLES: [(AlbumRole, &str); 2] = [(AlbumRole::Viewer, "Can View"), (AlbumRole::Editor, "Can Edit")];
 
-/// How far an album or a link reaches, from only you to anyone with its address. An album reaches as far as the
-/// widest of its people and its links still working.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Audience {
-    /// Only you.
-    Private,
-    /// People on the server it is shared with.
-    People,
-    /// Anyone with a link and its password.
-    Password,
-    /// Anyone with a link.
-    Public,
+pub use verso_core::sharing::Audience;
+
+/// How an [`Audience`] shows in the window: its icon, its name and what it means.
+pub trait AudienceLook {
+    /// Its icon, the same wherever it shows.
+    fn icon(self) -> &'static str;
+    /// Its name beside the icon, for an album shared with `others` people besides its owner.
+    fn label(self, others: usize) -> String;
+    /// Who can see it, in a sentence.
+    fn meaning(self) -> &'static str;
 }
 
-impl Audience {
-    /// A link's reach; none once it has expired.
-    pub fn of_link(link: &SharedLink, now: DateTime<Utc>) -> Option<Audience> {
-        if verso_core::shared_links::is_expired(link, now) {
-            return None;
-        }
-        Some(if link.password.is_some() { Audience::Password } else { Audience::Public })
-    }
-
-    /// An album's reach: shared with `others` people besides its owner, and its `links`.
-    pub fn of_album(others: usize, links: &[SharedLink], now: DateTime<Utc>) -> Audience {
-        let people = if others > 0 { Audience::People } else { Audience::Private };
-        links.iter().filter_map(|link| Audience::of_link(link, now)).fold(people, Audience::max)
-    }
-
-    /// Its icon, the same wherever it shows.
-    pub fn icon(self) -> &'static str {
+impl AudienceLook for Audience {
+    fn icon(self) -> &'static str {
         match self {
             Audience::Private => "verso-private-symbolic",
             Audience::People => "verso-people-symbolic",
@@ -56,8 +40,7 @@ impl Audience {
         }
     }
 
-    /// Its name beside the icon, for an album shared with `others` people besides its owner.
-    pub fn label(self, others: usize) -> String {
+    fn label(self, others: usize) -> String {
         match self {
             Audience::Private => tr("Private").to_owned(),
             Audience::People if others == 1 => tr("Shared with 1 person").to_owned(),
@@ -67,8 +50,7 @@ impl Audience {
         }
     }
 
-    /// Who can see it, in a sentence.
-    pub fn meaning(self) -> &'static str {
+    fn meaning(self) -> &'static str {
         match self {
             Audience::Private => tr("Only you can see it"),
             Audience::People => tr("The people it is shared with can see it"),
@@ -300,7 +282,7 @@ impl Share {
         let now = Utc::now();
         for link in links {
             let address = shared_links::address(&session.connection.server, link);
-            let reach = Audience::of_link(link, now);
+            let reach = Audience::of_working_link(link, now);
             let mut facts = vec![crate::links_page::expiry(link)];
             if link.password.is_some() {
                 facts.push(tr("Needs its password").to_owned());
@@ -357,27 +339,5 @@ impl Share {
             group.add(&row);
         }
         self.show(&self.links, group);
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use chrono::Duration;
-
-    fn link(password: bool, expires: Option<DateTime<Utc>>) -> SharedLink {
-        SharedLink { password: password.then(|| immich_api::Secret::new("secret")), expires_at: expires, ..SharedLink::default() }
-    }
-
-    #[test]
-    fn an_album_reaches_as_far_as_its_widest_way_still_working() {
-        let now = Utc::now();
-        assert_eq!(Audience::of_album(0, &[], now), Audience::Private);
-        assert_eq!(Audience::of_album(2, &[], now), Audience::People);
-        assert_eq!(Audience::of_album(2, &[link(true, None)], now), Audience::Password);
-        assert_eq!(Audience::of_album(0, &[link(true, None), link(false, None)], now), Audience::Public);
-        // An expired link no longer counts.
-        assert_eq!(Audience::of_album(0, &[link(false, Some(now - Duration::days(1)))], now), Audience::Private);
-        assert_eq!(Audience::of_album(1, &[link(false, Some(now + Duration::days(1)))], now), Audience::Public);
     }
 }

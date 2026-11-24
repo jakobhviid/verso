@@ -91,6 +91,7 @@ targets:
       - ../mac/Verso/Verso/App/PlacesOptions.swift
       - ../mac/Verso/Verso/App/SearchHistory.swift
       - ../mac/Verso/Verso/App/SharedLinksFilter.swift
+      - ../mac/Verso/Verso/App/SharingReach.swift
       - ../mac/Verso/Verso/App/SidebarLayout.swift
       - ../mac/Verso/Verso/App/SimilarPhotosAnalyzer.swift
       - ../mac/Verso/Verso/App/SimilarPhotosModel.swift

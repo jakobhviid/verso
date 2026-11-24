@@ -18,7 +18,7 @@ use verso_linux::i18n::tr;
 use crate::collections::item_actions;
 use crate::grid::{Grid, WeakGrid};
 use crate::pages::{self, Kind, Spec};
-use crate::sharing::{Audience, SharePage};
+use crate::sharing::{Audience, AudienceLook, SharePage};
 use crate::window::Window;
 
 /// What an album action does, with the album as read.

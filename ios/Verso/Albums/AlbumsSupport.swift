@@ -4,7 +4,6 @@
 import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
-import VersoCore
 
 /// A photo's thumbnail, square and cropped, for album covers, link rows and the photo picker: from the pipeline's
 /// cache at once, or read when it first shows. Nothing fades in as it arrives.
@@ -119,52 +118,11 @@ struct AlbumsMemberAvatar: View {
     }
 }
 
-/// How far an album or a link reaches, as on the Mac and Linux: the widest of its people and its links that still
-/// work. Each reach has one icon, the same on a cover, in a header and in the sharing sheet.
-enum AlbumsShareReach: Equatable {
-    /// Only its owner.
-    case personal
-    /// Shared with this many people besides its owner.
-    case people(Int)
-    /// A working link, each with a password.
-    case passwordLink
-    /// A working link anyone may open.
-    case publicLink
-
-    /// An album's reach: the people it is shared with besides its owner, and its links that still work.
-    static func album(people: Int, links: [SharedLink]) -> AlbumsShareReach {
-        let working = links.filter { !$0.isExpired }
-        if working.contains(where: { !$0.hasPassword }) { return .publicLink }
-        if !working.isEmpty { return .passwordLink }
-        return people > 0 ? .people(people) : .personal
-    }
-
-    /// An album's reach from the account's list, whose members may be left out for an album that is not shared.
-    static func album(_ album: Album, links: [SharedLink]) -> AlbumsShareReach {
-        let people = album.albumUsers.map { members in members.filter { $0.role != "owner" }.count } ?? (album.shared ? 1 : 0)
-        return .album(people: people, links: links)
-    }
-
-    /// A link's own reach.
-    static func link(_ link: SharedLink) -> AlbumsShareReach { link.hasPassword ? .passwordLink : .publicLink }
-
-    var title: String {
-        switch self {
-        case .personal: "Private"
-        case .people(let count): count == 1 ? "Shared with 1 person" : "Shared with \(count) people"
-        case .passwordLink: "Shared with a password"
-        case .publicLink: "Shared publicly"
-        }
-    }
-
-    /// Whether it reaches past the owner, which a cover shows; a private album, the usual case, shows nothing.
-    var isShared: Bool { self != .personal }
-}
-
-/// A reach's icon: a padlock for private, two people, the globe, and the globe with a padlock for a link with a
-/// password.
+/// A reach's icon (SharingReach, from the shared core, as on the Mac and Linux): a padlock for private, two people, the
+/// globe, and the globe with a padlock for a link with a password, the same on a cover, in a header and in the sharing
+/// sheet.
 struct AlbumsShareReachIcon: View {
-    let reach: AlbumsShareReach
+    let reach: SharingReach
 
     var body: some View {
         switch reach {
@@ -220,12 +178,6 @@ final class SharedLinkAddresses {
     static func copy(_ url: URL) {
         UIPasteboard.general.setItems([[UTType.url.identifier: url, UTType.utf8PlainText.identifier: url.absoluteString]])
     }
-}
-
-extension SharedLink {
-    /// Past its last day, so it no longer opens: the shared core tells (`sharedLinkExpired`), as on Linux. The Mac
-    /// asks SharingReach's, in Swift (ROADMAP, M9, step 8).
-    var isExpired: Bool { sharedLinkExpired(expiresAt: expiresAt.flatMap(ImmichDate.parse)) }
 }
 
 /// What a link shows, how long it works and what visitors may do, in words, for its row and its page.

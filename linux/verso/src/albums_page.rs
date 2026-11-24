@@ -14,7 +14,7 @@ use verso_desktop::{albums, settings, text};
 use verso_linux::i18n::tr;
 
 use crate::cards::{and_list, Card, Shown};
-use crate::sharing::{Audience, SharePage};
+use crate::sharing::{Audience, AudienceLook, SharePage};
 use crate::window::{sort_labels, Session, Window};
 
 
@@ -436,7 +436,7 @@ fn album_card(window: &Window, session: &Session, album: &Album) -> gtk::Box {
         let known = address.clone();
         crate::tasks::run(async move { client.shared_links(Some(&id)).await.unwrap_or_default() }, move |links| {
             let now = chrono::Utc::now();
-            let working: Vec<_> = links.iter().filter_map(|link| Audience::of_link(link, now).map(|reach| (reach, link))).collect();
+            let working: Vec<_> = links.iter().filter_map(|link| Audience::of_working_link(link, now).map(|reach| (reach, link))).collect();
             let (Some(globe), Some(reach)) = (weak_globe.upgrade(), working.iter().map(|(reach, _)| *reach).max()) else { return };
             let addresses: Vec<String> = working.iter().map(|(_, link)| verso_desktop::shared_links::address(&server, link)).collect();
             globe.set_icon_name(reach.icon());
@@ -517,7 +517,7 @@ fn use_link(window: &Window, album_id: &str, copy: bool) {
     let (client, server, id, shown) = (session.connection.client.clone(), session.connection.server.clone(), album_id.to_owned(), window.clone());
     crate::tasks::run(async move { client.shared_links(Some(&id)).await.unwrap_or_default() }, move |links| {
         let now = chrono::Utc::now();
-        let Some(link) = links.iter().find(|link| Audience::of_link(link, now).is_some()) else {
+        let Some(link) = links.iter().find(|link| Audience::of_working_link(link, now).is_some()) else {
             return shown.toast(tr("None of its links works any more"));
         };
         let address = verso_desktop::shared_links::address(&server, link);

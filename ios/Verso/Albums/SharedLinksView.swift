@@ -344,7 +344,7 @@ private struct SharedLinkHeader: View {
                 HeaderStatusRow {
                     Button(action: edit) {
                         Label {
-                            Text(AlbumsShareReach.link(link).title)
+                            Text(SharingReach.link(link).title)
                         } icon: {
                             AlbumsShareReachIcon(reach: .link(link))
                         }

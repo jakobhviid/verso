@@ -20,7 +20,7 @@ use verso_linux::i18n::tr;
 use crate::cards::{and_list, chip, fill, say, Card, Shown};
 use crate::grid::WeakGrid;
 use crate::pages::{self, Kind, Spec};
-use crate::sharing::Audience;
+use crate::sharing::{Audience, AudienceLook};
 use crate::utility_pages::{string_action, RowsPage};
 use crate::window::{Session, Window};
 
@@ -310,7 +310,7 @@ fn link_card(window: &Window, session: &Session, link: &SharedLink) -> gtk::Box 
         card.chip_end(&can);
     }
     // How far it reaches, in the corner where an album's card shows it: the globe, with a padlock for a password.
-    if let Some(reach) = crate::sharing::Audience::of_link(link, Utc::now()) {
+    if let Some(reach) = Audience::of_working_link(link, Utc::now()) {
         card.chip_end(&chip(Some(reach.icon()), None, reach.meaning()));
     }
     let foot = card.foot();
@@ -571,7 +571,7 @@ impl LinkHeader {
             facts.push(tr("Visitors may {things}").replace("{things}", &and_list(&may)));
         }
         self.facts.set_label(&facts.join(" · "));
-        let content = match Audience::of_link(link, Utc::now()) {
+        let content = match Audience::of_working_link(link, Utc::now()) {
             Some(reach) => {
                 self.reach.set_tooltip_text(Some(reach.meaning()));
                 adw::ButtonContent::builder().icon_name(reach.icon()).label(reach.label(0)).build()

@@ -153,7 +153,7 @@ struct SharedLinkCard: View {
     }
 
     private var accessibilityValue: String {
-        [what, SharedLinkWords.expiry(link), SharedLinkWords.visitorsMay(link), AlbumsShareReach.link(link).title]
+        [what, SharedLinkWords.expiry(link), SharedLinkWords.visitorsMay(link), SharingReach.link(link).title]
             .joined(separator: ", ")
     }
 }
