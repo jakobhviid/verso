@@ -134,11 +134,13 @@ else
   app="$archive/Products/Applications/$app_name"
 fi
 
-# Every language build-rust.sh made from po/ is in the app (ARCHITECTURE.md, "Translations").
+# Every language build-rust.sh made from po/ is in Verso Drive, whose Finder actions are named from it (ARCHITECTURE.md,
+# "Translations").
+drive="$app/Contents/PlugIns/VersoDrive.appex"
 for table in build/Localization/*.lproj; do
   language=$(basename "$table")
   for file in Localizable.strings InfoPlist.strings; do
-    [ -f "$app/Contents/Resources/$language/$file" ] || { echo "the app lacks $language/$file" >&2; exit 1; }
+    [ -f "$drive/Contents/Resources/$language/$file" ] || { echo "Verso Drive lacks $language/$file" >&2; exit 1; }
   done
 done
 
