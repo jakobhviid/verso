@@ -520,7 +520,8 @@ part in Immich Crosslink, which shows it there: from Verso Drive's menu in Files
   https (`normalised_address`); the Mac and the iPhone try https first, as Immich's app does, and plain http after a
   failed https only for a server on the local network (a private or link-local address, Tailscale's 100.64.0.0/10,
   this device, a name without a dot, or one under `.local`, `.lan`, `.home`, `.home.arpa`, `.internal` or
-  `.localdomain`), never after a certificate's error, which says to type `http://` to connect without encryption.
+  `.localdomain`), never after a certificate's error: a certificate the system refuses is asked about (below), and
+  where the server asks for a client certificate, the sign-in says to type `http://` to connect without encryption.
 - **A certificate of the server's own** (ARCHITECTURE.md, "A certificate of the server's own"). A certificate the
   system trusts needs nothing. One it does not (self-signed, or from a private authority not in the system's trust
   store) is refused, nothing is sent, and Verso asks:
@@ -550,8 +551,21 @@ part in Immich Crosslink, which shows it there: from Verso Drive's menu in Files
     the server is trusted again without asking.
   - An expired certificate may be trusted, and a trusted certificate stays trusted after its end date: it is still the
     certificate the person chose.
-  - The Flatpak does the same, keeping the certificate in its own config. The Mac, the iPhone and the iPad refuse such
-    a server, and ask nothing (ROADMAP.md, "Next, in order", has their step).
+  - The Flatpak does the same, keeping the certificate in its own config.
+  - **On the Mac, the iPhone and the iPad** the same question, in the same words ("this Mac", "this iPhone", "this
+    iPad"), is a sheet over the sign-in, after Continue, with the same details and Cancel and **Trust This
+    Certificate** (on the iPhone and the iPad, in red after the details, with the sheet's close button as Cancel too).
+    Trust checks the server again trusting that certificate for that address alone, and signing in keeps it with the
+    account. While the library shows, a certificate that changed, or one forgotten, is asked about by
+    itself once per certificate, as **The Server's Certificate Changed** where another was trusted; the banner across
+    the library says "*host*'s certificate is not trusted, so Verso does not connect to it", with **Check
+    Certificate…**, and Trust keeps the new one in place of the old one and connects again, Verso Drive with it. The
+    account's page (Settings, Account, on the Mac; the account's sheet, Server, on the iPhone and the iPad) shows
+    **Trusted Certificate (SHA-256)** while one is kept, with **Forget…** (on iOS **Forget Certificate…**), which
+    asks, closes the page and connects again: the question comes again, unless the system trusts the certificate by
+    then. Verso Drive serves what it holds meanwhile, as while the server cannot be reached; Verso in Messages says
+    "Immich's certificate is not trusted, so Verso does not connect to it. Open Verso to check it." Signing out
+    forgets the certificate with the account.
 - **Taking Immich Mount's account over.** Where Immich Mount is signed in on the computer (its
   `~/.config/immich-mount/config.toml` names a server, and its keyring item or credential file holds a sign-in), the
   window's first page offers **Use Immich Mount's Account**. Verso then signs in to Immich Mount's server with a
@@ -1046,8 +1060,8 @@ app (ARCHITECTURE.md, "Verso on the Mac"). Where Finder's way differs:
 
   | What | Where |
   |---|---|
-  | Settings (`config.toml`), the server's address (`server`), the account's email (`account`), the drive's metadata store (`Library/`), the extension's status (`status.json`) | The App Group container, `~/Library/Group Containers/<team>.dev.hviid.Verso/` |
-  | Verso's sign-in | The data protection Keychain, kept on this Mac, an item labelled "Verso account", service `dev.hviid.Verso` |
+  | Settings (`config.toml`), the server's address (`server`) and the certificate trusted for it (`certificate`), the account's email (`account`), the drive's metadata store (`Library/`), the extension's status (`status.json`) | The App Group container, `~/Library/Group Containers/<team>.dev.hviid.Verso/` |
+  | Verso's sign-in | The data protection Keychain, kept on this Mac, an item labelled "Verso account", service `dev.hviid.Verso`: the server, the credential and the certificate trusted for the server |
   | The drive's credential | The data protection Keychain, kept on this Mac, service `dev.hviid.Verso`, in the access group the app and its extension share |
   | The system's copy of the location: downloaded originals and what waits in Upload | `~/Library/CloudStorage/`, in a folder macOS names after the app and the location (`VersoDev-Verso` for Verso Dev), kept by macOS |
 
@@ -1083,7 +1097,7 @@ The same layout, names, attributes and content as in Finder, through the same Fi
 
   | What | Where |
   |---|---|
-  | Settings (`config.toml`), the server's address (`server`), the account's email (`account`), the drive's metadata store (`Library/`), the extension's status (`status.json`) | The App Group container, `group.dev.hviid.Verso` |
+  | Settings (`config.toml`), the server's address (`server`) and the certificate trusted for it (`certificate`), the account's email (`account`), the drive's metadata store (`Library/`), the extension's status (`status.json`) | The App Group container, `group.dev.hviid.Verso` |
   | The drive's credential | The Keychain, kept on this device, service `dev.hviid.Verso`, in the access group the app and its extension share |
   | The system's copy of the location: downloaded originals and what waits in Upload | Kept by iOS |
 

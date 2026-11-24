@@ -5,6 +5,10 @@
 //! Dolphin show. An item's identifier is its `NodeKey`'s storage key; the root's is `root`. Nothing here needs a Mac:
 //! it builds and is tested on Linux too, and only the Swift side needs Xcode.
 
+// A refused certificate's details cross to Swift inside `BridgeError`, by value, which uniffi has no box for; an error
+// is rare, so its size costs nothing that matters.
+#![allow(clippy::result_large_err)]
+
 use std::collections::HashMap;
 use std::future::Future;
 use std::path::{Path, PathBuf};
@@ -13,7 +17,7 @@ use std::sync::{Arc, Mutex, OnceLock, RwLock, Weak};
 use std::task::{Context, Poll};
 use std::time::{Duration, Instant, SystemTime};
 
-use immich_api::{ApiError, Client, Credential as ApiCredential};
+use immich_api::{ApiError, CertificatePin, Client, Credential as ApiCredential};
 use verso_core::folder_uploads::{make_albums, tried_again, AlbumProgress, AlbumTarget, FolderEvent, FolderUploads};
 use verso_core::immich::ImmichSource;
 use verso_core::links;
@@ -52,10 +56,79 @@ fn install_platform_tls() {
     }
 }
 
-/// A client for `server`, with this app's user agent, over the platform's TLS (`install_platform_tls`).
-fn new_client(server: &str, credential: Option<ApiCredential>) -> Result<Client, ApiError> {
+/// A client for `server`, with this app's user agent, over the platform's TLS (`install_platform_tls`), trusting
+/// `certificate` too where the system does not trust the server's own: the certificate the person trusted for that
+/// server, kept with the account (ARCHITECTURE.md, "A certificate of the server's own").
+fn new_client(server: &str, credential: Option<ApiCredential>, certificate: Option<CertificatePin>) -> Result<Client, ApiError> {
     install_platform_tls();
-    Client::new(server, credential, &user_agent())
+    Client::trusting(server, credential, &user_agent(), certificate)
+}
+
+/// The certificate trusted for a server, as the app keeps it: its SHA-256 fingerprint, in pairs separated by colons or
+/// not; none for nothing or an empty text.
+fn trusted(certificate: Option<String>) -> Result<Option<CertificatePin>, BridgeError> {
+    match certificate.as_deref().map(str::trim) {
+        None | Some("") => Ok(None),
+        Some(text) => text.parse().map(Some).map_err(failed),
+    }
+}
+
+/// A certificate the server presented that the system does not trust, nor the one trusted for the server: what the
+/// person sees to decide whether to trust it (ARCHITECTURE.md, "A certificate of the server's own").
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+pub struct ServerCertificate {
+    /// Its SHA-256 fingerprint in pairs (`AB:CD:…`), as `openssl x509 -fingerprint -sha256` prints it: what the person
+    /// compares with the server's, and what trusts it.
+    pub sha256: String,
+    /// Who it was issued to; empty where it does not say.
+    pub subject: String,
+    /// Who issued it; empty where it does not say.
+    pub issuer: String,
+    pub valid_from: Option<SystemTime>,
+    pub valid_until: Option<SystemTime>,
+    /// Issued by itself.
+    pub self_signed: bool,
+    /// Not made for the server's name, where the system said so.
+    pub other_name: bool,
+    /// The certificate trusted for the server until now, when the server presented another: it changed.
+    pub trusted: Option<String>,
+}
+
+impl From<&immich_api::CertificateRefusal> for ServerCertificate {
+    fn from(refusal: &immich_api::CertificateRefusal) -> ServerCertificate {
+        ServerCertificate {
+            other_name: refusal.reason == immich_api::RefusalReason::NotValidForName,
+            trusted: refusal.trusted.map(|pin| pin.to_string()),
+            ..certificate_details_of(&refusal.certificate)
+        }
+    }
+}
+
+fn certificate_details_of(certificate: &immich_api::CertificateDetails) -> ServerCertificate {
+    ServerCertificate {
+        sha256: certificate.sha256.to_string(),
+        subject: certificate.subject.clone(),
+        issuer: certificate.issuer.clone(),
+        valid_from: certificate.valid_from.map(SystemTime::from),
+        valid_until: certificate.valid_until.map(SystemTime::from),
+        self_signed: certificate.self_signed,
+        other_name: false,
+        trusted: None,
+    }
+}
+
+/// What a certificate says about itself, from its DER: for the certificate a server presented to the app's own
+/// requests (URLSession's), which the system refused, so the app asks as it does for the core's refusals. Only
+/// what it says, for showing: `other_name` and `trusted` are the app's to set.
+#[uniffi::export]
+pub fn certificate_details(der: Vec<u8>) -> ServerCertificate {
+    certificate_details_of(&immich_api::CertificateDetails::from_der(&der))
+}
+
+/// A refused certificate as the app hears of it, when `error` is one.
+fn certificate_refused(error: &ApiError) -> Option<BridgeError> {
+    let refusal = error.certificate_refusal()?;
+    Some(BridgeError::UntrustedCertificate { message: error.to_string(), certificate: ServerCertificate::from(refusal) })
 }
 
 /// What the bridge tells a server it is: `verso`, with its version, as Verso's window on Linux says it.
@@ -145,6 +218,10 @@ pub enum BridgeError {
     /// reason. Only Verso's typed calls give it, so the app can tell the statuses apart as it did.
     #[error("{message}")]
     Refused { status: u16, message: String },
+    /// The server presented a certificate the system does not trust, and not the one trusted for the server: nothing
+    /// was sent, and the person may decide to trust it (ARCHITECTURE.md, "A certificate of the server's own").
+    #[error("{message}")]
+    UntrustedCertificate { message: String, certificate: ServerCertificate },
 }
 
 impl From<SourceError> for BridgeError {
@@ -1203,7 +1280,12 @@ fn too_slow() -> BridgeError {
 pub struct Library {
     /// Replaced when the settings change; requests in flight finish with the one they started with.
     answers: RwLock<Arc<Answers<ImmichSource, Arc<MetadataStore>>>>,
-    source: Arc<ImmichSource>,
+    /// Replaced, with the answers, when the certificate trusted for the server changes.
+    source: RwLock<Arc<ImmichSource>>,
+    /// What the account signs in with, for a source made again.
+    credential: ApiCredential,
+    /// The certificate trusted for the server where the system does not trust its own, kept with the account.
+    certificate: Mutex<Option<CertificatePin>>,
     store: Arc<MetadataStore>,
     /// The text of `config.toml` the answers follow.
     config: Mutex<String>,
@@ -1247,6 +1329,15 @@ impl Library {
     fn answers(&self) -> Arc<Answers<ImmichSource, Arc<MetadataStore>>> {
         self.answers.read().expect("answers lock").clone()
     }
+
+    fn source(&self) -> Arc<ImmichSource> {
+        self.source.read().expect("source lock").clone()
+    }
+
+    /// Answers over `source` that follow `config`, with what the library keeps across them.
+    fn answers_over(&self, source: Arc<ImmichSource>, config: Config) -> Answers<ImmichSource, Arc<MetadataStore>> {
+        Answers::new(source, self.store.clone(), config).set_up_at(self.set_up).following(self.folders.clone(), Some(self.directory.clone()))
+    }
 }
 
 /// What an account signs in with.
@@ -1285,19 +1376,22 @@ fn open_libraries() -> &'static OpenLibraries {
 
 #[uniffi::export]
 impl Library {
-    /// Open one account's library. `directory` holds its metadata store (in the App Group container), and `config`
-    /// is the text of `config.toml`, empty for the defaults.
+    /// Open one account's library. `directory` holds its metadata store (in the App Group container), `config` is the
+    /// text of `config.toml`, empty for the defaults, and `certificate` the certificate trusted for the server where
+    /// the system does not trust its own (its SHA-256 fingerprint), kept with the account.
     #[uniffi::constructor]
-    pub fn open(server: String, credential: Credential, directory: String, config: String) -> Result<Arc<Library>, BridgeError> {
+    pub fn open(server: String, credential: Credential, certificate: Option<String>, directory: String, config: String) -> Result<Arc<Library>, BridgeError> {
         let (server, directory) = (normalised_address(&server), PathBuf::from(directory));
         let mut open = open_libraries().lock().expect("open libraries lock");
         open.retain(|_, library| library.strong_count() > 0);
         let key = (directory.clone(), server.clone(), credential.secret().to_owned());
         if let Some(library) = open.get(&key).and_then(Weak::upgrade) {
+            library.trust_certificate(certificate)?;
             return Ok(library);
         }
         let parsed = parse_config(&config)?;
-        let client = new_client(&server, Some(credential.for_client())).map_err(failed)?;
+        let pin = trusted(certificate)?;
+        let client = new_client(&server, Some(credential.for_client()), pin).map_err(failed)?;
         std::fs::create_dir_all(&directory).map_err(|error| failed(format!("{}: {error}", directory.display())))?;
         let store = MetadataStore::open(&directory.join("metadata.redb")).map_err(failed)?.with_journal(JOURNAL_LIMIT).map_err(failed)?;
         let store = Arc::new(store);
@@ -1308,7 +1402,9 @@ impl Library {
         *answers.kept_poll.lock().expect("kept poll lock") = store.kept_state(POLL_MEMORY);
         let library = Arc::new(Library {
             answers: RwLock::new(Arc::new(answers)),
-            source,
+            source: RwLock::new(source),
+            credential: credential.for_client(),
+            certificate: Mutex::new(pin),
             store,
             config: Mutex::new(config),
             set_up,
@@ -1381,7 +1477,7 @@ impl Library {
         let user_id = match known {
             Some(user_id) => Some(user_id),
             None => {
-                let source = self.source.clone();
+                let source = self.source();
                 let asked = on_runtime(async move {
                     match tokio::time::timeout(SIGN_IN_LIMIT, source.client().me()).await {
                         Ok(Ok(me)) => Ok(me.id),
@@ -1416,7 +1512,7 @@ impl Library {
 
     /// The server's Immich version, as `v3.3.5`, for the app's status.
     pub async fn server_version(&self) -> Result<String, BridgeError> {
-        let source = self.source.clone();
+        let source = self.source();
         on_runtime(async move {
             let version = source.client().server_version().await.map_err(verso_core::immich::source_error)?;
             Ok(version.to_string())
@@ -1462,11 +1558,30 @@ impl Library {
         if *current == config {
             return Ok(false);
         }
-        let answers = Answers::new(self.source.clone(), self.store.clone(), parse_config(&config)?)
-            .set_up_at(self.set_up)
-            .following(self.folders.clone(), Some(self.directory.clone()));
+        let answers = self.answers_over(self.source(), parse_config(&config)?);
         *self.answers.write().expect("answers lock") = Arc::new(answers);
         *current = config;
+        Ok(true)
+    }
+
+    /// Trust `certificate` for the server where the system does not trust its own (its SHA-256 fingerprint, or none),
+    /// from now on, when it is not the one trusted already: the app's Trust This Certificate and Forget, which the
+    /// extension reads from the account. Requests in flight finish over the connection they started on. Returns
+    /// whether it changed.
+    pub fn trust_certificate(&self, certificate: Option<String>) -> Result<bool, BridgeError> {
+        let pin = trusted(certificate)?;
+        let mut current = self.certificate.lock().expect("certificate lock");
+        if *current == pin {
+            return Ok(false);
+        }
+        let client = new_client(&self.server, Some(self.credential.clone()), pin).map_err(failed)?;
+        let source = Arc::new(ImmichSource::new(client));
+        let config = self.config.lock().expect("config lock");
+        let answers = self.answers_over(source.clone(), parse_config(&config)?);
+        *answers.kept_poll.lock().expect("kept poll lock") = self.store.kept_state(POLL_MEMORY);
+        *self.source.write().expect("source lock") = source;
+        *self.answers.write().expect("answers lock") = Arc::new(answers);
+        *current = pin;
         Ok(true)
     }
 }
@@ -1626,8 +1741,8 @@ pub struct SignedIn {
     pub account: Option<String>,
 }
 
-fn anonymous(server: &str) -> Result<Client, BridgeError> {
-    new_client(server, None).map_err(failed)
+fn anonymous(server: &str, certificate: Option<CertificatePin>) -> Result<Client, BridgeError> {
+    new_client(server, None, certificate).map_err(failed)
 }
 
 /// A step of signing in, with its own limit.
@@ -1638,14 +1753,18 @@ async fn in_time<Output>(step: impl Future<Output = Result<Output, String>>) -> 
     }
 }
 
+// Every step of signing in takes `certificate`: the certificate the person trusted for that server, where the system
+// does not trust its own (ARCHITECTURE.md, "A certificate of the server's own"); none otherwise.
+
 /// Check the server at an address, and what sign-in methods it offers. The app calls this before the extension ever
 /// runs, so macOS's Local Network prompt names the app (ARCHITECTURE.md, "Verso Drive on the Mac"); a connection that
-/// fails is tried again while that prompt may be open.
+/// fails is tried again while that prompt may be open. A certificate the system does not trust, nor `certificate`,
+/// comes back for the person to decide on (`BridgeError::UntrustedCertificate`).
 #[uniffi::export]
-pub async fn probe(address: String) -> Result<ServerOffer, BridgeError> {
+pub async fn probe(address: String, certificate: Option<String>) -> Result<ServerOffer, BridgeError> {
     on_runtime(async move {
         let address = normalised_address(&address);
-        let client = anonymous(&address)?;
+        let client = anonymous(&address, trusted(certificate)?)?;
         let started = Instant::now();
         while started.elapsed() < LOCAL_NETWORK_PATIENCE {
             match tokio::time::timeout(SIGN_IN_LIMIT, client.server_version()).await {
@@ -1653,17 +1772,27 @@ pub async fn probe(address: String) -> Result<ServerOffer, BridgeError> {
                 _ => break,
             }
         }
-        let offer = in_time(async { sign_in::probe(&client, &address).await.map_err(String::from) }).await?;
+        let checked = async {
+            match sign_in::probe(&client, &address).await {
+                Ok(offer) => Ok(Ok(offer)),
+                Err(sign_in::SignInError::Certificate(refusal)) => Ok(Err(BridgeError::UntrustedCertificate {
+                    message: sign_in::SignInError::Certificate(refusal.clone()).to_string(),
+                    certificate: ServerCertificate::from(refusal.as_ref()),
+                })),
+                Err(other) => Err(String::from(other)),
+            }
+        };
+        let offer = in_time(checked).await??;
         Ok(ServerOffer { address: offer.url, version: offer.version, browser_button: offer.browser_button, password: offer.password })
     })
     .await
 }
 
 #[uniffi::export]
-pub async fn sign_in_with_api_key(server: String, key: String) -> Result<SignedIn, BridgeError> {
+pub async fn sign_in_with_api_key(server: String, key: String, certificate: Option<String>) -> Result<SignedIn, BridgeError> {
     on_runtime(async move {
         let credential = Credential::ApiKey { key: key.trim().to_owned() };
-        let client = new_client(&normalised_address(&server), Some(credential.for_client())).map_err(failed)?;
+        let client = new_client(&normalised_address(&server), Some(credential.for_client()), trusted(certificate)?).map_err(failed)?;
         in_time(sign_in::check_api_key(&client)).await?;
         Ok(SignedIn { credential, account: None })
     })
@@ -1671,9 +1800,9 @@ pub async fn sign_in_with_api_key(server: String, key: String) -> Result<SignedI
 }
 
 #[uniffi::export]
-pub async fn sign_in_with_password(server: String, email: String, password: String) -> Result<SignedIn, BridgeError> {
+pub async fn sign_in_with_password(server: String, email: String, password: String, certificate: Option<String>) -> Result<SignedIn, BridgeError> {
     on_runtime(async move {
-        let client = anonymous(&normalised_address(&server))?;
+        let client = anonymous(&normalised_address(&server), trusted(certificate)?)?;
         let session = in_time(sign_in::password_session(&client, &email, &password)).await?;
         Ok(SignedIn { credential: Credential::Session { token: session.token }, account: Some(session.account) })
     })
@@ -1685,17 +1814,18 @@ pub async fn sign_in_with_password(server: String, email: String, password: Stri
 #[derive(uniffi::Object)]
 pub struct BrowserAttempt {
     server: String,
+    certificate: Option<CertificatePin>,
     secrets: BrowserSignIn,
     address: String,
 }
 
 #[uniffi::export]
-pub async fn begin_browser_sign_in(server: String) -> Result<Arc<BrowserAttempt>, BridgeError> {
+pub async fn begin_browser_sign_in(server: String, certificate: Option<String>) -> Result<Arc<BrowserAttempt>, BridgeError> {
     on_runtime(async move {
-        let server = normalised_address(&server);
+        let (server, certificate) = (normalised_address(&server), trusted(certificate)?);
         let secrets = BrowserSignIn::new().map_err(failed)?;
-        let address = in_time(sign_in::begin_browser(&anonymous(&server)?, &secrets.state, &secrets.code_challenge)).await?;
-        Ok(Arc::new(BrowserAttempt { server, secrets, address }))
+        let address = in_time(sign_in::begin_browser(&anonymous(&server, certificate)?, &secrets.state, &secrets.code_challenge)).await?;
+        Ok(Arc::new(BrowserAttempt { server, certificate, secrets, address }))
     })
     .await
 }
@@ -1717,9 +1847,9 @@ impl BrowserAttempt {
         if let Some(refusal) = sign_in::provider_error(&redirect, &self.secrets.state) {
             return Err(failed(refusal));
         }
-        let (server, secrets) = (self.server.clone(), self.secrets.clone());
+        let (server, certificate, secrets) = (self.server.clone(), self.certificate, self.secrets.clone());
         on_runtime(async move {
-            let session = in_time(sign_in::finish_browser(&anonymous(&server)?, &redirect, &secrets)).await?;
+            let session = in_time(sign_in::finish_browser(&anonymous(&server, certificate)?, &redirect, &secrets)).await?;
             Ok(SignedIn { credential: Credential::Session { token: session.token }, account: Some(session.account) })
         })
         .await
@@ -1729,10 +1859,10 @@ impl BrowserAttempt {
 /// End a session on the server, as signing out does; an API key has nothing to end. Signing out goes on whatever the
 /// server says.
 #[uniffi::export]
-pub async fn end_session(server: String, credential: Credential) {
+pub async fn end_session(server: String, credential: Credential, certificate: Option<String>) {
     let ended = on_runtime(async move {
         if matches!(credential, Credential::Session { .. }) {
-            let client = new_client(&normalised_address(&server), Some(credential.for_client())).map_err(failed)?;
+            let client = new_client(&normalised_address(&server), Some(credential.for_client()), trusted(certificate)?).map_err(failed)?;
             let _ = tokio::time::timeout(SIGN_IN_LIMIT, client.logout()).await;
         }
         Ok(())
@@ -1774,12 +1904,12 @@ const SHOW_LINK_LIMIT: Duration = Duration::from_secs(20);
 /// id. `config` is the text of `config.toml`: with `crosslink.enabled` off, nothing is read. Only ever finds: nothing is
 /// fetched but listings and, for a photo, its details.
 #[uniffi::export]
-pub async fn show_link(server: String, credential: Credential, config: String, link: String) -> ShowLinkOutcome {
+pub async fn show_link(server: String, credential: Credential, certificate: Option<String>, config: String, link: String) -> ShowLinkOutcome {
     let finding = on_runtime(async move {
         let server = normalised_address(&server);
         let config = parse_config(&config)?;
         let enabled = config.crosslink_enabled;
-        let client = new_client(&server, Some(credential.for_client())).map_err(failed)?;
+        let client = new_client(&server, Some(credential.for_client()), trusted(certificate)?).map_err(failed)?;
         let source = Arc::new(ImmichSource::new(client));
         let asking = source.clone();
         // An API key without `user.read` cannot tell its id: the link's user is then not checked.
@@ -2029,12 +2159,12 @@ pub fn forget_app(file: String, bundle_id: String) {
 /// The item's crosslink, as the extension's `Library::crosslink` makes it, for the app, which has no library: with
 /// the signed-in user's id when the server tells it in time.
 #[uniffi::export]
-pub async fn item_crosslink(server: String, credential: Credential, identifier: String) -> Option<String> {
+pub async fn item_crosslink(server: String, credential: Credential, certificate: Option<String>, identifier: String) -> Option<String> {
     let node = NodeKey::from_storage_key(&identifier)?;
     let server = normalised_address(&server);
     let asking = server.clone();
     let user_id = on_runtime(async move {
-        let client = new_client(&asking, Some(credential.for_client())).map_err(failed)?;
+        let client = new_client(&asking, Some(credential.for_client()), trusted(certificate)?).map_err(failed)?;
         match tokio::time::timeout(SIGN_IN_LIMIT, client.me()).await {
             Ok(Ok(me)) => Ok(me.id),
             _ => Err(too_slow()),
@@ -2444,7 +2574,7 @@ mod tests {
     fn a_web_link_is_the_items_address_on_the_signed_in_server() {
         let directory = tempfile::tempdir().unwrap();
         let path = directory.path().display().to_string();
-        let library = Library::open("lab.example/".into(), Credential::ApiKey { key: "key".into() }, path, String::new()).unwrap();
+        let library = Library::open("lab.example/".into(), Credential::ApiKey { key: "key".into() }, None, path, String::new()).unwrap();
         let album = NodeKey::Album("b1e2c3d4-0000-4000-8000-000000000001".into()).storage_key();
         assert_eq!(library.web_link(album).as_deref(), Some("https://lab.example/albums/b1e2c3d4-0000-4000-8000-000000000001"));
         assert_eq!(library.web_link(march_photo()).as_deref(), Some("https://lab.example/photos/asset-1"));
@@ -2569,7 +2699,7 @@ mod tests {
     fn new_settings_are_followed_without_opening_the_store_again() {
         let directory = tempfile::tempdir().unwrap();
         let path = directory.path().display().to_string();
-        let library = Library::open("lab.example".into(), Credential::ApiKey { key: "key".into() }, path, String::new()).unwrap();
+        let library = Library::open("lab.example".into(), Credential::ApiKey { key: "key".into() }, None, path, String::new()).unwrap();
         assert!(!library.apply_config(String::new()).unwrap(), "the same settings");
         assert!(library.apply_config("[sections]\nplaces = false\n".into()).unwrap());
         assert!(!library.answers().tree.config().show_places);
@@ -2767,11 +2897,61 @@ mod tests {
         let directory = tempfile::tempdir().unwrap();
         let path = directory.path().display().to_string();
         let key = |key: &str| Credential::ApiKey { key: key.into() };
-        let first = Library::open("lab.example".into(), key("key"), path.clone(), String::new()).unwrap();
-        let again = Library::open("https://lab.example/".into(), key(" key "), path.clone(), String::new()).unwrap();
+        let first = Library::open("lab.example".into(), key("key"), None, path.clone(), String::new()).unwrap();
+        let again = Library::open("https://lab.example/".into(), key(" key "), None, path.clone(), String::new()).unwrap();
         assert!(Arc::ptr_eq(&first, &again), "the store is opened once");
         drop((first, again));
-        assert!(Library::open("lab.example".into(), key("key"), path, "bad = [".into()).is_err(), "a config that does not parse");
+        assert!(Library::open("lab.example".into(), key("key"), None, path, "bad = [".into()).is_err(), "a config that does not parse");
+    }
+
+    /// The certificate trusted for the server, kept with the account (ARCHITECTURE.md, "A certificate of the server's
+    /// own"): a fingerprint as people write it, none for nothing, and refused when it is not one.
+    #[test]
+    fn the_certificate_trusted_for_the_server_is_a_fingerprint() {
+        let pin = CertificatePin::of(b"a certificate");
+        assert_eq!(trusted(None), Ok(None));
+        assert_eq!(trusted(Some("  ".into())), Ok(None));
+        assert_eq!(trusted(Some(pin.to_string())), Ok(Some(pin)));
+        assert_eq!(trusted(Some(pin.to_string().replace(':', "").to_lowercase())), Ok(Some(pin)));
+        assert!(matches!(trusted(Some("AB:CD".into())), Err(BridgeError::Failed { .. })));
+    }
+
+    /// Trust This Certificate and Forget reach an open library, as the extension reads them from the account: its
+    /// requests go over a client that trusts the new certificate, and the same one again changes nothing.
+    #[test]
+    fn an_open_library_follows_the_certificate_trusted_for_its_server() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().display().to_string();
+        let key = Credential::ApiKey { key: "key".into() };
+        let pin = CertificatePin::of(b"a certificate").to_string();
+        let library = Library::open("lab.example".into(), key.clone(), None, path.clone(), String::new()).unwrap();
+        let before = library.source();
+        assert_eq!(library.trust_certificate(None), Ok(false), "nothing trusted, as before");
+        assert_eq!(library.trust_certificate(Some(pin.clone())), Ok(true));
+        assert!(!Arc::ptr_eq(&before, &library.source()), "a client that trusts it");
+        assert_eq!(library.trust_certificate(Some(pin.to_lowercase())), Ok(false), "the same certificate");
+        let again = Library::open("lab.example".into(), key, None, path, String::new()).unwrap();
+        assert!(Arc::ptr_eq(&library, &again));
+        assert_eq!(*library.certificate.lock().unwrap(), None, "opened again with the certificate forgotten");
+        assert!(library.trust_certificate(Some("not a fingerprint".into())).is_err());
+    }
+
+    /// A refused certificate reaches the app with what the person sees to decide: a changed one with the certificate
+    /// trusted until now.
+    #[test]
+    fn a_refused_certificate_reaches_the_app_with_its_details() {
+        let details = immich_api::CertificateDetails::from_der(b"not a certificate");
+        let trusted_before = CertificatePin::of(b"the old one");
+        let refusal = immich_api::CertificateRefusal { certificate: details.clone(), reason: immich_api::RefusalReason::NotValidForName, trusted: Some(trusted_before) };
+        let Some(BridgeError::UntrustedCertificate { message, certificate }) = certificate_refused(&ApiError::CertificateChanged(Box::new(refusal))) else {
+            panic!("a refused certificate");
+        };
+        assert!(immich_api::is_certificate_text(&message), "{message}");
+        assert_eq!(certificate.sha256, details.sha256.to_string());
+        assert!(certificate.other_name);
+        assert_eq!(certificate.trusted, Some(trusted_before.to_string()));
+        assert_eq!(certificate_refused(&ApiError::Offline("down".into())), None);
+        assert_eq!(certificate_details(b"not a certificate".to_vec()).sha256, details.sha256.to_string());
     }
 
     // Received links: a library with one photo in March 2024, in the album Trip, in Aarhus, Denmark, and one person,

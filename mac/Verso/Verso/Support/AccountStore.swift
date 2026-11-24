@@ -6,6 +6,9 @@ enum AccountStore {
         var serverURL: URL
         var apiURL: URL
         var credential: Credential
+        /// The certificate trusted for the server where the system does not trust its own: its SHA-256 fingerprint,
+        /// kept with the server it was trusted for (ServerTrust; ARCHITECTURE.md, "A certificate of the server's own").
+        var certificate: String? = nil
     }
 
     private static let lastServerKey = "lastServerURL"

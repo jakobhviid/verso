@@ -37,6 +37,9 @@ struct SignInView: View {
     @State private var isConnecting = false
     @State private var tryingDemo = false
     @State private var serverProblem: String?
+    /// The question about the server's certificate, when this device does not trust it (ARCHITECTURE.md, "A certificate
+    /// of the server's own"): Trust This Certificate trusts it for that server and Continue goes on.
+    @State private var certificateQuestion: CertificateQuestion?
     @FocusState private var serverFocused: Bool
 
     var body: some View {
@@ -45,6 +48,12 @@ struct SignInView: View {
                 .navigationDestination(item: $found) { server in
                     SignInMethodsPage(server: server)
                 }
+        }
+        .sheet(item: $certificateQuestion) { question in
+            CertificateQuestionSheet(question: question) {
+                ServerTrust.trust(question.sha256, for: question.server)
+                connect()
+            }
         }
     }
 
@@ -153,6 +162,9 @@ struct SignInView: View {
         Task {
             do {
                 found = try await FoundServer.discover(address)
+            } catch let refused as ServerTrust.Refused {
+                // Nothing was sent to the server; the person decides whether to trust its certificate.
+                certificateQuestion = CertificateQuestion(refused)
             } catch {
                 serverProblem = error.localizedDescription
                 AccessibilityNotification.Announcement(error.localizedDescription).post()

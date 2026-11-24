@@ -281,7 +281,8 @@ final class ImmichClient: Sendable {
         return "verso/\(version) (\(system) \(os.majorVersion).\(os.minorVersion))"
     }()
 
-    /// Bootstrap session. Media caching begins only after choosing an account identity.
+    /// Bootstrap session. Media caching begins only after choosing an account identity. Like every session that talks
+    /// to Immich, it takes the certificate trusted for the server (ServerTrust).
     static let sharedSession: URLSession = {
         let config = URLSessionConfiguration.default
         // Authentication and bootstrap requests do not need a persistent media cache.
@@ -289,7 +290,7 @@ final class ImmichClient: Sendable {
         config.httpAdditionalHeaders = ["User-Agent": userAgent]
         config.httpMaximumConnectionsPerHost = 8
         config.timeoutIntervalForRequest = 30
-        return URLSession(configuration: config)
+        return ServerTrust.session(config)
     }()
 
     init(serverURL: URL, apiURL: URL, credential: Credential?, session: URLSession = ImmichClient.sharedSession,
@@ -413,7 +414,8 @@ extension ImmichClient {
     /// and tries https before http when no scheme was given. Plain http after a failed https only for a server on
     /// the local network, and never after a certificate's error: anyone on the way to a server elsewhere could make
     /// https fail (a certificate of their own, a blocked port) to read the password and every photo sent. Typed with
-    /// `http://`, an address is reached as typed.
+    /// `http://`, an address is reached as typed. A certificate the system does not trust, nor the one trusted for the
+    /// server (ServerTrust), comes back as `ServerTrust.Refused`, for the person to decide on.
     static func discover(_ input: String) async throws -> ImmichClient {
         var text = input.trimmingCharacters(in: .whitespacesAndNewlines)
         while text.hasSuffix("/") { text.removeLast() }
@@ -425,7 +427,8 @@ extension ImmichClient {
         let config = URLSessionConfiguration.ephemeral
         config.timeoutIntervalForRequest = 8
         config.httpAdditionalHeaders = ["User-Agent": userAgent]
-        let probe = URLSession(configuration: config)
+        let probe = ServerTrust.session(config)
+        defer { probe.finishTasksAndInvalidate() }
 
         var lastError: Error = ImmichError.invalidServerURL
         var certificateFailed = false
@@ -451,11 +454,30 @@ extension ImmichClient {
                 }
                 lastError = ImmichError.serverUnreachable(String(localized: "The server answered, but it isn't Immich."))
             } catch {
+                if let refused = ServerTrust.refused(in: error) { throw refused }
                 certificateFailed = certificateFailed || ServerAddress.isCertificateError(error)
                 lastError = ImmichError.serverUnreachable(error.localizedDescription)
             }
         }
         throw lastError
+    }
+
+    /// The certificate the server presents now, over a connection of its own, when the system refuses it and it is
+    /// not the one trusted for the server; nil when it is trusted, or the server is reached without TLS. Throws when
+    /// the server cannot be reached.
+    func refusedCertificate() async throws -> ServerTrust.Refused? {
+        let config = URLSessionConfiguration.ephemeral
+        config.timeoutIntervalForRequest = 10
+        config.httpAdditionalHeaders = ["User-Agent": Self.userAgent]
+        let looking = ServerTrust.session(config)
+        defer { looking.finishTasksAndInvalidate() }
+        do {
+            _ = try await looking.data(from: apiURL.appendingPathComponent("server/ping"))
+            return nil
+        } catch {
+            if let refused = ServerTrust.refused(in: error) { return refused }
+            throw error
+        }
     }
 
     private static func wellKnownEndpoint(base: URL, session: URLSession) async -> URL? {

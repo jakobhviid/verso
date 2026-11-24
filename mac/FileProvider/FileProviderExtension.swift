@@ -32,7 +32,7 @@ final class FileProviderExtension: NSObject, NSFileProviderReplicatedExtension, 
         }
         let config = (try? String(contentsOf: AppGroup.configFile, encoding: .utf8)) ?? ""
         do {
-            return try Library.open(server: account.server, credential: account.credential,
+            return try Library.open(server: account.server, credential: account.credential, certificate: account.certificate,
                                     directory: AppGroup.libraryDirectory.path, config: config)
         } catch {
             logger.error("the library did not open: \(String(describing: error), privacy: .public)")
@@ -77,6 +77,7 @@ final class FileProviderExtension: NSObject, NSFileProviderReplicatedExtension, 
     /// again, which comes through here first.
     private func followConfig(_ library: Library) {
         CurrentOffers.reload()
+        library.followCertificate()
         let config = (try? String(contentsOf: AppGroup.configFile, encoding: .utf8)) ?? ""
         do {
             if try library.applyConfig(config: config) {
@@ -266,5 +267,20 @@ final class FileProviderExtension: NSObject, NSFileProviderReplicatedExtension, 
             completionHandler(CocoaError(.featureUnsupported))
         }
         return Progress()
+    }
+}
+
+extension Library {
+    /// Follow the certificate trusted for the server, kept with the account, once the app trusted another or forgot it
+    /// (ARCHITECTURE.md, "A certificate of the server's own"): before a listing again, and before each change poll,
+    /// which the app asks for every ten seconds while it runs.
+    func followCertificate() {
+        do {
+            if try trustCertificate(certificate: Account.keptCertificate) {
+                logger.notice("the certificate trusted for the server changed; requests follow it")
+            }
+        } catch {
+            logger.error("the certificate trusted for the server was not followed: \(String(describing: error), privacy: .public)")
+        }
     }
 }

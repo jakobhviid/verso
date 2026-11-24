@@ -76,7 +76,7 @@ actor LiveMotions {
         if manager.fileExists(atPath: file.path) {
             try? manager.setAttributes([.modificationDate: Date.now], ofItemAtPath: file.path)
         } else {
-            let (downloaded, response) = try await URLSession.shared.download(for: request)
+            let (downloaded, response) = try await ImmichClient.sharedSession.download(for: request)
             guard let status = (response as? HTTPURLResponse)?.statusCode, (200..<300).contains(status) else {
                 try? manager.removeItem(at: downloaded)
                 throw URLError(.badServerResponse)

@@ -79,6 +79,9 @@ final class BackupCenter {
     func launch() {
         guard !launched else { return }
         launched = true
+        // The certificate trusted for the account's server (ServerTrust), which reading the account brings, before the
+        // background session's challenges can come.
+        _ = try? AccountVault.load()
         do {
             let store = try BackupStore(file: BackupStore.defaultFile())
             let transport = BackupTransport(store: store, identifier: BackupTransport.identifier(bundle: Bundle.main.bundleIdentifier ?? "dev.hviid.Verso"))

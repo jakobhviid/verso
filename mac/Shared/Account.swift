@@ -1,5 +1,6 @@
 // Where the app and the extension meet (ARCHITECTURE.md, "Verso Drive on the Mac"): the App Group container holds the
-// server's address, config.toml and the extension's metadata store; a Keychain access group holds the credential.
+// server's address with the certificate trusted for it, config.toml and the extension's metadata store; a Keychain
+// access group holds the credential.
 
 import Foundation
 import Security
@@ -19,6 +20,9 @@ enum AppGroup {
 
     /// The server's address, as checked when signing in. Not secret, so a plain file.
     static var serverFile: URL { container.appendingPathComponent("server") }
+    /// The certificate trusted for that server where the system does not trust its own: its SHA-256 fingerprint
+    /// (ARCHITECTURE.md, "A certificate of the server's own"). Not secret either.
+    static var certificateFile: URL { container.appendingPathComponent("certificate") }
     /// The account's email, when the sign-in told it (a password or single sign-on; an API key does not).
     static var emailFile: URL { container.appendingPathComponent("account") }
     /// The same settings table as on Linux (SPEC.md, "Configuration"); absent means the defaults.
@@ -36,10 +40,20 @@ enum AppGroup {
     }
 }
 
-/// The signed-in account: the server's address and its credential, an API key or a session.
+/// The signed-in account: the server's address and its credential, an API key or a session, and the certificate
+/// trusted for the server, the gallery's account's (AccountVault), where there is one.
 struct Account {
     let server: String
     let credential: Credential
+    var certificate: String? = nil
+
+    /// The certificate kept with the account: what Trust This Certificate and Forget in the app change, which the
+    /// extension follows (`Library.trustCertificate`).
+    static var keptCertificate: String? {
+        (try? String(contentsOf: AppGroup.certificateFile, encoding: .utf8))
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .flatMap { $0.isEmpty ? nil : $0 }
+    }
 
     private static let service = "dev.hviid.Verso"
     private static let accessible = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly as String
@@ -63,8 +77,8 @@ struct Account {
         let parts = kept.split(separator: "\n", maxSplits: 1).map(String.init)
         guard parts.count == 2 else { return nil }
         switch parts[0] {
-        case "api-key": return Account(server: server, credential: .apiKey(key: parts[1]))
-        case "session": return Account(server: server, credential: .session(token: parts[1]))
+        case "api-key": return Account(server: server, credential: .apiKey(key: parts[1]), certificate: keptCertificate)
+        case "session": return Account(server: server, credential: .session(token: parts[1]), certificate: keptCertificate)
         default: return nil
         }
     }
@@ -86,6 +100,11 @@ struct Account {
         guard status == errSecSuccess else { throw KeychainError(status: status) }
         try FileManager.default.createDirectory(at: AppGroup.container, withIntermediateDirectories: true)
         try server.write(to: AppGroup.serverFile, atomically: true, encoding: .utf8)
+        if let certificate {
+            try certificate.write(to: AppGroup.certificateFile, atomically: true, encoding: .utf8)
+        } else {
+            try? FileManager.default.removeItem(at: AppGroup.certificateFile)
+        }
     }
 
     /// The signed-in account's email, when known.
@@ -101,9 +120,11 @@ struct Account {
         }
     }
 
-    /// Forget the account: the credential, the address, the email and the last status. Nothing else is touched.
+    /// Forget the account: the credential, the address, the certificate trusted for it, the email and the last
+    /// status. Nothing else is touched.
     static func forget() {
         try? FileManager.default.removeItem(at: AppGroup.emailFile)
+        try? FileManager.default.removeItem(at: AppGroup.certificateFile)
         try? FileManager.default.removeItem(at: Status.file)
         if let server = try? String(contentsOf: AppGroup.serverFile, encoding: .utf8)
             .trimmingCharacters(in: .whitespacesAndNewlines) {

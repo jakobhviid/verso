@@ -49,11 +49,13 @@ pub struct ApiConnection {
 
 #[uniffi::export]
 impl ApiConnection {
-    /// `api` is the API's address (`/api` is added when it is missing, so the server's address does too).
+    /// `api` is the API's address (`/api` is added when it is missing, so the server's address does too), and
+    /// `certificate` the certificate trusted for the server where the system does not trust its own (its SHA-256
+    /// fingerprint): the one kept with the account, or the one the person just trusted as they sign in.
     #[uniffi::constructor]
-    pub fn new(api: String, credential: Option<Credential>) -> Result<Arc<ApiConnection>, BridgeError> {
+    pub fn new(api: String, credential: Option<Credential>, certificate: Option<String>) -> Result<Arc<ApiConnection>, BridgeError> {
         let credential = credential.map(|credential| credential.for_client());
-        let client = crate::new_client(&api, credential).map_err(failed)?;
+        let client = crate::new_client(&api, credential, crate::trusted(certificate)?).map_err(failed)?;
         Ok(Arc::new(ApiConnection { client }))
     }
 
@@ -2271,6 +2273,9 @@ impl ApiConnection {
 
 /// Why a typed call failed, in the kinds the app tells apart: signed out, refused, gone, out of reach.
 fn refused(error: ApiError) -> BridgeError {
+    if let Some(certificate) = crate::certificate_refused(&error) {
+        return certificate;
+    }
     match error {
         ApiError::Unauthorized => BridgeError::NotAuthenticated,
         ApiError::Forbidden { .. } => BridgeError::NotPermitted { message: error.to_string() },
@@ -2289,6 +2294,9 @@ fn pairs(fields: Vec<ApiField>) -> Vec<(String, String)> {
 
 /// Why no answer came, in the kinds the app tells apart.
 fn unanswered(error: ApiError) -> BridgeError {
+    if let Some(certificate) = crate::certificate_refused(&error) {
+        return certificate;
+    }
     match error {
         ApiError::Offline(message) => BridgeError::ServerUnreachable { message },
         other => failed(other),
@@ -2313,9 +2321,9 @@ mod tests {
 
     #[test]
     fn a_server_address_is_taken_as_its_api() {
-        assert!(ApiConnection::new("https://photos.example.org".to_owned(), None).is_ok());
-        assert!(ApiConnection::new("https://photos.example.org/api/".to_owned(), None).is_ok());
-        assert!(matches!(ApiConnection::new("photos".to_owned(), None), Err(BridgeError::Failed { .. })));
+        assert!(ApiConnection::new("https://photos.example.org".to_owned(), None, None).is_ok());
+        assert!(ApiConnection::new("https://photos.example.org/api/".to_owned(), None, None).is_ok());
+        assert!(matches!(ApiConnection::new("photos".to_owned(), None, None), Err(BridgeError::Failed { .. })));
     }
 
     #[test]
@@ -2495,7 +2503,7 @@ mod tests {
     #[tokio::test]
     async fn a_server_that_cannot_be_reached_is_unreachable() {
         let credential = Some(Credential::ApiKey { key: "key".to_owned() });
-        let connection = ApiConnection::new("http://127.0.0.1:9".to_owned(), credential).unwrap();
+        let connection = ApiConnection::new("http://127.0.0.1:9".to_owned(), credential, None).unwrap();
         let answer = connection.send("GET".to_owned(), "albums".to_owned(), vec![], vec![], None).await;
         assert!(matches!(answer, Err(BridgeError::ServerUnreachable { .. })));
     }

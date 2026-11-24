@@ -61,7 +61,7 @@ final class PickerLibrary {
         configuration.httpAdditionalHeaders = ["User-Agent": ImmichClient.userAgent]
         configuration.httpMaximumConnectionsPerHost = 6
         configuration.timeoutIntervalForRequest = 30
-        return URLSession(configuration: configuration)
+        return ServerTrust.session(configuration)
     }()
 
     /// The albums, the person's own and those shared with them, the most recently added to first.
@@ -75,7 +75,7 @@ final class PickerLibrary {
         } catch {
             guard !error.isCancellation else { return }
             if error.isUnauthorized { onSignInEnded?(); return }
-            albumsProblem = error.localizedDescription
+            albumsProblem = error.problemText
         }
     }
 

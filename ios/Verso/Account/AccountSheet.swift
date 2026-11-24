@@ -1,12 +1,11 @@
 // The account's sheet on iOS, opened from its picture in Collections' toolbar (ROADMAP.md, M10: Preferences live
 // here): first the notifications while there are any (AccountNotifications.swift), where the Mac and Linux have the
-// bell; then the profile with its picture, name and email, the storage used and the server, the account's Immich
-// features, its password, API keys and sessions, Administration for an admin, backing this iPhone up
-// (BackupSettingsSection), what Verso keeps on this device (Verso Drive in the Files app, the app icon, and Look Up
-// Place Names with Apple Maps, Verso Drive and Look Up off until switched on, and the image cache), About Verso, and
-// Sign Out. A list of iOS's own, as
-// Settings has the Apple Account; what each page does is the Mac's Settings'. The server's notifications and the
-// account are read again as it opens and on a pull.
+// bell; then the profile with its picture, name and email, the storage used and the server (with the certificate
+// trusted for it, and Forget), the account's Immich features, its password, API keys and sessions, Administration for
+// an admin, backing this iPhone up (BackupSettingsSection), what Verso keeps on this device (Verso Drive in the Files
+// app, the app icon, and Look Up Place Names with Apple Maps, Verso Drive and Look Up off until switched on, and the
+// image cache), About Verso, and Sign Out. A list of iOS's own, as Settings has the Apple Account; what each page does
+// is the Mac's Settings'. The server's notifications and the account are read again as it opens and on a pull.
 
 import ImageIO
 import PhotosUI
@@ -19,6 +18,7 @@ struct AccountSheet: View {
     @Environment(AppModel.self) private var app
     @Environment(\.dismiss) private var dismiss
     @State private var confirmingSignOut = false
+    @State private var forgettingCertificate = false
     /// The files in Verso Drive's Upload that have not reached Immich, which signing out removes with the drive.
     @State private var filesWaitingInUpload = 0
     @State private var cacheSize: Int64 = 0
@@ -52,6 +52,30 @@ struct AccountSheet: View {
                     // A session from a password and one from a browser look the same afterwards, so only a key is said.
                     if case .apiKey = services.client.credential {
                         LabeledContent("Signed In With", value: "API Key")
+                    }
+                    // The certificate trusted for the server where this device does not trust its own (ARCHITECTURE.md,
+                    // "A certificate of the server's own"), and forgetting it, which closes the sheet: the question
+                    // about the server's certificate then comes over the library.
+                    if let certificate = services.trustedCertificate {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Trusted Certificate (SHA-256)")
+                            Text(CertificateQuestion.lines(certificate, pairs: 8))
+                                .font(.footnote.monospaced())
+                                .foregroundStyle(.secondary)
+                                .textSelection(.enabled)
+                        }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityIdentifier("trustedCertificate")
+                        Button("Forget Certificate…", role: .destructive) { forgettingCertificate = true }
+                            .confirmationDialog("Forget the Certificate?", isPresented: $forgettingCertificate,
+                                                titleVisibility: .visible) {
+                                Button("Forget", role: .destructive) {
+                                    dismiss()
+                                    services.forgetCertificate()
+                                }
+                            } message: {
+                                Text("Verso stops trusting this certificate and connects again, asking about the server's certificate, unless this \(UIDevice.current.model) trusts it.")
+                            }
                     }
                 }
                 Section {

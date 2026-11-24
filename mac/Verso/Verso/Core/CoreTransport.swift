@@ -16,8 +16,9 @@ enum CoreTransport {
     }()
 }
 
-/// One core connection per API address and credential, kept for the process, so its connections to the server are
-/// used again.
+/// One core connection per API address, credential and certificate trusted for the server (ServerTrust), kept for the
+/// process, so its connections to the server are used again; trusting another certificate, or forgetting one, makes
+/// a new one, whose handshakes judge the server's certificate afresh.
 private final class Connections: Sendable {
     private let open = Mutex<[String: CoreConnection]>([:])
 
@@ -27,10 +28,15 @@ private final class Connections: Sendable {
         case .accessToken(let token): (nil, token)
         case nil: (nil, nil)
         }
-        let key = [apiURL.absoluteString, apiKey ?? "", sessionToken ?? ""].joined(separator: "\n")
+        let certificate = ServerTrust.certificate(for: apiURL)
+        let account = [apiURL.absoluteString, apiKey ?? "", sessionToken ?? ""].joined(separator: "\n")
+        let key = account + "\n" + (certificate ?? "")
         return open.withLock { open -> CoreConnection? in
             if let kept = open[key] { return kept }
-            guard let made = try? CoreConnection(apiURL: apiURL, apiKey: apiKey, sessionToken: sessionToken) else { return nil }
+            guard let made = try? CoreConnection(apiURL: apiURL, apiKey: apiKey, sessionToken: sessionToken,
+                                                 certificate: certificate) else { return nil }
+            // The same account's connection trusting another certificate goes.
+            open = open.filter { !$0.key.hasPrefix(account + "\n") }
             open[key] = made
             return made
         }
@@ -788,6 +794,7 @@ private func asClientErrors<Value>(_ call: () async throws -> Value) async throw
         case .notPermitted(let message): throw ImmichError.http(403, message)
         case .notFound: throw ImmichError.http(404, nil)
         case .unreachable(let message): throw URLError(.cannotConnectToHost, userInfo: [NSLocalizedDescriptionKey: message])
+        case .untrustedCertificate(let message, _): throw CoreError.certificateError(message, url: nil)
         case .refused(let status, let message): throw ImmichError.http(status, message)
         case .failed: throw error
         }

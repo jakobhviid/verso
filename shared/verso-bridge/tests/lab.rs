@@ -25,22 +25,22 @@ fn env(name: &str) -> String {
 #[tokio::test]
 #[ignore = "needs the lab server"]
 async fn signing_in_takes_a_key_or_a_password_and_refuses_a_wrong_key() {
-    let offer = probe(env("IMMICH_URL")).await.unwrap();
+    let offer = probe(env("IMMICH_URL"), None).await.unwrap();
     assert!(offer.version.starts_with('v') && offer.password, "{offer:?}");
-    let key = sign_in_with_api_key(env("IMMICH_URL"), env("IMMICH_API_KEY_READONLY")).await.unwrap();
+    let key = sign_in_with_api_key(env("IMMICH_URL"), env("IMMICH_API_KEY_READONLY"), None).await.unwrap();
     assert_eq!(key.credential, Credential::ApiKey { key: env("IMMICH_API_KEY_READONLY") });
-    let refused = sign_in_with_api_key(env("IMMICH_URL"), "not-a-key".into()).await.unwrap_err();
+    let refused = sign_in_with_api_key(env("IMMICH_URL"), "not-a-key".into(), None).await.unwrap_err();
     assert_eq!(refused.to_string(), "The server did not accept this API key.");
 
-    let session = sign_in_with_password(env("IMMICH_URL"), env("IMMICH_ADMIN_EMAIL"), env("IMMICH_ADMIN_PASSWORD")).await.unwrap();
+    let session = sign_in_with_password(env("IMMICH_URL"), env("IMMICH_ADMIN_EMAIL"), env("IMMICH_ADMIN_PASSWORD"), None).await.unwrap();
     assert_eq!(session.account, Some(env("IMMICH_ADMIN_EMAIL")));
     let directory = tempfile::tempdir().unwrap();
-    let library = Library::open(env("IMMICH_URL"), session.credential.clone(), directory.path().display().to_string(), String::new()).unwrap();
+    let library = Library::open(env("IMMICH_URL"), session.credential.clone(), None, directory.path().display().to_string(), String::new()).unwrap();
     assert_eq!(library.list("root".into(), None).await.unwrap().len(), 5, "a session browses as a key does");
     assert!(!library.poll(None, None).await.unwrap(), "a session's first poll, through the sync stream, takes note only");
     drop(library);
-    end_session(env("IMMICH_URL"), session.credential.clone()).await;
-    let ended = Library::open(env("IMMICH_URL"), session.credential, directory.path().join("again").display().to_string(), String::new()).unwrap();
+    end_session(env("IMMICH_URL"), session.credential.clone(), None).await;
+    let ended = Library::open(env("IMMICH_URL"), session.credential, None, directory.path().join("again").display().to_string(), String::new()).unwrap();
     assert!(ended.list("root".into(), None).await.is_ok(), "the root needs no server");
     assert!(ended.list("section|Photos".into(), None).await.is_err(), "a session ended on the server is refused");
 }
@@ -50,7 +50,7 @@ async fn signing_in_takes_a_key_or_a_password_and_refuses_a_wrong_key() {
 async fn a_photo_added_to_upload_reaches_the_library_byte_for_byte() {
     let directory = tempfile::tempdir().unwrap();
     let key = env("IMMICH_API_KEY_FULL");
-    let library = Library::open(env("IMMICH_URL"), Credential::ApiKey { key: key.clone() }, directory.path().join("library").display().to_string(), String::new()).unwrap();
+    let library = Library::open(env("IMMICH_URL"), Credential::ApiKey { key: key.clone() }, None, directory.path().join("library").display().to_string(), String::new()).unwrap();
     // A fixture with bytes appended after the image: whole, and unique, so Immich takes it as new.
     let fixture = concat!(env!("CARGO_MANIFEST_DIR"), "/../../lab/immich-server/fixtures/cache/001.jpg");
     let mut bytes = std::fs::read(fixture).expect("the fixtures are downloaded (lab/immich-server/seed.sh)");
@@ -109,7 +109,7 @@ async fn the_archive_holds_what_immich_archived_and_follows_it() {
     let directory = tempfile::tempdir().unwrap();
     let key = env("IMMICH_API_KEY_READONLY");
     let config = "[sections]\narchive = true\n".to_owned();
-    let library = Library::open(env("IMMICH_URL"), Credential::ApiKey { key: key.clone() }, directory.path().display().to_string(), config).unwrap();
+    let library = Library::open(env("IMMICH_URL"), Credential::ApiKey { key: key.clone() }, None, directory.path().display().to_string(), config).unwrap();
     let client = Client::new(&env("IMMICH_URL"), Some(ApiCredential::ApiKey(key)), "Verso/lab-tests (Linux; lab)").unwrap();
 
     let sections: Vec<String> = library.list("root".into(), None).await.unwrap().into_iter().map(|item| item.name).collect();
@@ -139,7 +139,7 @@ async fn favorites_hold_what_immich_marked_archived_ones_too() {
     let directory = tempfile::tempdir().unwrap();
     let key = env("IMMICH_API_KEY_READONLY");
     let config = "[sections]\nfavorites = true\n".to_owned();
-    let library = Library::open(env("IMMICH_URL"), Credential::ApiKey { key: key.clone() }, directory.path().display().to_string(), config).unwrap();
+    let library = Library::open(env("IMMICH_URL"), Credential::ApiKey { key: key.clone() }, None, directory.path().display().to_string(), config).unwrap();
     let client = Client::new(&env("IMMICH_URL"), Some(ApiCredential::ApiKey(key)), "Verso/lab-tests (Linux; lab)").unwrap();
 
     let sections: Vec<String> = library.list("root".into(), None).await.unwrap().into_iter().map(|item| item.name).collect();
@@ -175,6 +175,7 @@ async fn every_timeline_original_matches_the_servers_checksum() {
     let library = Library::open(
         env("IMMICH_URL"),
         Credential::ApiKey { key: env("IMMICH_API_KEY_READONLY") },
+        None,
         directory.path().join("library").display().to_string(),
         String::new(),
     )

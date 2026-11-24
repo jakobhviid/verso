@@ -110,6 +110,13 @@ final class VersoDrive {
         return next
     }
 
+    /// The certificate trusted for the account's server changed (Trust This Certificate, Forget): the drive keeps it
+    /// with its account, and its extension follows it as it next asks the server what changed.
+    func certificateChanged() {
+        inTurn { await self.bringUp() }
+        signalSoon()
+    }
+
     /// After changes made in the app, and as it comes to the front: Finder looks again soon.
     func signalSoon() {
         signalTask?.cancel()
@@ -195,7 +202,7 @@ final class VersoDrive {
             case .accessToken(let token): (nil, token)
             }
             try DriveCore.keepAccount(server: client.serverURL.absoluteString, apiKey: apiKey, sessionToken: sessionToken,
-                                      email: user?.email)
+                                      certificate: ServerTrust.certificate(for: client.apiURL), email: user?.email)
             UserDefaults.standard.set(key, forKey: Self.keptAccountKey)
             // Adding the location again updates it in place: its name follows `mount.name`, and its items stay.
             try await NSFileProviderManager.add(domain)

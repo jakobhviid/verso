@@ -11,6 +11,10 @@ import Security
 /// Quick Start or Migration Assistant, as it opens the whole library; a new device signs in once. On the Mac that is
 /// the data protection Keychain, which an app asks for; the login Keychain ignores the setting and travels with the
 /// Mac's backups, so an account kept there by an earlier Verso is moved over as it is read.
+///
+/// The account holds the certificate trusted for its server where the system does not trust the server's own
+/// (ARCHITECTURE.md, "A certificate of the server's own"): reading or keeping the account trusts it for that server in
+/// this process (ServerTrust), and signing out forgets it, once the session has ended on the server.
 enum AccountVault {
     struct Entry: Codable {
         var name: String
@@ -45,7 +49,9 @@ enum AccountVault {
         if item[kSecAttrAccessible as String] as? String != accessible {
             SecItemUpdate(Self.query as CFDictionary, [kSecAttrAccessible as String: accessible] as CFDictionary)
         }
-        return try JSONDecoder().decode(Entry.self, from: data)
+        let entry = try JSONDecoder().decode(Entry.self, from: data)
+        ServerTrust.trust(entry.account.certificate, for: entry.account.apiURL)
+        return entry
     }
 
     /// On the Mac, an account an earlier Verso kept in the login Keychain: moved into this one, and removed there.
@@ -79,6 +85,14 @@ enum AccountVault {
         try save(Entry(name: user.name, email: user.email, userID: user.id, account: account))
     }
 
+    /// Keep `certificate` (its SHA-256 fingerprint) as the one trusted for the account's server, or none: Trust This
+    /// Certificate and Forget.
+    static func keep(certificate: String?) throws {
+        guard var entry = try load() else { return }
+        entry.account.certificate = certificate
+        try save(entry)
+    }
+
     private static func save(_ entry: Entry) throws {
         let data = try JSONEncoder().encode(entry)
         let attributes: [String: Any] = [kSecValueData as String: data,
@@ -94,6 +108,9 @@ enum AccountVault {
             throw NSError(domain: NSOSStatusErrorDomain, code: Int(status),
                           userInfo: [NSLocalizedDescriptionKey: "Could not save the account to Keychain (\(status))."])
         }
+        // The account's certificate alone: one trusted for another server as the person signed in is not kept.
+        ServerTrust.forgetAll()
+        ServerTrust.trust(entry.account.certificate, for: entry.account.apiURL)
         AccountStore.lastServer = entry.account.serverURL.absoluteString
     }
 

@@ -46,14 +46,17 @@ Problems in the Immich server itself belong to the Immich project:
   address typed without `https://` or `http://` is tried with https, and with plain http after that only for a server
   on your local network and never after a certificate's error (on Linux, never), so nobody on the way can turn a
   connection to a server elsewhere into an unencrypted one. An address typed with `http://` is reached as typed.
-  Verso trusts the certificates your system trusts (its trust store, where you can add a private authority). A
-  server's own certificate the system does not trust (self-signed, or from a private authority) is never accepted by
-  itself: on Linux Verso shows it, with its SHA-256 fingerprint to compare with the server's, and trusts exactly that
-  certificate, for that server alone, only once you choose Trust This Certificate (or give its fingerprint to
-  `verso-service login`). The fingerprint is kept with the server's address in `config.toml`. A certificate the server
-  presents later that is not that one is refused and asked about again, and nothing is sent to the server until you
-  decide; Preferences, Account forgets it. Verso never accepts every certificate, nor trusts an authority for you. The
-  Mac, the iPhone and the iPad refuse such a server, and ask nothing. On Linux the map comes from where your Immich
+  Verso trusts the certificates your system trusts (its trust store, where you can add a private authority; on the
+  iPhone and the iPad, a profile). A server's own certificate the system does not trust (self-signed, or from a
+  private authority) is never accepted by itself: Verso shows it, with its SHA-256 fingerprint to compare with the
+  server's, and trusts exactly that certificate, for that server alone, only once you choose Trust This Certificate
+  (or give its fingerprint to `verso-service login`). On Linux the fingerprint is kept with the server's address in
+  `config.toml`; on the Mac, the iPhone and the iPad with the account in the Keychain, and Verso Drive's copy beside
+  the server's address in the App Group. A certificate the server presents later that is not that one is refused and
+  asked about again, and nothing is sent to the server until you decide; the account's page (Preferences, Account on
+  Linux) forgets it, and on the Mac, the iPhone and the iPad signing out does too. Videos from such a server play
+  through Verso's own connection, which checks the same certificate. Verso never accepts every certificate, nor
+  trusts an authority for you. On Linux the map comes from where your Immich
   server's map setting points, as Immich's web app's does: its style, its icons and its tiles, from Immich's own
   `tiles.immich.cloud` and `static.immich.cloud` unless the server's admin chose other hosts, which learn the areas
   you look at; nothing is fetched until a map shows, the style's fonts are never fetched (Verso writes the map's

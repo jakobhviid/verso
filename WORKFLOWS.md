@@ -117,6 +117,11 @@ authority to this computer's trust store instead (on Fedora and its atomic deskt
 <authority.crt>`; on Debian and Ubuntu, copy it into `/usr/local/share/ca-certificates/` and run `sudo
 update-ca-certificates`), which Verso follows with no question at its next sign-in.
 
+On the Mac, the iPhone and the iPad, Continue in the sign-in asks the same, with the same fingerprint to compare, and
+the account's page shows the certificate trusted, with **Forget…** (Settings, Account on the Mac; the account's
+sheet, Server, on the iPhone and the iPad). An authority there goes into Keychain Access on the Mac (Always Trust), and
+on the iPhone and the iPad into a profile, then Settings, General, About, Certificate Trust Settings.
+
 Without a terminal, `login` never prompts. Browser sign-in still prints the address to open on stderr, and reads
 the address the browser ends on from stdin; the other methods read their secrets from stdin. For Verso Drive, an API
 key needs `album.read`, `asset.read`, `asset.view`, `asset.download` and `person.read`, plus `asset.upload` for

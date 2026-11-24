@@ -92,9 +92,7 @@ final class ViewerVideoPage: ViewerZoomPage {
         guard let client = state?.session.client else { return }
         // Played as a video app plays, with its sound, as Photos plays a video.
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
-        let asset = AVURLAsset(url: client.videoURL(item.id),
-                               options: ["AVURLAssetHTTPHeaderFieldsKey": client.credential?.headers ?? [:]])
-        let player = AVPlayer(playerItem: AVPlayerItem(asset: asset))
+        let player = AVPlayer(playerItem: AVPlayerItem(asset: client.videoAsset(item.id)))
         videoView.playerLayer.player = player
         self.player = player
         state?.video.attach(player, itemID: item.id)

@@ -45,7 +45,7 @@ extension ImmichClient {
         let configuration = session.configuration
         configuration.timeoutIntervalForRequest = 3600
         configuration.timeoutIntervalForResource = 7 * 24 * 3600
-        let uploadSession = URLSession(configuration: configuration)
+        let uploadSession = ServerTrust.session(configuration)
         defer { uploadSession.finishTasksAndInvalidate() }
         let size = try multipart.file.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
         progress(0, Int64(size))

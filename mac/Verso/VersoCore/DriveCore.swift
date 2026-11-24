@@ -25,11 +25,12 @@ public enum DriveCore {
     public static var server: String? { Account.load()?.server }
 
     /// Keep the gallery's account for the drive: one sign-in serves both, as on Linux. One of `apiKey` and
-    /// `sessionToken`.
-    public static func keepAccount(server: String, apiKey: String?, sessionToken: String?, email: String?) throws {
+    /// `sessionToken`; `certificate` is the one trusted for the server where the system does not trust its own.
+    public static func keepAccount(server: String, apiKey: String?, sessionToken: String?, certificate: String?,
+                                   email: String?) throws {
         guard let credential = apiKey.map({ Credential.apiKey(key: $0) }) ?? sessionToken.map({ Credential.session(token: $0) })
         else { return }
-        try Account(server: server, credential: credential).save()
+        try Account(server: server, credential: credential, certificate: certificate).save()
         Account.keepEmail(email)
     }
 

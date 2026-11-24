@@ -156,12 +156,21 @@ struct AccountPasswordBanner: ViewModifier {
 
 /// When the server cannot be reached, a banner under each page's header says so, with Try Now, as on Linux
 /// (ARCHITECTURE.md, "Verso on the Mac"). What is shown stays, and the page reads itself again once the server answers.
+/// When its certificate is refused, the banner says that instead, with Check Certificate…, and the question about it
+/// comes by itself once for each certificate (ARCHITECTURE.md, "A certificate of the server's own").
 struct ServerUnreachableBanner: ViewModifier {
     @Environment(AppModel.self) private var app
 
     func body(content: Content) -> some View {
         content.safeAreaInset(edge: .top, spacing: 0) {
-            if let services = app.services, let reason = services.unreachable {
+            if let services = app.services, let refused = services.refusedCertificate {
+                HStack(spacing: 10) {
+                    Image(systemName: "lock.trianglebadge.exclamationmark").foregroundStyle(.secondary)
+                    Text("\(refused.host)'s certificate is not trusted, so Verso does not connect to it.")
+                    Button("Check Certificate…") { services.certificateRefused(asked: true) }
+                }
+                .padding(8).frame(maxWidth: .infinity).background(.bar)
+            } else if let services = app.services, let reason = services.unreachable {
                 HStack(spacing: 10) {
                     Image(systemName: "wifi.exclamationmark").foregroundStyle(.secondary)
                     Text("Can't reach \(services.client.serverURL.host() ?? "the server"). What's shown may be out of date.")
@@ -173,6 +182,15 @@ struct ServerUnreachableBanner: ViewModifier {
                 .padding(8).frame(maxWidth: .infinity).background(.bar)
             }
         }
+        .sheet(item: question) { question in
+            CertificateQuestionSheet(question: question) {
+                app.services?.trustCertificate(question)
+            }
+        }
+    }
+
+    private var question: Binding<CertificateQuestion?> {
+        Binding(get: { app.services?.certificateQuestion }, set: { app.services?.certificateQuestion = $0 })
     }
 }
 

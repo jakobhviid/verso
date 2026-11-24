@@ -10,5 +10,6 @@ final class VersoDrive {
 
     func start(client: ImmichClient, user: User?) {}
     func signalSoon() {}
+    func certificateChanged() {}
     func accountRemoved(apiURL: URL, userID: String, credential: Credential?) async {}
 }

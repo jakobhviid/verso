@@ -74,6 +74,7 @@ final class Enumerator: NSObject, NSFileProviderEnumerator {
                 if from == (try library.currentAnchor()) {
                     do {
                         let pending = await PendingItems.folders(in: domain)
+                        library.followCertificate()
                         _ = try await library.poll(pending: pending, cancel: cancel)
                         var version = Enumerator.version.withLock { $0 }
                         if version == nil {

@@ -25,6 +25,7 @@ enum AccountStore {
         var serverURL: URL
         var apiURL: URL
         var credential: Credential
+        var certificate: String? = nil
     }
     nonisolated(unsafe) static var lastServer: String?
 }
@@ -60,6 +61,16 @@ enum AccountStore {
         do { _ = try AccountVault.load(); preconditionFailure() } catch {}
         try AccountVault.save(account: account, user: user("first"))
         precondition(try AccountVault.load()?.userID == "first")
+        // The certificate trusted for the account's server is kept with it, and trusted for that server alone.
+        let pin = ServerTrust.fingerprint(of: Data("a certificate".utf8))
+        try AccountVault.keep(certificate: pin.lowercased())
+        precondition(try AccountVault.load()?.account.certificate == pin.lowercased())
+        precondition(ServerTrust.certificate(for: account.apiURL) == pin)
+        try AccountVault.save(account: other, user: user("second"))
+        precondition(ServerTrust.certificate(for: account.apiURL) == nil, "another account's sign-in leaves it")
+        try AccountVault.save(account: account, user: user("first"))
+        try AccountVault.keep(certificate: nil)
+        precondition(try AccountVault.load()?.account.certificate == nil && ServerTrust.certificate(for: account.apiURL) == nil)
         try AccountVault.forget()
         try AccountVault.forget()  // Forgetting none is no failure.
         precondition(try AccountVault.load() == nil)

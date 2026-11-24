@@ -103,7 +103,8 @@ extension Error {
         switch error {
         case .NotAuthenticated:
             return NSFileProviderError(.notAuthenticated)
-        case .ServerUnreachable:
+        case .ServerUnreachable, .UntrustedCertificate:
+            // A refused certificate: nothing reaches the server until the person decides in the app.
             return NSFileProviderError(.serverUnreachable)
         case .NoSuchItem:
             return NSFileProviderError(.noSuchItem)

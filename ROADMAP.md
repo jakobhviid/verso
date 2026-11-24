@@ -639,6 +639,9 @@ Every idea below is a possible choice, none chosen yet:
 - The viewer on a phone: Live Photos, the Locked Folder and light mode.
 - A viewer walk on the lab server; Verso Drive's settings; editing an external library's paths; saving an edit
   checked against the lab server.
+- A server with a certificate of its own (ARCHITECTURE.md, "A certificate of the server's own") on a real iPhone and in
+  the signed Mac app: backing up in the background to it, Verso in Messages and Verso Drive (Files, Finder) with it,
+  AirPlay of its videos, and the Mac's sheet, banner and Forget… in Settings.
 - Verso Drive switched off: the Files app still lists an empty location named after the app, as iOS keeps an
   extension's own default location while its app has none (SPEC, "In the Files app"; ARCHITECTURE, "Verso Drive on
   the iPhone and the iPad"). Whether it can go.
@@ -651,13 +654,10 @@ Agreed with the maintainer; each item's detail is where it points.
    before the App Store.
 2. The Swift twins into the Rust core (M9, step 8), an area at a time.
 3. iPad on a real iPad, before the first release (M10, step 5).
-4. Trusting a self-signed server certificate on the Mac and the iPhone: done in the core and on Linux (ARCHITECTURE.md,
-   "A certificate of the server's own", which has the Apple step's plan); left, the pin in the App Group's config and
-   the bridge's clients, the question in SwiftUI, and the app's own URLSession and AVPlayer requests.
-5. Verso's page, with its design (M9, step 7).
-6. Verso in the system's places, and the smaller gaps on the iPhone (M10).
-7. The walkthrough video (M10).
-8. The history cleaned at the public launch (M8, "Going public").
+4. Verso's page, with its design (M9, step 7).
+5. Verso in the system's places, and the smaller gaps on the iPhone (M10).
+6. The walkthrough video (M10).
+7. The history cleaned at the public launch (M8, "Going public").
 
 ## The full Immich API
 

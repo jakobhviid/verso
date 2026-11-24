@@ -68,6 +68,7 @@ final class AppModel {
                 try LockedFolderTouchID.forget(server: saved.account.serverURL, userID: saved.userID)
                 #endif
                 try AccountVault.forget()
+                ServerTrust.forgetAll()
                 try removeSavedCache(saved)
                 // Verso Drive: the account's location goes too.
                 await VersoDrive.shared.accountRemoved(apiURL: saved.account.apiURL, userID: saved.userID, credential: nil)
@@ -130,7 +131,8 @@ final class AppModel {
         defer { switching = false }
         let authed = client.with(credential: credential)
         let user = try await authed.currentUser()
-        try AccountVault.save(account: .init(serverURL: authed.serverURL, apiURL: authed.apiURL, credential: credential), user: user)
+        try AccountVault.save(account: .init(serverURL: authed.serverURL, apiURL: authed.apiURL, credential: credential,
+                                             certificate: ServerTrust.certificate(for: authed.apiURL)), user: user)
         start(client: authed, user: user, cacheUserID: user.id)
     }
 
@@ -158,6 +160,8 @@ final class AppModel {
             if let error = VersoDrive.shared.error { accountError = error }
         }
         if case .accessToken = services.client.credential { try? await services.client.logout() }
+        // The certificate trusted for the server goes with the account, once the session has ended there.
+        ServerTrust.forgetAll()
         do { try clearCache(services) } catch { accountError = error.localizedDescription }
         // The Live Photos' motions the viewer kept are the account's photos too.
         await LiveMotions.shared.removeAll()
@@ -206,7 +210,8 @@ final class AppModel {
         services.onUserLoaded = { [weak self, weak services] user in
             guard let self, self.services === services, !self.switching, let credential = client.credential else { return }
             do {
-                try AccountVault.save(account: .init(serverURL: client.serverURL, apiURL: client.apiURL, credential: credential), user: user)
+                try AccountVault.save(account: .init(serverURL: client.serverURL, apiURL: client.apiURL, credential: credential,
+                                                     certificate: ServerTrust.certificate(for: client.apiURL)), user: user)
             } catch { self.accountError = error.localizedDescription }
         }
         if let previous = self.services { endSession(previous) }
@@ -404,6 +409,7 @@ final class AccountServices {
 
     func handle(_ error: Error) {
         if case ImmichError.unauthorized = error { onUnauthorized(); return }
+        if ServerTrust.isRefusal(error) { certificateRefused(); return }
         if let reason = Self.unreachableReason(error) { askAfterFailure(reason) }
     }
 
@@ -441,6 +447,8 @@ final class AccountServices {
         pathMonitor?.cancel()
         pathMonitor = nil
         unreachable = nil
+        refusedCertificate = nil
+        certificateQuestion = nil
         client.setServerReachable(true)
     }
 
@@ -474,16 +482,18 @@ final class AccountServices {
     /// Ask the server whether it answers (Try Now, and every 10 seconds while it does not); when it does, the core's
     /// requests go out again, and the window reads its page again.
     func checkReach() async {
-        guard unreachable != nil, !checkingReach else { return }
+        guard unreachable != nil || refusedCertificate != nil, !checkingReach else { return }
         checkingReach = true
         defer { checkingReach = false }
         do {
             try await client.pingServer()
         } catch {
-            if let reason = Self.unreachableReason(error) { unreachable = reason }
+            if ServerTrust.isRefusal(error) { certificateRefused() }
+            else if let reason = Self.unreachableReason(error) { unreachable = reason; refusedCertificate = nil }
             return
         }
         unreachable = nil
+        refusedCertificate = nil
         client.setServerReachable(true)
         reachTask?.cancel()
         reachTask = nil
@@ -507,6 +517,85 @@ final class AccountServices {
             return nil
         }
     }
+
+    // MARK: When the server's certificate is refused
+
+    /// The certificate the server presents, refused: not one the system trusts, nor the one trusted for the server
+    /// (ARCHITECTURE.md, "A certificate of the server's own"). The banner says so, with Check Certificate…, and nothing
+    /// reaches the server until the person decides.
+    private(set) var refusedCertificate: CertificateQuestion?
+    /// The question shown about it: once by itself for each certificate, and again from Check Certificate….
+    var certificateQuestion: CertificateQuestion?
+    /// The certificate last asked about by itself, so a refusal seen again does not ask again.
+    @ObservationIgnored private var askedCertificate: String?
+    @ObservationIgnored private var lookingAtCertificate = false
+
+    /// A request was refused for the server's certificate: look at the certificate the server presents now, through
+    /// the app's own session, and ask about it the first time it is seen, or whenever `asked` (Check Certificate…).
+    /// While it is refused, the server is taken as unreachable, and asked again every 10 seconds.
+    func certificateRefused(asked: Bool = false) {
+        guard !lookingAtCertificate else { return }
+        lookingAtCertificate = true
+        Task { [weak self] in
+            guard let self else { return }
+            defer { self.lookingAtCertificate = false }
+            let refused: ServerTrust.Refused?
+            do {
+                refused = try await self.client.refusedCertificate()
+            } catch {
+                if let reason = Self.unreachableReason(error) { self.askAfterFailure(reason) }
+                return
+            }
+            guard let refused else {
+                // Trusted by now: by the system, or as the certificate trusted for the server.
+                await self.checkReach()
+                return
+            }
+            let question = CertificateQuestion(refused)
+            self.refusedCertificate = question
+            self.serverUnreachable(question.heading)
+            if asked || self.askedCertificate != question.sha256 {
+                self.askedCertificate = question.sha256
+                self.certificateQuestion = question
+            }
+        }
+    }
+
+    /// Trust This Certificate: kept with the account in place of the one trusted before, for Verso Drive too, and the
+    /// library connects again with it.
+    func trustCertificate(_ question: CertificateQuestion) {
+        certificateQuestion = nil
+        // Kept for the next launch; this run trusts it whatever the Keychain says.
+        try? AccountVault.keep(certificate: question.sha256)
+        ServerTrust.trust(question.sha256, for: question.server)
+        certificateRevision += 1
+        VersoDrive.shared.certificateChanged()
+        Task { await self.checkReach() }
+    }
+
+    /// Forget… on the account's page: the certificate is trusted no more, and Verso connects again, asking about the
+    /// server's certificate at once, unless the system trusts it.
+    func forgetCertificate() {
+        try? AccountVault.keep(certificate: nil)
+        ServerTrust.trust(nil, for: client.apiURL)
+        certificateRevision += 1
+        VersoDrive.shared.certificateChanged()
+        askedCertificate = nil
+        Task {
+            // New connections, which judge the server's certificate again.
+            await client.session.flush()
+            certificateRefused()
+        }
+    }
+
+    /// The certificate trusted for the account's server where the system does not trust its own, in pairs: the
+    /// account's page shows it, with Forget….
+    var trustedCertificate: String? {
+        _ = certificateRevision
+        return ServerTrust.certificate(for: client.apiURL)
+    }
+    /// Counts the changes to the certificate trusted, so the account's page reads it again.
+    private var certificateRevision = 0
 }
 
 /// Navigation, selection and presentations belong to one window.

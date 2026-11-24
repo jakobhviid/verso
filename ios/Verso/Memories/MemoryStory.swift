@@ -356,7 +356,7 @@ struct MemoryStory: View {
     /// A video's player, once its length is known; a video that cannot be read shows its preview for the usual time.
     private func prepareVideo(_ id: String) async {
         let client = session.client
-        let video = AVURLAsset(url: client.videoURL(id), options: ["AVURLAssetHTTPHeaderFieldsKey": client.credential?.headers ?? [:]])
+        let video = client.videoAsset(id)
         guard let length = try? await video.load(.duration), !Task.isCancelled else { return }
         player = AVPlayer(playerItem: AVPlayerItem(asset: video))
         playerAssetID = id

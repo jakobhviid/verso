@@ -5,7 +5,7 @@ import Synchronization
 
 // Vault and UI stand-ins fail closed: this executable cannot read credentials or launch the app.
 struct AccountStore {
-    struct Account { let serverURL: URL; let apiURL: URL; let credential: Credential }
+    struct Account { let serverURL: URL; let apiURL: URL; let credential: Credential; var certificate: String? = nil }
 }
 enum AccountVault {
     struct Entry { let account: AccountStore.Account; let userID: String; var name = ""; var email = "" } // Finder access reads the names.
@@ -13,6 +13,7 @@ enum AccountVault {
     @MainActor static func load() throws -> Entry? { restoreReads += 1; return nil }
     static func forget() throws { fatalError("No credential access") }
     static func save(account: AccountStore.Account, user: User) throws { fatalError("No credential access") }
+    static func keep(certificate: String?) throws { fatalError("No credential access") }
 }
 @MainActor final class MacIntegrationRouter {
     static let shared = MacIntegrationRouter()

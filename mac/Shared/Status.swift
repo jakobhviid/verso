@@ -38,7 +38,7 @@ func describe(_ error: Error) -> String {
         return "Finder asked for changes the app no longer has; it reads the library again."
     case .Cancelled?:
         return "Cancelled."
-    case .NotPermitted(let message)?, .Failed(let message)?, .Refused(_, let message)?:
+    case .NotPermitted(let message)?, .Failed(let message)?, .Refused(_, let message)?, .UntrustedCertificate(let message, _)?:
         return message
     case nil:
         return error.localizedDescription

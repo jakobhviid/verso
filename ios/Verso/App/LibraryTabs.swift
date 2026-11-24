@@ -363,6 +363,7 @@ struct LibraryTabs: View {
         .onChange(of: chrome.isSelecting) { chrome.libraryBarLeft() }
         .modifier(GridAlbumActionsPresentation(session: session, chrome: chrome))
         .modifier(LibraryWindowPresentations(session: session, chrome: chrome))
+        .modifier(CertificateBanner(services: session.services))
         .environment(chrome)
         .alert("Album Error", isPresented: albumErrorShown(session)) {
             Button("OK") { session.albumActions.error = nil }

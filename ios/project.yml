@@ -118,6 +118,8 @@ targets:
       - ../mac/Verso/Verso/Support/ImagePipeline.swift
       - ../mac/Verso/Verso/Support/LiveMotions.swift
       - ../mac/Verso/Verso/Support/ThumbHash.swift
+      # Videos from a server whose own certificate is trusted, through the app's session (ServerTrust).
+      - ../mac/Verso/Verso/Support/VideoStream.swift
       # A photo dragged out of a grid as its original, downloaded once another app takes it, and the mark that keeps
       # the app's own drops from importing it again.
       - ../mac/Verso/Verso/Views/MacIntegration/OriginalTransfer.swift
@@ -238,7 +240,7 @@ targets:
   # Logic tests that need no server and no app (ios/VersoTests): backing up's store and its recovery, the state of a
   # photo and its parts, how upload answers are recorded, Not in Immich's groups, the first run's tally and the
   # another-form match; what is on its way (which photos are new, the tiles' marks) and where the Library places it;
-  # and which server addresses sign-in may try over plain http.
+  # which server addresses sign-in may try over plain http; and the certificate trusted for a server, by its fingerprint.
   # The sources they test are compiled in, as they use nothing else of the app.
   VersoTests:
     type: bundle.unit-test
@@ -252,6 +254,7 @@ targets:
       - Verso/Backup/BackupTransport.swift
       - Verso/Grid/TimelinePhoneMerge.swift
       - ../mac/Verso/Verso/API/ServerAddress.swift
+      - ../mac/Verso/Verso/API/ServerTrust.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(VERSO_IDENTITY).Tests

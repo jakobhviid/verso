@@ -7,6 +7,7 @@ struct AccountSettingsView: View {
     @State private var operation = AccountOperation()
     @State private var name = ""
     @State private var importing = false
+    @State private var forgettingCertificate = false
 
     var body: some View {
         Form {
@@ -51,6 +52,28 @@ struct AccountSettingsView: View {
                 // A session from a password and one from a browser look the same afterwards, so only a key is said.
                 if case .apiKey = session.client.credential {
                     LabeledContent("Signed in with") { Text("API Key") }
+                }
+                // The certificate trusted for the server where the Mac does not trust its own (ARCHITECTURE.md, "A
+                // certificate of the server's own"), and forgetting it.
+                if let certificate = session.trustedCertificate {
+                    LabeledContent("Trusted Certificate (SHA-256)") {
+                        VStack(alignment: .trailing, spacing: 6) {
+                            Text(CertificateQuestion.lines(certificate, pairs: 8))
+                                .font(.body.monospaced())
+                                .multilineTextAlignment(.trailing)
+                                .textSelection(.enabled)
+                            Button("Forget…") { forgettingCertificate = true }
+                        }
+                    }
+                    .confirmationDialog("Forget the Certificate?", isPresented: $forgettingCertificate) {
+                        Button("Forget", role: .destructive) {
+                            // Settings closes, so the question about the server's certificate shows over the library.
+                            NSApp.keyWindow?.performClose(nil)
+                            session.forgetCertificate()
+                        }
+                    } message: {
+                        Text("Verso stops trusting this certificate and connects again, asking about the server's certificate, unless this Mac trusts it.")
+                    }
                 }
             }
             AccountOperationStatus(operation: operation)

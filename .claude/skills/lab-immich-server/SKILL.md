@@ -68,6 +68,16 @@ tunnel, forwarded on over SSH (the `mac-dev` skill, "The server").
   The whole LAN then reaches the server and its throwaway logins, so LAN mode is never left up unattended: `off`
   before the session ends, or before leaving it. `up.sh`'s restore puts it back on NAT too (the snapshot was taken on
   NAT), and no script takes a snapshot in LAN mode.
+- **A certificate of the server's own** (ARCHITECTURE.md, "A certificate of the server's own") is checked against a
+  server with nginx in front of Immich on 443, with an openssl-made self-signed certificate, made in its container
+  (nginx and openssl from Debian's packages; `openssl req -x509 -newkey rsa:2048 -nodes -subj "/CN=<name>"
+  -addext "subjectAltName=DNS:<name>"`), and a new one made the same way for a changed certificate. `tunnel.sh`
+  forwards Immich's own 2283, so TLS end to end needs the tunnel by hand to the container's 443 (`TCP\:127.0.0.1\:443`
+  in the `socat` above, then `ssh -R` to the Mac's loopback as `tunnel.sh` does); the address there is then
+  `https://127.0.0.1:<port>`, which the certificate was not made for, as for a server reached by its address. The
+  iPhone's walk of it is `ios/VersoUITests/CertificateWalkTests.swift`, whose header says what it takes. The
+  seeded server's credentials are in its container too, `/opt/immich/seed/keys.env`, for one whose `.env` file is gone.
+  XCUITest finds a sheet's buttons below its list's fold only once scrolled to: wait for the sheet by its close button.
 - **A server that cannot be reached is checked two ways:** with its packets dropped (silence, no refusal: the hardest
   case, which the service's 25-second poll limit and the window's 12-second wait cover) and with it stopped (refused
   at once). ARCHITECTURE.md, "When the server cannot be reached", says how soon each shows.

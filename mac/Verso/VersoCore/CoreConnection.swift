@@ -16,13 +16,16 @@ public final class CoreConnection: Sendable {
     private let connection: ApiConnection
     private let apiURL: URL
     private let credential: Credential?
+    private let certificate: String?
 
-    /// An account's connection: `apiKey` or `sessionToken`, or neither before signing in.
-    public init(apiURL: URL, apiKey: String? = nil, sessionToken: String? = nil) throws {
+    /// An account's connection: `apiKey` or `sessionToken`, or neither before signing in; `certificate` is the
+    /// certificate trusted for the server where the system does not trust its own (its SHA-256 fingerprint).
+    public init(apiURL: URL, apiKey: String? = nil, sessionToken: String? = nil, certificate: String? = nil) throws {
         let credential: Credential? = apiKey.map { .apiKey(key: $0) } ?? sessionToken.map { .session(token: $0) }
-        connection = try ApiConnection(api: apiURL.absoluteString, credential: credential)
+        connection = try ApiConnection(api: apiURL.absoluteString, credential: credential, certificate: certificate)
         self.apiURL = apiURL
         self.credential = credential
+        self.certificate = certificate
     }
 
     /// Send a request made for this API (`apiURL` and an endpoint below it). The credential, user agent and framing
@@ -38,6 +41,8 @@ public final class CoreConnection: Sendable {
                                                headers: headers, body: request.httpBody)
         } catch BridgeError.ServerUnreachable(message: let message) {
             throw URLError(.cannotConnectToHost, userInfo: [NSLocalizedDescriptionKey: message])
+        } catch BridgeError.UntrustedCertificate(message: let message, certificate: _) {
+            throw CoreError.certificateError(message, url: url)
         } catch {
             throw URLError(.cannotLoadFromNetwork, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription])
         }
@@ -68,6 +73,9 @@ public enum CoreError: LocalizedError, Sendable {
     case notFound
     case unreachable(String)
     case refused(status: Int, message: String)
+    /// The server's certificate is not one the system trusts, nor the one trusted for the server: nothing was sent
+    /// (ARCHITECTURE.md, "A certificate of the server's own").
+    case untrustedCertificate(message: String, certificate: ServerCertificate)
     case failed(String)
 
     init(_ error: BridgeError) {
@@ -77,6 +85,7 @@ public enum CoreError: LocalizedError, Sendable {
         case .NoSuchItem: self = .notFound
         case .ServerUnreachable(let message): self = .unreachable(message)
         case .Refused(let status, let message): self = .refused(status: Int(status), message: message)
+        case .UntrustedCertificate(let message, let certificate): self = .untrustedCertificate(message: message, certificate: certificate)
         case .Failed(let message): self = .failed(message)
         case .AnchorExpired, .Cancelled: self = .failed(error.localizedDescription)
         }
@@ -85,9 +94,18 @@ public enum CoreError: LocalizedError, Sendable {
     public var errorDescription: String? {
         switch self {
         case .signedOut: "signed out of Immich"
-        case .notPermitted(let message), .unreachable(let message), .refused(_, let message), .failed(let message): message
+        case .notPermitted(let message), .unreachable(let message), .refused(_, let message), .failed(let message),
+             .untrustedCertificate(let message, _): message
         case .notFound: "not found on the Immich server"
         }
+    }
+
+    /// A refused certificate as URLSession says one: a URLError of a certificate, without the certificate, which the
+    /// app looks at again through its own session to ask about it (`ServerTrust`).
+    public static func certificateError(_ message: String, url: URL?) -> URLError {
+        var userInfo: [String: Any] = [NSLocalizedDescriptionKey: message]
+        if let url { userInfo[NSURLErrorFailingURLErrorKey] = url }
+        return URLError(.serverCertificateUntrusted, userInfo: userInfo)
     }
 }
 
@@ -538,7 +556,7 @@ extension CoreConnection {
     /// Sign in with a password at this connection's server, through the core's sign-in: the
     /// session's token. Its refusals are messages for people ("Wrong email or password.").
     public func gallerySignIn(email: String, password: String) async throws -> String {
-        let signedIn = try await typed { try await signInWithPassword(server: apiURL.absoluteString, email: email, password: password) }
+        let signedIn = try await typed { try await signInWithPassword(server: apiURL.absoluteString, email: email, password: password, certificate: certificate) }
         guard case .session(let token) = signedIn.credential else { throw CoreError.failed("the server answered without a session") }
         return token
     }
@@ -547,7 +565,7 @@ extension CoreConnection {
     /// says, signing out goes on.
     public func galleryEndSession() async {
         guard let credential else { return }
-        await endSession(server: apiURL.absoluteString, credential: credential)
+        await endSession(server: apiURL.absoluteString, credential: credential, certificate: certificate)
     }
 
     /// Tell the connection whether the server can be reached: while it cannot, its requests fail at once.

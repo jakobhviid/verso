@@ -100,9 +100,7 @@ struct ViewerSlideshow: View {
         let client = state.session.client
         // Played as a video app plays, with its sound, as the viewer plays a video.
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
-        let asset = AVURLAsset(url: client.videoURL(item.id),
-                               options: ["AVURLAssetHTTPHeaderFieldsKey": client.credential?.headers ?? [:]])
-        return Slide(item: item, image: image, player: AVPlayer(playerItem: AVPlayerItem(asset: asset)))
+        return Slide(item: item, image: image, player: AVPlayer(playerItem: AVPlayerItem(asset: client.videoAsset(item.id))))
     }
 
     /// Until the video has played to its end, failed, or stalled too long.

@@ -150,7 +150,7 @@ final class PickerModel {
             return
         }
         log.error("sending failed: \(String(describing: error), privacy: .public)")
-        problem = error.localizedDescription
+        problem = error.problemText
     }
 }
 
@@ -163,5 +163,13 @@ extension Error {
     /// The server refused the account: its session ended, or its key was taken away.
     var isUnauthorized: Bool {
         if case .unauthorized? = self as? ImmichError { true } else { false }
+    }
+
+    /// A failure as the picker says it: a certificate refused (not the one trusted for the server, ServerTrust) sends
+    /// the person to the app, which asks about it.
+    var problemText: String {
+        ServerTrust.isRefusal(self)
+            ? String(localized: "Immich's certificate is not trusted, so Verso does not connect to it. Open Verso to check it.")
+            : localizedDescription
     }
 }

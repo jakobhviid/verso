@@ -145,6 +145,18 @@ final class BackupTransport: NSObject, BackupSending, URLSessionDataDelegate, @u
 
     // MARK: The delegate
 
+    /// The server's certificate as every session of the app judges it: as the system does, or as the certificate
+    /// trusted for the server (ServerTrust), which the account brings as Verso launches (`BackupCenter.launch`).
+    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge)
+        async -> (URLSession.AuthChallengeDisposition, URLCredential?) {
+        ServerTrust.answer(challenge)
+    }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, didReceive challenge: URLAuthenticationChallenge)
+        async -> (URLSession.AuthChallengeDisposition, URLCredential?) {
+        ServerTrust.answer(challenge)
+    }
+
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         let key = key(session, dataTask)
         lock.lock()

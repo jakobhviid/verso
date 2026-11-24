@@ -136,7 +136,7 @@ struct AssetViewer: View {
             if viewer?.window != nil && !isPresentation {
                 Color(nsColor: .windowBackgroundColor)
             } else if item.isVideo {
-                VideoPlayerView(url: session.client.videoURL(item.id), headers: session.client.credential?.headers ?? [:],
+                VideoPlayerView(client: session.client, id: item.id,
                                 playing: viewer?.slideshow != true || viewer?.paused != true,
                                 onFinished: videoFinished,
                                 onProgress: { viewer?.videoStalledElapsed = 0 },
@@ -532,10 +532,10 @@ private struct ZoomableImage: View {
     }
 }
 
-/// Authenticated range playback. Sound settings persist across assets and app launches.
+/// Authenticated range playback (`ImmichClient.videoAsset`). Sound settings persist across assets and app launches.
 struct VideoPlayerView: NSViewRepresentable {
-    let url: URL
-    let headers: [String: String]
+    let client: ImmichClient
+    let id: String
     var showsControls = true
     var playing = true
     var onFinished: (@MainActor @Sendable () -> Void)?
@@ -550,7 +550,7 @@ struct VideoPlayerView: NSViewRepresentable {
         view.allowsPictureInPicturePlayback = showsControls
         view.showsFullScreenToggleButton = false
         view.videoGravity = .resizeAspect
-        let item = AVPlayerItem(asset: AVURLAsset(url: url, options: ["AVURLAssetHTTPHeaderFieldsKey": headers]))
+        let item = AVPlayerItem(asset: client.videoAsset(id))
         let player = AVPlayer(playerItem: item)
         player.isMuted = UserDefaults.standard.bool(forKey: "viewer.videoMuted")
         player.volume = UserDefaults.standard.object(forKey: "viewer.videoVolume") as? Float ?? 1

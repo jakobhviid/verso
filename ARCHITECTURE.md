@@ -304,8 +304,9 @@ know. Verso connects to one only after the person has looked at that certificate
 itself (the maintainer's rule). SPEC.md, "Signing in and credentials", has what the person sees.
 
 **Trust is a pin: one certificate, for one server.** The pin is the SHA-256 of the leaf certificate's DER, kept with
-the server's address (on Linux `server.certificate_sha256` beside `server.url`, SPEC.md, "Configuration"). Signing in
-to a server writes its pin or removes the one there, so a pin never vouches for another server.
+the server's address (on Linux `server.certificate_sha256` beside `server.url`, SPEC.md, "Configuration"; on the Mac,
+the iPhone and the iPad in the account's record, beside its server, below). Signing in to a server writes its pin or
+removes the one there, so a pin never vouches for another server.
 
 **The verifier** (`immich_api::certificate`) is in every client's TLS configuration:
 1. The system's own verification runs first, as for any server: on Linux webpki over the roots `rustls-native-certs`
@@ -353,7 +354,13 @@ Verso opens no websocket to the server.
 first, and Trust This Certificate as the destructive choice; in the library, a banner and the same question when the
 certificate changes, and the trusted certificate with Forget on Preferences' Account page; a notification from the
 service, whose drive serves what it holds meanwhile, as while the server cannot be reached; a question on the
-terminal from `login`. The wording lives in `verso_desktop::session::certificate_question`, translated.
+terminal from `login`. The wording lives in `verso_desktop::session::certificate_question`, translated. On the Mac,
+the iPhone and the iPad the same question, in the same words, is a sheet (`CertificateQuestionSheet`, one for the Mac
+and one in iOS's list, where Trust This Certificate follows the details), over the sign-in or the library, whose
+banner says the certificate is not trusted, with Check Certificate…; the account's page (the Mac's Settings, Account;
+the account's sheet on iOS) shows the trusted certificate with Forget…, which closes it so the question comes over
+the library; Verso in Messages says to open Verso. Its wording is `CertificateQuestion`'s, in English, as the Apple
+gallery's own texts are ("Translations").
 
 **Not chosen:**
 - **Accepting every certificate** (a switch that skips verification): anyone on the way, a hotel's network or a
@@ -369,19 +376,69 @@ terminal from `login`. The wording lives in `verso_desktop::session::certificate
 **Flatpak impact:** none. The pin lives in the sandbox's own `config.toml`, the verifier runs in Verso's process, and
 no permission is added; the host's trust store is read as the runtime has it.
 
-**The Apple step** (ROADMAP.md) plugs into the same core. The bridge already hands the system's verifier to
-`set_system_verifier`, so the bridge's clients (Verso Drive's extension, the gallery's `ApiConnection`, the backup)
-refuse an untrusted certificate with the same `CertificateRefusal`. What remains:
-- keep the pin with the account, as `server.certificate_sha256` in the App Group's `config.toml`, which the extensions
-  read too, and build the bridge's clients with it (`Client::trusting`);
-- carry the refusal across uniffi (a `BridgeError` with its details), so the sign-in asks the same question in SwiftUI,
-  and the library shows the same banner;
-- the app's own requests (`ImmichClient`'s `URLSession`, the image pipeline, the server check) answer the session's
-  server-trust challenge as the verifier does: `SecTrustEvaluateWithError` first, then the leaf's SHA-256
-  (`SecTrustCopyCertificateChain`, `SecCertificateCopyData`) against the pin, accepted with `URLCredential(trust:)`;
-- AVPlayer streams through `AVURLAsset`, outside the app's session: its resource loader's delegate answers the same
-  challenge, or where AVFoundation does not ask it, the video comes through a scheme of the app's own, served by the
-  app's session.
+#### On the Mac, the iPhone and the iPad
+
+The core's requests and the app's own take the same pin, by the same rule.
+
+**The pin is kept with the account,** in its record in the Keychain group (`AccountVault`: the server, its API
+address, the credential and the pin), which the app, its backup and its Shortcuts actions and Verso in Messages read.
+Verso Drive's extension gets it with its copy of the account (`certificate` beside `server` in the App Group, SPEC.md,
+"Files on disk"). Reading the account trusts its pin for its server's host and port in that process
+(`ServerTrust`); a sign-in keeps the pin the person trusted for that server, or none; signing out forgets it once the
+session has ended on the server, with the address it belongs to.
+- **Not chosen: `server.certificate_sha256` in the App Group's `config.toml`,** as Linux keeps it. On the Mac and iOS
+  the server's address is the account's, not `config.toml`'s, so a pin kept there would outlive its server at a
+  sign-out, which keeps `config.toml`; and Verso in Messages reads the account but no `config.toml`, which it would
+  need a TOML reader of its own for, or the bridge it is kept small without.
+
+**The core's requests:** the bridge builds every client with `Client::trusting` and the pin it is handed (`Library`,
+`ApiConnection`, the sign-in's steps), and a refusal crosses uniffi as `BridgeError::UntrustedCertificate` with what
+the certificate says (`ServerCertificate`). The app keeps one core connection per API address, credential and pin, so
+a pin trusted or forgotten makes a new one, whose handshakes judge the certificate afresh. Verso Drive's extension
+follows a pin trusted or forgotten in the app before its next listing or change poll (`Library::trust_certificate`),
+which the app asks for every ten seconds while it runs.
+
+**The app's own requests** go through sessions made by `ServerTrust.session`, or delegates of their own that give the
+same answer (the backup's sessions, the video stream): `SecTrustEvaluateWithError` first, as for any server; a
+revoked certificate stays refused; otherwise the leaf's SHA-256 (`SecTrustCopyCertificateChain`,
+`SecCertificateCopyData`) is compared with the pin for the challenge's host and port, and only an equal one is
+accepted, with `URLCredential(trust:)`. A refused certificate is left to the system, whose error carries it.
+
+**The question shows what the server presents now:** whichever request was refused, the core's or a session's, the
+app looks at the server once more through a session of its own (`ImmichClient.refusedCertificate`) and asks about
+that certificate, once by itself for each one, and again from Check Certificate…. What the certificate says comes from
+the core's reader of its DER (`certificate_details`), as iOS lets no app read a certificate's dates or issuer; "made
+for another name" comes from the system's details of its evaluation (`SSLHostname` in the leaf's), as its error names
+one reason only, "not trusted" before the name. While it is refused, the server is taken as unreachable and asked
+again every ten seconds, as Linux does.
+
+**Videos stream through the app's own session where a pin is trusted.** AVPlayer fetches a video's address itself and
+asks the app nothing about the server's certificate. For a server with a pin, the asset's address takes a scheme of
+the app's own (`verso-stream:`), which AVFoundation leaves to the asset's resource loader, and its delegate
+(`VideoStream`) serves each byte range AVPlayer asks for through a session that answers the challenge as above:
+playback starts with the first range, and a seek asks for the range it needs, so the players' controls, the iPhone's
+video bar with its frames, slideshows and memories work as for any stream. A server the system trusts streams
+straight, as before.
+- **Not chosen: downloading the whole video first,** as Linux does for GStreamer: a long video would play only once
+  its last byte had come, and so would a seek.
+- **Not chosen: an https address with the resource loader's `shouldWaitForResponseTo` answering the challenge:**
+  AVFoundation is not documented to hand server trust to it, so videos could stop at an update.
+- AirPlay of such a video to another device is the stream's on this one, which only a real device shows.
+
+**Every connection on the Mac, the iPhone and the iPad takes the pin:**
+
+| What connects | How it takes the pin |
+|---|---|
+| The sign-in's server check (`ImmichClient.discover`) | A session of `ServerTrust`; a refused certificate comes back as `ServerTrust.Refused`, the sheet asks, and Trust trusts it for that server in this run and checks again |
+| Every endpoint call, the sign-in's steps among them (features, version, password, single sign-on's start and finish, the API key's check, signing out) | The core's connection for the API address, credential and pin (`CoreTransport`, `CoreConnection`, `ApiConnection`) |
+| Thumbnails and pictures (`ImagePipeline`), originals for sharing, copying, saving, Quick Look, drags and exports, ZIP downloads, imports, the Locked Folder's media, Administration | The account's session and the Locked Folder's, Administration's and the upload's: each made by `ServerTrust.session` |
+| Live Photos' motions (`LiveMotions`) | `ImmichClient.sharedSession`, a session of `ServerTrust` |
+| Videos in the viewer, a stack, slideshows and memories | `ImmichClient.videoAsset`: `VideoStream` where a pin is trusted, the address straight otherwise |
+| Backing the iPhone up, in the background session and the foreground one | `BackupTransport`'s delegate answers with `ServerTrust.answer`; Verso reads the account as it launches, so the pin is there before the session's events |
+| Verso Drive's extension, on the Mac and on iOS | `Library::open` with the pin of the drive's account, followed when it changes |
+| Verso in Messages | Its session is one of `ServerTrust`, and the pin comes with the account it reads |
+| The Mac's Shortcuts actions | A client of the account read from the Keychain, which brings its pin, over the shared session and the core |
+| Not the server: Apple's maps, single sign-on in the system's web authentication session (which asks its own question), Open in Immich; the widgets, which connect to nothing | The system's trust alone |
 
 ### The tree
 
@@ -1718,7 +1775,9 @@ which opens the page) for as long as it runs. It sends nothing but the request a
     `immich-api` through `certificate::set_system_verifier` before its first client): iOS lets no program list its
     trusted roots, so with `rustls-native-certs` every server is refused there ("UnknownIssuer"), and the system's
     verifier also follows the trust settings the user and their profiles give, a private CA installed with a profile
-    among them. `immich-api` holds no platform code for it: the bridge chooses.
+    among them. `immich-api` holds no platform code for it: the bridge chooses. The apps' own sessions leave the
+    judgement to the system too, and accept a certificate it refuses only as the pin does ("A certificate of the
+    server's own", "On the Mac, the iPhone and the iPad").
 - **Places are named from Immich** (the asset's city, else its state, else its country), on iOS as on the Mac and
   Linux. Apple's reverse geocoding (`MKReverseGeocodingRequest`), which names landmarks and parks as Photos does, runs
   on iOS only once the person switches on Look Up Place Names with Apple Maps, a setting of the device's own

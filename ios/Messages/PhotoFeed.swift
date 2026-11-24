@@ -54,7 +54,7 @@ final class PhotoFeed {
                 onUnauthorized?()
                 return
             }
-            problem = error.localizedDescription
+            problem = error.problemText
         }
     }
 

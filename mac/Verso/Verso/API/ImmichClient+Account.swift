@@ -112,7 +112,7 @@ extension ImmichClient {
             config.httpAdditionalHeaders = ["User-Agent": Self.userAgent]
             config.httpMaximumConnectionsPerHost = 8
             config.timeoutIntervalForRequest = 30
-            session = URLSession(configuration: config)
+            session = ServerTrust.session(config)
             Self.accountSessions.sessions[directory.path] = session
         }
         return ImmichClient(serverURL: serverURL, apiURL: apiURL, credential: credential, session: session)

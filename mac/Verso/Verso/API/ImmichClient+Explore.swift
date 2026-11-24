@@ -123,7 +123,7 @@ extension ImmichClient {
         configuration.timeoutIntervalForRequest = 30
         configuration.urlCache = nil
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        return ImmichClient(serverURL: serverURL, apiURL: apiURL, credential: credential, session: URLSession(configuration: configuration),
+        return ImmichClient(serverURL: serverURL, apiURL: apiURL, credential: credential, session: ServerTrust.session(configuration),
                             transferRoot: transferRoot)
     }
 }

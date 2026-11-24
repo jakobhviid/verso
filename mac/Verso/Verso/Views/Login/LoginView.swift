@@ -23,6 +23,9 @@ struct LoginView: View {
     @State private var oauthButton: String?
     @State private var isWorking = false
     @State private var errorMessage: String?
+    /// The question about the server's certificate, when the Mac does not trust it (ARCHITECTURE.md, "A certificate of
+    /// the server's own"): Trust This Certificate trusts it for that server and checks the server again.
+    @State private var certificateQuestion: CertificateQuestion?
     @FocusState private var focused: Field?
 
     private enum Field { case server, email, password, apiKey }
@@ -65,6 +68,12 @@ struct LoginView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .disabled(isWorking)
         .onAppear { focused = .server }
+        .sheet(item: $certificateQuestion) { question in
+            CertificateQuestionSheet(question: question) {
+                ServerTrust.trust(question.sha256, for: question.server)
+                connect()
+            }
+        }
     }
 
     private var subtitle: String {
@@ -210,7 +219,14 @@ struct LoginView: View {
         errorMessage = nil
         isWorking = true
         Task {
-            do { try await work() } catch { errorMessage = error.localizedDescription }
+            do {
+                try await work()
+            } catch let refused as ServerTrust.Refused {
+                // Nothing was sent to the server; the person decides whether to trust its certificate.
+                certificateQuestion = CertificateQuestion(refused)
+            } catch {
+                errorMessage = error.localizedDescription
+            }
             isWorking = false
         }
     }
