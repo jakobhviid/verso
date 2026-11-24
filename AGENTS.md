@@ -99,8 +99,8 @@ on any step shows what it would do and changes nothing outside the checkout:
 3. `ci/release.sh build TAG` builds Linux's files from the tag in a worktree of its own (the tarball in the toolbox,
    the rpm and the deb each in a container of its distribution, with podman, the Flatpak's source, and the Flatpak
    where `flatpak-builder` is) into `target/dist/TAG`, and makes a draft release
-   of them, "Verso 0.72.0 (Linux)", here and in the public `jakobhviid/verso-releases`, which Homebrew's `verso` cask
-   downloads from until Verso goes public (ROADMAP.md, M8, "Going public"). The release workflow
+   of them, "Verso 0.72.0 (Linux)", here, which Homebrew's `verso` cask and Verso's page download from. The release
+   workflow
    (`.github/workflows/release.yml`) runs this step on a pushed tag, once GitHub Actions is on in this repository.
    The workstation has no flatpak: there the Flatpak is built in the GNOME VM from the source archive and attached to
    both drafts, as the step prints.
@@ -123,7 +123,7 @@ at once (ARCHITECTURE.md, "Verso's releases"):
   `ci/sign-mac-update.sh` signs it for Sparkle on the workstation, and both are attached to the tag's drafts.
 - iOS ships through TestFlight and the App Store, never on GitHub.
 - There is no rolling "latest" release: each platform's newest is found on its own; the cask follows GitHub's Latest
-  in `jakobhviid/verso-releases`.
+  here.
 
 ## The green gate
 

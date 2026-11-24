@@ -88,9 +88,8 @@ Open:
 ## M8. Verso
 
 One app with a gallery, the drive and the tray, as Immich Gallery is on the Mac, on the same crates (ARCHITECTURE,
-"Verso"). Built in the private `verso` repository, whose source goes public with the first public release. Until then
-the releases are test builds for the maintainer's own testing, made by hand on the Linux workstation and published
-from the public `jakobhviid/verso-releases`, which Homebrew's `verso` cask downloads from.
+"Verso"). Built in this repository, public since 2026-11-24. The releases are 0.x builds, made by hand on the Linux
+workstation and the Mac and published here, which Homebrew's `verso` cask and Verso's page download from.
 
 Built on Linux: the gallery's window with Immich Gallery's pages (ARCHITECTURE, "Verso's window"), and Verso's service
 with the tray and the drive, off until switched on; named apart from Immich Mount so both can be installed, and taking
@@ -124,16 +123,13 @@ the import panel, Change Password and the profile picture.
      `release.yml` are switched off. It builds the tarball, the rpm,
      the deb and the Flatpak; the Mac's disk image, signed and notarized on GitHub's Mac runner, joins it (M9, step
      6)
-   - `jakobhviid/verso-releases` retired: the releases come from `jakobhviid/verso`, so the cask's `url` and
-     `homepage`, Preferences' "Installing Verso with Homebrew" link (`preferences.rs`) and the requirements' address
-     the tarball's launcher gives (`linux/packaging/verso-launcher.sh`), point there
    - decided with the maintainer:
      - **The history:** public since 2026-11-24, with what came before 23 November at 13:45 in one commit and
        the commits since kept, tagged from `v0.72.1`. The whole earlier history, every branch, tag and release's
        files, is kept in git bundles on the workstation's disk (`~/developer/Backups/verso/`) and in the private
        `jakobhviid/verso-history`.
-     - **The releases before the launch:** evaluation builds the maintainer alone uses, so `verso-releases` is retired
-       at the launch with them, and this repository's tags and releases go with its history.
+     - **The releases before the launch:** evaluation builds the maintainer alone uses; `verso-releases`, which
+       carried them, is archived, read-only, and the releases come from this repository.
      - **The license:** MIT, as today (`LICENSE`, the workspace's `Cargo.toml`), with the notices of the code taken
        from others in THIRD-PARTY-NOTICES.md, so anyone, Immich's own apps first, may take any idea, design or code
        from Verso (README, "License").

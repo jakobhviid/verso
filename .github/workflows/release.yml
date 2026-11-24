@@ -29,7 +29,7 @@ jobs:
           fetch-depth: 0
       - name: Build, and make the draft releases
         env:
-          # A token that may make releases in this repository and in jakobhviid/verso-releases.
+          # A token that may make releases in this repository.
           GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"

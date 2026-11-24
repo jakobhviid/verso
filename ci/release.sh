@@ -7,9 +7,8 @@
 #                                  signed, and push the tag
 #   ci/release.sh build TAG        build Linux's files from the tag, in a worktree of its own (the tarball, the rpm
 #                                  and the deb, the Flatpak's source and, where flatpak-builder is, the Flatpak), into
-#                                  target/dist/TAG, and make a draft release of them here and in
-#                                  jakobhviid/verso-releases
-#   ci/release.sh publish TAG      publish both drafts, then bump the tap's `verso` cask (not for a pre-release)
+#                                  target/dist/TAG, and make a draft release of them here
+#   ci/release.sh publish TAG      publish the draft, then bump the tap's `verso` cask (not for a pre-release)
 #
 # --dry-run, anywhere on the line, changes nothing outside this checkout: every tag, push, release and cask change is
 # printed in place of being made. `build` still builds, and where the tag is not there yet it builds HEAD as tagging it
@@ -19,9 +18,6 @@ cd "$(dirname "$0")/.."
 root=$PWD
 
 repository=jakobhviid/verso
-# The public repository the releases are mirrored to, which Homebrew's cask downloads from until Verso goes public
-# (ROADMAP.md, M8, "Going public"); left out once it is gone.
-mirror=jakobhviid/verso-releases
 tap=jakobhviid/homebrew-tap
 cask=Casks/verso.rb
 tarball=verso-x86_64.tar.gz
@@ -129,12 +125,9 @@ release_text() {
   printf '`flatpak run dev.hviid.Verso`. With no keyring in the session, it keeps the sign-in in its own file.\n'
 }
 
-# The GitHub repositories a release goes to: this one, and the mirror while it exists.
+# The GitHub repositories a release goes to: this one, which Homebrew's cask and Verso's page download from.
 release_repositories() {
   echo "$repository"
-  if gh api "repos/$mirror" --silent 2>/dev/null; then
-    echo "$mirror"
-  fi
 }
 
 signed_in_to_github() {

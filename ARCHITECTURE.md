@@ -3344,8 +3344,7 @@ check before a release needs a person.
 is numbered, and a push releases nothing. `ci/release.sh` suggests the next version from the commit subjects since the
 last tag (`ci/version.sh`), tags the number the maintainer agrees to, builds Linux's files from the tag into a
 **draft** release, and publishes it after the maintainer's check; AGENTS.md, "Versioning", has the steps and the
-version rules. Until the public launch, each release is published both here and in the public
-`jakobhviid/verso-releases`, which Homebrew's `verso` cask downloads from (ROADMAP, M8, "Going public"). The Mac's
+version rules. Each release is published here, which Homebrew's `verso` cask and Verso's page download from. The Mac's
 disk image is built on the Mac (`mac/release.sh`), signed for Sparkle (`ci/sign-mac-update.sh`) and attached to the
 tag's drafts by hand; the cask has a part for each system, and its Mac part moves only with a release that carries
 the disk image.

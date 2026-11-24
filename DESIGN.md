@@ -180,16 +180,18 @@ Rules:
 
 ## The website
 
-Verso's page, for `jakob.hviid.phd/verso` and the top of `jakob.hviid.phd/software`, is a draft in `site/`, not live
-yet (ROADMAP.md, M9, step 7). Until it is, the README is Verso's landing page, and its downloads are the releases in
-`jakobhviid/verso-releases`.
+Verso's page, at `jakob.hviid.phd/verso` and for the top of `jakob.hviid.phd/software`, is built from `site/`
+(ROADMAP.md, M9, step 7).
 - **A table of prints.** Verso is the back of a photo, so every card on the page is the app icon's print: paper, Day
   or Night with the page, its bottom right corner turned over to show the back, laid on Mist's calm light blue-grey
   (`#e8edf3`, and `#1a1d23` in the dark). The first is one large print: the pictures in its picture, on Mist's
   gradient, and the words on its strip, where "Verso" is written in the icon's own hand (the strip's path, in its
   ink).
-- **The lens is the mark** (`site/mark.svg`, the small icons' lens) in the bar, the tab and the footer; each
-  platform's own icon stands beside that platform alone, Day or Night with the page.
+- **Verso's app icon is the brand** in the bar and the footer: its design, Mist on Day paper, which people know
+  from their system. The lens (`site/mark.svg`, the small icons' lens) marks the tight places: the tab, and the
+  drive's folders. Each platform's own icon stands beside that platform alone, on Day paper in both appearances.
+- **Light or dark** as the system says, until the switch in the bar chooses; the choice is kept for the next visit,
+  and the pictures with a dark version follow it.
 - **The ring's colours** mark each section's heading together and in order, and one at a time as a small dot (a
   feature, a platform's state). The one dark band, backing up, is the lens's glass.
 - **Light and dark** follow the system, and so do the pictures: each has a dark twin, taken in Verso's dark style.
@@ -198,7 +200,7 @@ yet (ROADMAP.md, M9, step 7). Until it is, the README is Verso's landing page, a
 - **Fast and private:** one HTML file and one stylesheet, the system's fonts, no framework, nothing loaded from
   elsewhere, no cookies and no counting; the pictures are WebP, those below the first screen loaded as they come near.
 - **Built for the releases there are** by `site/build.py` (`site/build-latest.sh` gathers them): the version and
-  Linux's downloads from the latest release in `jakobhviid/verso-releases` (its rpm and deb where it carries them,
+  Linux's downloads from the latest release in `jakobhviid/verso` (its rpm and deb where it carries them,
   each with the command that installs it), the Mac's disk image from the newest
   release with one or else "Coming", the App Store's and TestFlight's links once given, `latest.json` for the update
   check, and `photos.html`, the credits of the showcase server's photos. A picture not taken yet is a place marked

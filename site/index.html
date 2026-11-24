@@ -2,10 +2,15 @@
 <!-- Verso's page, filled in for one release by site/build.py, which replaces each name in double braces and makes each
      shot in them (a name and its description) a picture from site/screenshots/, with its dark version where there is
      one; a picture not taken yet leaves its place out. Its look (DESIGN.md, "The website"): every card is a print with its corner turned to show the
-     back, laid on Mist; the lens is the mark; each platform's own icon stands for that platform. -->
+     back, laid on Mist; Verso's app icon is the brand, the lens marks the tight places; each platform's own icon
+     stands for that platform, Day in both appearances. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <script>
+    // The appearance chosen with the bar's switch, before anything is drawn (DESIGN.md, "The website").
+    try { const chosen = localStorage.getItem("appearance"); if (chosen) document.documentElement.dataset.theme = chosen; } catch {}
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Verso for Immich: your Immich library in a native app on the iPhone, the iPad, the Mac and Linux</title>
   <meta name="description" content="Verso is a native app for a self-hosted Immich library on the iPhone, the iPad, the Mac and the Linux desktop: browse, search, organise and share it, back your phone up to it, and keep the whole library as a drive in Files or Finder. Free and MIT licensed. Unofficial and independent.">
@@ -33,11 +38,12 @@
   </svg>
 
   <nav class="bar wrap" aria-label="Verso">
-    <a class="brand" href="#top"><img src="mark.svg" alt="" width="30" height="30"><span>Verso</span><span class="for">for Immich</span></a>
+    <a class="brand" href="#top"><img src="icon.svg" alt="" width="34" height="34"><span>Verso</span><span class="for">for Immich</span></a>
     <span class="links">
       <a href="#platforms">Platforms</a>
       <a href="#drive">Verso Drive</a>
       <a href="#privacy">Privacy</a>
+      <button class="appearance" type="button" aria-label="Switch between light and dark"></button>
       <a class="pill" href="#get">Get Verso</a>
     </span>
   </nav>
@@ -61,10 +67,10 @@
             the whole library as a drive in Files or Finder. One app, made natively for the iPhone, the iPad, the Mac
             and the Linux desktop.</p>
           <ul class="chips" aria-label="Platforms">
-            <li><picture><source srcset="icon-ios-night.png" media="(prefers-color-scheme: dark)"><img src="icon-ios.png" alt="" width="22" height="22"></picture>iPhone</li>
-            <li><picture><source srcset="icon-ios-night.png" media="(prefers-color-scheme: dark)"><img src="icon-ios.png" alt="" width="22" height="22"></picture>iPad</li>
-            <li><picture><source srcset="icon-mac-night.png" media="(prefers-color-scheme: dark)"><img src="icon-mac.png" alt="" width="22" height="22"></picture>Mac</li>
-            <li><picture><source srcset="icon-linux-night.svg" media="(prefers-color-scheme: dark)"><img src="icon-linux.svg" alt="" width="22" height="22"></picture>Linux</li>
+            <li><picture><img src="icon-ios.png" alt="" width="22" height="22"></picture>iPhone</li>
+            <li><picture><img src="icon-ios.png" alt="" width="22" height="22"></picture>iPad</li>
+            <li><picture><img src="icon-mac.png" alt="" width="22" height="22"></picture>Mac</li>
+            <li><picture><img src="icon-linux.svg" alt="" width="22" height="22"></picture>Linux</li>
           </ul>
           <p class="actions">
             <a class="button" href="#get">Get Verso</a>
@@ -96,7 +102,7 @@
         <article class="print platform" id="on-iphone">
           <div class="shot tall">{{shot iphone-viewer|Verso on the iPhone: a photo opened out of its tile, its details a swipe up}}</div>
           <div class="about">
-            <h3><picture><source srcset="icon-ios-night.png" media="(prefers-color-scheme: dark)"><img src="icon-ios.png" alt="" width="40" height="40"></picture>iPhone<span class="status soon">Coming</span></h3>
+            <h3><picture><img src="icon-ios.png" alt="" width="40" height="40"></picture>iPhone<span class="status soon">Coming</span></h3>
             <p>SwiftUI and UIKit, with Liquid Glass. It looks and moves as Photos does: a photo opens out of its tile
               and pinches back into it.</p>
           </div>
@@ -104,7 +110,7 @@
         <article class="print platform" id="on-ipad">
           <div class="shot wide">{{shot ipad-library|Verso on the iPad: the Library, with the tabs in the floating bar at the top}}</div>
           <div class="about">
-            <h3><picture><source srcset="icon-ios-night.png" media="(prefers-color-scheme: dark)"><img src="icon-ios.png" alt="" width="40" height="40"></picture>iPad<span class="status soon">Coming</span></h3>
+            <h3><picture><img src="icon-ios.png" alt="" width="40" height="40"></picture>iPad<span class="status soon">Coming</span></h3>
             <p>Laid out as Photos is on the iPad, with the keyboard's commands in the menu bar, the pointer's effects,
               and drag and drop between apps.</p>
           </div>
@@ -112,7 +118,7 @@
         <article class="print platform" id="on-mac">
           <div class="shot wide">{{shot mac-library|Verso on the Mac: the Library beside its sidebar}}</div>
           <div class="about">
-            <h3><picture><source srcset="icon-mac-night.png" media="(prefers-color-scheme: dark)"><img src="icon-mac.png" alt="" width="40" height="40"></picture>Mac{{mac_status}}</h3>
+            <h3><picture><img src="icon-mac.png" alt="" width="40" height="40"></picture>Mac{{mac_status}}</h3>
             <p>SwiftUI and AppKit, from Immich Gallery. Widgets with your photos, Shortcuts actions, and an icon in the
               menu bar.</p>
           </div>
@@ -120,7 +126,7 @@
         <article class="print platform" id="on-linux">
           <div class="shot wide">{{shot linux-albums|Verso on Linux: Albums, each with its cover}}</div>
           <div class="about">
-            <h3><picture><source srcset="icon-linux-night.svg" media="(prefers-color-scheme: dark)"><img src="icon-linux.svg" alt="" width="40" height="40"></picture>Linux<span class="status out">Released</span></h3>
+            <h3><picture><img src="icon-linux.svg" alt="" width="40" height="40"></picture>Linux<span class="status out">Released</span></h3>
             <p>GTK 4 and libadwaita, made for GNOME. An icon in the top bar keeps Verso Drive working with the window
               closed, and Verso has a menu of its own in Files.</p>
           </div>
@@ -249,7 +255,7 @@
       </header>
       <div class="gets">
         <article class="print get" id="get-linux">
-          <h3><picture><source srcset="icon-linux-night.svg" media="(prefers-color-scheme: dark)"><img src="icon-linux.svg" alt="" width="48" height="48"></picture>
+          <h3><picture><img src="icon-linux.svg" alt="" width="48" height="48"></picture>
             <span>Linux<small>x86_64, made for GNOME</small></span><span class="yours">Your system</span></h3>
           <p>With <a href="https://brew.sh">Homebrew</a>, which keeps it up to date:</p>
           <pre class="command"><code>brew install jakobhviid/tap/verso</code></pre>
@@ -261,12 +267,12 @@
           <pre class="command"><code>flatpak install --user verso-x86_64.flatpak</code></pre>
         </article>
         <article class="print get" id="get-mac">
-          <h3><picture><source srcset="icon-mac-night.png" media="(prefers-color-scheme: dark)"><img src="icon-mac.png" alt="" width="48" height="48"></picture>
+          <h3><picture><img src="icon-mac.png" alt="" width="48" height="48"></picture>
             <span>Mac<small>macOS 15 or later</small></span><span class="yours">Your system</span></h3>
           {{macos}}
         </article>
         <article class="print get" id="get-ios">
-          <h3><picture><source srcset="icon-ios-night.png" media="(prefers-color-scheme: dark)"><img src="icon-ios.png" alt="" width="48" height="48"></picture>
+          <h3><picture><img src="icon-ios.png" alt="" width="48" height="48"></picture>
             <span>iPhone and iPad<small>iOS and iPadOS 26.1 or later</small></span><span class="yours">Your system</span></h3>
           {{ios}}
         </article>
@@ -329,7 +335,7 @@
   <footer>
    <div class="wrap footer-grid">
     <div class="footer-brand">
-      <img src="mark.svg" alt="" width="40" height="40">
+      <img src="icon.svg" alt="" width="44" height="44">
       <svg class="written" role="img" aria-label="Verso"><use href="#written"/></svg>
     </div>
     <div class="footer-text">
@@ -362,6 +368,25 @@
     if (/iPhone|iPad|iPod/.test(agent) || (/Mac/.test(platform) && navigator.maxTouchPoints > 1)) document.body.dataset.os = "ios";
     else if (/mac/i.test(platform)) document.body.dataset.os = "macos";
     else if (/linux/i.test(platform) && !/android/i.test(agent)) document.body.dataset.os = "linux";
+    // The bar's switch between light and dark, kept for the next visit. Pictures with a dark version follow it: their
+    // dark source is chosen always, never, or as the system says.
+    const root = document.documentElement;
+    const system = matchMedia("(prefers-color-scheme: dark)");
+    const darkSources = [...document.querySelectorAll('source[media="(prefers-color-scheme: dark)"]')];
+    const switcher = document.querySelector("button.appearance");
+    const isDark = () => root.dataset.theme ? root.dataset.theme === "dark" : system.matches;
+    const show = () => {
+      for (const source of darkSources) source.media = root.dataset.theme ? (root.dataset.theme === "dark" ? "all" : "not all") : "(prefers-color-scheme: dark)";
+      switcher.textContent = isDark() ? "\u2600\ufe0e" : "\u263e\ufe0e";
+      switcher.title = isDark() ? "Light" : "Dark";
+    };
+    switcher.addEventListener("click", () => {
+      root.dataset.theme = isDark() ? "light" : "dark";
+      try { localStorage.setItem("appearance", root.dataset.theme); } catch {}
+      show();
+    });
+    system.addEventListener("change", show);
+    show();
     // A copy button on every command.
     for (const block of document.querySelectorAll("pre.command")) {
       const button = document.createElement("button");

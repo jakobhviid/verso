@@ -45,7 +45,7 @@ lab/bazzite-vm/down.sh                                          # the VM and its
 ```
 
 The cask is what Verso's users on Bazzite install (WORKFLOWS.md, "1. Install"): it downloads the release's tarball from
-`jakobhviid/verso-releases`, links `verso` and `verso-service` into Homebrew's `bin`, and puts the desktop entry,
+`jakobhviid/verso`, links `verso` and `verso-service` into Homebrew's `bin`, and puts the desktop entry,
 the icons and Verso's menu in Files in the home. A build of one's own goes in as in the GNOME VM (the
 `lab-desktop-vm` skill, "Putting Verso in"), to `/opt/verso`, which is a link into `/var` on Bazzite. Signing in and
 switching Verso Drive on are as there, with `verso-service` from Homebrew's `bin`; the drive is at `~/Verso`, a drive

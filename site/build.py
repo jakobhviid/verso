@@ -3,7 +3,7 @@
 with the latest release's version and download links, its pictures, style, icons and photo credits, written into an
 output folder to be served as it is. Standard library only.
 
-    gh api 'repos/jakobhviid/verso-releases/releases?per_page=30' > releases.json
+    gh api 'repos/jakobhviid/verso/releases?per_page=30' > releases.json
     site/build.py releases.json OUTPUT [--app-store URL] [--testflight URL]
 
 site/build-latest.sh gathers releases.json and runs this. Linux's files come from the newest published release that
@@ -33,8 +33,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
 PAGE = "https://jakob.hviid.phd/verso/"
 REPOSITORY = "https://github.com/jakobhviid/verso"
-# The public repository the releases are mirrored to while Verso's own is private (ci/release.sh).
-RELEASES = "https://github.com/jakobhviid/verso-releases"
+RELEASES = REPOSITORY
 TARBALL = "verso-x86_64.tar.gz"
 FLATPAK = "verso-x86_64.flatpak"
 # The rpm and the deb of a release (linux/packaging/verso-packages.sh), named by its version.
@@ -42,15 +41,14 @@ RPM = "verso-{version}.x86_64.rpm"
 DEB = "verso_{version}_amd64.deb"
 DISK_IMAGE = r"(?i)verso[-_ ].*\.dmg"
 
-# Each platform's icon for that platform (DESIGN.md, "A platform's icon only where that platform is meant"): Mist on Day
-# paper, and on Night paper for the dark appearance.
+# The brand and each platform's icon for that platform (DESIGN.md, "The website"): Mist on Day paper in both
+# appearances, as people know the icon from their system.
 ICONS = {
+    # Verso's own: the app icon's design, Mist on Day paper, which every platform's icon is drawn from.
+    "icon.svg": "linux/packaging/icons/dev.hviid.Verso.svg",
     "icon-linux.svg": "linux/packaging/icons/dev.hviid.Verso.svg",
-    "icon-linux-night.svg": "linux/packaging/icons/dev.hviid.Verso-mist-night.svg",
     "icon-mac.png": "mac/Verso/Verso/Assets.xcassets/AppIcon.appiconset/icon_128x128@2x.png",
-    "icon-mac-night.png": "mac/Verso/Verso/Assets.xcassets/AppIcon-MistNight.appiconset/icon_128x128@2x.png",
     "icon-ios.png": "ios/Verso/Assets.xcassets/AppIconImage.imageset/AppIconImage@3x.png",
-    "icon-ios-night.png": "ios/Verso/Assets.xcassets/AppIconImage.imageset/AppIconImage-dark@3x.png",
 }
 
 
@@ -201,6 +199,7 @@ def photo_credits():
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <script>try {{ const chosen = localStorage.getItem("appearance"); if (chosen) document.documentElement.dataset.theme = chosen; }} catch {{}}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The photos in Verso's pictures</title>
   <meta name="color-scheme" content="light dark">
@@ -209,7 +208,7 @@ def photo_credits():
 </head>
 <body>
   <nav class="bar wrap" aria-label="Verso">
-    <a class="brand" href="./"><img src="mark.svg" alt="" width="30" height="30"><span>Verso</span><span class="for">for Immich</span></a>
+    <a class="brand" href="./"><img src="icon.svg" alt="" width="34" height="34"><span>Verso</span><span class="for">for Immich</span></a>
   </nav>
   <main class="wrap credits-page">
     <h1>The photos in Verso's pictures</h1>
@@ -323,7 +322,7 @@ def main(releases_file, output, app_store=None, testflight=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("releases", help="the releases, as gh api repos/jakobhviid/verso-releases/releases writes them")
+    parser.add_argument("releases", help="the releases, as gh api repos/jakobhviid/verso/releases writes them")
     parser.add_argument("output")
     parser.add_argument("--app-store", help="Verso's page in the App Store, once it is there")
     parser.add_argument("--testflight", help="Verso's public TestFlight link, once there is one")

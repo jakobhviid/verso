@@ -267,7 +267,7 @@ fn drive_unavailable_page() -> adw::PreferencesPage {
         .title(tr("Verso Drive"))
         .description(tr("Your library as a drive in Files needs access outside the Flatpak's sandbox, so it is not part of this version of Verso. Verso installed with Homebrew has it."))
         .build();
-    status.set_child(Some(&gtk::LinkButton::builder().label(tr("Installing Verso with Homebrew")).uri("https://github.com/jakobhviid/verso-releases#readme").halign(gtk::Align::Center).build()));
+    status.set_child(Some(&gtk::LinkButton::builder().label(tr("Installing Verso with Homebrew")).uri("https://github.com/jakobhviid/verso#with-homebrew").halign(gtk::Align::Center).build()));
     let group = adw::PreferencesGroup::new();
     group.add(&status);
     let page = adw::PreferencesPage::new();

@@ -8,7 +8,7 @@
 # sign-in's app.immich: redirect and crosslinks come as the desktop entry's %u).
 
 # Where the requirements are, for someone on an older system.
-address=https://github.com/jakobhviid/verso-releases#requirements
+address=https://github.com/jakobhviid/verso#requirements
 
 # The install's folder, through links: Homebrew links its bin/verso to this file in the Caskroom. The window is in its
 # libexec, or, from /usr/bin, in /usr/libexec.
