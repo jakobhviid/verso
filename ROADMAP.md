@@ -162,8 +162,8 @@ upstream's main with the maintainer's pull requests merged in, taken at `50bb4c3
    is supported.
 4. **No trace of the old name** but the credit. The About panel carries the credits, the AI disclosure and the
    non-affiliation notice.
-5. **No updates from Immich Gallery:** Sparkle is left out; Verso's own feed and key come with Verso's first Mac
-   release.
+5. **Updates from Verso's own feed,** never Immich Gallery's: Sparkle with Verso's own key (ARCHITECTURE, "Verso on
+   the Mac", "Updates with Sparkle, from Verso's own feed").
 6. **Verso's identifiers** are in the project: `dev.hviid.Verso` and `dev.hviid.Verso.Dev`, each with `.FileProvider`
    and `.Widget`, and an App Group of its own. The developer portal does not have them yet: the maintainer makes the
    App IDs, the App Groups and the Developer ID provisioning profiles. The team's Developer ID certificate signs
@@ -195,6 +195,14 @@ video bar stay the iPhone's (the Mac's floating video controls are its own nativ
 8. **The details under a photo settle at two stops,** the photo alone or the details at rest, once measured against
    Photos on the Mac; the maintainer finds the plain scroll fine, so it comes last.
 
+**First, the next time the Mac app is touched** (the maintainer's, after the first Mac release):
+1. **Check for Updates… in the menu bar icon's menu** too, beside Settings…, as Immich Mount's has it; today it is in
+   the app menu alone.
+2. **The sidebar's account row** (`AccountSidebarFooter.swift`) shows the storage used under the name, where the
+   server's address is today; the address, the storage and the server's version are in the menu it opens.
+3. **⌘Q quits Verso's gallery, not the menu bar icon:** the windows close and the icon (and Verso Drive's account with
+   it) stays, as Immich Mount's app does; Quit Verso in the icon's menu quits it all.
+
 **Next, with the maintainer at the Mac:** the library and the viewer as they look, the widget, the icons as macOS
 draws them, and the pages built after Linux's designs (ARCHITECTURE, "Verso on the Mac", "Pages after Linux's
 designs"), which build and pass the checks but nobody has looked at yet: a link's page and the photo picker, the Share
@@ -224,17 +232,15 @@ app, its location added with the gallery's account. Next:
   switch their panes from the toolbar.) Its look is the maintainer's to settle. Verso Drive's switch then shows two more
   entries, its Status and its settings, as Verso's Preferences do on Linux
 
-**Building and releasing:** on the Mac, or by GitHub's Mac runner once the release pipeline builds Verso; never on the
-Linux workstation, which cannot. Before the first Mac release, the release steps the one version line needs
-(ARCHITECTURE, "Verso's releases"):
-- titles that name the release's platforms ("Verso 3.9.1 (Linux)")
-- a step that puts a checked Mac build (the disk image and its update file) on its commit's release, names macOS in
-  the title and adds the macOS section to the notes
+**Building and releasing:** on the Mac (`mac/release.sh`, signed with Developer ID and notarized), or by GitHub's Mac
+runner once the release pipeline builds Verso; never on the Linux workstation, which cannot. Built: the disk image and
+its update file put on the tag's release by hand, its title naming macOS, and the tap's `verso` cask with a part and
+a version per system, which Homebrew's audit takes. Left (ARCHITECTURE, "Verso's releases"):
+- a `ci/release.sh` step that attaches a checked Mac build and writes the macOS section of the notes
 - Linux's notes without the Apple editions' commits
-- the Mac update window's notes from those macOS sections alone: `site/build.py` takes the notes of the latest six
-  releases, Linux-only ones included
-- Verso's cask with a version per system, checked against Homebrew first: its audit refuses a `sha256` inside
-  `on_macos` and `on_linux`, and whether it takes a `version` there is not known
+- the Mac update window's notes from those macOS sections alone (the appcast links the release's page today)
+- the release workflow's Mac job, with the Developer ID certificate, the two profiles, the notary key and Sparkle's
+  key as secrets
 
 ## M9. The repository becomes Verso's alone
 
