@@ -12,9 +12,8 @@
 #
 # Signed, it reads from the environment:
 #   TEAM_ID                         the Apple Developer Program team
-#   APP_PROFILE, EXTENSION_PROFILE, WIDGET_PROFILE
-#                                   the names of the app's, Verso Drive's and the widget's Developer ID provisioning
-#                                   profiles, installed, as CI has them. Without them, Xcode signs automatically and makes the
+#   APP_PROFILE, EXTENSION_PROFILE  the names of the app's and Verso Drive's Developer ID provisioning profiles,
+#                                   installed, as CI has them (the widget needs none: it shares no Keychain group). Without them, Xcode signs automatically and makes the
 #                                   profiles itself, which needs a Mac whose Xcode is signed in to the team.
 #   NOTARY_PROFILE                  a notarytool keychain profile (`xcrun notarytool store-credentials`), or
 #   NOTARY_KEY, NOTARY_KEY_ID, NOTARY_ISSUER   an App Store Connect API key (.p8 path) and its IDs
@@ -46,7 +45,6 @@ if [ "$signed" = yes ]; then
   : "${TEAM_ID:?TEAM_ID is the Apple Developer Program team}"
   if [ -n "${APP_PROFILE:-}" ]; then
     : "${EXTENSION_PROFILE:?EXTENSION_PROFILE goes with APP_PROFILE}"
-    : "${WIDGET_PROFILE:?WIDGET_PROFILE goes with APP_PROFILE}"
     style=manual
     provisioning=()
   else
@@ -90,7 +88,7 @@ if [ "$signed" = no ]; then
   settings+=(CODE_SIGNING_ALLOWED=NO)
 elif [ "$style" = manual ]; then
   settings+=(DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="Developer ID Application"
-    APP_PROFILE="$APP_PROFILE" EXTENSION_PROFILE="$EXTENSION_PROFILE" WIDGET_PROFILE="$WIDGET_PROFILE" OTHER_CODE_SIGN_FLAGS=--timestamp)
+    APP_PROFILE="$APP_PROFILE" EXTENSION_PROFILE="$EXTENSION_PROFILE" OTHER_CODE_SIGN_FLAGS=--timestamp)
 else
   # Signed for development here; the export below signs it again with Developer ID.
   settings+=(DEVELOPMENT_TEAM="$TEAM_ID")
@@ -100,13 +98,12 @@ xcodebuild archive -quiet -project Verso/Verso.xcodeproj -scheme Verso -configur
   -destination 'generic/platform=macOS' -archivePath "$archive" ${provisioning[@]+"${provisioning[@]}"} "${settings[@]}"
 
 if [ "$signed" = yes ]; then
-  # Export signs the app, Verso Drive and the widget again for distribution, each with its own Developer ID profile:
-  # the Keychain group they share is an entitlement only a profile grants (TN3125).
+  # Export signs the app and Verso Drive again for distribution, each with its own Developer ID profile: the Keychain
+  # group they share is an entitlement only a profile grants (TN3125). The widget is signed with the certificate alone.
   if [ "$style" = manual ]; then
     profiles="<key>provisioningProfiles</key><dict>
     <key>dev.hviid.Verso</key><string>$APP_PROFILE</string>
-    <key>dev.hviid.Verso.Drive</key><string>$EXTENSION_PROFILE</string>
-    <key>dev.hviid.Verso.Widget</key><string>$WIDGET_PROFILE</string></dict>"
+    <key>dev.hviid.Verso.Drive</key><string>$EXTENSION_PROFILE</string></dict>"
   else
     profiles=""
   fi
