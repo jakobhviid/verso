@@ -26,6 +26,7 @@ mod imports;
 mod info;
 mod links_page;
 mod map;
+mod map_style;
 mod memories;
 mod menu_actions;
 mod motion;

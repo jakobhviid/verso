@@ -31,6 +31,8 @@ const _INTERFACE: &str = include_str!("window.blp");
 pub struct Session {
     pub connection: Connection,
     pub textures: Rc<Textures>,
+    /// What the session's maps draw from (`map_style`).
+    pub maps: Rc<crate::map_style::Styles>,
 }
 
 /// A sidebar page: its id, title and icon.
@@ -845,7 +847,8 @@ impl Window {
         let host = host_of(&connection.server);
         let bell = crate::notifications::Bell::new(self, connection.client.clone(), connection.account_key(), host);
         self.imp().bell.replace(Some(bell));
-        let session = Rc::new(Session { textures: Textures::new(cache), connection });
+        let maps = crate::map_style::Styles::new(connection.client.clone());
+        let session = Rc::new(Session { textures: Textures::new(cache), connection, maps });
         self.imp().session.replace(Some(session));
         self.imp().grids.borrow_mut().clear();
         self.sidebar_foot();

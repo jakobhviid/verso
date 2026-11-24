@@ -164,10 +164,7 @@ pub fn edit_place(window: &Window, ids: Vec<String>, start: Option<(f64, f64)>, 
     let search = gtk::SearchEntry::builder().placeholder_text(tr("Search for a place")).hexpand(true).build();
     let results = gtk::ListBox::builder().selection_mode(gtk::SelectionMode::None).css_classes(["boxed-list"]).visible(false).build();
     let simple = shumate::SimpleMap::builder().vexpand(true).height_request(320).build();
-    let registry = shumate::MapSourceRegistry::with_defaults();
-    if let Some(source) = registry.by_id(shumate::MAP_SOURCE_OSM_MAPNIK) {
-        simple.set_map_source(Some(&source));
-    }
+    let styled = crate::map_style::styled(window, &simple, false);
     let chosen: Rc<Cell<Option<(f64, f64)>>> = Rc::new(Cell::new(start));
     let pin = shumate::Marker::new();
     pin.set_child(Some(&gtk::Image::builder().icon_name("mark-location-symbolic").pixel_size(32).css_classes(["accent"]).build()));
@@ -179,7 +176,7 @@ pub fn edit_place(window: &Window, ids: Vec<String>, start: Option<(f64, f64)>, 
         layer.add_marker(&pin);
         pin.set_visible(start.is_some());
         let (latitude, longitude) = start.unwrap_or((30.0, 10.0));
-        viewport.set_zoom_level(if start.is_some() { 12.0 } else { 2.0 });
+        viewport.set_zoom_level(crate::map_style::zoom(if start.is_some() { 12.0 } else { 2.0 }));
         map_widget.center_on(latitude, longitude);
         pin.set_location(latitude, longitude);
         // A click sets the place where it lands.
@@ -191,7 +188,7 @@ pub fn edit_place(window: &Window, ids: Vec<String>, start: Option<(f64, f64)>, 
                 return;
             }
             let (dx, dy) = (x - f64::from(map_widget.width()) / 2.0, y - f64::from(map_widget.height()) / 2.0);
-            let (latitude, longitude) = map::location_at(viewport.latitude(), viewport.longitude(), viewport.zoom_level(), dx, dy);
+            let (latitude, longitude) = map::location_at(viewport.latitude(), viewport.longitude(), viewport.zoom_level(), dx, dy, crate::map_style::tile_size(&viewport));
             pin.set_location(latitude, longitude);
             pin.set_visible(true);
             place.set(Some((latitude, longitude)));
@@ -227,7 +224,7 @@ pub fn edit_place(window: &Window, ids: Vec<String>, start: Option<(f64, f64)>, 
         let Some(found) = found.borrow().get(row.index() as usize).cloned() else { return };
         let (Some(simple), Some(pin), Some(set)) = (weak_map.upgrade(), weak_pin.upgrade(), weak_set.upgrade()) else { return };
         if let (Some(map_widget), Some(viewport)) = (simple.map(), simple.viewport()) {
-            viewport.set_zoom_level(12.0);
+            viewport.set_zoom_level(crate::map_style::zoom(12.0));
             map_widget.center_on(found.latitude, found.longitude);
         }
         pin.set_location(found.latitude, found.longitude);
@@ -265,7 +262,7 @@ pub fn edit_place(window: &Window, ids: Vec<String>, start: Option<(f64, f64)>, 
     let content = gtk::Box::builder().orientation(gtk::Orientation::Vertical).spacing(12).margin_top(12).margin_bottom(12).margin_start(12).margin_end(12).build();
     content.append(&search);
     content.append(&results);
-    content.append(&simple);
+    content.append(&styled);
     content.append(&caption);
     let toolbar = adw::ToolbarView::new();
     toolbar.add_top_bar(&header);

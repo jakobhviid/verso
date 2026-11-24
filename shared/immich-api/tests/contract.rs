@@ -100,6 +100,9 @@ async fn server_config_without_a_credential() {
     let config = client_with(None).server_config().await.unwrap();
     assert_eq!(config.trash_days, 30);
     assert_eq!(config.oauth_button_text, "Login with OAuth");
+    // The lab keeps Immich's own map, whose styles Verso's map on Linux draws.
+    assert_eq!(config.map_light_style_url, "https://tiles.immich.cloud/v1/style/light.json");
+    assert_eq!(config.map_dark_style_url, "https://tiles.immich.cloud/v1/style/dark.json");
 }
 
 #[tokio::test]

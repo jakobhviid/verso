@@ -345,7 +345,7 @@ system's trust store, which Verso follows (SECURITY.md).
 | The window's library: pages, thumbnails, previews, originals, downloads, imports, edits, the account, notifications, and videos | `connection::connect` builds the window's one client from `server.url` and `server.certificate_sha256`. Videos and Live Photos are downloaded through it into the cache and played from the file, so GStreamer never connects |
 | The service: Verso Drive's listings, reads and uploads, the sync stream, and the tray's state | `online::daemon` builds its client from the same keys, at its start; the window restarts it once a certificate is trusted or forgotten |
 | The command line: `login`, `status`, `doctor`, and `logout`'s ending of the session | `online::client` with the kept pin; `login` asks on a terminal, or takes `--trust-certificate` |
-| Not the server: the map's tiles (OpenStreetMap, through libshumate), the update check (the download page), and Open in Immich (the browser, which asks its own question) | The system's trust alone |
+| Not the server: the map's style, sprites and tiles (the hosts the server's map setting names; libshumate fetches the tiles), the update check (the download page), and Open in Immich (the browser, which asks its own question) | The system's trust alone |
 
 Verso opens no websocket to the server.
 
@@ -1431,14 +1431,47 @@ ROADMAP, M8, has its status and what is still to come; DESIGN.md, "The apps' int
     writers of one photo never corrupt it. Thumbnails and previews are kept under the photo's ThumbHash as well as its
     id, so a photo whose picture changed in Immich is fetched again: Immich makes the hash again with the picture.
     Locking the Locked Folder again removes what memory and the cache hold of its photos.
-- **The map** shows every photo with a place through libshumate (GNOME Maps' widget, OpenStreetMap's tiles), in
-  clusters made in the cells of a grid whose size doubles with each zoom out, so a cluster keeps its edges and its
-  picture as the view moves (`verso_core::map::clusters`, which the Mac's and the iPhone's maps use too, ported from
-  Immich Gallery's). The view's spans come from the zoom level by Web Mercator's arithmetic (`verso_desktop::map`).
-  A cluster is a pin standing by its tail's tip on the spot, and opens its photos, read by id.
-  - **Privacy and tiles:** the tiles come from OpenStreetMap's own servers, libshumate's default source, which learn
-    the areas viewed. A release needs a tile service that allows an app's traffic (OpenStreetMap's tile usage policy),
-    or the user's own, before it ships.
+- **The map** shows every photo with a place through libshumate (GNOME Maps' widget), in clusters made in the cells
+  of a grid whose size doubles with each zoom out, so a cluster keeps its edges and its picture as the view moves
+  (`verso_core::map::clusters`, which the Mac's and the iPhone's maps use too, ported from Immich Gallery's). The
+  view's spans come from the zoom level by Web Mercator's arithmetic, in the map's 512 pixel tiles
+  (`verso_desktop::map`). A cluster is a pin standing by its tail's tip on the spot, and opens its photos, read by id.
+  - **The Immich server's own map,** as Immich's web app draws it: the MapLibre style its map setting names
+    (`mapLightStyleUrl` and `mapDarkStyleUrl` in `/server/config`; Immich's own, at `tiles.immich.cloud`, unless the
+    admin chose another), in the light or the dark as libadwaita's style is, changing with it. The setting is read
+    once a session, and each look's style when a map first wants it, so a changed setting shows from the next
+    session; the session's maps share one renderer for each look (`map_style`). Every map in the window is drawn so:
+    the Map page, a photo's place in its details, and Assign Location's. Apple's systems keep Apple's maps.
+  - **What libshumate draws of a style** (its vector renderer: Fedora 44's 1.6, which the tarball carries, and the
+    Flatpak's 1.7): one vector source in Web Mercator, and background, fill, line and symbol layers with their filters
+    and expressions, icons from the style's sprite sheet (Verso fetches its pages at one and two times) and text in the
+    computer's own fonts through Pango, by the names the style gives (Noto Sans in Immich's). What it does not take,
+    `verso_desktop::map_style` reads its way first, so the rest draws: a source's TileJSON link is read and its tiles
+    written into the style; of several sources, the vector one most layers use is kept, with its layers; 3D buildings
+    (`fill-extrusion`) become their footprints, as they show from straight above, the only way the map is seen; raster,
+    circle, heatmap and hillshade layers are left out; `is-supported-script` is true, since Pango shapes every script it
+    has fonts for; and a `text-font` that is an expression gives way to its fallback list. The style's glyphs are never
+    fetched. A layer libshumate still refuses is left out and the rest drawn. Of Immich's style every layer draws, with
+    its icons and labels, its buildings as footprints; properties libshumate does not know are passed over.
+  - **Credits** are what the style's source asks for (its TileJSON's `attribution`; "© OpenStreetMap", linked to its
+    copyright page, for Immich's), at the foot of every map on the right with their links, as Immich's web app shows
+    them, on the small map of a photo's place too.
+  - **When it cannot be drawn,** the map says so where it would be, rather than showing a plain grey: "Map
+    Unavailable" and why on the Map page and Assign Location, a line on a photo's small map. The reasons are plain:
+    the server's setting names no style, the setting or the style could not be read (offline, refused, not there),
+    or libshumate cannot draw it (raster tiles only, tiles at a `pmtiles://` address or numbered from the south). The
+    markers stay, on the plain view, and still open their photos. A failure is tried again by the next map that opens.
+    Tiles that fail once the style is drawn are named along the map's top while one of them is in view; libshumate
+    asks for a failed tile again once it has left the view and come back.
+    - **Not chosen: a map to fall back on.** The admin's setting decides who learns the areas viewed, so drawing
+      another host's map when that one fails would send them where nobody chose; and OpenStreetMap's own servers
+      forbid an app's traffic.
+  - **Not chosen: OpenStreetMap's tile servers,** libshumate's default source: their tile usage policy forbids an
+    app's traffic. **A tile service of Verso's own:** a running cost, and one more host that learns every user's areas
+    viewed, where Immich's setting leaves that to the server's admin, who may serve tiles of their own.
+  - **Flatpak impact:** none. The network permission is there; the Flatpak's libshumate builds its vector renderer
+    (always, since 1.6), Pango finds the runtime's and the host's fonts, and libshumate keeps tiles in the sandbox's
+    own cache. No permission is added.
   - **The map's date range and filters** are the Mac gallery's, not remembered; the markers are read again for each
     change, and the first read fits the map to them.
 - **Stacks** show as their primary photo in the Library, with a badge (`TimelineScope::LibraryStacked`, `withStacked`,

@@ -3733,6 +3733,7 @@ dependencies = [
  "image",
  "immich-api",
  "log",
+ "reqwest",
  "serde",
  "serde_json",
  "sha1",

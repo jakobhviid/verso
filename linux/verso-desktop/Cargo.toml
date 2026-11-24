@@ -15,6 +15,9 @@ immich-api = { path = "../../shared/immich-api" }
 verso-core = { path = "../../shared/verso-core" }
 verso-linux = { path = "../verso-linux" }
 log = "0.4"
+# The map's style and what it points to, from the hosts the Immich server's map setting names (src/map_style.rs);
+# TLS comes with immich-api's default feature.
+reqwest = { version = "0.12", default-features = false, features = ["json"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha1 = "0.10"

@@ -26,5 +26,7 @@ serde_json = "1"
 chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
 gtk = { package = "gtk4", version = "0.11", features = ["v4_18", "blueprint"] }
 adw = { package = "libadwaita", version = "0.9", features = ["v1_8"] }
-shumate = { package = "libshumate", version = "0.8", features = ["gtk_v4_18"] }
+# The map: 1.4 for its vector renderer's sprites and a tile's error (Fedora 44 has 1.6; the tarball and the Flatpak
+# carry their own).
+shumate = { package = "libshumate", version = "0.8", features = ["gtk_v4_18", "v1_4"] }
 tokio = { version = "1", features = ["rt-multi-thread"] }

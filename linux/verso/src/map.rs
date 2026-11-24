@@ -1,6 +1,7 @@
 //! The map: every photo with a place, gathered into clusters that follow the zoom (`verso_core::map`, as on the Mac and
 //! the iPhone), each a pin: a thumbnail in a rounded square, as places are, with its count, and a tail whose tip is on
-//! the spot; a click opens its photos. OpenStreetMap's tiles through libshumate, GNOME Maps' map widget.
+//! the spot; a click opens its photos. The Immich server's map (`map_style`), through libshumate, GNOME Maps' map
+//! widget.
 
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
@@ -36,17 +37,14 @@ struct State {
 
 pub fn map_page(window: &Window) -> adw::NavigationPage {
     let simple = shumate::SimpleMap::new();
-    let registry = shumate::MapSourceRegistry::with_defaults();
-    if let Some(source) = registry.by_id(shumate::MAP_SOURCE_OSM_MAPNIK) {
-        simple.set_map_source(Some(&source));
-    }
+    let styled = crate::map_style::styled(window, &simple, false);
     let (Some(map_widget), Some(viewport)) = (simple.map(), simple.viewport()) else {
         return pages::message_page(tr("Map"), tr("The Map Cannot Be Shown"), "", "find-location-symbolic");
     };
     let layer = shumate::MarkerLayer::new(&viewport);
     map_widget.add_layer(&layer);
     let spinner = adw::Spinner::builder().halign(gtk::Align::Center).valign(gtk::Align::Center).width_request(48).height_request(48).build();
-    let overlay = gtk::Overlay::builder().child(&simple).build();
+    let overlay = gtk::Overlay::builder().child(&styled).build();
     overlay.add_overlay(&spinner);
     // When and what, as in the Mac gallery: the date ranges side by side in the header, as Library's Years, Months
     // and All Photos, and the map's filters with a custom range (not remembered).
@@ -281,7 +279,8 @@ impl State {
     fn fit(&self, latitude: f64, longitude: f64, longitude_span: f64) {
         let (Some(map), Some(viewport)) = (self.map.map(), self.map.viewport()) else { return };
         let width = f64::from(map.width().max(600));
-        let zoom = (360.0 * width / (256.0 * longitude_span.max(0.001))).log2().clamp(2.0, 16.0);
+        let tile_size = crate::map_style::tile_size(&viewport);
+        let zoom = (360.0 * width / (tile_size * longitude_span.max(0.001))).log2().clamp(crate::map_style::zoom(2.0), crate::map_style::zoom(16.0));
         viewport.set_zoom_level(zoom);
         map.center_on(latitude, longitude);
     }
@@ -293,7 +292,7 @@ impl State {
         if width < 1.0 || height < 1.0 {
             return;
         }
-        let (latitude_span, longitude_span) = map::view_spans(viewport.latitude(), viewport.zoom_level(), width, height);
+        let (latitude_span, longitude_span) = map::view_spans(viewport.latitude(), viewport.zoom_level(), width, height, crate::map_style::tile_size(&viewport));
         let clusters = verso_core::map::clusters(&self.markers.borrow(), viewport.latitude(), viewport.longitude(), latitude_span, longitude_span);
         self.layer.remove_all();
         let Some(window) = self.window.upgrade() else { return };

@@ -53,9 +53,13 @@ Problems in the Immich server itself belong to the Immich project:
   `verso-service login`). The fingerprint is kept with the server's address in `config.toml`. A certificate the server
   presents later that is not that one is refused and asked about again, and nothing is sent to the server until you
   decide; Preferences, Account forgets it. Verso never accepts every certificate, nor trusts an authority for you. The
-  Mac, the iPhone and the iPad refuse such a server, and ask nothing. The map's tiles come from OpenStreetMap's tile
-  servers on Linux and from Apple's maps on the Mac, the iPhone and the iPad, where a place search when you adjust a
-  photo's location also sends the words you type to Apple's maps (Linux searches through your Immich server). On the
+  Mac, the iPhone and the iPad refuse such a server, and ask nothing. On Linux the map comes from where your Immich
+  server's map setting points, as Immich's web app's does: its style, its icons and its tiles, from Immich's own
+  `tiles.immich.cloud` and `static.immich.cloud` unless the server's admin chose other hosts, which learn the areas
+  you look at; nothing is fetched until a map shows, the style's fonts are never fetched (Verso writes the map's
+  names in your computer's fonts), and the tiles are kept in `~/.cache/shumate` (up to 100 MB), which signing out
+  leaves. On the Mac, the iPhone and the iPad the map is Apple's, where a place search when you adjust a photo's
+  location also sends the words you type to Apple's maps (Linux searches through your Immich server). On the
   iPhone and the iPad, **Look Up Place Names with Apple Maps** (Account, On This iPhone; off until you switch it on)
   sends the location of each photo you open to Apple, to name the landmark or street in its title; off, places are named
   from your Immich server alone, and photos in the Locked Folder are never looked up. Verso looks for no updates of its

@@ -37,7 +37,7 @@ pub struct ServerFeatures {
     pub map: bool,
 }
 
-/// The public settings from `/server/config` that the mount uses.
+/// The public settings from `/server/config` that Verso uses.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 pub struct ServerConfig {
@@ -45,6 +45,12 @@ pub struct ServerConfig {
     pub oauth_button_text: String,
     /// Days before trashed Assets are deleted for good. Immich's default, 30, when the server does not say.
     pub trash_days: u32,
+    /// The map's style in the light, a MapLibre style's address (Immich's own,
+    /// `https://tiles.immich.cloud/v1/style/light.json`, unless the admin chose another); empty when the server
+    /// names none.
+    pub map_light_style_url: String,
+    /// The map's style in the dark, as `map_light_style_url`.
+    pub map_dark_style_url: String,
 }
 
 impl Default for ServerConfig {
@@ -52,6 +58,8 @@ impl Default for ServerConfig {
         ServerConfig {
             oauth_button_text: String::new(),
             trash_days: 30,
+            map_light_style_url: String::new(),
+            map_dark_style_url: String::new(),
         }
     }
 }
@@ -171,10 +179,14 @@ mod tests {
     fn config_decodes_the_fields_we_use() {
         let body = r#"{"loginPageMessage":"","trashDays":30,"userDeleteDelay":7,"oauthButtonText":"Login with OAuth",
             "oauthAccountManagementUrl":"","isInitialized":true,"isOnboarded":false,"externalDomain":"",
-            "publicUsers":true,"maintenanceMode":false,"minFaces":3}"#;
+            "publicUsers":true,"maintenanceMode":false,"minFaces":3,
+            "mapDarkStyleUrl":"https://tiles.immich.cloud/v1/style/dark.json",
+            "mapLightStyleUrl":"https://tiles.immich.cloud/v1/style/light.json"}"#;
         let config: ServerConfig = serde_json::from_str(body).unwrap();
         assert_eq!(config.oauth_button_text, "Login with OAuth");
         assert_eq!(config.trash_days, 30);
+        assert_eq!(config.map_light_style_url, "https://tiles.immich.cloud/v1/style/light.json");
+        assert_eq!(config.map_dark_style_url, "https://tiles.immich.cloud/v1/style/dark.json");
     }
 
     #[test]

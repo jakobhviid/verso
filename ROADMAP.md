@@ -116,7 +116,8 @@ the import panel, Change Password and the profile picture.
    Mac", below).
 8. **Going public,** with the first public release. Before it:
    - a Mac edition at parity with Linux ("Verso on the Mac", below)
-   - a map tile service that allows the traffic (ARCHITECTURE, "Verso's window")
+   - a map whose tiles allow the traffic: done, Linux's maps draw the Immich server's own map setting (ARCHITECTURE,
+     "Verso's window", the map)
    - every release built by the release workflow (`.github/workflows/release.yml`), as Immich Mount's are, in place
      of the builds on the workstation: Actions is switched off in this repository. It builds the tarball and the
      Flatpak; the packages on Linux and the Mac's disk image, signed and notarized on GitHub's Mac runner, join it
@@ -646,13 +647,10 @@ Agreed with the maintainer; each item's detail is where it points.
 4. Trusting a self-signed server certificate on the Mac and the iPhone: done in the core and on Linux (ARCHITECTURE.md,
    "A certificate of the server's own", which has the Apple step's plan); left, the pin in the App Group's config and
    the bridge's clients, the question in SwiftUI, and the app's own URLSession and AVPlayer requests.
-5. Linux's map from the Immich server's own map setting (`mapLightStyleUrl`, `mapDarkStyleUrl`; Immich's own
-   `tiles.immich.cloud` unless its admin chose another), drawn by libshumate's vector renderer (in Fedora 44's 1.6.3),
-   in place of OpenStreetMap's servers, whose usage policy forbids an app's traffic. Apple's systems keep Apple's maps.
-6. Verso's page, with its design (M9, step 7).
-7. Verso in the system's places, and the smaller gaps on the iPhone (M10).
-8. The walkthrough video (M10).
-9. The history cleaned at the public launch (M8, "Going public").
+5. Verso's page, with its design (M9, step 7).
+6. Verso in the system's places, and the smaller gaps on the iPhone (M10).
+7. The walkthrough video (M10).
+8. The history cleaned at the public launch (M8, "Going public").
 
 ## The full Immich API
 

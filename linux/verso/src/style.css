@@ -129,6 +129,23 @@ listview.gallery-grid > row {
   font-weight: 800;
 }
 
+/* The map's credits at its foot on the right, on a pale band as Immich's web app shows them (`map_style`). */
+.gallery-map-credits {
+  background-color: alpha(var(--view-bg-color), 0.75);
+  color: var(--view-fg-color);
+  border-top-left-radius: 6px;
+  padding: 1px 6px;
+  font-size: 0.75em;
+}
+
+/* What the map says in its place when it cannot be drawn, or of tiles that could not be loaded. */
+.gallery-map-status {
+  background-color: alpha(var(--view-bg-color), 0.85);
+  color: var(--view-fg-color);
+  border-radius: 9px;
+  padding: 6px 12px;
+}
+
 /* The Library's Years and Months: year cards and month mosaics, after Photos. */
 .gallery-overview-year {
   margin: 18px;

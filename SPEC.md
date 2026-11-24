@@ -873,6 +873,13 @@ first.
 - **The Map:** each photo with a place, in clusters, each a pin with a photo and its count, opening its photos. Its
   header's date range (All, 3 Years, 1 Year, 30 Days, 7 Days, 24 Hours) and Map Filters (Favorites Only, Include
   Archived, Include Partners, on at first, and a Custom Range from one day through another) are not remembered.
+- **Every map** (the Map, a photo's place in its details, and Set the Place's): the Immich server's own map, from its
+  map setting (Immich's light and dark map styles), as Immich's web app shows it, in the light or the dark as the
+  desktop's style is, with the credits its tiles ask for at its foot ("© OpenStreetMap" for Immich's own), whose
+  links open in the browser. When it cannot be drawn (the server names no map style, the map's host cannot be
+  reached, or its style is one Verso cannot draw), the map says so where it would be, "Map Unavailable" with why (a
+  line on a photo's small map), and the Map's pins still show and open their photos; the next map opened tries again.
+  Tiles that could not be loaded are named along the map's top while one of them is in view.
 - **Places:** Cities or Countries (a switch in the header, remembered). A city is a square tile, its photo with its name
   on it (and its country, where cities of several show), opening its photos; a country is a card of three of its places'
   photos, each labelled with its city, with how many places and the years its photos span, its first places named on

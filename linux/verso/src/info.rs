@@ -162,7 +162,7 @@ pub fn info_groups(window: &Window, details: &AssetDetails, albums: &[immich_api
 
     // Where it was taken, on a map.
     if let Some((latitude, longitude)) = details.exif.as_ref().and_then(|exif| exif.latitude.zip(exif.longitude)) {
-        if let Some(map) = place_map(latitude, longitude) {
+        if let Some(map) = place_map(window, latitude, longitude) {
             let group = adw::PreferencesGroup::builder().title(tr("Place")).build();
             group.add(&map);
             if below_photo {
@@ -228,13 +228,11 @@ pub fn info_groups(window: &Window, details: &AssetDetails, albums: &[immich_api
 }
 
 /// A small map of where a photo was taken, with a pin.
-fn place_map(latitude: f64, longitude: f64) -> Option<gtk::Widget> {
+fn place_map(window: &Window, latitude: f64, longitude: f64) -> Option<gtk::Widget> {
     let simple = shumate::SimpleMap::new();
-    if let Some(source) = shumate::MapSourceRegistry::with_defaults().by_id(shumate::MAP_SOURCE_OSM_MAPNIK) {
-        simple.set_map_source(Some(&source));
-    }
+    let styled = crate::map_style::styled(window, &simple, true);
     let (map, viewport) = (simple.map()?, simple.viewport()?);
-    viewport.set_zoom_level(12.0);
+    viewport.set_zoom_level(crate::map_style::zoom(12.0));
     map.center_on(latitude, longitude);
     let pins = shumate::MarkerLayer::new(&viewport);
     let pin = shumate::Marker::new();
@@ -244,9 +242,9 @@ fn place_map(latitude: f64, longitude: f64) -> Option<gtk::Widget> {
     map.add_layer(&pins);
     simple.set_show_zoom_buttons(false);
     // A picture of the place: it takes no scrolling or dragging, so the page scrolls past it (the Location row's map
-    // button opens a full map).
+    // button opens a full map); its credits' links still take a click.
     simple.set_can_target(false);
-    let frame = gtk::Frame::builder().child(&simple).height_request(220).css_classes(["gallery-place-map"]).build();
+    let frame = gtk::Frame::builder().child(&styled).height_request(220).css_classes(["gallery-place-map"]).build();
     Some(frame.upcast())
 }
 
