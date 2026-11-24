@@ -20,7 +20,7 @@ Verso is an independent, unofficial project. It is not affiliated with, endorsed
 Needs an Immich server, v3.2 or later.
 
 - **Linux** (x86_64, GNOME 49's libraries or newer: Fedora 43+, Ubuntu 25.10 and 26.04 LTS, Debian 14, Arch): `brew install jakobhviid/tap/verso`, or the tarball and the Flatpak test build (without Verso Drive) from the releases: https://github.com/jakobhviid/verso-releases/releases/latest
-- **Mac** (macOS 15 or later): not released yet; a signed and notarized disk image and Homebrew's cask are coming.
+- **Mac** (macOS 15 or later): a signed and notarized disk image from this page, or `brew install --cask jakobhviid/tap/verso`; it updates itself with Sparkle.
 - **iPhone and iPad** (iOS and iPadOS 26.1 or later): not released yet; TestFlight, then the App Store.
 
 ## Privacy

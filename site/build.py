@@ -277,6 +277,7 @@ def main(releases_file, output, app_store=None, testflight=None):
         "tarball": link(tarball, f"The tarball, {TARBALL}"),
         "flatpak": link(asset_url(linux, FLATPAK), f"The Flatpak, {FLATPAK}"),
         "macos": macos,
+        "mac_status": '<span class="status out">Released</span>' if disk_image else '<span class="status soon">Coming</span>',
         "ios": ios,
     }
     page = (SITE / "index.html").read_text()

@@ -19,8 +19,8 @@ that places the grid's dates, so they behave alike.
 
 | Platform | Where it stands |
 |---|---|
-| Linux, x86_64 (GNOME) | Released as 0.x builds: Homebrew, and a Flatpak test build; rpm and deb packages from the next release (below) |
-| Mac | Built here; no release yet |
+| Linux, x86_64 (GNOME) | Released as 0.x builds: Homebrew, rpm and deb packages, and a Flatpak test build (below) |
+| Mac (macOS 15 or later) | Released as 0.x builds: a signed and notarized disk image from [Verso's page](https://jakob.hviid.phd/verso/), or `brew install --cask jakobhviid/tap/verso`; it updates itself |
 | iPhone and iPad | Built here; no release yet. It will come through TestFlight and the App Store |
 
 ## What it does

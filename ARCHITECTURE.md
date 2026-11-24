@@ -2567,14 +2567,17 @@ maintainer out, and a release never replaces it. It runs under a free Personal T
 `~/Library/CloudStorage`, named after the app and the drive (`VersoDev-Verso`); renaming the location moves the folder,
 and keeps its items and downloads.
 
-**Signing for release.** No Mac release of Verso has gone out yet ("Verso's releases"). What the drive's earlier Mac
-releases settled holds for it: a disk image signed with the maintainer's paid Apple Developer Program team, the app
+**Signing for release** (`mac/release.sh`; "Verso's releases"). What the drive's Mac releases settled holds for
+Verso's: a disk image signed with the maintainer's paid Apple Developer Program team, the app
 in it universal, signed with Developer ID, notarized and stapled, so a copy taken out of the disk image passes
 Gatekeeper offline too.
-- **Developer ID provisioning profiles,** named in the project (`APP_PROFILE`, `EXTENSION_PROFILE`, `WIDGET_PROFILE`;
-  empty in a development build, which Xcode signs automatically): the Keychain group the app and the extension share
-  is an entitlement only a profile grants (Apple's TN3125), and a manually signed build cannot use profiles Xcode
-  manages. The team-prefixed App Group needs none.
+- **Developer ID provisioning profiles** for the app and Verso Drive, made in the developer portal ("Verso
+  Provisioning Profile", "Verso Drive Provisioning Profile") and named to the build (`APP_PROFILE`,
+  `EXTENSION_PROFILE`; empty in a development build, which Xcode signs automatically): the Keychain group the two
+  share is an entitlement only a profile grants (Apple's TN3125). Xcode does not make them for an individual
+  membership, whose role it shows as Admin: its export stops at "No Accounts". The widget shares no Keychain group
+  and is signed with the certificate alone. The App IDs carry App Groups for the iPhone's `group.dev.hviid.Verso`;
+  the profiles also allow every team-prefixed group, which the Mac uses.
 - **Only the Account Holder can make the Developer ID certificate.** Xcode shows an individual membership's role as
   Admin and does not offer it, so the certificate is made in the developer portal, from a signing request made in
   Keychain Access.
@@ -3342,9 +3345,10 @@ is numbered, and a push releases nothing. `ci/release.sh` suggests the next vers
 last tag (`ci/version.sh`), tags the number the maintainer agrees to, builds Linux's files from the tag into a
 **draft** release, and publishes it after the maintainer's check; AGENTS.md, "Versioning", has the steps and the
 version rules. Until the public launch, each release is published both here and in the public
-`jakobhviid/verso-releases`, which Homebrew's `verso` cask downloads from (ROADMAP, M8, "Going public"). No Mac
-release has gone out yet; the Mac's disk image, and the rpm and deb packages, are not part of the release step
-(ROADMAP, M9, step 6).
+`jakobhviid/verso-releases`, which Homebrew's `verso` cask downloads from (ROADMAP, M8, "Going public"). The Mac's
+disk image is built on the Mac (`mac/release.sh`), signed for Sparkle (`ci/sign-mac-update.sh`) and attached to the
+tag's drafts by hand; the cask has a part for each system, and its Mac part moves only with a release that carries
+the disk image.
 
 - **Every release carries Linux,** also one whose commits touch only the Apple editions. The newest release then
   always has the Linux files, so GitHub's Latest is right for Linux, and the Mac's version is never ahead of Linux's.

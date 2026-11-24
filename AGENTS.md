@@ -4,7 +4,7 @@ Instructions for any AI coding agent (Claude Code, opencode, and others) and for
 `CLAUDE.md` is a symlink to this file, so there is exactly one copy of the rules. Edit `AGENTS.md`, never the link.
 
 This repository is Verso's: Verso for Immich, a native gallery for an Immich library with its drive, Verso Drive, on
-Linux (GNOME) and, not yet released, on the Mac. It follows the maintainer's house style for Rust command-line tools,
+Linux (GNOME) and the Mac. It follows the maintainer's house style for Rust command-line tools,
 `rust-cli-guidelines` (a private guide: governance, code style, CLI patterns, release). Where those guidelines assume
 a pure CLI, the adaptation is written down in ARCHITECTURE.md, "Note for the house guidelines".
 
@@ -119,7 +119,8 @@ at once (ARCHITECTURE.md, "Verso's releases"):
 - An Apple build is made on the Mac, never on the Linux workstation, and ships only after the maintainer has
   checked it there. It goes on the GitHub release of the tag it was built from, whose title then names macOS
   beside Linux ("Verso 3.9.0 (Linux and macOS)"), with a macOS section in its notes since the previous Mac release.
-  No Mac build has shipped yet.
+  `mac/release.sh` builds its disk image, signed with Developer ID and notarized, in a Terminal window on the Mac;
+  `ci/sign-mac-update.sh` signs it for Sparkle on the workstation, and both are attached to the tag's drafts.
 - iOS ships through TestFlight and the App Store, never on GitHub.
 - There is no rolling "latest" release: each platform's newest is found on its own; the cask follows GitHub's Latest
   in `jakobhviid/verso-releases`.
