@@ -1,5 +1,6 @@
 import AppKit
 import Sparkle
+import SwiftUI
 
 /// Updates on the Mac (ARCHITECTURE.md, "Verso on the Mac"): Sparkle reads the appcast on
 /// Verso's page and replaces the app in place, checking the disk image against Verso's own key (`SUPublicEDKey`).
