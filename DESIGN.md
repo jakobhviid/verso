@@ -217,6 +217,11 @@ yet (ROADMAP.md, M9, step 7). Until it is, the README is Verso's landing page, a
   with a `-dark` twin, as WebP: Linux's at the README's sizes, Files' window with its corners clear; the iPhone's and
   the iPad's as the device takes them; the Mac's as above. They show the showcase server's library (the
   `lab-immich-server` skill), whose photos the page credits; `site/build.py` names those still to take.
+- **The iPhone's and the iPad's** in the Simulator (an iPhone 17 Pro Max, an iPad Pro 13-inch in landscape), at the
+  device's own resolution, whole: the page draws the device round each. The status bar reads 9:41 with full bars and
+  battery, and the app is named Verso, as a release is. The phone's own library holds showcase photos only: two trips
+  as Immich holds them, so they count as in Immich and fill Free Up Space's review, and four new ones on their way
+  (the `mac-dev` skill, "The website's pictures").
 
 ## The apps' interfaces
 

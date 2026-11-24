@@ -303,9 +303,10 @@ Immich Crosslink, the protocol between apps, and the takeover of Immich Mount's 
 7. Verso's page at `jakob.hviid.phd/verso`, presented at the top of `jakob.hviid.phd/software`, with a design of its
    own rather than a list: Verso on each platform in pictures from the lab's showcase server, a download for each
    (the Flatpak, the tarball, Homebrew, the Mac's disk image, the App Store), what Verso Drive is, the non-affiliation
-   notice and the credits. Drafted in `site/` (DESIGN.md, "The website"), with Linux's pictures in light and dark.
-   Left: the maintainer's look at the draft; the Apple pictures, which the page marks as to come (the iPhone's
-   Library, viewer, Backup page and Free Up Space, the iPad's Library and the Mac's Library); where it is served,
+   notice and the credits. Drafted in `site/` (DESIGN.md, "The website"), with the pictures of Linux, the iPhone
+   (its Library, viewer, Backup page and Free Up Space) and the iPad (its Library) in light and dark.
+   Left: the maintainer's look at the draft; the Mac's Library, the maintainer's picture to take, which the page
+   marks as to come; where it is served,
    as Verso's own repository is private, and its place at the top of `jakob.hviid.phd/software`; its links into the
    repository, which answer only once Verso is public; and `ci/release.sh publish` building it.
 8. Next after the releases (the maintainer: very near), an area at a time: what the Mac does in Swift and Linux in

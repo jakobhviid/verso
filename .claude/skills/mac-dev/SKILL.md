@@ -191,6 +191,34 @@ addmedia` adds it, or a demo original, to the Simulator's Photos, and it is uplo
 the moment of the motion it shows (the script's header has the steps). Photos ignores the closing pinches XCUITest
 makes, so its zoom outward cannot be measured that way.
 
+## The website's pictures
+
+The iPhone's and the iPad's pictures in `site/screenshots/` (DESIGN.md, "Screenshots") come from Simulators of their
+own, deleted after, signed in to a showcase server of the session's own through `tunnel.sh`, its address and key in
+the run's environment as `ios/tools/live/record.sh` passes them, on screens that show no server address.
+- **A copy of the checkout of its own** on the Mac (`~/Developer/Private/<name>`, the checkout's `.git` and `target/`
+  cloned in with `cp -Rc`), so another agent's build in the checkout is left alone; deleted after. A throwaway UI test
+  that reads its steps from a file there (the Simulator's processes read the Mac's files) moves through the app
+  without a run for each picture.
+- **The clock:** a Simulator takes the Mac's region, whose clock reads 09.41. `xcrun simctl spawn <udid> defaults
+  write .GlobalPreferences AppleLocale -string en_US` (and `AppleLanguages -array en-US`) and a reboot, then `xcrun
+  simctl status_bar <udid> override --time 9:41 --batteryState discharging --batteryLevel 100 --cellularBars 4
+  --wifiBars 3` after each boot; `charged` draws the battery green with a bolt.
+- **The app's name:** iPadOS writes it in the status bar, Verso Dev for a Debug build. Build with `IMMICH_APP_NAME=Verso`
+  on `build-for-testing` and `test-without-building` both: the app is then `Verso.app`, its identity still Verso Dev's.
+- **The Simulator's sample photos:** a new Simulator's Photos holds six of Apple's, which backing up counts and Free Up
+  Space offers. With it shut down, delete `data/Media/DCIM/100APPLE` and `data/Media/PhotoData` in
+  `~/Library/Developer/CoreSimulator/Devices/<udid>/`, and it boots with an empty library.
+- **Photos already in Immich:** the server's originals (`GET /api/assets/<id>/original`), added with `xcrun simctl
+  addmedia`, keep their bytes and dates, so backing up finds them in Immich and sends nothing; the fixtures'
+  renditions (other bytes, no date) are new photos, kept on their way by `VERSO_BACKUP_HOLD` (seconds) in the app's
+  environment. `xcrun simctl privacy <udid> grant photos dev.hviid.Verso.Dev` answers the photos question before it is
+  asked; notifications' is an alert.
+- **Free Up Space's review** shows the newest months first, so the phone's photos are whole trips (the zoo in 2023,
+  Rome and Venice in 2022), aged by when they were taken (`VERSO_FREE_UP_BY_TAKEN`).
+- **Dark:** `xcrun simctl ui <udid> appearance dark` turns a screen already set up. The Backup page's symbol pulses
+  while it works: take a few and keep one where it shows whole.
+
 ## Look
 
 - **Our log** (the app, Verso Drive's extension and the bridge): `/usr/bin/log show --last 10m --predicate
