@@ -163,8 +163,10 @@ struct CrosslinkMenuItems: View {
         Menu("Show In") {
             if let item, VersoDrive.shared.isOn {
                 Button("Verso Drive") {
-                    let link = Crosslink.link(item, server: server, user: session.user?.id)
-                    Task { await VersoDrive.shared.show(link) }
+                    // The item's web address, which the drive reads in every build: Verso Dev's crosslinks have a
+                    // scheme of their own, which the drive's lookup does not take.
+                    let address = Crosslink.webAddress(item, server: server)
+                    Task { await VersoDrive.shared.show(address) }
                 }
             }
             if let widgetIDs, !widgetIDs.isEmpty {
