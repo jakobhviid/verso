@@ -937,32 +937,29 @@ impl Window {
         sidebar.remove_all();
         let with_api_key = self.session().is_some_and(|session| session.connection.with_api_key);
         let editing = self.imp().editing_sidebar.get();
-        let hidden = verso_desktop::sidebar::hidden(verso_desktop::settings::shared());
-        let is_hidden = |id: &str| hidden.iter().any(|known| known == id);
-        // The sections in the order Edit Sidebar arranged, each with its pages (`sidebar::Layout`).
+        // The sections in the order Edit Sidebar arranged, each with its pages, and what is hidden (`sidebar::Layout`).
         let layout = sidebar_layout();
         let albums = self.imp().albums.borrow().clone();
-        for section in &layout.sections {
-            let hidden_id = format!("section:{}", section.id);
+        for section in layout.sections() {
             let title = section_title(section);
             let pages: Vec<&Entry> = layout.pages_in(&section.id).into_iter().filter_map(page_entry).filter(|(id, _, _)| !(*id == "locked" && with_api_key)).collect();
             if editing {
-                sidebar.append(&self.editing_section_row(&layout, section, &title, !is_hidden(&hidden_id)));
+                sidebar.append(&self.editing_section_row(&layout, section, &title, !section.hidden));
                 for (id, title, icon) in pages {
                     // The Library always shows, so the sidebar never empties.
-                    let shown = (*id != "library").then(|| !is_hidden(id));
+                    let shown = (*id != "library").then(|| !layout.is_hidden(id));
                     sidebar.append(&self.editing_page_row(&layout, id, tr(title), icon, shown));
                 }
                 continue;
             }
-            if is_hidden(&hidden_id) {
+            if section.hidden {
                 continue;
             }
             if let Some((album_section, filter)) = album_section_of(&section.id) {
                 self.append_album_section(&albums, album_section, filter, &title);
                 continue;
             }
-            let pages: Vec<&Entry> = pages.into_iter().filter(|(id, _, _)| *id == "library" || !is_hidden(id)).collect();
+            let pages: Vec<&Entry> = pages.into_iter().filter(|(id, _, _)| *id == "library" || !layout.is_hidden(id)).collect();
             if pages.is_empty() {
                 continue;
             }
@@ -1035,7 +1032,7 @@ impl Window {
         menu.append_section(None, &moving);
         let here = layout.section_of(id).unwrap_or_default().to_owned();
         let to = gio::Menu::new();
-        for section in layout.sections.iter().filter(|section| section.id != here && layout.takes_pages(&section.id)) {
+        for section in layout.sections().iter().filter(|section| section.id != here && layout.takes_pages(&section.id)) {
             to.append(Some(&section_title(section)), Some(&format!("win.sidebar-edit::page-to:{id}:{}", section.id)));
         }
         if to.n_items() > 0 {
@@ -1117,17 +1114,12 @@ impl Window {
                 let section = layout.section_of(before).unwrap_or_default().to_owned();
                 layout.move_page(page, &section, Some(before))
             }
-            "section-up" => layout.step_section(rest, -1),
-            "section-down" => layout.step_section(rest, 1),
-            "section-delete" => {
-                let deleted = layout.remove_section(rest);
-                if deleted {
-                    verso_desktop::sidebar::set_hidden(settings, &format!("section:{rest}"), false);
-                }
-                deleted
-            }
+            "section-up" => layout.shift_section(rest, -1),
+            "section-down" => layout.shift_section(rest, 1),
+            // Its hiding goes with it.
+            "section-delete" => layout.remove_section(rest),
             "section-rename" | "section-new" => {
-                let current = layout.sections.iter().find(|section| section.id == rest).and_then(|section| section.name.clone()).unwrap_or_default();
+                let current = layout.section(rest).and_then(|section| section.name.clone()).unwrap_or_default();
                 let (heading, yes) = if op == "section-new" { (tr("New Section"), tr("Add")) } else { (tr("Rename Section"), tr("Rename")) };
                 let (weak, id, new) = (self.downgrade(), rest.to_owned(), op == "section-new");
                 crate::dialogs::ask_text(self, heading, tr("Name"), &current, yes, move |name| {
@@ -1135,7 +1127,7 @@ impl Window {
                     let mut layout = sidebar_layout();
                     let changed = if new { layout.add_section(&name).is_some() } else { layout.rename_section(&id, &name) };
                     if changed {
-                        layout.save(verso_desktop::settings::shared());
+                        verso_desktop::sidebar::save(verso_desktop::settings::shared(), &layout);
                         window.fill_sidebar();
                     }
                 });
@@ -1144,7 +1136,7 @@ impl Window {
             _ => false,
         };
         if changed {
-            layout.save(settings);
+            verso_desktop::sidebar::save(settings, &layout);
             self.fill_sidebar();
         }
     }
@@ -2128,7 +2120,14 @@ fn editing_row(id: &str, title: &str, icon: Option<&str>, shown: Option<bool>, m
         let switch = gtk::Switch::builder().active(shown).valign(gtk::Align::Center).tooltip_text(tr("Show in Sidebar")).build();
         let id = id.to_owned();
         switch.connect_active_notify(move |switch| {
-            verso_desktop::sidebar::set_hidden(verso_desktop::settings::shared(), &id, !switch.is_active());
+            let mut layout = sidebar_layout();
+            match id.strip_prefix("section:") {
+                Some(section) => {
+                    layout.set_section_hidden(section, !switch.is_active());
+                }
+                None => layout.set_hidden(&id, !switch.is_active()),
+            }
+            verso_desktop::sidebar::save_hidden(verso_desktop::settings::shared(), &layout);
         });
         content.append(&switch);
     }
@@ -2155,7 +2154,7 @@ fn sidebar_defaults() -> Vec<(&'static str, Vec<&'static str>)> {
 fn sidebar_layout() -> verso_desktop::sidebar::Layout {
     let defaults = sidebar_defaults();
     let defaults: Vec<(&str, &[&str])> = defaults.iter().map(|(section, pages)| (*section, pages.as_slice())).collect();
-    verso_desktop::sidebar::Layout::load(verso_desktop::settings::shared(), &defaults)
+    verso_desktop::sidebar::load(verso_desktop::settings::shared(), &defaults)
 }
 
 /// A page's title and icon, by its id.

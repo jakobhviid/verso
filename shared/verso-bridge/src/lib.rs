@@ -35,6 +35,7 @@ uniffi::setup_scaffolding!();
 mod arrangements;
 mod gallery;
 mod rail;
+mod sidebar;
 
 pub use gallery::{ApiAnswer, ApiConnection, ApiField};
 

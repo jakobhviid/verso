@@ -1552,11 +1552,12 @@ ROADMAP, M8, has its status and what is still to come; DESIGN.md, "The apps' int
   nothing.
 - **The sidebar** keeps its fixed pages at the top and the albums last, as the Mac gallery does, in two sections, My
   Albums and Shared Albums, each as many and in the order chosen in its heading's menu. **Edit Sidebar** arranges it
-  as the Mac's `SidebarLayout` does (`sidebar::Layout`, the same format): the sections in order, the built-in ones by
-  their English heading, the user's own as `custom-N` with a name, and each page with its section, in order; the
-  albums' two sections take no pages. A page or section it does not know is left out, and a new one joins its own
-  section at the end. **The account** sits at the bottom of the sidebar, as on the Mac, lit only under the pointer: a
-  panel at rest reads as an outline too many.
+  as the Mac's does, through the core (`verso_core::sidebar`; "What the gallery arranges comes from the core"), kept in
+  Linux's own form: the sections in order, the built-in ones by their English heading, the user's own as `custom-N`
+  with a name, and each page with its section, in order (`sidebar.layout`), and what is hidden beside it
+  (`sidebar.hidden`); the albums' two sections take no pages. A page or section it does not know is left out, and a new
+  one joins its own section at the end. **The account** sits at the bottom of the sidebar, as on the Mac, lit only
+  under the pointer: a panel at rest reads as an outline too many.
 - **The scrubber** (`scrubber`), at the right edge of a grid of months, as Immich's web app and the Mac gallery have
   one, goes to exactly the place a click or a drag points at. The arithmetic is the core's ("The date scroller"), given
   the grid's layout of a month not read yet (placeholders at a typical shape, or squares), which a month read comes
@@ -2124,12 +2125,23 @@ to come.
   (`verso_core::places`); the Albums page's filter, groups and order, which groups are collapsed, and a sidebar
   section's first albums (`verso_core::albums`); a photo page's view options, which a page offers and what they mean
   for its grid (`verso_core::grid_options`; the query they make is still the Mac's `TimelineQuery`, ROADMAP, M9, step
-  8); and the date scroller (`rail`; "The date scroller"). The views hand over plain records (buckets with their
+  8); the date scroller (`rail`; "The date scroller"); and the sidebar's layout as Edit Sidebar arranges it, the Mac's
+  sidebar and the iPhone's Collections, each platform naming its own built-in sections and pages
+  (`verso_core::sidebar`, through the bridge's `sidebar`). The views hand over plain records (buckets with their
   counts, photos with their dates, ids and coordinates, choices by the codes the settings keep them by, which are
   Linux's) and get places back by index; the records are `Identifiable` for SwiftUI's lists
   (`VersoCore/CoreConnection.swift`). What a platform keeps in a form of its own, the core reads and writes in that
   form: the Albums page's collapsed groups are one value for every grouping on the Mac and the iPhone
   (`{"Year":["year-2024"]}`, as Immich's web app keeps them), and a value for each grouping, a group a line, on Linux.
+  - **The sidebar's layout is kept in each platform's form,** read and written as it is, as a whole layout in another
+    form would be lost to an earlier version: one value on the Mac and the iPhone (`sidebarLayout`: the sections with
+    whether each is hidden or collapsed, each link with its section, the links, albums and partners hidden, each album
+    section's count and order), and on Linux the arrangement (`sidebar.layout`) with what is hidden beside it
+    (`sidebar.hidden`, ids by commas). Two rules differ with the form, on purpose: the person's own sections are
+    `custom-N` on Linux and UUIDs on the Mac and the iPhone, and an album section takes no pages on Linux and takes
+    them above its albums on the Mac. Collapsed sections, hidden albums and partners, and an album section's count and
+    order are the Mac's and the iPhone's alone in the layout; Linux keeps its album sections' count and order beside
+    it, ten and by date modified at first, where the Mac lists five by the newest photo.
   - **A choice kept under two spellings is read in both and written in Linux's,** so nothing kept needs migrating: a
     photo page's view options are written by Linux's lower-case codes (`favorites`, `photos`, `added`, as
     `config.toml`'s are lower-case), and the Mac and the iPhone, which kept Immich's names (`Favorites`, `IMAGE`,

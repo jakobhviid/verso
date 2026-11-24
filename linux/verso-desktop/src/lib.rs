@@ -25,7 +25,7 @@ pub mod search; // a search's words, filters, order and history
 pub mod session; // signing in and out, the credential, the service and the drive's switch
 pub mod settings; // remembered choices
 pub mod shared_links; // shared links: which show, remembered, their addresses and titles
-pub mod sidebar; // the sidebar as Edit Sidebar arranges it: sections, pages, what is hidden
+pub mod sidebar; // the sidebar as Edit Sidebar arranges it, remembered
 pub mod similar; // Find Similar Photos: which photos group, and the cover
 pub mod tags; // the tags as a tree
 pub mod text; // dates, lengths, sizes

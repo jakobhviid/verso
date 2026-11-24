@@ -594,6 +594,8 @@ extension CoreConnection {
 // and a cluster of the map by its first photo.
 extension OverviewYear: Identifiable {}
 extension MapCluster: Identifiable {}
+/// A section of the sidebar (`sidebarArrangement`), known by its id.
+extension SidebarSection: Identifiable {}
 
 /// Names by their places in the order `compare` gives, the person's language's, which only the app knows, as the core's
 /// arrangements take them (`placesSections`, `albumsSections`): names alike in it share a place.

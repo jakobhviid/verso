@@ -33,7 +33,6 @@ cases = {
     'grid-context-menu': ['Verso/Views/Grid/DeferredContextMenu.swift', 'Tests/GridContextMenuChecks.swift'],
     'viewer-scroll-pan': ['Verso/Views/Viewer/ViewerScrollPan.swift', 'Tests/ViewerScrollPanChecks.swift'],
     'viewer-swipe': ['Verso/Views/Viewer/ViewerSwipeNavigation.swift', 'Verso/Views/Viewer/ViewerScrollPan.swift', 'Tests/ViewerSwipeNavigationChecks.swift'],
-    'sidebar-layout': [app('SidebarLayout'), 'Tests/SidebarLayoutChecks.swift'],
     'viewer-motion': [app('ViewerMotionLayout'), 'Tests/ViewerMotionChecks.swift'],
     'card-layout': [app('CardLayout'), 'Tests/CardLayoutChecks.swift'],
     'inspector-editing': models + [app('AssetInspectorState'), 'Verso/Views/InlineEditableText.swift', 'Tests/InspectorEditingChecks.swift'],
