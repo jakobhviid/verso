@@ -166,8 +166,9 @@ welcome in this repository's [issues](../../issues).
   library as a drive in Finder, and its API layer started from **[immich-rs](https://github.com/boul2gom/immich-rs)**
   (MIT).
 - **[Immich](https://github.com/immich-app/immich)**, the server all of this talks to.
-- The photos in the screenshots are the test server's, Creative Commons and public domain photos from Wikimedia
-  Commons, each credited in [lab/immich-server/fixtures/ATTRIBUTION.md](lab/immich-server/fixtures/ATTRIBUTION.md).
+- The photos in the screenshots are the lab servers', Creative Commons and public domain photos from Wikimedia
+  Commons, each credited in [lab/immich-server/fixtures/ATTRIBUTION.md](lab/immich-server/fixtures/ATTRIBUTION.md),
+  and the map's in [lab/immich-server/fixtures/showcase/ATTRIBUTION.md](lab/immich-server/fixtures/showcase/ATTRIBUTION.md).
   Map data and imagery are OpenStreetMap's, as credited on the map.
 
 More: [CREDITS.md](CREDITS.md).
