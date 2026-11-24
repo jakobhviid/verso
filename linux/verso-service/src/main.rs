@@ -129,8 +129,8 @@ pub(crate) fn cli_command() -> clap::Command {
 
 fn main() -> ExitCode {
     let arguments: Vec<String> = std::env::args().collect();
-    // The Flatpak's build (`--features flatpak`), as the window's.
-    verso_core::product::set(if cfg!(feature = "flatpak") { &verso_core::product::VERSO_FLATPAK } else { &verso_core::product::VERSO });
+    // The Flatpak's build (`--features flatpak`) and the packages' (`--features package`), as the window's.
+    verso_core::product::set(verso_core::product::built_for(cfg!(feature = "flatpak"), cfg!(feature = "package")));
     if is_leading_flag(&arguments, "--man") {
         return finish(completions::print_man());
     }

@@ -14,6 +14,8 @@ path = "src/main.rs"
 [features]
 # Verso as a Flatpak: what its sandbox cannot reach is left out (ARCHITECTURE.md, "Verso as a Flatpak").
 flatpak = []
+# Verso's own rpm and deb, which tell of a newer release (ARCHITECTURE.md, "Updates on Linux").
+package = []
 
 [dependencies]
 verso-linux = { path = "../verso-linux" }

@@ -65,8 +65,10 @@ Problems in the Immich server itself belong to the Immich project:
   location also sends the words you type to Apple's maps (Linux searches through your Immich server). On the
   iPhone and the iPad, **Look Up Place Names with Apple Maps** (Account, On This iPhone; off until you switch it on)
   sends the location of each photo you open to Apple, to name the landmark or street in its title; off, places are named
-  from your Immich server alone, and photos in the Locked Folder are never looked up. Verso looks for no updates of its
-  own: `updates.check` is off and hidden in Verso, and an install by Homebrew or as a Flatpak never looks.
+  from your Immich server alone, and photos in the Locked Folder are never looked up. Verso's rpm and deb look for a
+  newer release once a day (`updates.check`, Check for Updates in Preferences, on until you switch it off): the
+  service reads `https://jakob.hviid.phd/verso/latest.json`, sending nothing but the request and Verso's name and
+  version as its User-Agent. An install by Homebrew, the tarball or the Flatpak never looks.
 - **What it changes on the server:** the gallery changes your library only when you ask it to (a favorite, a rating, an
   album, a tag, a comment or a like, a date or a place, a crop or a turn, a stack, the archive, the trash, sharing, an
   import).

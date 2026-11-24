@@ -89,7 +89,8 @@ def packages(release, version):
         url = asset_url(release, file)
         if url:
             items.append(f'<li>{link(url, f"The {kind}, {file}")}<span>For {system}: '
-                         f'<code>{html.escape(command + file)}</code></span></li>\n            ')
+                         f'<code>{html.escape(command + file)}</code>. Verso tells you when a new version is out.'
+                         '</span></li>\n            ')
     return "".join(items)
 
 

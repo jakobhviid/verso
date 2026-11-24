@@ -26,7 +26,8 @@ lab/packaging/matrix.sh v0.73.0 fedora/44 ubuntu/24.04        # one tag, chosen 
   the matrix at the same time. The exit code fails when any row fails; each row's log is in `/tmp/verso-matrix.*/`.
 - **What is checked** is decided per distribution by `install-test.sh`, which says so in its header:
   - Fedora 44 and 43 (the rpm), Ubuntu 26.04 and Debian 14 (the deb): it installs with the distribution's package
-    manager, `verso-service --version` says the package's version, every file is in its place (the 27 other looks of
+    manager, `verso-service --version` says the package's version, `updates.check` is on (only the packages' build
+    has it on), every file is in its place (the 27 other looks of
     the app icon among them), the window, the service and the Files extension find every library, `verso --probe`
     goes through the launcher into the window, the window keeps running for 10 seconds under a headless weston with a
     session bus, `doctor --json` answers, and it removes, leaving none of its files.

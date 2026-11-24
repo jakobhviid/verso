@@ -370,7 +370,7 @@ pub struct Config {
     pub upload_folders: FolderChoice,
     pub sharp_thumbnails: bool,
     pub thumbnail_safety_net: bool,
-    /// Linux packages from the download page: tell of a newer release (ARCHITECTURE.md, "Updates on Linux").
+    /// The rpm and the deb from a release page: tell of a newer release (ARCHITECTURE.md, "Updates on Linux").
     pub update_check: bool,
     /// Immich Crosslink: show in the file manager what another app links to, and offer the other apps (ROADMAP.md,
     /// "Open in Immich, and links between apps").
@@ -527,10 +527,15 @@ mod tests {
 
     #[test]
     fn verso_has_its_own_defaults_and_its_drive_is_off_until_switched_on() {
-        use crate::product::{IMMICH_MOUNT, VERSO};
+        use crate::product::{IMMICH_MOUNT, VERSO, VERSO_PACKAGE};
         let verso = Config::from_toml_for("", &VERSO).unwrap();
         assert_eq!((verso.mount_enabled, verso.mount_path.as_str(), verso.mount_name), (false, "~/Verso", "Verso"));
         assert!(!verso.update_check);
+        // Only the rpm and the deb look for a newer release: on until switched off there, off whatever is stored
+        // elsewhere.
+        assert!(Config::from_toml_for("", &VERSO_PACKAGE).unwrap().update_check);
+        assert!(!Config::from_toml_for("[updates]\ncheck = false\n", &VERSO_PACKAGE).unwrap().update_check);
+        assert!(!Config::from_toml_for("[updates]\ncheck = true\n", &VERSO).unwrap().update_check);
         let mount = Config::from_toml_for("", &IMMICH_MOUNT).unwrap();
         assert_eq!((mount.mount_enabled, mount.mount_path.as_str(), mount.mount_name), (true, "~/Immich", "Immich Mount"));
         assert!(Config::from_toml_for("[mount]\nenabled = true\n", &VERSO).unwrap().mount_enabled);

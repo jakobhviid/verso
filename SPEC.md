@@ -622,8 +622,8 @@ part in Immich Crosslink, which shows it there: from Verso Drive's menu in Files
 read, and writes preserve comments. One settings table in the Core drives validation, `verso-service configure`,
 Verso's Preferences and the Mac's Settings, where each setting has one place (ARCHITECTURE.md, "One layout for every
 settings window"). Verso's Preferences show them on these pages:
-- **General:** the app icon in the light style and in the dark style, Open in Immich and Copy Immich Link, and the top
-  bar icon's double click and colour.
+- **General:** the app icon in the light style and in the dark style, Open in Immich and Copy Immich Link, the top
+  bar icon's double click and colour, and, in the rpm and the deb, Check for Updates.
 - **Crosslink:** Immich Crosslink, Verso Gallery and Verso Drive, and the other apps (Show in other apps).
 - Under **Verso Drive:** **Status** (the drive's switch), **Drive** (its location and name, a bookmark instead of a
   drive, the cache's size, sharp thumbnails) and **Folders** (each section with its date folders, Upload, album and
@@ -666,7 +666,7 @@ reads none of them.
 | `crosslink.gallery` | bool | `true` | Take part as Verso Gallery, so other apps show items in Verso's window |
 | `crosslink.drive` | bool | `true` | Take part as Verso Drive while the drive is on, so other apps show items in Files |
 | `crosslink.hidden` | ids separated by `;` | none | The apps left out of Show in *app*, by desktop entry id (`org.example.Photos.desktop`) or bundle id; Preferences show a switch per app found instead |
-| `updates.check` | bool | `false` | Whether the service looks for a newer release (ARCHITECTURE.md, "Updates on Linux"). Off, and hidden in Preferences, until Verso has a download page of its own (ROADMAP.md, M9); never under Homebrew or in a Flatpak, which update their own |
+| `updates.check` | bool | `true` in the rpm and the deb, else `false` | Whether the service looks for a newer release on Verso's page and tells of it, once in a notification and on the top bar menu (ARCHITECTURE.md, "Updates on Linux"). "Check for Updates" in Preferences, General, in the rpm and the deb alone; elsewhere hidden and read as off, whatever is stored, and never under Homebrew or in a Flatpak, which update their own. Linux only |
 | `credential.file` | path | none | Headless only: a 0600 file holding the credential |
 
 The config file carries a format version; older files are migrated once on load.

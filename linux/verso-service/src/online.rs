@@ -516,7 +516,8 @@ fn daemon_without_drive(
             }
         }
     };
-    match daemon::serve_without_drive(server, check, runtime, without == Without::Unmounted) {
+    let updates = crate::updates::wanted(config).then(|| (crate::updates::check(), paths.state_directory.join("update-told")));
+    match daemon::serve_without_drive(server, check, updates, runtime, without == Without::Unmounted) {
         StopReason::Uninstalled => {
             if let Some(unit) = verso_linux::service::own_unit() {
                 let _ = std::process::Command::new("systemctl").args(["--user", "disable", &unit]).output();

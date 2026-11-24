@@ -1,9 +1,10 @@
-# Verso's rpm (ARCHITECTURE.md, "Packaging"): the files linux/packaging/verso-packages.sh built and laid out in Fedora
-# 44's container, in their places under /usr; nothing is compiled here.
+# Verso's rpm (ARCHITECTURE.md, "The rpm and the deb"): the files linux/packaging/verso-packages.sh built and laid out
+# in Fedora 44's container, in their places under /usr; nothing is compiled here.
 # rpmbuild -bb --define "pkg_version <version>" --define "payload <directory>" verso.spec
 %global debug_package %{nil}
-# The programs are stripped already, and their notes kept.
-%global __strip /bin/true
+# The files go in as they were laid out and stripped: none of the steps that would change them after %install (strip,
+# add-determinism rewriting the PNGs in place and leaving their folder with the time of the build, and the rest).
+%global __os_install_post %{nil}
 # Where this Fedora's Nautilus loads extensions from (nautilus-devel), as the payload has it.
 %global nautilus_extensiondir %(pkg-config --variable=extensiondir libnautilus-extension-4)
 # The Files extension is loaded by Nautilus, never linked: it provides no library to depend on.

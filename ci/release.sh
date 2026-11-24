@@ -113,9 +113,9 @@ release_text() {
   printf 'Verso Drive needs FUSE 3, and its menu in Files nautilus-python. %s\n\n' "$upgrade"
   printf '**Packages:** `%s` for Fedora 43 and newer (`sudo dnf install ./%s`), and `%s` for Ubuntu 26.04 and ' \
     "$(rpm_of "$version")" "$(rpm_of "$version")" "$(deb_of "$version")"
-  printf 'newer and Debian 14 (`sudo apt install ./%s`): Verso with Verso Drive and its menu in Files, which the ' \
+  printf 'newer and Debian 14 (`sudo apt install ./%s`): Verso with Verso Drive and its menu in Files, which your ' \
     "$(deb_of "$version")"
-  printf 'package manager installs with what they need, and refuses on an older system.\n\n'
+  printf 'package manager installs with what it needs, and refuses on an older system.\n\n'
   if [ -z "$previous" ]; then
     printf '%s\n\n' "$notes"
   elif [ -n "$notes" ]; then

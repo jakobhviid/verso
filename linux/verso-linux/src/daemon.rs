@@ -194,8 +194,8 @@ pub struct ServerInfo {
 
 /// Mount the library at `mount_point` and serve it until stopped. `account_cache` holds this account's metadata store,
 /// content cache and seeding ledger; `thumbnail_directory` is the freedesktop thumbnail cache seeds go into.
-/// `updates`, where this install learns of new releases from the download page, is the look and the file that keeps
-/// the version last told of (`crate::updates`).
+/// `updates`, where this install learns of new releases from Verso's page (the rpm and the deb), is the look and the
+/// file that keeps the version last told of (`crate::updates`).
 #[allow(clippy::too_many_arguments)]
 pub fn serve<Source>(
     source: Arc<Source>,
@@ -393,8 +393,15 @@ where
 /// Serve without a drive (Verso's, until it is switched on, `mount.enabled`, or once it was unmounted, `unmounted`,
 /// when the tray offers to mount it): the D-Bus interface, so the app finds the daemon and how the server is, and the
 /// tray, until stopped, or the program is upgraded or uninstalled. `check` asks the server how it is, as the change
-/// polling does with a drive, and whether it is out of reach because its certificate was refused.
-pub fn serve_without_drive<Check, Answer>(server: ServerInfo, check: Check, runtime: &tokio::runtime::Runtime, unmounted: bool) -> StopReason
+/// polling does with a drive, and whether it is out of reach because its certificate was refused. `updates` is the look
+/// for a newer release, as `serve` has it, so an install without the drive is told too.
+pub fn serve_without_drive<Check, Answer>(
+    server: ServerInfo,
+    check: Check,
+    updates: Option<(crate::updates::Check, PathBuf)>,
+    runtime: &tokio::runtime::Runtime,
+    unmounted: bool,
+) -> StopReason
 where
     Check: Fn() -> Answer + Send + 'static,
     Answer: std::future::Future<Output = (State, bool)> + Send,
@@ -443,7 +450,10 @@ where
             }
         }
     };
-    let tasks = [Some(runtime.spawn(follow)), Some(runtime.spawn(follow_network())), tray].into_iter().flatten().collect::<Vec<_>>();
+    let mut tasks = [Some(runtime.spawn(follow)), Some(runtime.spawn(follow_network())), tray].into_iter().flatten().collect::<Vec<_>>();
+    if let Some((check, told)) = updates {
+        tasks.push(runtime.spawn(crate::updates::follow(check, verso_core::product::VERSION, connection.clone(), told)));
+    }
     let reason = runtime.block_on(wait_for_stop(None, || true));
     log::info!("stopping ({reason:?})");
     for task in tasks {

@@ -71,7 +71,8 @@ inside() {
     esac
     export VERSO_VERSION
     target=/src/target/package-$format
-    CARGO_TARGET_DIR=$target cargo build --release --locked -p verso -p verso-service
+    # Built as the packages' Verso, which tells of a newer release (ARCHITECTURE.md, "Updates on Linux").
+    CARGO_TARGET_DIR=$target cargo build --release --locked --features package -p verso -p verso-service
 
     work=$(mktemp -d)
     # Where dpkg-shlibdeps looks for a package's files.

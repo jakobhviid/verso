@@ -39,10 +39,10 @@ sudo apt install ./verso_<version>_amd64.deb       # Ubuntu 26.04 and newer, Deb
 
 Then open **Verso** from the app grid and sign in (section 2). Verso's menu in Files comes with it; the top bar icon
 needs a tray (on GNOME, the AppIndicator extension). On an older system apt and dnf refuse the package, naming
-libadwaita. **Upgrades:** install the new release's package the same way; the service and an open window restart
-into it as under Homebrew. **Uninstalling:** `sudo dnf remove verso`, or `sudo apt remove verso`; the service
-unmounts the drive and turns itself off about two and a half minutes later, and your settings and caches stay in
-your home.
+libadwaita. **Upgrades:** Verso tells you when a new version is out (**Updates**, section 6); install its package the
+same way, and the service and an open window restart into it as under Homebrew. **Uninstalling:** `sudo dnf remove
+verso`, or `sudo apt remove verso`; the service unmounts the drive and turns itself off about two and a half minutes
+later, and your settings and caches stay in your home.
 
 **As a Flatpak** (a test build): download `verso-x86_64.flatpak` from the release, then:
 
@@ -304,15 +304,17 @@ verso-service configure unset thumbnails.sharp      # back to the default
 Verso's Preferences (Ctrl+, in Verso, or **Preferences…** in the top bar menu) edit the same settings, on the pages in
 its sidebar: **Account**, **General** (the app icon in the light style and in the dark style, each a picture, Day or
 Night paper and a lens in colour or graphite; Open in Immich and Copy Immich Link; the top bar icon's double click and
-colour), **Crosslink**, **Features** (your account's Immich preferences), then under **Verso Drive**: **Status** (the
+colour; in the rpm and the deb, Check for Updates), **Crosslink**, **Features** (your account's Immich preferences), then under **Verso Drive**: **Status** (the
 switch, Mount, Unmount and Open in Files), **Drive** (location, name, bookmark instead of drive, cache size, sharp
 thumbnails) and **Folders** (each section with its date folders, Upload, album and file names); and for a server's
 admins, **Administration**. A change to the drive's settings reaches it when you leave the page or close Preferences.
 The keys are listed in SPEC.md; `thumbnails.safety_net` is set here only. On the Mac, Settings has a Verso Drive pane
 with the drive's switch, its sections and its names.
 
-**Updates.** Homebrew updates Verso with `brew upgrade verso`, and Flatpak updates the Flatpak. Verso does not look for
-new versions itself.
+**Updates.** Homebrew updates Verso with `brew upgrade verso`, and Flatpak updates the Flatpak. Verso's rpm and deb,
+which nothing else updates, look for a new version once a day and tell you in a notification and on the top bar menu
+(**Get Verso *version*…**, which opens Verso's page); **Check for Updates** in Preferences, General, switches that
+off (`updates.check`). The other installs do not look.
 
 **Language.** Verso Drive's settings pages, the top bar icon's menu, the notifications and Verso's menu in Files
 follow the desktop's language (`LANGUAGE`, then `LC_ALL`, `LC_MESSAGES` and `LANG`, as every gettext program does),

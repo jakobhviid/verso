@@ -1,8 +1,8 @@
-//! Which Verso the shared code runs as: the packages' and the tarball's, or the Flatpak's, whose sandbox leaves the
-//! drive out (ARCHITECTURE.md, "What Verso is"). Every name the service and the window share comes from here: the folders,
+//! Which Verso the shared code runs as: the tarball's, the rpm's and the deb's, which also tell of a newer release, or
+//! the Flatpak's, whose sandbox leaves the drive out (ARCHITECTURE.md, "What Verso is"). Every name the service and the window share comes from here: the folders,
 //! the keyring's items, the service's D-Bus name, user service and program, the tray, and Verso's own defaults.
 //!
-//! A program says which it is once, first thing in `main` ([`set`]); unset, it is the packages' Verso. Immich Mount,
+//! A program says which it is once, first thing in `main` ([`set`]); unset, it is the tarball's Verso. Immich Mount,
 //! whose account Verso takes over, is described here too ([`IMMICH_MOUNT`]), so Verso can read its settings and
 //! sign-in and never touch them; nothing runs as it.
 
@@ -43,8 +43,8 @@ pub struct Product {
     pub drive_names: &'static [&'static str],
     /// Defaults that differ from the settings table's, which are Verso's, by key.
     pub defaults: &'static [(&'static str, &'static str)],
-    /// Settings its windows leave out: Verso's service starts at login while signed in, whether its drive is on or
-    /// not, and Verso is updated by Homebrew.
+    /// Settings its windows leave out, and read as the product's own defaults: Verso's service starts at login while
+    /// signed in, whether its drive is on or not, and only the rpm and the deb look for a newer release.
     pub hidden_settings: &'static [&'static str],
     /// Built for a Flatpak's sandbox (`VERSO_FLATPAK`): no drive, no systemd service, no announcements written at run
     /// time, no other app's account to take over (ARCHITECTURE.md, "Verso as a Flatpak").
@@ -79,6 +79,16 @@ pub const VERSO: Product = Product {
     sandboxed: false,
 };
 
+/// Verso from its own rpm or deb (`--features package` on both programs; ARCHITECTURE.md, "Updates on Linux"): the same
+/// app, names and folders, which tells of a newer release, as nothing else updates a package downloaded from a release
+/// page. The look is on until switched off in Preferences (`updates.check`). Homebrew's tarball and the Flatpak are
+/// updated by their own channels, and keep it off and hidden.
+pub const VERSO_PACKAGE: Product = Product {
+    defaults: &[("updates.check", "true")],
+    hidden_settings: &["mount.at_login"],
+    ..VERSO
+};
+
 /// Verso's window, which the tray opens and the service's `app` command runs.
 pub const WINDOW: &str = "verso";
 
@@ -93,12 +103,24 @@ pub const VERSO_FLATPAK: Product = Product {
 
 static CURRENT: OnceLock<&'static Product> = OnceLock::new();
 
+/// The product a build of the programs is, by its features: `flatpak` (the Flatpak), `package` (the rpm and the deb),
+/// else the tarball's Verso. Both programs ask this, so they agree.
+pub fn built_for(flatpak: bool, package: bool) -> &'static Product {
+    if flatpak {
+        &VERSO_FLATPAK
+    } else if package {
+        &VERSO_PACKAGE
+    } else {
+        &VERSO
+    }
+}
+
 /// Say which product this program is. Only the first call counts.
 pub fn set(product: &'static Product) {
     let _ = CURRENT.set(product);
 }
 
-/// The product this program is: the packages' Verso unless [`set`] said otherwise.
+/// The product this program is: the tarball's Verso unless [`set`] said otherwise.
 pub fn current() -> &'static Product {
     CURRENT.get().copied().unwrap_or(&VERSO)
 }
@@ -152,5 +174,14 @@ mod tests {
         assert_eq!(IMMICH_MOUNT.default_for("mount.enabled"), Some("true"));
         assert_eq!((VERSO_FLATPAK.folder, VERSO_FLATPAK.bus_name()), (VERSO.folder, VERSO.bus_name()));
         assert!(VERSO_FLATPAK.sandboxed && !VERSO_FLATPAK.shows("mount.enabled") && VERSO.shows("mount.enabled"));
+    }
+
+    #[test]
+    fn only_the_packages_look_for_a_newer_release() {
+        assert_eq!((built_for(true, false), built_for(false, true), built_for(false, false)), (&VERSO_FLATPAK, &VERSO_PACKAGE, &VERSO));
+        assert_eq!((VERSO_PACKAGE.folder, VERSO_PACKAGE.bus_name(), VERSO_PACKAGE.sandboxed), (VERSO.folder, VERSO.bus_name(), false));
+        assert!(VERSO_PACKAGE.shows("updates.check") && !VERSO_PACKAGE.shows("mount.at_login"));
+        assert_eq!(VERSO_PACKAGE.default_for("updates.check"), Some("true"));
+        assert!(!VERSO.shows("updates.check") && !VERSO_FLATPAK.shows("updates.check"));
     }
 }

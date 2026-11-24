@@ -337,9 +337,8 @@ yet, beside step 6's list:
   desktop VMs, and the Mac build).
 - The workflow running the same steps on a pushed tag once Actions is switched on and holds the signing secrets; the
   scripts are what it calls, so the two never differ.
-- The look for a newer release (`updates.check`, off and hidden in Verso; `linux/verso-service/src/updates.rs`) reads
-  Immich Mount's page. With Verso's page (step 7) it reads Verso's `latest.json`, and is on for the rpm and deb
-  packages, which nothing else updates.
+- Verso's page served (step 7): the rpm's and the deb's look for a newer release reads its `latest.json`
+  (ARCHITECTURE.md, "Updates on Linux"), and tells of nothing until the page answers.
 
 ## M10. Verso on iOS
 
@@ -696,7 +695,8 @@ the daemon's own look can stop for them.
 1. **COPR for Fedora** (and Fedora's atomic desktops through `rpm-ostree`), built from the release's rpms or its
    sources. Needs the maintainer's Fedora account and a COPR project.
 2. **An apt repository for Ubuntu,** signed, served beside the download page.
-3. **Then:** packages from a repository carry a marker the daemon reads, and do not look for releases themselves.
+3. **Then:** packages from a repository are built without the `package` feature, so they do not look for releases
+   themselves (ARCHITECTURE.md, "Updates on Linux").
 
 ## Watch upstream
 

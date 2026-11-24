@@ -106,8 +106,9 @@ sudo dnf install ./verso-<version>.x86_64.rpm
 sudo apt install ./verso_<version>_amd64.deb
 ```
 
-Open **Verso** from the app grid and sign in. Upgrade by installing the next release's package the same way; remove
-it with `sudo dnf remove verso` or `sudo apt remove verso`.
+Open **Verso** from the app grid and sign in. Verso tells you when a new version is out (you can switch that off in
+Preferences); upgrade by installing its package the same way, and remove it with `sudo dnf remove verso` or `sudo apt
+remove verso`.
 
 ### As a Flatpak (test build)
 

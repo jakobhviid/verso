@@ -4,9 +4,10 @@
 # package must be refused, and its launcher, unpacked, must say why. The last line is the verdict; the exit code is the
 # result.
 #
-#   Checked where it installs: `verso-service --version` says the package's version; every file is in its place; the
-#   window and the service find every library, and the launcher hands on to the window (`verso --probe`); the window
-#   starts and keeps running under a headless Wayland compositor; `doctor --json` answers; it removes cleanly.
+#   Checked where it installs: `verso-service --version` says the package's version, and `updates.check` is on, as only
+#   the packages have it; every file is in its place; the window and the service find every library, and the launcher
+#   hands on to the window (`verso --probe`); the window starts and keeps running under a headless Wayland compositor;
+#   `doctor --json` answers; it removes cleanly.
 #   With /root/server.env (IMMICH_URL and IMMICH_KEY, a read-only API key), it also signs in, switches Verso Drive on,
 #   mounts it as root, and checks originals read through it against Immich's own checksums.
 set -u
@@ -66,6 +67,8 @@ install_package || fail "install: $(tail -3 /tmp/install.log | tr '\n' ' ')"
 installed || fail "installed, but the package database does not list it"
 version=$(verso-service --version | awk '{print $2}')
 [ "$version" = "$expected" ] || fail "--version says $version, the package $expected"
+# Built as the packages' Verso, which tells of a newer release (ARCHITECTURE.md, "Updates on Linux").
+[ "$(verso-service configure get updates.check 2>/dev/null)" = true ] || fail "updates.check is not on"
 
 # Every file in its place.
 for file in /usr/bin/verso /usr/bin/verso-service /usr/libexec/verso; do
@@ -147,4 +150,4 @@ for file in /usr/bin/verso /usr/bin/verso-service /usr/libexec/verso /usr/share/
   /usr/share/applications/dev.hviid.Verso.desktop "$extension"; do
   [ ! -e "$file" ] || fail "$file left after removal"
 done
-echo "ok: $version installed, window started, doctor answered${mounted}, removed"
+echo "ok: $version installed, updates.check on, window started, doctor answered${mounted}, removed"

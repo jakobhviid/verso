@@ -1003,6 +1003,7 @@ sees.
 - **Its names come from one place** (`verso_core::product`), first thing in each program: its folders, keyring items,
   D-Bus name, user service, program, tray, notifications, translation domain and the drive's defaults (SPEC.md,
   "Files on disk" and "The daemon's D-Bus interface"). The switch knows Verso, Verso as a Flatpak (`VERSO_FLATPAK`),
+  Verso from its rpm or deb (`VERSO_PACKAGE`, the same names, which tells of a newer release: "Updates on Linux"),
   and Immich Mount (`IMMICH_MOUNT`), described only so Verso can read its settings and keyring to take its account
   over ("Taking Immich Mount's account over"); nothing runs as it. No name is shared, so Immich Mount and Verso can be
   installed at once, both drives on; only the volume monitor's private fstab is one per session, so then one drive
@@ -1736,19 +1737,26 @@ a Flatpak").
 
 ### Updates on Linux
 
-A package downloaded from a release page is never updated: no repository stands behind it. **The service can tell of a
-new release** (`updates.check`): while it serves the drive, five minutes after it starts and then every 24 hours, it
-reads a `latest.json` (the release's version and the page's address) and tells of a version once, in a notification
-(the version told of is kept in `~/.local/state/verso/update-told`), and on the tray's menu ("Get Verso *version*…",
-which opens the page) for as long as it runs. It sends nothing but the request and its User-Agent.
-- **Off and hidden in Verso** (default `false`, left out by `Product::hidden_settings`): Verso has no download page of
-  its own yet, and the look reads Immich Mount's (`linux/verso-service/src/updates.rs`). Once Verso has one, the look
-  reads Verso's `latest.json` and is on for the rpm and deb packages, which nothing else updates (ROADMAP, M9).
-- **Who looks:** not Homebrew's installs (in its Cellar or a cask's folder, which `brew upgrade` keeps current), not a
-  Flatpak (its remote updates it), not a development build (version 0.0.0), and not with `updates.check` off.
+An rpm or a deb downloaded from a release page is never updated: no repository stands behind it. **The service tells
+of a new release** (`updates.check`): while it runs, with the drive or without it, five minutes after it starts and
+then every 24 hours, it reads Verso's page's `latest.json` (`https://jakob.hviid.phd/verso/latest.json`, the latest
+release's version and the page's address, which `site/build.py` writes) and tells of a newer version once, in a
+notification (the version told of is kept in `~/.local/state/verso/update-told`), and on the tray's menu ("Get Verso
+*version*…", which opens the page) for as long as it runs. It sends nothing but the request and its User-Agent.
+- **On for the rpm and the deb alone:** they are built with the `package` feature (`linux/packaging/verso-packages.sh`),
+  which makes the product `VERSO_PACKAGE`: Verso's, with `updates.check` on by default and shown in Preferences
+  (General, Updates), so it can be switched off. Every other build is `VERSO` or `VERSO_FLATPAK`, which hide the
+  setting and read it as off, whatever `config.toml` says (`Product::hidden_settings`).
+- **Who looks, besides:** never Homebrew's installs (in its Cellar or a cask's folder, which `brew upgrade` keeps
+  current) nor a Flatpak (its remote updates it), whatever the setting, and not a development build (version 0.0.0),
+  which has no release to compare (`linux/verso-service/src/updates.rs`, `verso_linux::updates`). A pre-release is
+  never told of: the page names the latest release.
+- **Not chosen: deciding at run time** by where the program is (`/usr/bin`): a build of one's own installed there would
+  look, and packages from a repository, which update themselves, would too. The build says what it is, once, as the
+  Flatpak's does; a repository's packages are built without the feature (ROADMAP.md, "Package repositories").
 - **Never replaced in place:** the packages own `/usr`, and files changed under dpkg or rpm break their package
   database. The user updates the way they installed.
-- **Flatpak impact:** none; a Flatpak does not look.
+- **Flatpak impact:** none; a Flatpak does not look, and its build has no `package` feature.
 - **Not chosen:** GitHub's releases API (rate-limited without a token, and a second host to name in SECURITY.md); a
   check in the window (it runs only when opened).
 
@@ -1968,22 +1976,26 @@ the license with the third-party licenses.
   package may write Nautilus's own folder of extensions, so Files loads it with no nautilus-python, which neither
   Fedora nor Ubuntu installs, and no Python in Files' process. It is built in each package's container against that
   distribution's Nautilus, and finds the catalogs in `/usr/share/locale`.
-- **Made the same from the same tree:** every file's time and the rpm's build time are the commit's
-  (`SOURCE_DATE_EPOCH`), the tree is built at one path in the container, and the rpm names no build host, so the same
-  tree, image and toolchain make the same package. A pre-release's version takes a tilde (`1.0.0~beta.1`), which rpm
-  and dpkg sort before the release; its files keep the tag's (`verso-1.0.0-beta.1.x86_64.rpm`).
+- **The same package from the same programs:** every file's time and the rpm's build time are the commit's
+  (`SOURCE_DATE_EPOCH`), the tree is built at one path in the container, the rpm names no build host, and rpm changes
+  nothing it is given after `%install` (Fedora's add-determinism would rewrite the PNGs and leave their folder with
+  the build's time), so packaging the same programs again makes the same package, byte for byte.
+- **A pre-release's version** takes a tilde (`1.0.0~beta.1`), which rpm and dpkg sort before the release; its files
+  keep the tag's (`verso-1.0.0-beta.1.x86_64.rpm`).
 - **No maintainer scripts:** the distributions' own triggers refresh the icon cache, the desktop database and the
   MIME cache, and an upgrade or an uninstall reaches the running programs through their watch of their own files
   ("The daemon's lifecycle", step 6).
+- **Built with the `package` feature,** so the service tells of a newer release, which nothing else would bring
+  ("Updates on Linux").
 - **Checked by the packaging matrix** (`lab/packaging/`, the `lab-packaging-matrix` skill): on Fedora 44 and 43,
-  Ubuntu 26.04 and Debian 14 each installs, says its version, finds its libraries, starts its window and mounts the
-  lab server's library with originals matching Immich's checksums, then removes cleanly; on Ubuntu 24.04 apt refuses
-  the deb, and its launcher says why.
+  Ubuntu 26.04 and Debian 14 each installs, says its version, has `updates.check` on, finds its libraries, starts its
+  window and mounts the lab server's library with originals matching Immich's checksums, then removes cleanly; on
+  Ubuntu 24.04 apt refuses the deb, and its launcher says why.
 - **Not chosen: a package for each release of each distribution** (`%{?dist}`, a deb per Ubuntu): one file per format
   is what a release page offers plainly, and the matrix checks it on each system it is for. Repositories, which would
   build per release, are in ROADMAP.md, "Package repositories".
-- **Flatpak impact:** none. The packages are another channel beside it, from the same programs built without the
-  `flatpak` feature.
+- **Flatpak impact:** none. The packages are another channel beside it, from the same programs built with the
+  `package` feature in place of the `flatpak` one.
 
 #### Verso as a Flatpak
 
