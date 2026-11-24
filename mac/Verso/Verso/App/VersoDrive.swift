@@ -139,6 +139,29 @@ final class VersoDrive {
     }
 
     #if os(macOS)
+    /// Show in Verso Drive: what `link` names selected in Finder, where the drive has it, asked twice as Immich Mount
+    /// does (the system may answer "database is locked" while it reads the location again); the location itself
+    /// when the drive has no place for it.
+    func show(_ link: String) async {
+        guard let manager = NSFileProviderManager(for: domain), let identifier = await DriveCore.item(showing: link) else {
+            await showInFinder()
+            return
+        }
+        let item = NSFileProviderItemIdentifier(identifier)
+        var url = try? await manager.getUserVisibleURL(for: item)
+        if url == nil {
+            try? await Task.sleep(for: .seconds(2))
+            url = try? await manager.getUserVisibleURL(for: item)
+        }
+        guard let url else {
+            await showInFinder()
+            return
+        }
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        NSWorkspace.shared.activateFileViewerSelecting([url])
+    }
+
     func showInFinder() async {
         do {
             guard let manager = NSFileProviderManager(for: domain) else { return }

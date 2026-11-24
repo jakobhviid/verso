@@ -146,32 +146,53 @@ final class CrosslinkDirectory {
     }
 }
 
-/// Open in Immich and Copy Immich Link, and Show in <app> for each app found that shows this kind of item.
+/// The right-click's Show In submenu: Verso Drive (while it is on), the widget (for photos), Immich's web app, and each
+/// other app found that shows this kind of item; Copy Immich Link beside it, as it shows nothing. A selection of
+/// several photos has no single item: its submenu has the widget alone.
 struct CrosslinkMenuItems: View {
     @Environment(LibrarySession.self) private var session
     @AppStorage(CrosslinkSettings.enabledKey) private var enabled = true
     @AppStorage(CrosslinkSettings.webLinksKey) private var webLinks = true
     @AppStorage(CrosslinkSettings.hiddenKey) private var hidden = ""
-    let item: Crosslink.Item
+    let item: Crosslink.Item?
+    /// The photos the widget item adds or takes out; nil where the widget has no place (albums, people, places).
+    var widgetIDs: [String]? = nil
 
     var body: some View {
         let server = session.client.serverURL.absoluteString
-        if webLinks {
-            Button("Open in Immich") {
-                if let url = URL(string: Crosslink.webAddress(item, server: server)) { NSWorkspace.shared.open(url) }
+        Menu("Show In") {
+            if let item, VersoDrive.shared.isOn {
+                Button("Verso Drive") {
+                    let link = Crosslink.link(item, server: server, user: session.user?.id)
+                    Task { await VersoDrive.shared.show(link) }
+                }
             }
+            if let widgetIDs, !widgetIDs.isEmpty {
+                let updater = WidgetFeedUpdater.shared
+                Toggle("Widget", isOn: Binding(get: { updater.isChosen(widgetIDs) },
+                                               set: { updater.setChosen(widgetIDs, $0) }))
+            }
+            if let item {
+                if webLinks {
+                    Button("Immich") {
+                        if let url = URL(string: Crosslink.webAddress(item, server: server)) { NSWorkspace.shared.open(url) }
+                    }
+                }
+                if enabled {
+                    ForEach(CrosslinkDirectory.shared.offered(for: item.kind, hidden: hidden)) { app in
+                        Button {
+                            app.send(Crosslink.link(item, server: server, user: session.user?.id))
+                        } label: {
+                            Label { Text(app.name) } icon: { Image(nsImage: app.icon) }
+                        }
+                    }
+                }
+            }
+        }
+        if let item, webLinks {
             Button("Copy Immich Link") {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(Crosslink.webAddress(item, server: server), forType: .string)
-            }
-        }
-        if enabled {
-            ForEach(CrosslinkDirectory.shared.offered(for: item.kind, hidden: hidden)) { app in
-                Button {
-                    app.send(Crosslink.link(item, server: server, user: session.user?.id))
-                } label: {
-                    Label { Text("Show in \(app.name)") } icon: { Image(nsImage: app.icon) }
-                }
             }
         }
     }

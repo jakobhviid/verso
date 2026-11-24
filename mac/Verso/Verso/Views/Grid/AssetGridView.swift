@@ -1129,7 +1129,6 @@ struct ThumbnailCell: View {
 /// Shared by the grid and the opened photo; callers choose the target IDs.
 struct AssetActionsMenu: View {
     @Environment(LibrarySession.self) private var session
-    @AppStorage("showInspector") private var showInspector = false
     let model: AssetGridModel
     let asset: AssetItem
     let ids: [String]
@@ -1137,14 +1136,11 @@ struct AssetActionsMenu: View {
     let onTags: ([String], Bool) -> Void
 
     var body: some View {
-        Button("Info") {
-            model.selection = [asset.id]
-            showInspector = true
-        }
         if model.source != .locked {
             ViewerContextMenu(model: model, asset: asset)
-            if model.source != .trash { WidgetChosenMenuItem(ids: ids) } // Widget
-            if model.source != .trash, ids.count <= 1 { CrosslinkMenuItems(item: .asset(asset.id, model.source.crosslinkContext)) } // Crosslink
+            if model.source != .trash { // Crosslink and the widget, in Show In
+                CrosslinkMenuItems(item: ids.count <= 1 ? .asset(asset.id, model.source.crosslinkContext) : nil, widgetIDs: ids)
+            }
         }
         Divider()
         if model.source == .locked {

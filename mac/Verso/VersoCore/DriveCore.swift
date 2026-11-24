@@ -21,6 +21,15 @@ public enum DriveCore {
     /// The drive's settings with their values, for its Settings pane.
     public static func panes() throws -> SettingsPanes { try settingsPanes(config: AppGroup.configText) }
 
+    /// The drive's item that shows what a crosslink names (a photo, an album, a person, a place), as a received link
+    /// is followed; nil when the drive keeps no account or has no place for it.
+    public static func item(showing link: String) async -> String? {
+        guard let account = Account.load() else { return nil }
+        let outcome = await showLink(server: account.server, credential: account.credential,
+                                     certificate: account.certificate, config: AppGroup.configText, link: link)
+        return outcome.result == "show" ? outcome.identifier : nil
+    }
+
     /// The server the drive keeps an account for; nil when it keeps none.
     public static var server: String? { Account.load()?.server }
 

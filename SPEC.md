@@ -478,6 +478,10 @@ in Files, selected.
 
 Beside Open in Immich and Copy Immich Link, **Show in _app_** sends the item's crosslink to another app that takes
 part in Immich Crosslink, which shows it there: from Verso Drive's menu in Files, and from Verso's window.
+- **On the Mac,** a right-click in Verso's window gathers them in a **Show In** submenu: **Verso Drive** (while it is
+  on: the item selected in Finder, in the drive's location, through the drive's own lookup of the link), **Widget**
+  for photos (checked while they are in the widget's Chosen Photos), **Immich** (the web app) and each other app
+  found; Copy Immich Link stays beside the submenu.
 - **Which apps:** those whose desktop entry takes the scheme and announces draft 0.2 (`X-Immich-Crosslink-Version`)
   and the item's kind (`X-Immich-Crosslink-Shows`), less the participant asking (Files' menu leaves out Verso Drive,
   the window Verso Gallery, so each offers the other) and the ones switched off in the settings (`crosslink.hidden`).
