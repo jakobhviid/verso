@@ -100,7 +100,8 @@ on any step shows what it would do and changes nothing outside the checkout:
 1. `ci/release.sh` suggests the next version and prints its notes.
 2. `ci/release.sh tag [VERSION]` tags a clean HEAD that is on `origin/main`, signed, and pushes the tag.
 3. `ci/release.sh build TAG` builds Linux's files from the tag in a worktree of its own (the tarball in the toolbox,
-   the Flatpak's source, and the Flatpak where `flatpak-builder` is) into `target/dist/TAG`, and makes a draft release
+   the rpm and the deb each in a container of its distribution, with podman, the Flatpak's source, and the Flatpak
+   where `flatpak-builder` is) into `target/dist/TAG`, and makes a draft release
    of them, "Verso 0.72.0 (Linux)", here and in the public `jakobhviid/verso-releases`, which Homebrew's `verso` cask
    downloads from until Verso goes public (ROADMAP.md, M8, "Going public"). The release workflow
    (`.github/workflows/release.yml`) runs this step on a pushed tag, once GitHub Actions is on in this repository.
@@ -195,6 +196,8 @@ Build on Fedora 44, or in a Fedora 44 toolbox (the easy way on an immutable host
     cargo clippy --workspace --all-targets -- -D warnings && cargo test --workspace'
   ```
 
+- **The rpm and the deb** are built on the host, not in the toolbox, with podman (or docker): each in a fresh container
+  of its distribution (`linux/packaging/verso-packages.sh`; ARCHITECTURE.md, "The rpm and the deb").
 - **The portability check** (`--target aarch64-apple-darwin`) runs in CI; Fedora's Rust has no `rustup` to add
   targets. It runs with `--no-default-features`, which leaves out TLS: ring's C code does not cross-compile for
   macOS on Linux.
@@ -254,11 +257,12 @@ The procedures are skills in `.claude/skills/`; agents that do not load skills r
 | `lab/immich-server/` | A disposable Immich server (Docker CE in a nested Debian 13 container, no machine learning), seeded with 50 Creative Commons photos and edge cases, a full-access and a read-only API key, and optionally Dex for OIDC sign-in | `lab-immich-server` |
 | `lab/gnome-vm/` | A Fedora 44 VM with a headless GNOME 50 session and Files, that you can drive, screenshot and trace | `lab-desktop-vm` |
 | `lab/bazzite-vm/` | A stock Bazzite VM, GNOME or KDE edition, booted from a kept base disk built from the published bootc images: Bazzite's own Homebrew, `/home` a link to `/var/home`, SELinux enforcing, and a headless session and input helpers as in the GNOME VM | `lab-bazzite-vm` |
+| `lab/packaging/` | The packaging matrix: Verso's rpm and deb, built here or from a release, installed on Fedora 44 and 43, Ubuntu 26.04 and Debian 14 in throwaway containers at once, checked (the version, the files, the libraries, the window starting, Verso Drive mounted against a lab server's checksums) and removed, and refused on Ubuntu 24.04, where the launcher says why | `lab-packaging-matrix` |
 
-Verso has no scripted release check and no packaging matrix yet: they come with its .rpm and .deb packages (ROADMAP.md,
-M9, step 6), built after Immich Mount's (`lab/check/`, `lab/packaging/` and `lab/mac/check.sh` in its own repository,
-`../immich-mount`). Until then a Verso change is checked by hand, in the VMs of the `lab-desktop-vm` and
-`lab-bazzite-vm` skills and on the Mac (`mac-dev`).
+Verso's packages have the packaging matrix; Verso has no scripted release check yet (ROADMAP.md, M9, step 6), to be
+built after Immich Mount's (`lab/check/` and `lab/mac/check.sh` in its own repository, `../immich-mount`). Until then
+a Verso change is checked by hand, in the VMs of the `lab-desktop-vm` and `lab-bazzite-vm` skills and on the Mac
+(`mac-dev`).
 
 Rules:
 - **Lab instances are disposable, and stay warm for a working session.** A VM or server may stay up between checks

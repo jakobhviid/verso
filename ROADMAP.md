@@ -109,8 +109,9 @@ the import panel, Change Password and the profile picture.
 4. **Partners' photos** show in the Library (`withPartners` on the gallery's own scope, so the drive's stays as it
    is); a partner's photo there is theirs, and changing it is refused by Immich, not yet kept from the menus.
 5. **Translations** of the gallery's texts, once they settle (`po/i18n.py`; the crates are not in its sources yet).
-6. **Packages:** Verso's tarball and cask are there (`linux/packaging/verso-tarball.sh`), and the Flatpak's manifest
-   (`linux/packaging/flatpak/`), built by hand in the GNOME VM; Fedora and Ubuntu packages and AppStream data are not.
+6. **Packages:** Verso's tarball and cask are there (`linux/packaging/verso-tarball.sh`), the rpm and the deb
+   (`linux/packaging/verso-packages.sh`, M9, step 6), and the Flatpak's manifest (`linux/packaging/flatpak/`), built by
+   hand in the GNOME VM; AppStream data is not.
 7. **On macOS, then iOS,** named Verso there too, on the same crates and the one version line (ARCHITECTURE,
    "Verso's releases"). The Mac edition comes first, from the maintainer's fork of Immich Gallery ("Verso on the
    Mac", below).
@@ -119,9 +120,9 @@ the import panel, Change Password and the profile picture.
    - a map whose tiles allow the traffic: done, Linux's maps draw the Immich server's own map setting (ARCHITECTURE,
      "Verso's window", the map)
    - every release built by the release workflow (`.github/workflows/release.yml`), as Immich Mount's are, in place
-     of the builds on the workstation: Actions is switched off in this repository. It builds the tarball and the
-     Flatpak; the packages on Linux and the Mac's disk image, signed and notarized on GitHub's Mac runner, join it
-     (M9, step 6)
+     of the builds on the workstation: Actions is switched off in this repository. It builds the tarball, the rpm,
+     the deb and the Flatpak; the Mac's disk image, signed and notarized on GitHub's Mac runner, joins it (M9, step
+     6)
    - `jakobhviid/verso-releases` retired: the releases come from `jakobhviid/verso`, so the cask's `url` and
      `homepage`, Preferences' "Installing Verso with Homebrew" link (`preferences.rs`) and the requirements' address
      the tarball's launcher gives (`linux/packaging/verso-launcher.sh`), point there
@@ -264,8 +265,7 @@ linux/
   verso-linux/      FUSE, the keyring, D-Bus, thumbnails, the tray: what the service and the window share on Linux
   verso-service/    the drive's daemon, the tray and the command line
   files-extension/  the Files extension (Nautilus)
-  packaging/        the Flatpak, the tarball, the desktop entry, the service unit, the icons; rpm and deb come with
-                    step 6
+  packaging/        the Flatpak, the tarball, the rpm and the deb, the desktop entry, the service unit, the icons
 mac/                Verso/ (the Xcode project: the app, the widget, the checks), FileProvider/ (Verso Drive's
                     extension), Shared/, build-rust.sh (the bridge for Xcode)
 ios/                the iPhone and iPad app (M10)
@@ -294,12 +294,13 @@ Immich Crosslink, the protocol between apps, and the takeover of Immich Mount's 
    that may come, which takes the drive's Plasma integration from Immich Mount's repository ("Parked on purpose").
 6. Releases cut by a tag, Linux and the Mac together (below). Built: `ci/release.sh` with every step and `--dry-run`,
    `ci/version.sh`, the Mac's and iOS's build number as the build's UTC time, and `.github/workflows/release.yml`
-   building Linux's files (written, not yet run: Actions is off) (AGENTS.md, "Versioning"). Left: the rpm and deb
-   packages; `mac/release.sh` and `ios/release.sh`; the Flatpak on the workstation, which has no flatpak (the GNOME VM
-   builds it from the source archive `build` leaves in `target/dist/`, and it is attached to the drafts by hand);
-   Verso's release check and packaging matrix, for the check of a draft, built after Immich Mount's (`lab/check/`,
-   `lab/packaging/` and `lab/mac/check.sh` in its repository); publishing's rebuild of the page (step 7);
-   and the first release cut with it.
+   building Linux's files (written, not yet run: Actions is off) (AGENTS.md, "Versioning"), and the rpm and the deb,
+   which `build` makes beside the tarball, each in a container of its distribution (ARCHITECTURE.md, "The rpm and the
+   deb"), with the packaging matrix that checks them (`lab/packaging/`). Left: `mac/release.sh` and `ios/release.sh`;
+   the Flatpak on the workstation, which has no flatpak (the GNOME VM builds it from the source archive `build` leaves
+   in `target/dist/`, and it is attached to the drafts by hand); Verso's release check, for the check of a draft,
+   built after Immich Mount's (`lab/check/` and `lab/mac/check.sh` in its repository); publishing's rebuild of the
+   page (step 7); and the first release cut with it.
 7. Verso's page at `jakob.hviid.phd/verso`, presented at the top of `jakob.hviid.phd/software`, with a design of its
    own rather than a list: Verso on each platform in pictures from the lab's showcase server, a download for each
    (the Flatpak, the tarball, Homebrew, the Mac's disk image, the App Store), what Verso Drive is, the non-affiliation
@@ -329,8 +330,6 @@ Immich Crosslink, the protocol between apps, and the takeover of Immich Mount's 
 
 **Releases are cut by a tag** (AGENTS.md, "Versioning", has how; ARCHITECTURE, "Verso's releases", why). Not built
 yet, beside step 6's list:
-- `ci/release.sh build` making the rpm and deb packages, beside the tarball and the Flatpak, checked in a packaging
-  matrix of containers still to be built (step 6).
 - Until Actions is on, the Mac's disk image built on the Mac (`mac/release.sh` in the maintainer's session, notarized
   with the API key file) and attached to the draft, and the iPhone app sent to TestFlight from the Mac
   (`ios/release.sh`, with an App Store Connect API key).
@@ -642,9 +641,9 @@ Every idea below is a possible choice, none chosen yet:
 ## Next, in order
 
 Agreed with the maintainer; each item's detail is where it points.
-1. Releases cut by a tag (M9, step 6): built for Linux's tarball and Flatpak; left, Linux's rpm and deb packages, and
-   the Apple builds (the maintainer's, with the Developer ID and TestFlight). Verso goes public with the Mac and Linux
-   before the App Store.
+1. Releases cut by a tag (M9, step 6): built for Linux's tarball, rpm, deb and Flatpak; left, the Apple builds (the
+   maintainer's, with the Developer ID and TestFlight). Verso goes public with the Mac and Linux before the App
+   Store.
 2. The Swift twins into the Rust core (M9, step 8), an area at a time.
 3. iPad on a real iPad, before the first release (M10, step 5).
 4. Verso's page, with its design (M9, step 7).
@@ -691,18 +690,13 @@ platform. SPEC.md, "Links to Immich", has the map; the protocol's test links
 
 ## Package repositories
 
-The real fix for updates on Linux (ARCHITECTURE.md, "Updates on Linux"): with a repository behind the packages, GNOME
-Software and Discover offer each release like any other update, and the daemon's own look can stop for them.
+The real fix for updates on Linux (ARCHITECTURE.md, "Updates on Linux"): with a repository behind the rpm and the deb
+(ARCHITECTURE.md, "The rpm and the deb"), GNOME Software and Discover offer each release like any other update, and
+the daemon's own look can stop for them.
 1. **COPR for Fedora** (and Fedora's atomic desktops through `rpm-ostree`), built from the release's rpms or its
    sources. Needs the maintainer's Fedora account and a COPR project.
 2. **An apt repository for Ubuntu,** signed, served beside the download page.
 3. **Then:** packages from a repository carry a marker the daemon reads, and do not look for releases themselves.
-4. **One package on every distribution,** as the tarball is: the window and the service together, one install and
-   one version (ARCHITECTURE.md, "One package, two programs"), with the C Files extension built against that
-   distribution's Nautilus, the launcher, the service unit, the icons, the translations and the license notices
-   (ARCHITECTURE.md, "Packaging"). The system's GTK 4 (4.18 at least), libadwaita (1.8 at least), libshumate and
-   fuse3 are real dependencies. Compatibility comes before size: it must install and run the same on every
-   distribution and version, never relying on what a desktop happens to ship.
 
 ## Watch upstream
 

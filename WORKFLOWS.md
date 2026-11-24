@@ -28,6 +28,22 @@ An open Verso window closes and the new version opens on the page it showed, onc
 **Uninstalling:** `brew uninstall verso`, with `--zap` to remove the settings and caches too. About two and a half
 minutes after the program is gone, the service unmounts the drive and turns itself off, and an open window closes.
 
+**From an rpm or a deb** (from the next release; not on an atomic system such as Silverblue or Bazzite, where
+Homebrew is the way): download the one for your system from the release and install it with your package manager,
+which brings GTK, libadwaita, libshumate and FUSE 3 with it:
+
+```sh
+sudo dnf install ./verso-<version>.x86_64.rpm      # Fedora 43 and newer
+sudo apt install ./verso_<version>_amd64.deb       # Ubuntu 26.04 and newer, Debian 14
+```
+
+Then open **Verso** from the app grid and sign in (section 2). Verso's menu in Files comes with it; the top bar icon
+needs a tray (on GNOME, the AppIndicator extension). On an older system apt and dnf refuse the package, naming
+libadwaita. **Upgrades:** install the new release's package the same way; the service and an open window restart
+into it as under Homebrew. **Uninstalling:** `sudo dnf remove verso`, or `sudo apt remove verso`; the service
+unmounts the drive and turns itself off about two and a half minutes later, and your settings and caches stay in
+your home.
+
 **As a Flatpak** (a test build): download `verso-x86_64.flatpak` from the release, then:
 
 ```sh
@@ -59,10 +75,11 @@ update-desktop-database ~/.local/share/applications
 
 `linux/packaging/verso-tarball.sh out` builds what the release tarball holds into `out/verso`: both programs (the
 window as `libexec/verso`, behind `verso`, a script that checks the system's libraries first), the icons, the desktop
-entry, Verso's menu in Files (`verso-nautilus.py`) and the third-party licenses. A debug build decodes pictures
-slowly; `cargo build -p verso --config 'profile.dev.package."*".opt-level=2'` optimises the dependencies only.
-
-**Coming:** rpm and deb packages of Verso's own.
+entry, Verso's menu in Files (`verso-nautilus.py`) and the third-party licenses. `linux/packaging/verso-packages.sh
+out` builds the rpm and the deb into `out`, each in a container of its distribution (Fedora 44, Ubuntu 26.04), with
+podman or docker, on the host rather than in the toolbox; `verso-packages.sh out deb` builds one. A debug build
+decodes pictures slowly; `cargo build -p verso --config 'profile.dev.package."*".opt-level=2'` optimises the
+dependencies only.
 
 **On the Mac** (macOS 15 or later), Verso has no release yet: it is built from source with Xcode (AGENTS.md,
 "Development environment").

@@ -1,0 +1,21 @@
+Package: verso
+Version: @VERSION@
+Architecture: amd64
+Maintainer: Jakob Hviid <jakob@hviid.phd>
+Installed-Size: @SIZE@
+Depends: @DEPENDS@
+Recommends: desktop-file-utils, libglib2.0-bin
+Section: graphics
+Priority: optional
+Homepage: https://github.com/jakobhviid/verso
+Description: Browse, search and organise your Immich photos and videos
+ Verso is a native GNOME gallery for a self-hosted Immich server: the library,
+ albums, people, places, the map and search in a window, and Verso Drive, the
+ library as a drive in Files and in every file dialog, which downloads
+ originals only when something opens them and uploads what is copied into its
+ Upload folder.
+ .
+ Verso is an independent, unofficial project. It is not affiliated with,
+ endorsed by, or sponsored by the Immich project or FUTO. "Immich" is used only
+ to describe the server this software works with, and remains the mark of its
+ owner.

@@ -603,8 +603,10 @@ part in Immich Crosslink, which shows it there: from Verso Drive's menu in Files
   sign-in stops, saying which Immich the server runs and that Verso needs v3.2 or later.
 - **GNOME:** the current and previous release; today GNOME 50 and 49. Verso's window needs GNOME 49's libraries or
   newer, libadwaita 1.8 and GTK 4.18: Fedora 43 and newer, Ubuntu 25.10 and 26.04 LTS, Debian 14, Arch and other
-  rolling distributions. On an older system (Ubuntu 24.04 LTS and what is built on it, Debian 13, Fedora 42) the
-  tarball's `verso` does not start the window (ARCHITECTURE.md, "Packaging"): it writes to stderr `error: Verso needs
+  rolling distributions. On an older system (Ubuntu 24.04 LTS and what is built on it, Debian 13, Fedora 42) the rpm
+  and the deb do not install, as their dependencies ask for those libraries, and `verso`, the tarball's (or a
+  package's forced past its dependencies), does not start the window (ARCHITECTURE.md, "Packaging"): it writes to
+  stderr `error: Verso needs
   GNOME 49 or newer (libadwaita 1.8 and GTK 4.18), and this system's libraries are older.` (`this system has no
   libadwaita.` where there is none), the systems new enough, that Verso's Flatpak runs there without Verso Drive, the
   requirements' address and the library it found; started on a desktop without a terminal, it shows the same in
@@ -776,7 +778,7 @@ systemd scope of its own, so a window it opened outlives the service.
 | The window's pictures | `~/.cache/verso/gallery/<key>/`, one folder per server and account: thumbnails, previews, played videos and opened originals |
 | Files not uploaded | `~/.local/share/verso/not-uploaded/`; `logout` keeps them |
 | Seeded thumbnails | `$HOME/.cache/thumbnails/{x-large,xx-large}/`, each URI recorded in `~/.cache/verso/<account>/seeded-thumbnails`; where home is reached through a symlink, under both the resolved and the configured path |
-| The user service | `verso.service`, from the install that brought one, else written by Verso as `~/.config/systemd/user/verso.service` for the `verso-service` it finds (Homebrew's cask, a build of one's own) |
+| The user service | `verso.service`, from the install that brought one (the rpm's and the deb's `/usr/lib/systemd/user/verso.service`), else written by Verso as `~/.config/systemd/user/verso.service` for the `verso-service` it finds (Homebrew's cask, a build of one's own) |
 | GVfs's volume monitor's settings, where it is a user service | `~/.config/systemd/user/gvfs-udisks2-volume-monitor.service.d/verso.conf`: `Environment=LIBMOUNT_FSTAB=<the volume monitor's fstab>`, and, where home is reached through a symlink, `Environment=HOME=<resolved home>`; written by the service as it mounts, which then restarts the volume monitor, so Files lists the drive with its icon; removed by `logout` |
 | The volume monitor's fstab | `~/.local/state/verso/gvfs-fstab`: `/etc/fstab` as it was when the service started, and, while the drive is mounted, `immich <resolved mount point> fuse.immich noauto,x-gvfs-show,x-gvfs-name=<drive's name>,x-gvfs-icon=dev.hviid.Verso.Drive,x-gvfs-symbolic-icon=dev.hviid.Verso-symbolic 0 0` (`x-gvfs-hide` in place of `x-gvfs-show` with `mount.unmount_button` off); written with that line before the drive mounts, and without it once it stops; removed by `logout` |
 | The mount point's folder icon in Files | `metadata::custom-icon-name=dev.hviid.Verso.Drive` on the mount point, in gvfsd-metadata's store (`~/.local/share/gvfs-metadata/`), set by the service as it mounts and once mounted |
@@ -787,6 +789,24 @@ systemd scope of its own, so a window it opened outlives the service.
 | The sign-in redirect's handler | `x-scheme-handler/app.immich` in `~/.config/mimeapps.list`, set by Verso as it starts a browser sign-in |
 | Verso's menu in Files, Homebrew's cask | `~/.local/share/nautilus-python/extensions/verso-nautilus.py` |
 | Logs | journald (`journalctl --user -u verso`) |
+
+**What the rpm and the deb install** (ARCHITECTURE.md, "The rpm and the deb"), and take away again when removed:
+
+| What | Where |
+|---|---|
+| `verso`, the launcher in front of the window | `/usr/bin/verso` |
+| The window | `/usr/libexec/verso` |
+| The service and the command line | `/usr/bin/verso-service` |
+| The user service | `/usr/lib/systemd/user/verso.service`, running `/usr/bin/verso-service daemon` |
+| The launcher entry | `/usr/share/applications/dev.hviid.Verso.desktop`, running `/usr/bin/verso %u` |
+| The icons | `/usr/share/icons/hicolor/`: the app's and Verso Drive's at 16 to 512 pixels, the symbolic ones and the top bar's states |
+| The app's own icons, the app icon's 27 other looks among them | `/usr/share/verso/icons/` |
+| The translations | `/usr/share/locale/<language>/LC_MESSAGES/verso.mo` |
+| Verso's menu in Files | `libverso-nautilus.so` in Nautilus's folder of extensions: `/usr/lib64/nautilus/extensions-4/` (Fedora), `/usr/lib/x86_64-linux-gnu/nautilus/extensions-4/` (Debian and Ubuntu) |
+| The license and the third-party licenses | `/usr/share/licenses/verso/` (rpm); `/usr/share/doc/verso/`, the license as `copyright` (deb) |
+
+Removing the package leaves the settings, the credential and the caches in the person's home; a running service
+takes away what points at the drive once its program is gone (`verso-service daemon`).
 
 `<account>` is the server's host and port (`photos.example.org-443`), readable in a file listing. Signing in again,
 with any credential, keeps the caches. Two accounts on one server share the directory only if the user signs in as

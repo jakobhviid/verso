@@ -27,12 +27,14 @@ static DARK: AtomicBool = AtomicBool::new(false);
 /// they are how Verso knows the entry for its own.
 const WRITTEN: &str = "# Written by Verso over the installed entry, for the app icon chosen in Preferences (app.icon).\n";
 
-/// The folders the app's own icons are in: `icons` in the install's folder, as the tarball has them, or, run from a
-/// checkout, beside the sources.
+/// The folders the app's own icons are in: `icons` in the install's folder, as the tarball has them, or
+/// `share/verso/icons` there or beside it (the packages' `/usr/share/verso/icons`, from `/usr/libexec/verso` and
+/// `/usr/bin`), or, run from a checkout, beside the sources.
 pub fn icon_folders() -> Vec<PathBuf> {
-    let beside = crate::programs::install_folder().map(|folder| folder.join("icons"));
+    let data = Path::new("share").join(product::current().folder).join("icons");
+    let beside = crate::programs::install_folder().map(|folder| [folder.join("icons"), folder.join(&data), folder.join("..").join(&data)]);
     let checkout = Path::new(env!("CARGO_MANIFEST_DIR")).join("../packaging/icons");
-    beside.into_iter().chain([checkout]).filter(|folder| folder.is_dir()).collect()
+    beside.into_iter().flatten().chain([checkout]).filter(|folder| folder.is_dir()).collect()
 }
 
 /// Say whether the desktop's style is dark, as the window sees it, for a notification's picture and the next change of

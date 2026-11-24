@@ -34,6 +34,9 @@ REPOSITORY = "https://github.com/jakobhviid/verso"
 RELEASES = "https://github.com/jakobhviid/verso-releases"
 TARBALL = "verso-x86_64.tar.gz"
 FLATPAK = "verso-x86_64.flatpak"
+# The rpm and the deb of a release (linux/packaging/verso-packages.sh), named by its version.
+RPM = "verso-{version}.x86_64.rpm"
+DEB = "verso_{version}_amd64.deb"
 DISK_IMAGE = r"(?i)verso[-_ ].*\.dmg"
 
 # Each platform's icon for that platform (DESIGN.md, "A platform's icon only where that platform is meant"): Mist on Day
@@ -74,6 +77,20 @@ def link(url, text):
     if url is None:
         return f'<span class="missing">{html.escape(text)}</span>'
     return f'<a href="{html.escape(url)}">{html.escape(text)}</a>'
+
+
+def packages(release, version):
+    """The release's rpm and deb, each with the command that installs it, where the release carries them: a release
+    from before them offers none, so the page never offers a file that is not there."""
+    items = []
+    for kind, name, system, command in (("rpm", RPM, "Fedora 43 and newer", "sudo dnf install ./"),
+                                        ("deb", DEB, "Ubuntu 26.04 and newer, and Debian 14", "sudo apt install ./")):
+        file = name.format(version=version)
+        url = asset_url(release, file)
+        if url:
+            items.append(f'<li>{link(url, f"The {kind}, {file}")}<span>For {system}: '
+                         f'<code>{html.escape(command + file)}</code></span></li>\n            ')
+    return "".join(items)
 
 
 def day(timestamp):
@@ -219,6 +236,7 @@ def main(releases_file, output, app_store=None, testflight=None):
         "version": html.escape(version),
         "published": html.escape(day(linux["published_at"])),
         "release_url": html.escape(linux["html_url"]),
+        "packages": packages(linux, version),
         "tarball": link(tarball, f"The tarball, {TARBALL}"),
         "flatpak": link(asset_url(linux, FLATPAK), f"The Flatpak, {FLATPAK}"),
         "macos": macos,

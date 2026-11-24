@@ -1,16 +1,22 @@
 #!/bin/sh
-# Verso's launcher, `verso` in the tarball (ARCHITECTURE.md, "Packaging"). The window, libexec/verso beside it, needs
-# GNOME 49's libraries, libadwaita 1.8 and GTK 4.18, and binds every symbol as it loads, so on an older system the
-# loader stops it before it can say anything, and someone who opened it from the app grid sees nothing. This looks at
-# the libadwaita the loader would take first: older or missing, it says why on stderr and, to someone without a
-# terminal, in a dialog or a notification, and exits with 1. Otherwise it becomes the window, with the arguments as
-# given (the browser sign-in's app.immich: redirect and crosslinks come as the desktop entry's %u).
+# Verso's launcher, `verso` in the tarball and /usr/bin/verso in the rpm and deb packages (ARCHITECTURE.md,
+# "Packaging"). The window, libexec/verso beside it (the tarball) or above it (/usr/libexec/verso), needs GNOME 49's
+# libraries, libadwaita 1.8 and GTK 4.18, and binds every symbol as it loads, so on an older system the loader stops it
+# before it can say anything, and someone who opened it from the app grid sees nothing. This looks at the libadwaita
+# the loader would take first: older or missing, it says why on stderr and, to someone without a terminal, in a dialog
+# or a notification, and exits with 1. Otherwise it becomes the window, with the arguments as given (the browser
+# sign-in's app.immich: redirect and crosslinks come as the desktop entry's %u).
 
 # Where the requirements are, for someone on an older system.
 address=https://github.com/jakobhviid/verso-releases#requirements
 
-# The install's folder, through links: Homebrew links its bin/verso to this file in the Caskroom.
+# The install's folder, through links: Homebrew links its bin/verso to this file in the Caskroom. The window is in its
+# libexec, or, from /usr/bin, in /usr/libexec.
 here=$(dirname "$(readlink -f "$0" 2>/dev/null || printf '%s\n' "$0")")
+window=$here/libexec/verso
+if [ ! -f "$window" ]; then
+    window=$(dirname "$here")/libexec/verso
+fi
 
 # The library in the first of the folders on standard input, one a line, that holds it.
 holding() {
@@ -40,7 +46,7 @@ fi
 
 # New enough: it has a function libadwaita 1.8 added, whose name is a string in the library's table of symbols.
 if [ -n "$library" ] && LC_ALL=C grep -q adw_shortcuts_dialog_new "$library" 2>/dev/null; then
-    exec "$here/libexec/verso" "$@"
+    exec "$window" "$@"
 fi
 
 needs="Verso needs GNOME 49 or newer (libadwaita 1.8 and GTK 4.18)"

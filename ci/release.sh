@@ -5,9 +5,10 @@
 #   ci/release.sh                  the version the next release would take (ci/version.sh) and its notes
 #   ci/release.sh tag [VERSION]    tag HEAD, clean and on origin/main, as vVERSION (the suggested one when not given),
 #                                  signed, and push the tag
-#   ci/release.sh build TAG        build Linux's files from the tag, in a worktree of its own (the tarball, the
-#                                  Flatpak's source and, where flatpak-builder is, the Flatpak), into target/dist/TAG,
-#                                  and make a draft release of them here and in jakobhviid/verso-releases
+#   ci/release.sh build TAG        build Linux's files from the tag, in a worktree of its own (the tarball, the rpm
+#                                  and the deb, the Flatpak's source and, where flatpak-builder is, the Flatpak), into
+#                                  target/dist/TAG, and make a draft release of them here and in
+#                                  jakobhviid/verso-releases
 #   ci/release.sh publish TAG      publish both drafts, then bump the tap's `verso` cask (not for a pre-release)
 #
 # --dry-run, anywhere on the line, changes nothing outside this checkout: every tag, push, release and cask change is
@@ -25,6 +26,9 @@ tap=jakobhviid/homebrew-tap
 cask=Casks/verso.rb
 tarball=verso-x86_64.tar.gz
 flatpak=verso-x86_64.flatpak
+# The packages, named by the release's version (linux/packaging/verso-packages.sh).
+rpm_of() { echo "verso-$1.x86_64.rpm"; }
+deb_of() { echo "verso_$1_amd64.deb"; }
 flathub=https://dl.flathub.org/repo/flathub.flatpakrepo
 version_pattern='^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$'
 
@@ -105,8 +109,13 @@ release_text() {
   is_prerelease "$version" && upgrade="A pre-release: Homebrew's cask stays at the last release."
   printf "Evaluation build for x86_64 Linux. Needs GNOME 49's libraries or newer, libadwaita 1.8 and GTK 4.18 "
   printf '(Fedora 43 and newer, Ubuntu 25.10 and 26.04 LTS, Debian 14, Arch); on an older system Verso says so as it '
-  printf 'starts, and the Flatpak below runs there, without Verso Drive. Verso Drive needs FUSE 3, and its menu in '
-  printf 'Files nautilus-python. %s\n\n' "$upgrade"
+  printf 'starts, and the Flatpak below runs there, without Verso Drive. From the tarball, which Homebrew installs, '
+  printf 'Verso Drive needs FUSE 3, and its menu in Files nautilus-python. %s\n\n' "$upgrade"
+  printf '**Packages:** `%s` for Fedora 43 and newer (`sudo dnf install ./%s`), and `%s` for Ubuntu 26.04 and ' \
+    "$(rpm_of "$version")" "$(rpm_of "$version")" "$(deb_of "$version")"
+  printf 'newer and Debian 14 (`sudo apt install ./%s`): Verso with Verso Drive and its menu in Files, which the ' \
+    "$(deb_of "$version")"
+  printf 'package manager installs with what they need, and refuses on an older system.\n\n'
   if [ -z "$previous" ]; then
     printf '%s\n\n' "$notes"
   elif [ -n "$notes" ]; then
@@ -222,8 +231,10 @@ build() {
   rm -rf "$out"
   mkdir -p "$out"
   (cd "$work/verso" && in_build_environment linux/packaging/verso-tarball.sh "$out")
+  # The rpm and the deb, each in a container of its distribution, with podman or docker here.
+  (cd "$work/verso" && linux/packaging/verso-packages.sh "$out")
   (cd "$work/verso" && linux/packaging/flatpak/source-archive.sh "$out")
-  files=("$out/$tarball")
+  files=("$out/$tarball" "$out/$(rpm_of "$version")" "$out/$(deb_of "$version")")
   if command -v flatpak-builder >/dev/null; then
     mkdir "$out/flatpak"
     cp "$work/verso/linux/packaging/flatpak/dev.hviid.Verso.yml" "$out/verso-source.tar.gz" "$out/flatpak/"
@@ -304,11 +315,11 @@ bump_cask() {
 
 publish() {
   [ $# -eq 1 ] || usage
-  local tag=$1 version repositories release draft digest flatpaks first_digest="" latest=(--latest)
+  local tag=$1 version repositories release draft digest flatpaks packages first_digest="" latest=(--latest)
   version=$(version_of "$tag")
   signed_in_to_github
   mapfile -t repositories < <(release_repositories)
-  # Every release goes out whole: the same tarball everywhere, and the Flatpak beside it.
+  # Every release goes out whole: the same tarball everywhere, the packages and the Flatpak beside it.
   for release in "${repositories[@]}"; do
     draft=$(gh release view "$tag" --repo "$release" --json isDraft --jq .isDraft 2>/dev/null) ||
       die "$release has no release $tag; build it first (ci/release.sh build $tag)"
@@ -316,7 +327,10 @@ publish() {
       --jq ".assets[] | select(.name == \"$tarball\") | .digest")
     flatpaks=$(gh release view "$tag" --repo "$release" --json assets \
       --jq "[.assets[] | select(.name == \"$flatpak\")] | length")
+    packages=$(gh release view "$tag" --repo "$release" --json assets --jq "[.assets[] | select(.name ==
+      \"$(rpm_of "$version")\" or .name == \"$(deb_of "$version")\")] | length")
     [ -n "$digest" ] || die "$release's $tag has no $tarball"
+    [ "$packages" -eq 2 ] || die "$release's $tag lacks $(rpm_of "$version") or $(deb_of "$version")"
     [ "$flatpaks" -gt 0 ] || die "$release's $tag has no $flatpak; attach it first (ci/release.sh build says how)"
     [ -z "$first_digest" ] || [ "$digest" = "$first_digest" ] ||
       die "$release's $tarball is not the one in $repository ($digest, $first_digest)"

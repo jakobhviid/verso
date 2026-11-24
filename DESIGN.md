@@ -198,7 +198,8 @@ yet (ROADMAP.md, M9, step 7). Until it is, the README is Verso's landing page, a
 - **Fast and private:** one HTML file and one stylesheet, the system's fonts, no framework, nothing loaded from
   elsewhere, no cookies and no counting; the pictures are WebP, those below the first screen loaded as they come near.
 - **Built for the releases there are** by `site/build.py` (`site/build-latest.sh` gathers them): the version and
-  Linux's downloads from the latest release in `jakobhviid/verso-releases`, the Mac's disk image from the newest
+  Linux's downloads from the latest release in `jakobhviid/verso-releases` (its rpm and deb where it carries them,
+  each with the command that installs it), the Mac's disk image from the newest
   release with one or else "Coming", the App Store's and TestFlight's links once given, `latest.json` for the update
   check, and `photos.html`, the credits of the showcase server's photos. A picture not taken yet is a place marked
   for it, and the build lists those.

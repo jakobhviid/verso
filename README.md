@@ -19,7 +19,7 @@ that places the grid's dates, so they behave alike.
 
 | Platform | Where it stands |
 |---|---|
-| Linux, x86_64 (GNOME) | Released as 0.x builds: Homebrew, and a Flatpak test build (below) |
+| Linux, x86_64 (GNOME) | Released as 0.x builds: Homebrew, and a Flatpak test build; rpm and deb packages from the next release (below) |
 | Mac | Built here; no release yet |
 | iPhone and iPad | Built here; no release yet. It will come through TestFlight and the App Store |
 
@@ -83,8 +83,8 @@ x86_64 Linux:
   Fedora 42 and anything older. There Verso says so when it starts, and the [Flatpak](#as-a-flatpak-test-build),
   which brings GNOME's own libraries, runs instead, without Verso Drive.
 
-Verso Drive needs FUSE 3, Verso's menu in Files needs nautilus-python, and the top bar icon needs a tray: on GNOME,
-the AppIndicator extension.
+Verso Drive needs FUSE 3, Verso's menu in Files needs nautilus-python where Homebrew installed Verso, and the top bar
+icon needs a tray: on GNOME, the AppIndicator extension.
 
 ### With Homebrew
 
@@ -94,6 +94,20 @@ brew install jakobhviid/tap/verso
 
 Open **Verso** from the app grid and sign in. Update with `brew upgrade verso`; remove it with `brew uninstall verso`,
 and add `--zap` to remove its settings and cache too.
+
+### As an rpm or a deb package
+
+From the next release, each release also carries Verso as a package for Fedora (43 and newer) and for Ubuntu (26.04
+and newer) and Debian 14: download `verso-<version>.x86_64.rpm` or `verso_<version>_amd64.deb` from the release, then
+install it with your package manager, which brings what it needs:
+
+```sh
+sudo dnf install ./verso-<version>.x86_64.rpm
+sudo apt install ./verso_<version>_amd64.deb
+```
+
+Open **Verso** from the app grid and sign in. Upgrade by installing the next release's package the same way; remove
+it with `sudo dnf remove verso` or `sudo apt remove verso`.
 
 ### As a Flatpak (test build)
 
@@ -126,8 +140,10 @@ linux/packaging/verso-tarball.sh out
 `out/verso` then holds Verso as the release tarball has it: `verso`, which opens the window (`libexec/verso`) once it
 has checked the system's libraries, and `verso-service`, the top bar icon and the drive, with the icons and the
 desktop entry. The two programs alone are `cargo build --release -p verso
--p verso-service`. [`linux/packaging/flatpak/dev.hviid.Verso.yml`](linux/packaging/flatpak/dev.hviid.Verso.yml)
-builds the Flatpak, as its first lines say.
+-p verso-service`. `linux/packaging/verso-packages.sh out`, run with podman or docker on the host, builds the rpm
+and the deb, each in a container of its distribution.
+[`linux/packaging/flatpak/dev.hviid.Verso.yml`](linux/packaging/flatpak/dev.hviid.Verso.yml) builds the Flatpak, as
+its first lines say.
 
 **The Mac, the iPhone and the iPad,** on a Mac with Xcode, Rust (through rustup) and XcodeGen: `mac/build-rust.sh`
 builds the core for the Mac (with `--ios`, for the iPhone and the iPad too), and `xcodegen` makes the Xcode projects,

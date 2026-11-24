@@ -1866,18 +1866,17 @@ Mist, and Mist Night in the dark style: the Flatpak carries that one drawing mor
 
 ### Packaging
 
-Verso installs as one package with both programs, from two channels today, with a third to come:
+Verso installs as one package with both programs, from three channels:
 - **The tarball** (`linux/packaging/verso-tarball.sh`, built in the Fedora 44 toolbox for x86_64), which Homebrew's
   `verso` cask installs: `verso`, the launcher in front of the window (below); the window, `libexec/verso`, with the
   libraries a desktop may lack (libshumate, libprotobuf-c) beside it in `libexec/lib/` (its run path is
-  `$ORIGIN/lib`); the service; the icons; the catalogs in `share/locale`; the desktop entry made from its template,
-  whose `Exec` the cask writes its own path into; and the Files extension in Python ("Links on Linux, and the Files
-  extension"). The script checks that each program finds every library.
+  `$ORIGIN/lib`); the service; the icons, the app's own in `icons/`; the catalogs in `share/locale`; the desktop
+  entry made from its template, whose `Exec` the cask writes its own path into; and the Files extension in Python
+  ("Links on Linux, and the Files extension"). The script checks that each program finds every library.
+- **The rpm and the deb** (below), Verso's own packages for Fedora, Debian and Ubuntu, which a release carries beside
+  the tarball.
 - **The Flatpak** (`linux/packaging/flatpak/`), for our own builds and testing, without the drive ("Verso as a
   Flatpak").
-- **rpm and deb packages** of Verso's own come with releases cut by a tag (ROADMAP, M9, step 6), with the C Files
-  extension built for each distribution, and a packaging matrix to check them, built after Immich Mount's
-  (`lab/packaging/` in its repository).
 
 What an install carries:
 - **One launcher entry,** `dev.hviid.Verso.desktop` (`linux/packaging/desktop/dev.hviid.Verso.desktop.in`), named Verso,
@@ -1893,19 +1892,20 @@ What an install carries:
 - **The translations,** `verso.mo` for each language ("Translations").
 - **The license notices:** `linux/packaging/third-party-licenses.py` writes what a binary package must carry,
   `THIRD-PARTY-NOTICES.md` first, then every crate the package's binaries link (from `cargo tree`) with the license
-  files it ships, each distinct text printed once; the tarball carries none yet.
+  files it ships, each distinct text printed once, as `THIRD-PARTY-LICENSES.md` in the tarball and the packages.
 
 **The window links the system's GNOME libraries, GNOME 49's or newer:** libadwaita 1.8 and GTK 4.18 at least (SPEC.md,
 "Supported versions"). Verso is built for the current GNOME: the window uses libadwaita's widgets up to 1.8
 (AdwShortcutsDialog from 1.8, AdwToggleGroup from 1.7, AdwSpinner and AdwButtonRow from 1.6) and GTK 4.16's CSS
-variables. The tarball needs them on the desktop, and the Flatpak brings them in the GNOME runtime.
+variables. The tarball needs them on the desktop, the rpm and the deb ask for them as dependencies, and the Flatpak
+brings them in the GNOME runtime.
 
 **The launcher: a script in front of the window,** so that a system whose libraries are too old says why. A Rust
 program binds every symbol as it loads (full RELRO, no PLT), so on Ubuntu 24.04 (libadwaita 1.5, GTK 4.14) the loader
 stops the window before `main` (`symbol lookup error: ... undefined symbol: adw_shortcuts_dialog_add`), and someone
 who opened it from the app grid or a launcher sees nothing. So the tarball's `verso` is a POSIX `sh` script,
-`linux/packaging/verso-launcher.sh`, and the window is `libexec/verso` in the same folder, named so that its process
-is `verso`:
+`linux/packaging/verso-launcher.sh`, and the window is `libexec/verso` in the same folder (in the packages,
+`/usr/bin/verso` and `/usr/libexec/verso`), named so that its process is `verso`:
 - It finds its own folder through links (Homebrew's `bin/verso` links to it), then the libadwaita the loader would
   take: the first in `LD_LIBRARY_PATH`, else the one in the loader's cache (`ldconfig -p`, also from `/sbin` and
   `/usr/sbin`, which may be off a user's PATH), else one in the usual folders. It is new enough when it holds a
@@ -1916,15 +1916,17 @@ is `verso`:
   `org.freedesktop.Notifications`), and exits with 1.
 - Otherwise it `exec`s the window with the arguments as given, adding none: no process of its own stays, and the
   browser sign-in's `app.immich:` redirect and crosslinks arrive as the desktop entry's `%u`.
-- What starts the window by its path starts the launcher: the desktop entry's `Exec` (the cask's `bin/verso`), the
-  tray's Open and `verso-service app` (`programs::find`), and Verso Gallery's Crosslink entry, which the service
-  writes. The window, in `libexec/`, finds its install's programs, icons and catalogs in the folder above
-  (`programs::install_folder`), and watches the launcher for an upgrade (`programs::launcher`, "The window and the
-  service"), as its own path is one version's folder under Homebrew.
+- What starts the window by its path starts the launcher: the desktop entry's `Exec` (the cask's `bin/verso`, the
+  packages' `/usr/bin/verso`), the tray's Open and `verso-service app` (`programs::find`), and Verso Gallery's
+  Crosslink entry, which the service writes. The window, in `libexec/`, finds its install's programs, icons and
+  catalogs in the folder above (`programs::install_folder`; the packages' `/usr`, with the programs in its `bin` and
+  the app's own icons in `share/verso/icons`), and watches the launcher for an upgrade (`programs::launcher`, "The
+  window and the service"), as its own path is one version's folder under Homebrew.
 - The service needs none: it loads no toolkit and links no GNOME library, so the loader has nothing to stop it on.
   On an older system the window, which signs in and sets it up, does not start; its command line is for advanced use.
-- rpm and deb packages (ROADMAP, M9, step 6) state the libraries as dependencies, which keeps them off an older
-  system, so they need no launcher.
+- The rpm and the deb carry it too, though their dependencies keep them off an older system: the window then finds
+  its install and watches for an upgrade the same way from every channel, and a package forced past its
+  dependencies (`rpm --nodeps`, `dpkg --force-depends`) still says why.
 - **Not chosen: lowering the floor to GNOME 46,** Ubuntu 24.04's libraries: it gives up the widgets above for systems
   the Flatpak serves already, and Verso is built for the current GNOME.
 - **Not chosen: the check inside the window.** It cannot run there: the loader binds every symbol before `main`.
@@ -1935,6 +1937,53 @@ is `verso`:
 
 **Not chosen: AppImage.** No service or autostart integration, the sign-in scheme handler needs extra desktop
 integration, and bundling GTK 4 and libadwaita drifts from the host look.
+
+#### The rpm and the deb
+
+One `verso` package per format, made by `linux/packaging/verso-packages.sh`, which `ci/release.sh build` runs beside
+the tarball, so a release carries `verso-<version>.x86_64.rpm` and `verso_<version>_amd64.deb`. Each is built in a
+fresh container of its distribution (podman, else docker), from the tag's tree, with that distribution's Rust,
+libraries and Nautilus:
+- **The rpm, in Fedora 44, for Fedora 43 and newer,** as the tarball is built: its programs ask for no glibc newer
+  than Fedora 43's.
+- **The deb, in Ubuntu 26.04 LTS, for it, its successors and Debian 14:** one deb for both, built on the older
+  (Ubuntu 26.04 has GTK 4.22, libadwaita 1.9 and Nautilus 50; Debian 14 newer ones of each), so the versions its
+  symbols ask for hold on both.
+
+What the tarball holds, in the system's places (SPEC.md, "Files on disk", has the list): the launcher in
+`/usr/bin/verso` in front of the window in `/usr/libexec/verso` (above), the service in `/usr/bin`, the user unit,
+which the window then finds installed and writes none, the launcher entry running `/usr/bin/verso %u`, the icons in
+hicolor and the app's own in `/usr/share/verso/icons`, the catalogs in `/usr/share/locale`, the Files extension, and
+the license with the third-party licenses.
+- **Dependencies:** what each distribution's own tools find the programs link (rpm's from the libraries' names,
+  `dpkg-shlibdeps` from the symbols used), with GTK 4.18, libadwaita 1.8 and libshumate 1.4 at least, and `fuse3`
+  for the drive, stated beside them, which keeps a package off a system too old for it: apt and dnf refuse it, naming
+  libadwaita. Recommended: `desktop-file-utils`, whose trigger registers the entry's `app.immich` scheme and whose
+  `update-desktop-database` registers Verso's Crosslink entries, and on Debian and Ubuntu `libglib2.0-bin`, whose
+  `gio` sets the mount point's icon.
+- **The distribution's libshumate,** not one carried beside the window as the tarball carries it: a package manager
+  installs it with Verso, which a tarball cannot ask for, and every system the packages are for has 1.4 or newer, the
+  version the map needs.
+- **The Files extension in C** (`linux/files-extension/verso-nautilus.c`), not the Python one the tarball carries: a
+  package may write Nautilus's own folder of extensions, so Files loads it with no nautilus-python, which neither
+  Fedora nor Ubuntu installs, and no Python in Files' process. It is built in each package's container against that
+  distribution's Nautilus, and finds the catalogs in `/usr/share/locale`.
+- **Made the same from the same tree:** every file's time and the rpm's build time are the commit's
+  (`SOURCE_DATE_EPOCH`), the tree is built at one path in the container, and the rpm names no build host, so the same
+  tree, image and toolchain make the same package. A pre-release's version takes a tilde (`1.0.0~beta.1`), which rpm
+  and dpkg sort before the release; its files keep the tag's (`verso-1.0.0-beta.1.x86_64.rpm`).
+- **No maintainer scripts:** the distributions' own triggers refresh the icon cache, the desktop database and the
+  MIME cache, and an upgrade or an uninstall reaches the running programs through their watch of their own files
+  ("The daemon's lifecycle", step 6).
+- **Checked by the packaging matrix** (`lab/packaging/`, the `lab-packaging-matrix` skill): on Fedora 44 and 43,
+  Ubuntu 26.04 and Debian 14 each installs, says its version, finds its libraries, starts its window and mounts the
+  lab server's library with originals matching Immich's checksums, then removes cleanly; on Ubuntu 24.04 apt refuses
+  the deb, and its launcher says why.
+- **Not chosen: a package for each release of each distribution** (`%{?dist}`, a deb per Ubuntu): one file per format
+  is what a release page offers plainly, and the matrix checks it on each system it is for. Repositories, which would
+  build per release, are in ROADMAP.md, "Package repositories".
+- **Flatpak impact:** none. The packages are another channel beside it, from the same programs built without the
+  `flatpak` feature.
 
 #### Verso as a Flatpak
 
