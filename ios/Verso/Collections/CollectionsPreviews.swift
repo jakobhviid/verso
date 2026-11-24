@@ -64,10 +64,10 @@ final class CollectionsPreviews {
     /// itself counts them.
     func loadCounts(_ session: LibrarySession) async {
         let client = session.client
-        let archiveQuery = GridSource.archive.timelineQuery
-        let trashQuery = session.features.trash ? GridSource.trash.timelineQuery : nil
-        async let archive = Self.timelineCount(client, archiveQuery)
-        async let trash = Self.timelineCount(client, trashQuery)
+        let archiveTimeline = GridSource.archive.timeline
+        let trashTimeline = session.features.trash ? GridSource.trash.timeline : nil
+        async let archive = Self.timelineCount(client, archiveTimeline)
+        async let trash = Self.timelineCount(client, trashTimeline)
         var counts: [SidebarLink: Int] = [:]
         counts[.archive] = await archive
         counts[.trash] = await trash
@@ -83,8 +83,8 @@ final class CollectionsPreviews {
         if places { await loadPlaces(session, again: true) }
     }
 
-    nonisolated private static func timelineCount(_ client: ImmichClient, _ query: TimelineQuery?) async -> Int? {
-        guard let query, let months = try? await client.timeBuckets(query) else { return nil }
+    nonisolated private static func timelineCount(_ client: ImmichClient, _ timeline: (any TimelineRequest)?) async -> Int? {
+        guard let timeline, let months = try? await client.timeBuckets(timeline) else { return nil }
         return months.reduce(0) { $0 + $1.count }
     }
 }

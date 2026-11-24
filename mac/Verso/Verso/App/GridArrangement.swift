@@ -4,8 +4,9 @@ import VersoCore
 // Grid pages: view options in the style of Apple Photos. Immich's web app has none for these pages, so
 // they stay with what the server filters and orders: the timeline API (GET /timeline/buckets) and, for
 // Videos and Large Files, the search API. The shared core reads each page's options, decides which a page offers and
-// what they mean (`gridOptions`, `gridFacts`), as on Linux, and keeps them by Linux's codes, reading the spelling
-// this app kept before (Immich's names) too.
+// what they mean (`gridOptions`, `gridFacts`), and makes the query a timeline page reads with them (`gridQuery`, which
+// AssetGridModel asks), as on Linux; it keeps them by Linux's codes, reading the spelling this app kept before
+// (Immich's names) too.
 
 /// The grid pages with view options. Each saves its own settings.
 enum GridPage: String {
@@ -182,26 +183,15 @@ struct GridArrangement: Equatable {
     /// Sorting by Date Added, but not while searching, which has no upload-date order.
     var sortsByDateAdded: Bool { facts.sortsByDateAdded }
 
-    /// The options on the timeline's query (ROADMAP.md, M9, step 8, has the query itself from the core).
-    func applied(to query: TimelineQuery) -> TimelineQuery {
-        var query = query
-        if facts.favoritesOnly {
-            query.isFavorite = true
-            // The server refuses partners' photos together with a favorites filter.
-            query.withPartners = nil
-        }
-        // Without partners the timeline is the account's own photos.
-        if facts.ownPhotosOnly { query.withPartners = nil }
-        if facts.oldestFirst { query.order = "asc" }
-        if facts.sortsByDateAdded { query.orderBy = "createdAt" }
-        return query
+    /// The options as the core reads them.
+    var options: GridOptions {
+        GridOptions(show: show.rawValue, mediaType: mediaType.rawValue, sortBy: sortBy.rawValue, order: order.rawValue,
+                    location: location.rawValue, owner: owner.rawValue)
     }
 
     /// The month an asset falls in, as the first seven characters of a bucket ID ("2026-11").
     /// Date Added buckets go by the upload time in UTC, Date Taken buckets by the photo's own clock.
     func month(localDateTime: String, createdAt: String?) -> Substring? {
-        let options = GridOptions(show: show.rawValue, mediaType: mediaType.rawValue, sortBy: sortBy.rawValue, order: order.rawValue,
-                                  location: location.rawValue, owner: owner.rawValue)
-        return gridMonth(options: options, localDateTime: localDateTime, createdAt: createdAt.flatMap(ImmichDate.parse)).map { Substring($0) }
+        gridMonth(options: options, localDateTime: localDateTime, createdAt: createdAt.flatMap(ImmichDate.parse)).map { Substring($0) }
     }
 }

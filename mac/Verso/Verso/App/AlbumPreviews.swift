@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import VersoCore
 
 /// An album's photos besides its cover, for its card: read as the card first shows (the album's newest month, through
 /// the timeline), and kept for the session, read again only when the album changes.
@@ -18,11 +19,11 @@ final class AlbumPreviews {
         guard photos[key] == nil, !reading.contains(key), album.assetCount > 1 else { return }
         reading.insert(key)
         defer { reading.remove(key) }
-        let query = TimelineQuery(visibility: nil, albumId: album.id)
+        let timeline = CoreTimeline(source: .album(id: album.id), settings: .stacked)
         var found: [String] = []
         do {
-            for month in try await client.timeBuckets(query).prefix(3) where found.count < 2 {
-                let assets = try await client.timeBucket(month.timeBucket, query)
+            for month in try await client.timeBuckets(timeline).prefix(3) where found.count < 2 {
+                let assets = try await client.timeBucket(month.timeBucket, timeline)
                 found += assets.id.filter { $0 != album.albumThumbnailAssetId && !found.contains($0) }.prefix(2 - found.count)
             }
         } catch { return }

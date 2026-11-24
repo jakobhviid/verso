@@ -10,9 +10,11 @@
 //!
 //! The timeline API narrows to favorites and orders, by date taken or date added (Immich v3.0); it has no media type, so
 //! photos or videos alone read through the search API instead, which orders by date taken and groups by the month taken.
+//! The query a page reads with its options is made here too ([`Arrangement::query`]): Linux's window reads it as its
+//! grid's source, the Mac and the iPhone through the typed timeline calls or their search.
 
 use chrono::{DateTime, Utc};
-use immich_api::AssetKind;
+use immich_api::{AssetKind, AssetQuery, TimelineOptions, TimelineScope, Visibility};
 
 /// The pages with view options.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -194,6 +196,15 @@ impl MediaType {
 /// The names the options are kept by, after the page's name: `grid.<page>.<option>`.
 pub const OPTIONS: [&str; 6] = ["show", "mediaType", "sortBy", "order", "location", "owner"];
 
+/// What a timeline page reads with its view options.
+#[derive(Debug, Clone, PartialEq)]
+pub enum Query {
+    /// Its timeline, narrowed and ordered.
+    Timeline(TimelineScope, TimelineOptions),
+    /// Photos or videos alone, through the search API, newest or oldest first by date taken.
+    Search(Box<AssetQuery>),
+}
+
 /// One page's view options.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Arrangement {
@@ -256,6 +267,51 @@ impl Arrangement {
     /// Without partners the timeline is the account's own photos.
     pub fn own_photos_only(&self) -> bool {
         self.owner == Owner::Mine
+    }
+
+    /// The query a timeline page reads with these options, from the scope it shows and the options it reads it with
+    /// without them, which are each platform's (the Mac and the iPhone read every timeline stacked, and an album in its
+    /// order); by date added only on servers that have it. Photos or videos alone read through search where it can say
+    /// the scope, which it cannot for the trash or a partner's library; the account's own photos alone leave the
+    /// partners' out of the Library and keep its stacks.
+    pub fn query(&self, scope: &TimelineScope, options: TimelineOptions, server_has_date_added: bool) -> Query {
+        if let Some(query) = self.search(scope) {
+            return Query::Search(Box::new(query));
+        }
+        let mut options = TimelineOptions {
+            favorites_only: options.favorites_only || self.favorites_only(),
+            oldest_first: options.oldest_first || self.oldest_first(),
+            by_date_added: options.by_date_added || (server_has_date_added && self.sorts_by_date_added()),
+            stacked: options.stacked,
+        };
+        let scope = match scope {
+            TimelineScope::LibraryStacked if self.own_photos_only() => {
+                options.stacked = true;
+                TimelineScope::Library
+            }
+            other => other.clone(),
+        };
+        Query::Timeline(scope, options)
+    }
+
+    /// Photos or videos alone: the search for a timeline's scope, if search can say it.
+    fn search(&self, scope: &TimelineScope) -> Option<AssetQuery> {
+        let kind = self.media_type.kind()?;
+        let mut query = AssetQuery { kind: Some(kind), favorites_only: self.favorites_only(), oldest_first: self.oldest_first(), ..AssetQuery::default() };
+        match scope {
+            TimelineScope::Library | TimelineScope::LibraryStacked => query.visibility = Some(Visibility::Timeline),
+            TimelineScope::Archive => query.visibility = Some(Visibility::Archive),
+            TimelineScope::Locked => query.visibility = Some(Visibility::Locked),
+            TimelineScope::Favorites => query.favorites_only = true,
+            TimelineScope::Person(id) => {
+                query.person_ids = Some(vec![id.clone()]);
+                query.visibility = Some(Visibility::Timeline);
+            }
+            TimelineScope::Tag(id) => query.tag_ids = Some(vec![id.clone()]),
+            TimelineScope::Album(id) => query.album_ids = Some(vec![id.clone()]),
+            TimelineScope::Trash | TimelineScope::Partner(_) => return None,
+        }
+        Some(query)
     }
 
     /// The month a photo falls in, as a bucket's first seven characters (`2026-11`): by date added the month it was
@@ -396,5 +452,89 @@ mod tests {
         assert_eq!(added.month(taken, None), None);
         let videos = Arrangement { media_type: MediaType::Videos, ..added };
         assert_eq!(videos.month(taken, uploaded).as_deref(), Some("2026-01"), "search groups by the month taken");
+    }
+
+    fn timeline(query: Query) -> (TimelineScope, TimelineOptions) {
+        match query {
+            Query::Timeline(scope, options) => (scope, options),
+            Query::Search(query) => panic!("a search: {query:?}"),
+        }
+    }
+
+    fn search(query: Query) -> AssetQuery {
+        match query {
+            Query::Search(query) => *query,
+            Query::Timeline(scope, options) => panic!("a timeline: {scope:?} {options:?}"),
+        }
+    }
+
+    #[test]
+    fn a_timeline_narrows_and_orders_and_media_type_reads_through_search() {
+        let library = TimelineScope::LibraryStacked;
+        let none = TimelineOptions::default();
+        assert_eq!(Arrangement::default().query(&library, none, true), Query::Timeline(library.clone(), none));
+        let favorites_oldest = Arrangement { show: Show::Favorites, order: Order::OldestFirst, ..Arrangement::default() };
+        let (_, options) = timeline(favorites_oldest.query(&library, none, true));
+        assert!(options.favorites_only && options.oldest_first && !options.by_date_added);
+        let added = Arrangement { sort_by: SortBy::DateAdded, ..Arrangement::default() };
+        assert_eq!(added.query(&library, none, false), Query::Timeline(library.clone(), none), "an older server keeps date taken");
+        assert!(timeline(added.query(&library, none, true)).1.by_date_added);
+        let videos = Arrangement { media_type: MediaType::Videos, show: Show::Favorites, ..Arrangement::default() };
+        let query = search(videos.query(&TimelineScope::Person("p".into()), none, true));
+        assert_eq!(query.kind, Some(AssetKind::Video));
+        assert!(query.favorites_only);
+        assert_eq!(query.person_ids.as_deref(), Some(&["p".to_owned()][..]));
+        assert_eq!(query.visibility, Some(Visibility::Timeline));
+        let videos_added = Arrangement { sort_by: SortBy::DateAdded, ..videos };
+        let (scope, options) = timeline(videos_added.query(&TimelineScope::Partner("p".into()), none, true));
+        assert_eq!(scope, TimelineScope::Partner("p".into()), "a partner's photos are not searched");
+        assert!(!options.by_date_added);
+        assert!(matches!(videos.query(&TimelineScope::Trash, none, true), Query::Timeline(TimelineScope::Trash, _)), "nor the trash");
+    }
+
+    #[test]
+    fn photos_or_videos_alone_search_each_scope_as_its_timeline_shows_it() {
+        let photos = Arrangement { media_type: MediaType::Photos, order: Order::OldestFirst, ..Arrangement::default() };
+        let none = TimelineOptions::default();
+        let searched = |scope: TimelineScope| search(photos.query(&scope, none, true));
+        for scope in [TimelineScope::Library, TimelineScope::LibraryStacked] {
+            let query = searched(scope);
+            assert_eq!((query.kind, query.visibility, query.oldest_first, query.favorites_only), (Some(AssetKind::Image), Some(Visibility::Timeline), true, false));
+        }
+        assert_eq!(searched(TimelineScope::Archive).visibility, Some(Visibility::Archive));
+        assert_eq!(searched(TimelineScope::Locked).visibility, Some(Visibility::Locked));
+        let favorites = searched(TimelineScope::Favorites);
+        assert!(favorites.favorites_only && favorites.visibility.is_none(), "the favorites, archived ones included");
+        let tag = searched(TimelineScope::Tag("t".into()));
+        assert_eq!((tag.tag_ids.as_deref(), tag.visibility), (Some(&["t".to_owned()][..]), None));
+        let album = searched(TimelineScope::Album("a".into()));
+        assert_eq!((album.album_ids.as_deref(), album.visibility), (Some(&["a".to_owned()][..]), None));
+        let newest = Arrangement { media_type: MediaType::Videos, ..Arrangement::default() };
+        assert!(!search(newest.query(&TimelineScope::Library, none, true)).oldest_first);
+    }
+
+    #[test]
+    fn the_accounts_own_photos_leave_the_partners_out_and_keep_the_stacks() {
+        let none = TimelineOptions::default();
+        let mine = Arrangement { owner: Owner::Mine, ..Arrangement::default() };
+        let stacked = TimelineOptions { stacked: true, ..none };
+        assert_eq!(mine.query(&TimelineScope::LibraryStacked, none, true), Query::Timeline(TimelineScope::Library, stacked));
+        let mine_favorites = Arrangement { show: Show::Favorites, sort_by: SortBy::DateAdded, ..mine };
+        assert_eq!(
+            mine_favorites.query(&TimelineScope::LibraryStacked, none, true),
+            Query::Timeline(TimelineScope::Library, TimelineOptions { favorites_only: true, by_date_added: true, ..stacked })
+        );
+        assert_eq!(Arrangement::default().query(&TimelineScope::LibraryStacked, none, true), Query::Timeline(TimelineScope::LibraryStacked, none));
+    }
+
+    #[test]
+    fn a_platforms_own_options_are_kept() {
+        let stacked_oldest = TimelineOptions { stacked: true, oldest_first: true, ..TimelineOptions::default() };
+        let album = TimelineScope::Album("a".into());
+        assert_eq!(Arrangement::default().query(&album, stacked_oldest, true), Query::Timeline(album.clone(), stacked_oldest), "an album in its order");
+        let favorites = Arrangement { show: Show::Favorites, ..Arrangement::default() };
+        let (scope, options) = timeline(favorites.query(&TimelineScope::Archive, TimelineOptions { stacked: true, ..TimelineOptions::default() }, true));
+        assert_eq!(scope, TimelineScope::Archive);
+        assert!(options.stacked && options.favorites_only && !options.oldest_first);
     }
 }

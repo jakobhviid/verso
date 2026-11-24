@@ -2,6 +2,7 @@
 // python3 scripts/check-integration.py compiles this harness with production account services and grids.
 import Foundation
 import Synchronization
+import VersoCore
 
 // Vault and UI stand-ins fail closed: this executable cannot read credentials or launch the app.
 struct AccountStore {
@@ -376,7 +377,7 @@ final class PagingProtocol: URLProtocol, @unchecked Sendable {
         // Locked Folder: its own grid source, uncached client, pipeline and files. Access errors check the unlock
         // instead of signing out, and discarding removes the files.
         assert(AssetItem.from(columns, includingLocked: true).map(\.id) == ["public", "private"])
-        assert(GridSource.locked.timelineQuery?.visibility == "locked" && !GridSource.locked.excludesArchived)
+        assert((GridSource.locked.timeline as? CoreTimeline)?.source == .locked && !GridSource.locked.excludesArchived)
         let lockedMedia = LockedFolderMedia(account: client)
         let lockedWindow = LibrarySession(services: services, lockedFolder: lockedMedia)
         assert(!lockedWindow.gridModel(for: .locked).isPaged)

@@ -64,8 +64,9 @@ pub struct TimelineOptions {
 }
 
 impl TimelineScope {
-    /// The scope's query with `options` added.
-    fn query_with(&self, options: &TimelineOptions) -> Vec<(&'static str, &str)> {
+    /// The scope's query with `options` added: what [`Client::time_buckets_with`] and [`Client::time_bucket_with`] send,
+    /// for a client that asks the same without them.
+    pub fn query_with(&self, options: &TimelineOptions) -> Vec<(&'static str, &str)> {
         let mut query = self.query();
         if options.favorites_only && *self != TimelineScope::Favorites {
             // Immich refuses partners' photos together with the favorite filter; a partner's favorites are theirs.

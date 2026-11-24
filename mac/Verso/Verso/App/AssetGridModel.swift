@@ -3,6 +3,7 @@ import AppKit
 #endif
 import Foundation
 import Observation
+import VersoCore
 
 /// What a grid shows.
 enum GridSource: Hashable {
@@ -31,18 +32,22 @@ enum GridSource: Hashable {
         }
     }
 
-    var timelineQuery: TimelineQuery? {
+    /// The timeline the source reads month by month without view options: the core's (CoreTimeline), every one stacked
+    /// (the library's scope is, with the partners' photos), or the map's area as a request; nil for the sources read a
+    /// page at a time.
+    var timeline: (any TimelineRequest)? {
         switch self {
-        case .library: TimelineQuery(withPartners: true)
-        case .geolocation: TimelineQuery(withPartners: false, withCoordinates: true)
-        case .favorites: TimelineQuery(visibility: nil, isFavorite: true)
-        case .archive: TimelineQuery(visibility: "archive")
-        case .trash: TimelineQuery(visibility: nil, isTrashed: true)
-        case .locked: TimelineQuery(visibility: "locked")
-        case .album(let id): TimelineQuery(visibility: nil, albumId: id)
-        case .partner(let id): TimelineQuery(userId: id) // Sharing
-        case .person(let id): TimelineQuery(personId: id)
-        case .explore(.tag(let id)): TimelineQuery(visibility: nil, tagId: id)
+        case .library: CoreTimeline(source: .libraryStacked, settings: .plain)
+        case .geolocation: CoreTimeline(source: .library, settings: TimelineSettings(favoritesOnly: false, oldestFirst: false, byDateAdded: false,
+                                                                                      stacked: true, coordinates: true))
+        case .favorites: CoreTimeline(source: .favorites, settings: .stacked)
+        case .archive: CoreTimeline(source: .archive, settings: .stacked)
+        case .trash: CoreTimeline(source: .trash, settings: .stacked)
+        case .locked: CoreTimeline(source: .locked, settings: .stacked)
+        case .album(let id): CoreTimeline(source: .album(id: id), settings: .stacked)
+        case .partner(let id): CoreTimeline(source: .partner(userId: id), settings: .stacked) // Sharing
+        case .person(let id): CoreTimeline(source: .person(id: id), settings: .stacked)
+        case .explore(.tag(let id)): CoreTimeline(source: .tag(id: id), settings: .stacked)
         case .explore(.map(let query)): query.timeline
         case .explore: nil
         case .videos, .search, .filteredSearch, .largeFiles, .sharedLink, .memory: nil
@@ -243,10 +248,23 @@ final class AssetGridModel {
         return sections.filter { $0.assets == nil }.count
     }
 
-    /// The source's timeline filters with the page's view options applied.
-    private var timelineQuery: TimelineQuery? {
-        guard let query = source.timelineQuery else { return nil }
-        return arrangement.map { $0.applied(to: query) } ?? query
+    /// What the source reads with the page's view options and an album's order, as the shared core makes it
+    /// (`gridQuery`): its timeline, narrowed and ordered, or photos or videos alone through search; nil for the map's
+    /// area, a request, and the sources read a page at a time.
+    private var query: GridQuery? {
+        guard let timeline = source.timeline as? CoreTimeline else { return nil }
+        var settings = timeline.settings
+        if source.albumID != nil { settings.oldestFirst = albumOrder == "asc" }
+        return gridQuery(source: timeline.source, settings: settings, options: arrangement?.options)
+    }
+
+    /// The timeline the grid reads month by month: the core's typed one, or the map's area as a request.
+    private var timeline: (any TimelineRequest)? {
+        switch query {
+        case .timeline(let scope, let settings)?: CoreTimeline(source: scope, settings: settings)
+        case .search?: nil
+        case nil: source.timeline
+        }
     }
 
     /// The ID prefix ("2026-11") of the section that holds an asset, following the view options.
@@ -255,9 +273,9 @@ final class AssetGridModel {
     }
 
     /// A timeline page showing photos or videos only, through the search API.
-    private var searchesTimeline: Bool { source.timelineQuery != nil && arrangement?.searchesTimeline == true }
+    private var searchesTimeline: Bool { source.timeline != nil && arrangement?.searchesTimeline == true }
 
-    var isPaged: Bool { source.timelineQuery == nil || searchesTimeline }
+    var isPaged: Bool { source.timeline == nil || searchesTimeline }
     var showsSectionHeaders: Bool {
         switch source { case .search, .filteredSearch, .largeFiles: false; default: true }
     }
@@ -353,10 +371,8 @@ final class AssetGridModel {
         if sections.isEmpty { state = .loading }
         arrangement = source.gridPage.map { GridArrangement(page: $0) }
         do {
-            if let query = timelineQuery, !searchesTimeline {
-                var buckets = try await source.albumID != nil
-                    ? session.client.albumTimeBuckets(query, order: albumOrder)
-                    : session.client.timeBuckets(query)
+            if let timeline, !searchesTimeline {
+                var buckets = try await session.client.timeBuckets(timeline)
                 if case .explore(.map(let map)) = source {
                     buckets.removeAll { !map.includesMonth(start: ImmichDate.parse($0.timeBucket)) }
                 }
@@ -443,10 +459,8 @@ final class AssetGridModel {
 
     /// A month's photos as the grid shows them, read from the server; nil without a session or a timeline to read.
     private func readSection(_ id: String) async throws -> [AssetItem]? {
-        guard let session, let query = timelineQuery else { return nil }
-        let columns = try await source.albumID != nil
-            ? session.client.albumTimeBucket(id, query, order: albumOrder)
-            : session.client.timeBucket(id, query)
+        guard let session, let timeline else { return nil }
+        let columns = try await session.client.timeBucket(id, timeline)
         // A month can hold tens of thousands of items: convert them off the main actor.
         let includingLocked = source == .locked
         let items = await Task.detached { AssetItem.from(columns, includingLocked: includingLocked) }.value
@@ -506,12 +520,13 @@ final class AssetGridModel {
         let result: SearchResponse.Assets
         switch source {
         case _ where searchesTimeline:
-            // Photos or videos only on a timeline page: the timeline API has no type filter, search does.
-            guard let query = source.timelineQuery, let arrangement else { return }
+            // Photos or videos only on a timeline page: the timeline API has no type filter, search does. The core
+            // makes the search (an album's, which it can make too, never comes: an album has no view options here).
+            guard case .search(let search)? = query else { return }
             result = try await session.client.metadataSearch(
-                type: arrangement.mediaType == .videos ? .video : .image, visibility: query.visibility,
-                isFavorite: query.isFavorite ?? arrangement.isFavorite, personIds: query.personId.map { [$0] },
-                tagIds: query.tagId.map { [$0] }, order: arrangement.order.rawValue, page: page)
+                type: AssetType(rawValue: search.kind), visibility: search.visibility, isFavorite: search.favoritesOnly ? true : nil,
+                personIds: search.personId.map { [$0] }, tagIds: search.tagId.map { [$0] }, order: search.oldestFirst ? "asc" : "desc",
+                page: page)
         case .largeFiles:
             let assets = try await session.client.assetsLargeFiles(type: arrangement?.assetType, isFavorite: arrangement?.isFavorite)
             try Task.checkCancellation()

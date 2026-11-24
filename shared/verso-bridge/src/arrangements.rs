@@ -14,14 +14,15 @@ use std::time::SystemTime;
 use chrono::{DateTime, Utc};
 use immich_api::map::MapMarker;
 use immich_api::timeline::YearMonth;
-use immich_api::{ServerVersion, SharedLink, SharedLinkKind};
+use immich_api::{AssetQuery, ServerVersion, SharedLink, SharedLinkKind, TimelineScope};
 use verso_core::duplicates::{self, Measure, SortBy};
 use verso_core::shared_links::{self, Arrangement, Filter};
 use verso_core::sharing::Audience;
 use verso_core::names::caseless;
+use verso_core::grid_options::Query;
 use verso_core::{albums, grid_options, map, overview, people, places};
 
-use crate::gallery::GalleryVersion;
+use crate::gallery::{GalleryVersion, TimelineSettings, TimelineSource};
 
 /// A month of the timeline, as the grid has it: its bucket and how many photos it holds.
 #[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
@@ -196,8 +197,8 @@ pub fn shared_link_expired(expires_at: Option<SystemTime>) -> bool {
 fn shared_link(kind: String, expires_at: Option<SystemTime>) -> SharedLink {
     SharedLink { kind: SharedLinkKind::from(kind), expires_at: expires_at.map(DateTime::<Utc>::from), ..SharedLink::default() }
 }
-
-/// How far an album or a link reaches (`verso_core::sharing`'s `Audience`), narrowest first, by the names the Mac and the
+/// How far an album or a link reaches (`verso_core::sharing`'s `Audience`), narrowest first, by the names the Mac
+/// and the iPhone give it; each shows it in its own icon and words.
 /// iPhone give it; each shows it in its own icon and words.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, uniffi::Enum)]
 pub enum SharingAudience {
@@ -731,11 +732,64 @@ pub fn grid_month(options: GridOptions, local_date_time: String, created_at: Opt
     grid_arrangement(&options).month(&local_date_time, created_at.map(DateTime::<Utc>::from))
 }
 
+/// What a timeline page reads (`verso_core::grid_options`' `Query`): its timeline, narrowed and ordered, through the
+/// typed timeline calls, or photos or videos alone through the search API.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Enum)]
+pub enum GridQuery {
+    Timeline { source: TimelineSource, settings: TimelineSettings },
+    Search { search: GridSearch },
+}
+
+/// Photos or videos alone on a timeline page, as Immich's metadata search asks for them, newest or oldest first by date
+/// taken.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+pub struct GridSearch {
+    /// Immich's asset type: `IMAGE` or `VIDEO`.
+    pub kind: String,
+    /// `timeline`, `archive` or `locked`; none for every visibility.
+    pub visibility: Option<String>,
+    pub favorites_only: bool,
+    pub person_id: Option<String>,
+    pub tag_id: Option<String>,
+    pub album_id: Option<String>,
+    pub oldest_first: bool,
+}
+
+impl From<AssetQuery> for GridSearch {
+    fn from(query: AssetQuery) -> GridSearch {
+        let first = |ids: Option<Vec<String>>| ids.and_then(|ids| ids.into_iter().next());
+        GridSearch {
+            kind: query.kind.map(|kind| kind.as_str().to_owned()).unwrap_or_default(),
+            visibility: query.visibility.map(|visibility| visibility.as_str().to_owned()),
+            favorites_only: query.favorites_only,
+            person_id: first(query.person_ids),
+            tag_id: first(query.tag_ids),
+            album_id: first(query.album_ids),
+            oldest_first: query.oldest_first,
+        }
+    }
+}
+
+/// The query a timeline page reads: `source` with the `settings` the page reads it with without view options (every
+/// timeline stacked on the Mac and the iPhone, an album in its order, the coordinates for Assign Location), narrowed and
+/// ordered by its view `options` where it has them; by date added as every server Verso signs in to has it.
+#[uniffi::export]
+pub fn grid_query(source: TimelineSource, settings: TimelineSettings, options: Option<GridOptions>) -> GridQuery {
+    let Some(options) = options else { return GridQuery::Timeline { source, settings } };
+    match grid_arrangement(&options).query(&TimelineScope::from(source), settings.into(), true) {
+        Query::Timeline(scope, timeline) => {
+            GridQuery::Timeline { source: TimelineSource::from(scope), settings: TimelineSettings::with(timeline, settings.coordinates) }
+        }
+        Query::Search(query) => GridQuery::Search { search: GridSearch::from(*query) },
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::time::Duration;
 
     use super::*;
+    use crate::gallery::timeline_parameters;
 
     fn month(bucket: &str, count: u32) -> OverviewMonth {
         OverviewMonth { bucket: bucket.to_owned(), count }
@@ -1181,5 +1235,116 @@ mod tests {
         assert_eq!(month(grid("all", "all", "createdAt", "asc", "all", "anyone"), uploaded).as_deref(), Some("2025-12"));
         assert_eq!(month(grid("all", "all", "added", "asc", "all", "anyone"), None), None);
         assert_eq!(month(grid("all", "VIDEO", "added", "asc", "all", "anyone"), uploaded).as_deref(), Some("2026-01"), "search groups by the month taken");
+    }
+
+    /// A Mac's or an iPhone's page read with its options kept: the query the core makes.
+    fn query(page: &str, source: TimelineSource, settings: TimelineSettings, kept_options: &[(&str, &str)]) -> GridQuery {
+        grid_query(source, settings, Some(grid_options(page.to_owned(), kept(kept_options))))
+    }
+
+    /// The request a timeline query sends.
+    fn sent(query: GridQuery) -> HashMap<String, String> {
+        match query {
+            GridQuery::Timeline { source, settings } => timeline_parameters(source, settings),
+            GridQuery::Search { search } => panic!("a search: {search:?}"),
+        }
+    }
+
+    fn settings(stacked: bool, favorites_only: bool, oldest_first: bool, by_date_added: bool) -> TimelineSettings {
+        TimelineSettings { favorites_only, oldest_first, by_date_added, stacked, coordinates: false }
+    }
+
+    #[test]
+    fn each_pages_timeline_asks_what_the_macs_typed_call_asked_for_its_view_options() {
+        // Each page as the Mac and the iPhone read it without options: every timeline stacked (the library's scope is),
+        // and the typed call the app made before for the same options, which the core's query sends the same.
+        let stacked = settings(true, false, false, false);
+        let library = |kept_options: &[(&str, &str)]| query("library", TimelineSource::LibraryStacked, TimelineSettings::default(), kept_options);
+        let typed = |source: TimelineSource, settings: TimelineSettings| timeline_parameters(source, settings);
+        assert_eq!(library(&[]), GridQuery::Timeline { source: TimelineSource::LibraryStacked, settings: TimelineSettings::default() });
+        assert_eq!(sent(library(&[("show", "favorites")])), typed(TimelineSource::Library, settings(true, true, false, false)), "favorites without the partners'");
+        assert_eq!(library(&[("owner", "mine")]), GridQuery::Timeline { source: TimelineSource::Library, settings: stacked }, "the account's own, stacked");
+        assert_eq!(
+            library(&[("owner", "Mine"), ("show", "Favorites"), ("order", "asc")]),
+            GridQuery::Timeline { source: TimelineSource::Library, settings: settings(true, true, true, false) }
+        );
+        assert_eq!(
+            library(&[("order", "asc"), ("sortBy", "createdAt")]),
+            GridQuery::Timeline { source: TimelineSource::LibraryStacked, settings: settings(false, false, true, true) }
+        );
+        let page = |page: &str, source: TimelineSource, kept_options: &[(&str, &str)]| query(page, source, stacked, kept_options);
+        assert_eq!(page("favorites", TimelineSource::Favorites, &[("order", "asc"), ("sortBy", "added")]), GridQuery::Timeline { source: TimelineSource::Favorites, settings: settings(true, false, true, true) });
+        assert_eq!(page("archive", TimelineSource::Archive, &[("show", "favorites")]), GridQuery::Timeline { source: TimelineSource::Archive, settings: settings(true, true, false, false) });
+        assert_eq!(page("locked", TimelineSource::Locked, &[("order", "asc")]), GridQuery::Timeline { source: TimelineSource::Locked, settings: settings(true, false, true, false) });
+        let partner = TimelineSource::Partner { user_id: "u".to_owned() };
+        assert_eq!(page("partner", partner.clone(), &[("order", "asc"), ("sortBy", "added"), ("show", "favorites")]), GridQuery::Timeline { source: partner, settings: settings(true, false, true, true) }, "a partner's favorites are their own");
+        let person = TimelineSource::Person { id: "p".to_owned() };
+        assert_eq!(page("person", person.clone(), &[("show", "favorites"), ("order", "asc")]), GridQuery::Timeline { source: person, settings: settings(true, true, true, false) });
+        let tag = TimelineSource::Tag { id: "t".to_owned() };
+        assert_eq!(page("tag", tag.clone(), &[("sortBy", "added")]), GridQuery::Timeline { source: tag, settings: settings(true, false, false, true) });
+        // Assign Location: the library's own photos with their coordinates; the grid leaves out those with a place.
+        let located = TimelineSettings { coordinates: true, ..stacked };
+        let assign = query("geolocation", TimelineSource::Library, located, &[("order", "asc"), ("sortBy", "added")]);
+        assert_eq!(assign, GridQuery::Timeline { source: TimelineSource::Library, settings: TimelineSettings { oldest_first: true, by_date_added: true, ..located } });
+        // A page without view options reads as it is: an album in its order, the trash.
+        let album = TimelineSource::Album { id: "a".to_owned() };
+        let oldest = settings(true, false, true, false);
+        assert_eq!(grid_query(album.clone(), oldest, None), GridQuery::Timeline { source: album, settings: oldest });
+        assert_eq!(grid_query(TimelineSource::Trash, stacked, None), GridQuery::Timeline { source: TimelineSource::Trash, settings: stacked });
+    }
+
+    #[test]
+    fn photos_or_videos_alone_search_as_the_macs_grid_searched() {
+        let stacked = settings(true, false, false, false);
+        let search = |page: &str, source: TimelineSource, kept_options: &[(&str, &str)]| match query(page, source, stacked, kept_options) {
+            GridQuery::Search { search } => search,
+            other => panic!("not a search: {other:?}"),
+        };
+        let found = |kind: &str, visibility: Option<&str>, favorites_only: bool, oldest_first: bool| GridSearch {
+            kind: kind.to_owned(),
+            visibility: visibility.map(str::to_owned),
+            favorites_only,
+            person_id: None,
+            tag_id: None,
+            album_id: None,
+            oldest_first,
+        };
+        assert_eq!(search("library", TimelineSource::LibraryStacked, &[("mediaType", "photos")]), found("IMAGE", Some("timeline"), false, false));
+        assert_eq!(search("library", TimelineSource::LibraryStacked, &[("mediaType", "VIDEO"), ("show", "Favorites"), ("order", "asc")]), found("VIDEO", Some("timeline"), true, true));
+        assert_eq!(search("library", TimelineSource::LibraryStacked, &[("mediaType", "photos"), ("owner", "mine"), ("sortBy", "added")]), found("IMAGE", Some("timeline"), false, false), "search has no date added, and no partners");
+        assert_eq!(search("favorites", TimelineSource::Favorites, &[("mediaType", "videos")]), found("VIDEO", None, true, false), "the favorites, archived ones included");
+        assert_eq!(search("archive", TimelineSource::Archive, &[("mediaType", "photos")]), found("IMAGE", Some("archive"), false, false));
+        assert_eq!(search("locked", TimelineSource::Locked, &[("mediaType", "videos")]), found("VIDEO", Some("locked"), false, false));
+        let person = search("person", TimelineSource::Person { id: "p".to_owned() }, &[("mediaType", "photos")]);
+        assert_eq!(person, GridSearch { person_id: Some("p".to_owned()), ..found("IMAGE", Some("timeline"), false, false) });
+        let tag = search("tag", TimelineSource::Tag { id: "t".to_owned() }, &[("mediaType", "photos"), ("order", "asc")]);
+        assert_eq!(tag, GridSearch { tag_id: Some("t".to_owned()), ..found("IMAGE", None, false, true) });
+        // Pages without a media type keep their timeline, whatever is kept.
+        let partner = TimelineSource::Partner { user_id: "u".to_owned() };
+        assert_eq!(query("partner", partner.clone(), stacked, &[("mediaType", "VIDEO")]), GridQuery::Timeline { source: partner, settings: stacked });
+        let located = TimelineSettings { coordinates: true, ..stacked };
+        assert_eq!(query("geolocation", TimelineSource::Library, located, &[("mediaType", "photos")]), GridQuery::Timeline { source: TimelineSource::Library, settings: located });
+    }
+
+    #[test]
+    fn a_timeline_asked_as_a_request_sends_what_the_typed_call_sends() {
+        let sent = |source: TimelineSource, settings: TimelineSettings| {
+            let mut parameters: Vec<(String, String)> = timeline_parameters(source, settings).into_iter().collect();
+            parameters.sort();
+            parameters
+        };
+        let pairs = |pairs: &[(&str, &str)]| {
+            let mut pairs: Vec<(String, String)> = pairs.iter().map(|(name, value)| ((*name).to_owned(), (*value).to_owned())).collect();
+            pairs.sort();
+            pairs
+        };
+        assert_eq!(sent(TimelineSource::LibraryStacked, TimelineSettings::default()), pairs(&[("visibility", "timeline"), ("withStacked", "true"), ("withPartners", "true")]));
+        assert_eq!(
+            sent(TimelineSource::LibraryStacked, settings(false, true, true, true)),
+            pairs(&[("visibility", "timeline"), ("withStacked", "true"), ("isFavorite", "true"), ("order", "asc"), ("orderBy", "createdAt")])
+        );
+        assert_eq!(sent(TimelineSource::Library, TimelineSettings { coordinates: true, ..settings(true, false, false, false) }), pairs(&[("visibility", "timeline"), ("withStacked", "true"), ("withCoordinates", "true")]));
+        assert_eq!(sent(TimelineSource::Album { id: "a".to_owned() }, settings(true, false, true, false)), pairs(&[("albumId", "a"), ("withStacked", "true"), ("order", "asc")]));
+        assert_eq!(sent(TimelineSource::Trash, settings(true, false, false, false)), pairs(&[("isTrashed", "true"), ("withStacked", "true")]));
     }
 }

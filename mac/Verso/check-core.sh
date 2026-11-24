@@ -17,7 +17,7 @@ swiftc -parse-as-library -emit-library -static -emit-module -module-name VersoCo
   -I "$bridge/headers" "$bridge/Generated/verso_bridge.swift" VersoCore/CoreConnection.swift \
   -emit-module-path "$out/VersoCore.swiftmodule" -o "$out/libVersoCore.a"
 swiftc -parse-as-library -swift-version 6 -I "$out" -I "$bridge/headers" \
-  Verso/API/*.swift Verso/Core/CoreTransport.swift Verso/Support/Formatters.swift Tests/CoreTransportLiveCheck.swift \
+  Verso/API/*.swift Verso/Core/CoreTransport.swift Verso/App/CoreTimeline.swift Verso/Support/Formatters.swift Tests/CoreTransportLiveCheck.swift \
   "$out/libVersoCore.a" "$bridge/universal/libverso_bridge.a" \
   -framework Security -framework SystemConfiguration -o "$out/check"
 "$out/check"

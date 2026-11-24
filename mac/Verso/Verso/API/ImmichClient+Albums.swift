@@ -73,17 +73,4 @@ extension ImmichClient {
         if try await Self.core?(apiURL, credential)?.deleteAlbumActivity(id) == true { return }
         try await send("DELETE", "activities/\(id)")
     }
-
-    /// The album's timeline in its own order: the timeline's calls, typed where the core answers them.
-    func albumTimeBuckets(_ query: TimelineQuery, order: String) async throws -> [TimeBucket] {
-        var ordered = query
-        ordered.order = order
-        return try await timeBuckets(ordered)
-    }
-
-    func albumTimeBucket(_ bucket: String, _ query: TimelineQuery, order: String) async throws -> TimeBucketAssets {
-        var ordered = query
-        ordered.order = order
-        return try await timeBucket(bucket, ordered)
-    }
 }

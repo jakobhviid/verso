@@ -3,6 +3,7 @@
 // and cannot be chosen.
 
 import SwiftUI
+import VersoCore
 
 struct AlbumsPhotoPicker: View {
     /// Where the photos to choose from come from.
@@ -172,9 +173,9 @@ struct AlbumsPhotoPicker: View {
 
     /// The album's next months of photos, newest first, until one adds a photo to show.
     private func loadAlbumMonth(_ id: String) async throws {
-        let query = TimelineQuery(visibility: nil, albumId: id)
+        let timeline = CoreTimeline(source: .album(id: id), settings: .stacked)
         if albumMonths == nil {
-            albumMonths = try await session.client.timeBuckets(query).map(\.timeBucket)
+            albumMonths = try await session.client.timeBuckets(timeline).map(\.timeBucket)
         }
         var added = 0
         while added == 0 {
@@ -184,7 +185,7 @@ struct AlbumsPhotoPicker: View {
             }
             let month = months.removeFirst()
             albumMonths = months
-            let assets = try await session.client.timeBucket(month, query)
+            let assets = try await session.client.timeBucket(month, timeline)
             let known = Set(photos.map(\.id))
             let shown = assets.id.indices
                 .filter { index in assets.visibility?.indices.contains(index) != true || assets.visibility?[index] != "locked" }

@@ -39,8 +39,8 @@ enum ImmichError: LocalizedError {
 /// the Mac"): nil from one sends that call as a request instead.
 protocol ImmichTransport: Sendable {
     func data(for request: URLRequest) async throws -> (Data, URLResponse)
-    func timeBuckets(_ query: TimelineQuery) async throws -> [TimeBucket]?
-    func timeBucket(_ bucket: String, _ query: TimelineQuery) async throws -> TimeBucketAssets?
+    func timeBuckets(_ timeline: any TimelineRequest) async throws -> [TimeBucket]?
+    func timeBucket(_ bucket: String, _ timeline: any TimelineRequest) async throws -> TimeBucketAssets?
     func albums() async throws -> [Album]?
     func albumDetails(_ id: String) async throws -> AlbumDetails?
     func peoplePage(page: Int, size: Int, withHidden: Bool, name: String?, filters: [String: String]) async throws -> PeopleResponse?
@@ -158,8 +158,8 @@ struct AssetChangeSet: Sendable {
 }
 
 extension ImmichTransport {
-    func timeBuckets(_ query: TimelineQuery) async throws -> [TimeBucket]? { nil }
-    func timeBucket(_ bucket: String, _ query: TimelineQuery) async throws -> TimeBucketAssets? { nil }
+    func timeBuckets(_ timeline: any TimelineRequest) async throws -> [TimeBucket]? { nil }
+    func timeBucket(_ bucket: String, _ timeline: any TimelineRequest) async throws -> TimeBucketAssets? { nil }
     func albums() async throws -> [Album]? { nil }
     func albumDetails(_ id: String) async throws -> AlbumDetails? { nil }
     func peoplePage(page: Int, size: Int, withHidden: Bool, name: String?, filters: [String: String]) async throws -> PeopleResponse? { nil }
@@ -493,8 +493,16 @@ extension ImmichClient {
 
 // MARK: - Endpoints
 
-/// Filters understood by `GET /timeline/buckets` and `GET /timeline/bucket`.
-struct TimelineQuery: Hashable, Sendable {
+/// A timeline to read, month by month (`GET /timeline/buckets` and `GET /timeline/bucket`): the request's query, and
+/// for a transport that answers it typed, what it asks in the core's terms (the app's `CoreTimeline`, which the core
+/// makes for a page with its view options). A transport answers nil for one it does not know, which goes as a request.
+protocol TimelineRequest: Sendable {
+    var parameters: [String: String?] { get }
+}
+
+/// A timeline asked as a request, with the filters `GET /timeline/buckets` and `GET /timeline/bucket` understand: the
+/// map's area, which no typed call asks, and the Messages extension's timelines, which it reads without the core.
+struct TimelineQuery: TimelineRequest, Hashable {
     var visibility: String? = "timeline"
     var isFavorite: Bool?
     var isTrashed: Bool?
@@ -569,14 +577,14 @@ extension ImmichClient {
         try await send("POST", "auth/logout")
     }
 
-    func timeBuckets(_ query: TimelineQuery) async throws -> [TimeBucket] {
-        if let months = try await Self.core?(apiURL, credential)?.timeBuckets(query) { return months }
-        return try await get("timeline/buckets", query: query.parameters)
+    func timeBuckets(_ timeline: any TimelineRequest) async throws -> [TimeBucket] {
+        if let months = try await Self.core?(apiURL, credential)?.timeBuckets(timeline) { return months }
+        return try await get("timeline/buckets", query: timeline.parameters)
     }
 
-    func timeBucket(_ bucket: String, _ query: TimelineQuery) async throws -> TimeBucketAssets {
-        if let month = try await Self.core?(apiURL, credential)?.timeBucket(bucket, query) { return month }
-        var parameters = query.parameters
+    func timeBucket(_ bucket: String, _ timeline: any TimelineRequest) async throws -> TimeBucketAssets {
+        if let month = try await Self.core?(apiURL, credential)?.timeBucket(bucket, timeline) { return month }
+        var parameters = timeline.parameters
         parameters["timeBucket"] = bucket
         return try await get("timeline/bucket", query: parameters)
     }

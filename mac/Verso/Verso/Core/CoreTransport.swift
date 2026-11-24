@@ -44,20 +44,19 @@ private final class Connections: Sendable {
 }
 
 extension CoreConnection: ImmichTransport {
-    // The timeline, through immich-api's own calls when one of its scopes asks exactly what the query asks.
+    // The timeline, through immich-api's own calls, for a timeline the core made (CoreTimeline); one asked as a request
+    // (the map's area) goes as one.
 
-    func timeBuckets(_ query: TimelineQuery) async throws -> [TimeBucket]? {
-        guard let call = TypedTimeline.call(for: query) else { return nil }
-        let (source, settings) = call
-        let months = try await asClientErrors { try await timelineMonths(source, settings) }
+    func timeBuckets(_ timeline: any TimelineRequest) async throws -> [TimeBucket]? {
+        guard let timeline = timeline as? CoreTimeline else { return nil }
+        let months = try await asClientErrors { try await timelineMonths(timeline.source, timeline.settings) }
         return months.map { TimeBucket(timeBucket: $0.bucket, count: Int($0.count)) }
     }
 
-    func timeBucket(_ bucket: String, _ query: TimelineQuery) async throws -> TimeBucketAssets? {
-        guard let call = TypedTimeline.call(for: query) else { return nil }
-        let (source, settings) = call
-        let assets = try await asClientErrors { try await timelineMonth(source, settings, bucket: bucket) }
-        return TypedTimeline.columns(assets, coordinates: settings.coordinates)
+    func timeBucket(_ bucket: String, _ timeline: any TimelineRequest) async throws -> TimeBucketAssets? {
+        guard let timeline = timeline as? CoreTimeline else { return nil }
+        let assets = try await asClientErrors { try await timelineMonth(timeline.source, timeline.settings, bucket: bucket) }
+        return TimeBucketAssets(assets, coordinates: timeline.settings.coordinates)
     }
 }
 
@@ -801,59 +800,10 @@ private func asClientErrors<Value>(_ call: () async throws -> Value) async throw
     }
 }
 
-/// Which typed call a timeline query is, and its answer in the client's columns.
-enum TypedTimeline {
-    /// The scope and settings that ask exactly what `query` asks; nil when none does (the map's area, for one), and
-    /// the query goes as a request.
-    static func call(for query: TimelineQuery) -> (TimelineSource, TimelineSettings)? {
-        guard query.bbox == nil, query.order == nil || query.order == "asc" || query.order == "desc",
-              query.orderBy == nil || query.orderBy == "createdAt", query.isTrashed != false, query.isFavorite != false
-        else { return nil }
-        var settings = TimelineSettings(favoritesOnly: false, oldestFirst: query.order == "asc",
-                                        byDateAdded: query.orderBy == "createdAt", stacked: query.withStacked == true,
-                                        coordinates: query.withCoordinates == true)
-        let ids = [query.albumId, query.personId, query.userId, query.tagId].compactMap { $0 }
-        let partners = query.withPartners == true
-        guard ids.count <= 1, !partners || (ids.isEmpty && query.visibility == "timeline") else { return nil }
-        let source: TimelineSource
-        if query.isTrashed == true {
-            guard query.visibility == nil, ids.isEmpty, query.isFavorite == nil else { return nil }
-            source = .trash
-        } else if let id = query.albumId {
-            guard query.visibility == nil else { return nil }
-            source = .album(id: id)
-        } else if let id = query.tagId {
-            guard query.visibility == nil else { return nil }
-            source = .tag(id: id)
-        } else if let id = query.personId {
-            guard query.visibility == "timeline" else { return nil }
-            source = .person(id: id)
-        } else if let id = query.userId {
-            guard query.visibility == "timeline" else { return nil }
-            source = .partner(userId: id)
-        } else if query.visibility == nil, query.isFavorite == true {
-            return (.favorites, settings)
-        } else if query.visibility == "archive" {
-            source = .archive
-        } else if query.visibility == "locked" {
-            source = .locked
-        } else if query.visibility == "timeline", partners {
-            // The library as a gallery shows it: the scope has the stacks and the partners.
-            guard settings.stacked else { return nil }
-            settings.stacked = false
-            source = .libraryStacked
-        } else if query.visibility == "timeline" {
-            source = .library
-        } else {
-            return nil
-        }
-        settings.favoritesOnly = query.isFavorite == true
-        return (source, settings)
-    }
-
-    /// A month's Assets as the client's columns, which the grid reads.
-    static func columns(_ assets: [TimelineAsset], coordinates: Bool) -> TimeBucketAssets {
-        TimeBucketAssets(
+extension TimeBucketAssets {
+    /// A month's Assets from the typed call as the client's columns, which the grid reads.
+    init(_ assets: [TimelineAsset], coordinates: Bool) {
+        self.init(
             id: assets.map(\.id),
             isImage: assets.map(\.isImage),
             isFavorite: assets.map(\.isFavorite),

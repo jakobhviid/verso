@@ -1565,8 +1565,9 @@ ROADMAP, M8, has its status and what is still to come; DESIGN.md, "The apps' int
   toolbar's Date Scroller toggle hides it on every grid (`grid.dateScroller`), as on the Mac.
 - **View Options** on the photo pages follow the Mac gallery's `GridArrangement`, each page remembering its own
   (`arrangement`) and offering only what it can (`verso_core::grid_options`, which reads them for the Mac and the
-  iPhone too). The timeline API narrows to favorites and orders (`isFavorite`, `order`, `orderBy=createdAt`) but has no
-  media type, so photos or videos alone read through the search API, which orders by date taken.
+  iPhone too, and makes the query a timeline page reads with them, `Arrangement::query`). The timeline API narrows to
+  favorites and orders (`isFavorite`, `order`, `orderBy=createdAt`) but has no media type, so photos or videos alone
+  read through the search API, which orders by date taken.
 - **Cards** (`cards`) are how Shared Links, Countries, Memories and Albums show: one to three photos edge to edge carry
   the title and the rest on a fade at their foot, so no space goes to a block of text under them; only a link's
   buttons go under its photos. Five sizes (220 to 440 pixels wide at least, widened to fill a line, never more than
@@ -2094,14 +2095,17 @@ to come.
   the server turns down with a status of its own (a validation failure's 400, a wrong PIN code's) as
   `ImmichError.http` with that status and the server's reason (the bridge's `BridgeError::Refused`, read by
   immich-api's `ApiError::refusal`).
-  - **Typed:** the timeline, for every query one of immich-api's scopes asks exactly (`TypedTimeline.call`), the
-    albums, people, a photo's details, sharing's lists, search (as the flat fields Immich's web app sends, paged by
-    number or by cursor), the server's, the account's and Explore's reads, what surrounds a photo, administration's
-    lists, and the changes the app makes. Changes to many answer each one's outcome, so a duplicate is still no
-    failure. immich-api grew what the app reads: `TimelineOptions::stacked` (the Mac shows every timeline stacked),
-    each Asset's country, `Client::people_page`, `Client::flat_search` (its `filter` dialect pages smart search not at
-    all), each album's last change, and `ServerFeatures`' switches.
-  - **Still requests, each for a reason:** the map's area query, which no scope asks; administration's server
+  - **Typed:** the timeline, as the core makes it for each page (`CoreTimeline`, a scope with its settings, from the
+    bridge's `grid_query` where the page has view options), the albums, people, a photo's details, sharing's lists,
+    search (as the flat fields Immich's web app sends, paged by number or by cursor), the server's, the account's and
+    Explore's reads, what surrounds a photo, administration's lists, and the changes the app makes. Changes to many
+    answer each one's outcome, so a duplicate is still no failure. immich-api grew what the app reads:
+    `TimelineOptions::stacked` (the Mac shows every timeline stacked), each Asset's country, `Client::people_page`,
+    `Client::flat_search` (its `filter` dialect pages smart search not at all), each album's last change, and
+    `ServerFeatures`' switches.
+  - **Still requests, each for a reason:** the map's area query, which no scope asks (`TimelineQuery`, by which the
+    Messages extension, without the core, reads its timelines too; where no core answers, as in the offline checks, a
+    timeline the core made goes as immich-api's own query for it, `timeline_parameters`); administration's server
     settings, overview and a library's path check, shown as the server's own JSON; and the account's preferences,
     which immich-api keeps mostly as raw JSON while the app's models read more of them, so a typed call would only
     pass the JSON through.
@@ -2125,18 +2129,20 @@ to come.
   reaches, which each platform shows in its own icon and words (`verso_core::sharing`); People's filter, with what
   Immich v3.3 and later filter themselves; Places' cities alone or by country, by visit or by name
   (`verso_core::places`); the Albums page's filter, groups and order, which groups are collapsed, and a sidebar
-  section's first albums (`verso_core::albums`); a photo page's view options, which a page offers and what they mean
-  for its grid (`verso_core::grid_options`; the query they make is still the Mac's `TimelineQuery`, ROADMAP, M9, step
-  8); the date scroller (`rail`; "The date scroller"); the sidebar's layout as Edit Sidebar arranges it, the Mac's
-  sidebar and the iPhone's Collections, each platform naming its own built-in sections and pages
-  (`verso_core::sidebar`, through the bridge's `sidebar`); and what the apps keep on the device for each account, the
-  recent searches and Verso's own notifications (`verso_core::recent_searches`, `verso_core::notifications`, through
-  the bridge's `kept`). The views hand over plain records (buckets with their counts, photos with their dates, ids and
-  coordinates, choices by the codes the settings keep them by, which are Linux's) and get places back by index; the
-  records are `Identifiable` for SwiftUI's lists (`VersoCore/CoreConnection.swift`). What a platform keeps in a form
-  of its own, the core reads and writes in that form: the Albums page's collapsed groups are one value for every
-  grouping on the Mac and the iPhone (`{"Year":["year-2024"]}`, as Immich's web app keeps them), and a value for each
-  grouping, a group a line, on Linux.
+  section's first albums (`verso_core::albums`); a photo page's view options, which a page offers, what they mean for
+  its grid, and the query a timeline page reads with them, its timeline narrowed and ordered or photos or videos alone
+  through search, from the scope and settings each platform reads the page with otherwise (every timeline stacked on
+  the Mac and the iPhone, an album in its order), which the Mac and the iPhone ask through the typed timeline calls
+  (`verso_core::grid_options`, the bridge's `grid_query`); the date scroller (`rail`; "The date scroller"); the
+  sidebar's layout as Edit Sidebar arranges it, the Mac's sidebar and the iPhone's Collections, each platform naming its
+  own built-in sections and pages (`verso_core::sidebar`, through the bridge's `sidebar`); and what the apps keep on the
+  device for each account, the recent searches and Verso's own notifications (`verso_core::recent_searches`,
+  `verso_core::notifications`, through the bridge's `kept`). The views hand over plain records (buckets with their
+  counts, photos with their dates, ids and coordinates, choices by the codes the settings keep them by, which are
+  Linux's) and get places back by index; the records are `Identifiable` for SwiftUI's lists
+  (`VersoCore/CoreConnection.swift`). What a platform keeps in a form of its own, the core reads and writes in that
+  form: the Albums page's collapsed groups are one value for every grouping on the Mac and the iPhone
+  (`{"Year":["year-2024"]}`, as Immich's web app keeps them), and a value for each grouping, a group a line, on Linux.
   - **The sidebar's layout is kept in each platform's form,** read and written as it is, as a whole layout in another
     form would be lost to an earlier version: one value on the Mac and the iPhone (`sidebarLayout`: the sections with
     whether each is hidden or collapsed, each link with its section, the links, albums and partners hidden, each album

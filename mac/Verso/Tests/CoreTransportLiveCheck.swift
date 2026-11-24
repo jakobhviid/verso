@@ -5,6 +5,7 @@ import CoreGraphics
 import Foundation
 import ImageIO
 import UniformTypeIdentifiers
+import VersoCore
 
 @main struct CoreTransportLiveCheck {
     static func main() async throws {
@@ -53,22 +54,36 @@ import UniformTypeIdentifiers
             preconditionFailure("an address with no server answered")
         } catch is URLError {}
 
-        // The timeline through immich-api's typed calls, against the same queries sent as requests: the same months,
-        // and the same first month, column by column.
-        var sources: [(String, TimelineQuery)] = [
-            ("library", TimelineQuery(withPartners: true)),
-            ("map", TimelineQuery(withPartners: false, withCoordinates: true)),
-            ("favorites", TimelineQuery(visibility: nil, isFavorite: true)),
-            ("archive", TimelineQuery(visibility: "archive")),
-            ("trash", TimelineQuery(visibility: nil, isTrashed: true)),
-            ("oldest first", TimelineQuery(withPartners: true, order: "asc")),
+        // The timeline through immich-api's typed calls, as the app reads each page (AssetGridModel's sources, every one
+        // stacked; gridQuery with a page's view options), against the queries the app sent as requests for the same: the
+        // same months, and the same first month, column by column.
+        func page(_ page: String, _ timeline: CoreTimeline, _ kept: [String: String]) -> CoreTimeline {
+            guard case .timeline(let scope, let settings) = gridQuery(source: timeline.source, settings: timeline.settings,
+                                                                      options: gridOptions(page: page, kept: kept))
+            else { preconditionFailure("\(page) with \(kept) is not a timeline") }
+            return CoreTimeline(source: scope, settings: settings)
+        }
+        let library = CoreTimeline(source: .libraryStacked, settings: .plain)
+        let located = TimelineSettings(favoritesOnly: false, oldestFirst: false, byDateAdded: false, stacked: true, coordinates: true)
+        var sources: [(String, CoreTimeline, TimelineQuery)] = [
+            ("library", library, TimelineQuery(withPartners: true)),
+            ("map", CoreTimeline(source: .library, settings: located), TimelineQuery(withPartners: false, withCoordinates: true)),
+            ("favorites", CoreTimeline(source: .favorites, settings: .stacked), TimelineQuery(visibility: nil, isFavorite: true)),
+            ("archive", CoreTimeline(source: .archive, settings: .stacked), TimelineQuery(visibility: "archive")),
+            ("trash", CoreTimeline(source: .trash, settings: .stacked), TimelineQuery(visibility: nil, isTrashed: true)),
+            ("oldest first", page("library", library, ["order": "asc"]), TimelineQuery(withPartners: true, order: "asc")),
+            ("favorites alone", page("library", library, ["show": "favorites"]), TimelineQuery(isFavorite: true)),
+            ("the account's own", page("library", library, ["owner": "mine", "sortBy": "added"]), TimelineQuery(orderBy: "createdAt")),
         ]
-        if let album = albums.first { sources.append(("album", TimelineQuery(visibility: nil, albumId: album.id))) }
-        if let person = people.people.first { sources.append(("person", TimelineQuery(personId: person.id))) }
+        if let album = albums.first {
+            sources.append(("album", CoreTimeline(source: .album(id: album.id), settings: .stacked), TimelineQuery(visibility: nil, albumId: album.id)))
+        }
+        if let person = people.people.first {
+            sources.append(("person", CoreTimeline(source: .person(id: person.id), settings: .stacked), TimelineQuery(personId: person.id)))
+        }
         var compared: [String] = []
-        for (name, query) in sources {
-            precondition(TypedTimeline.call(for: query) != nil, "\(name) is not a typed call")
-            let typed = try await client.timeBuckets(query)
+        for (name, timeline, query) in sources {
+            let typed = try await client.timeBuckets(timeline)
             let sent: [TimeBucket] = try await client.get("timeline/buckets", query: query.parameters)
             precondition(typed.map { $0.timeBucket.prefix(7) } == sent.map { $0.timeBucket.prefix(7) }
                          && typed.map(\.count) == sent.map(\.count), "\(name): the months differ")
@@ -76,7 +91,7 @@ import UniformTypeIdentifiers
                 compared.append("\(name) (empty)")
                 continue
             }
-            let typedMonth = try await client.timeBucket(first.timeBucket, query)
+            let typedMonth = try await client.timeBucket(first.timeBucket, timeline)
             var parameters = query.parameters
             parameters["timeBucket"] = first.timeBucket
             let sentMonth: TimeBucketAssets = try await client.get("timeline/bucket", query: parameters)

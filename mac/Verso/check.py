@@ -21,7 +21,7 @@ cases = {
     'password-banner': api + ['Tests/PasswordBannerChecks.swift'],
     'metadata-state': models + ['Verso/API/Models+Metadata.swift', app('MetadataState'), 'Tests/verify-metadata-state.swift'],
     'admin-refresh': models + ['Verso/API/Models+Admin.swift', 'Verso/API/ImmichClient+Admin.swift', 'Verso/API/ServerTrust.swift', 'Verso/API/ServerAddress.swift', app('AdminModel'), 'Tests/check-admin-refresh.swift'],
-    'paging-and-services': api + [app(s) for s in ['AppModel', 'AlbumPreviews', 'PlaceVisits', 'AssetGridModel', 'GridArrangement', 'AlbumsActions', 'LockedFolderMedia', 'LockedFolderTouchID', 'MetadataState', 'SharingModel', 'UploadQueue', 'VersoNotifications']] + [support('ImagePipeline'), support('LiveMotions'), support('Formatters'), 'Verso/Core/CertificateQuestion.swift', 'Tests/VersoDriveStub.swift', 'Tests/check-search-paging.swift'],
+    'paging-and-services': api + [app(s) for s in ['AppModel', 'AlbumPreviews', 'PlaceVisits', 'AssetGridModel', 'GridArrangement', 'CoreTimeline', 'AlbumsActions', 'LockedFolderMedia', 'LockedFolderTouchID', 'MetadataState', 'SharingModel', 'UploadQueue', 'VersoNotifications']] + [support('ImagePipeline'), support('LiveMotions'), support('Formatters'), 'Verso/Core/CertificateQuestion.swift', 'Tests/VersoDriveStub.swift', 'Tests/check-search-paging.swift'],
     'sharing': api + [app('SharingModel'), 'Tests/SharingModelCheck.swift'],
     'upload': api + [app('UploadQueue'), app('VersoNotifications'), 'Tests/verify-upload.swift'],
     'map-annotation': api + [support('ImagePipeline'), 'Verso/Views/Albums/RemoteThumbnail.swift', 'Verso/Views/Explore/ExploreMapAnnotation.swift', 'Tests/MapAnnotationChecks.swift'],

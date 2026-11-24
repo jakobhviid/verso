@@ -105,6 +105,7 @@ targets:
       - ../mac/Verso/Verso/App/AlbumsActions.swift
       - ../mac/Verso/Verso/App/AppModel.swift
       - ../mac/Verso/Verso/App/AssetGridModel.swift
+      - ../mac/Verso/Verso/App/CoreTimeline.swift
       - ../mac/Verso/Verso/App/GridArrangement.swift
       - ../mac/Verso/Verso/App/LockedFolderMedia.swift
       - ../mac/Verso/Verso/App/MetadataState.swift

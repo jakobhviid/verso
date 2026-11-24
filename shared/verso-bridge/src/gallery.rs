@@ -4,6 +4,7 @@
 //! reachability gate, and the answer goes back as it came. Pictures, originals, videos and uploads still go through
 //! the app's own URLSession.
 
+use std::collections::HashMap;
 use std::sync::Arc;
 
 use immich_api::timeline::{BucketAsset, TimelineOptions, TimelineScope, YearMonth};
@@ -168,6 +169,23 @@ impl From<TimelineSource> for TimelineScope {
     }
 }
 
+impl From<TimelineScope> for TimelineSource {
+    fn from(scope: TimelineScope) -> TimelineSource {
+        match scope {
+            TimelineScope::Library => TimelineSource::Library,
+            TimelineScope::LibraryStacked => TimelineSource::LibraryStacked,
+            TimelineScope::Album(id) => TimelineSource::Album { id },
+            TimelineScope::Person(id) => TimelineSource::Person { id },
+            TimelineScope::Archive => TimelineSource::Archive,
+            TimelineScope::Favorites => TimelineSource::Favorites,
+            TimelineScope::Trash => TimelineSource::Trash,
+            TimelineScope::Locked => TimelineSource::Locked,
+            TimelineScope::Tag(id) => TimelineSource::Tag { id },
+            TimelineScope::Partner(user_id) => TimelineSource::Partner { user_id },
+        }
+    }
+}
+
 impl From<TimelineSettings> for TimelineOptions {
     fn from(settings: TimelineSettings) -> TimelineOptions {
         TimelineOptions {
@@ -177,6 +195,33 @@ impl From<TimelineSettings> for TimelineOptions {
             stacked: settings.stacked,
         }
     }
+}
+
+impl TimelineSettings {
+    /// `options`, with the coordinates or not.
+    pub fn with(options: TimelineOptions, coordinates: bool) -> TimelineSettings {
+        TimelineSettings {
+            favorites_only: options.favorites_only,
+            oldest_first: options.oldest_first,
+            by_date_added: options.by_date_added,
+            stacked: options.stacked,
+            coordinates,
+        }
+    }
+}
+
+/// The query of a timeline's months as the typed calls send it, for a client that asks it as a request (the Mac's and
+/// the iPhone's offline checks): immich-api's own, with each Asset's coordinates where `settings` ask for them. A
+/// month's call adds its bucket (`timeBucket`).
+#[uniffi::export]
+pub fn timeline_parameters(source: TimelineSource, settings: TimelineSettings) -> HashMap<String, String> {
+    let scope = TimelineScope::from(source);
+    let mut parameters: HashMap<String, String> =
+        scope.query_with(&settings.into()).into_iter().map(|(name, value)| (name.to_owned(), value.to_owned())).collect();
+    if settings.coordinates {
+        parameters.insert("withCoordinates".to_owned(), "true".to_owned());
+    }
+    parameters
 }
 
 impl From<BucketAsset> for TimelineAsset {

@@ -1,14 +1,10 @@
 //! A photo page's view options as Linux remembers them, under `grid.<page>.<option>` in `gallery.json`, and the source a
-//! page reads with them; the options themselves, which a page offers and how each is kept, are the core's
-//! (`verso_core::grid_options`), as on the Mac and the iPhone. Linux's window shows favorites alone, photos or videos
-//! alone, by date taken or date added, newest or oldest first.
-//!
-//! The timeline API narrows to favorites and orders; it has no media type, so photos or videos only reads through the
-//! search API instead, which orders by date taken and groups by the month taken.
+//! page reads with them; the options themselves, which a page offers and how each is kept, and the query a timeline page
+//! reads with them, are the core's (`verso_core::grid_options`), as on the Mac and the iPhone. Linux's window shows
+//! favorites alone, photos or videos alone, by date taken or date added, newest or oldest first.
 
-use immich_api::search::AssetQuery;
-use immich_api::{AssetKind, TimelineOptions, TimelineScope, Visibility};
-use verso_core::grid_options::{Arrangement, GridPage, MediaType, Order, Show, SortBy};
+use immich_api::TimelineOptions;
+use verso_core::grid_options::{Arrangement, GridPage, MediaType, Order, Query, Show, SortBy};
 
 use crate::library::Source;
 use crate::settings::Settings;
@@ -26,21 +22,14 @@ pub fn save(arrangement: &Arrangement, page: GridPage, settings: &Settings) {
     settings.set(&page.key("order"), (arrangement.order != Order::NewestFirst).then_some(arrangement.order.code()));
 }
 
-/// The source a page reads with these options, from the one it reads without them; date added only on servers that
-/// have it.
+/// The source a page reads with these options, from the one it reads without them, a timeline's by the core's query
+/// (`Arrangement::query`); date added only on servers that have it.
 pub fn source(arrangement: &Arrangement, base: &Source, server_has_date_added: bool) -> Source {
     match base {
-        Source::Timeline(scope) | Source::Arranged(scope, _) => match searched(arrangement, scope) {
-            Some(query) => Source::Search(Box::new(query)),
-            None => {
-                let options = TimelineOptions {
-                    favorites_only: arrangement.favorites_only(),
-                    oldest_first: arrangement.oldest_first(),
-                    by_date_added: server_has_date_added && arrangement.sorts_by_date_added(),
-                    ..TimelineOptions::default()
-                };
-                if options == TimelineOptions::default() { Source::Timeline(scope.clone()) } else { Source::Arranged(scope.clone(), options) }
-            }
+        Source::Timeline(scope) | Source::Arranged(scope, _) => match arrangement.query(scope, TimelineOptions::default(), server_has_date_added) {
+            Query::Search(query) => Source::Search(query),
+            Query::Timeline(scope, options) if options == TimelineOptions::default() => Source::Timeline(scope),
+            Query::Timeline(scope, options) => Source::Arranged(scope, options),
         },
         Source::Search(query) => {
             let mut query = (**query).clone();
@@ -56,29 +45,10 @@ pub fn source(arrangement: &Arrangement, base: &Source, server_has_date_added: b
     }
 }
 
-/// Photos or videos only: the search API's query for a timeline, if it can express the scope.
-fn searched(arrangement: &Arrangement, scope: &TimelineScope) -> Option<AssetQuery> {
-    let kind: AssetKind = arrangement.media_type.kind()?;
-    let mut query = AssetQuery { kind: Some(kind), favorites_only: arrangement.favorites_only(), oldest_first: arrangement.oldest_first(), ..AssetQuery::default() };
-    match scope {
-        TimelineScope::Library | TimelineScope::LibraryStacked => query.visibility = Some(Visibility::Timeline),
-        TimelineScope::Archive => query.visibility = Some(Visibility::Archive),
-        TimelineScope::Locked => query.visibility = Some(Visibility::Locked),
-        TimelineScope::Favorites => query.favorites_only = true,
-        TimelineScope::Person(id) => {
-            query.person_ids = Some(vec![id.clone()]);
-            query.visibility = Some(Visibility::Timeline);
-        }
-        TimelineScope::Tag(id) => query.tag_ids = Some(vec![id.clone()]),
-        TimelineScope::Album(id) => query.album_ids = Some(vec![id.clone()]),
-        TimelineScope::Trash | TimelineScope::Partner(_) => return None,
-    }
-    Some(query)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+    use immich_api::{AssetKind, TimelineScope};
 
     #[test]
     fn options_are_remembered_per_page_in_linuxs_codes_and_only_those_a_page_offers() {
