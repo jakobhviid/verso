@@ -224,6 +224,23 @@ org.gnome.Shell.Eval "global.display.focus_window.move_resize_frame(false, x, y,
 - **Single sign-on** shows on the sign-in page once `lab/immich-server/oidc.sh` has run; it restarts Immich, so the
   service may tell of a moment offline, a banner GNOME keeps until someone is active: dismiss it before a picture.
 
+## The website's pictures
+
+`site/screenshots/` (DESIGN.md, "Screenshots") are taken as the README's, against the showcase server, light and
+dark (the portal started first, then `gsettings set org.gnome.desktop.interface color-scheme prefer-dark`), and saved
+as WebP:
+- **A clean address:** sign in to `http://photos.example.com`, not the lab address, which the sidebar's foot shows. As
+  root in the VM: `127.0.0.1 photos.example.com` in `/etc/hosts`, and `systemd-run --unit=showcase-forward socat
+  TCP-LISTEN:80,bind=127.0.0.1,reuseaddr,fork TCP:<server address>:2283` (`dnf install socat`).
+- **The theme's icons** from the tarball's `hicolor/` in `~/.local/share/icons/`, or Verso Drive has no icon in Files.
+- **A page by its crosslink:** `/opt/verso/verso "immich-crosslink:///photos/<asset id>?server=http%3A%2F%2Fphotos.example.com"`
+  opens a photo in the running window (the asset ids are in `.assets.<instance>.tsv`); Info then shows its details.
+- **Scrolling to a place:** the touchpad `scroll` coasts and lands somewhere new each time; a mouse wheel's steps
+  (an Eval of `notify_discrete_scroll`, above) land the same way every time.
+- **Lazy pictures in a headless render:** Chromium's `headless_shell` (`dnf install chromium-headless`) takes the
+  page with `--run-all-compositor-stages-before-draw --virtual-time-budget=8000`, and draws pictures marked
+  `loading="lazy"` or `decoding="async"` only once those are taken off.
+
 ## Recording the result
 
 A check's outcome goes where its claim lives: a design reason in ARCHITECTURE.md, observable behaviour in SPEC.md,

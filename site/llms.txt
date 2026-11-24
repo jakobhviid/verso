@@ -1,0 +1,43 @@
+# Verso for Immich
+
+> Verso is a native app for a self-hosted Immich photo library on the iPhone, the iPad, the Mac and the Linux desktop (GNOME): browse, search, organise and share the library, back the phone up to it, and keep the whole library as a drive in Files or Finder (Verso Drive). Free, MIT licensed. Unofficial and independent.
+
+Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO. "Immich" is used only to describe the server this software works with, and remains the mark of its owner. Verso is one of the software projects by Jakob Hviid, all listed at https://jakob.hviid.phd/software/ (for LLMs: https://jakob.hviid.phd/llms.txt).
+
+## What it does
+
+- **One app, native on each platform**: SwiftUI and UIKit on the iPhone and the iPad, where it looks and moves as Photos does; SwiftUI and AppKit on the Mac; GTK 4 and libadwaita on Linux, made for GNOME. The platforms share one core in Rust: the Immich client, the drive's layout and the arithmetic that places the grid's dates.
+- **The whole library**: the timeline by year, by month or every photo, with a date scroller; albums, people, places and the map, memories, tags, folders, shared links, partners, duplicates, the archive, the trash and the Locked Folder.
+- **Search** by what photos show, by text in them, by file name or description, narrowed by people, places, dates and cameras.
+- **Organise and share**: favorites, albums, stacks, dates and locations; albums shared with people and by link; imports from the device.
+- **Verso Drive**, off until switched on: the library as folders (Photos, Albums, People, Places, Upload) in Files on Linux, the iPhone and the iPad, and in Finder on the Mac. Thumbnails come from the server; originals download only when something opens them; files copied into Upload are uploaded.
+- **On the iPhone and the iPad**: backing up to Immich in the background (Live Photos, edits, favorites, hidden photos into the Locked Folder), Free Up Space (removes photos from the phone once Immich holds them whole, only after a review), and Verso in Messages.
+- **Sign-in** with the server's single sign-on, email and password, or an API key, kept in the system's keyring or Keychain.
+- **Immich Crosslink** on the Mac and Linux: Show in opens the same photo, album, person or place in another Immich app that takes part.
+
+## Get it
+
+Needs an Immich server, v3.2 or later.
+
+- **Linux** (x86_64, GNOME 49's libraries or newer: Fedora 43+, Ubuntu 25.10 and 26.04 LTS, Debian 14, Arch): `brew install jakobhviid/tap/verso`, or the tarball and the Flatpak test build (without Verso Drive) from the releases: https://github.com/jakobhviid/verso-releases/releases/latest
+- **Mac** (macOS 15 or later): not released yet; a signed and notarized disk image and Homebrew's cask are coming.
+- **iPhone and iPad** (iOS and iPadOS 26.1 or later): not released yet; TestFlight, then the App Store.
+
+## Privacy
+
+Verso talks to the Immich server it is signed in to. No account with us, no analytics, no trackers, no update checks of its own. On Linux the map comes from where the Immich server's map setting points; on Apple's platforms the map is Apple's. It changes the library only when asked; backing up never deletes on the server.
+
+## Docs
+
+- [README](https://github.com/jakobhviid/verso/blob/main/README.md): what it does, install, building, credits
+- [WORKFLOWS.md](https://github.com/jakobhviid/verso/blob/main/WORKFLOWS.md): install, sign in, status, settings, troubleshooting
+- [SPEC.md](https://github.com/jakobhviid/verso/blob/main/SPEC.md): exactly what Verso does
+- [ARCHITECTURE.md](https://github.com/jakobhviid/verso/blob/main/ARCHITECTURE.md): how it is built, and why
+- [SECURITY.md](https://github.com/jakobhviid/verso/blob/main/SECURITY.md): what Verso keeps, where it connects, what it changes on the server
+- [CREDITS.md](https://github.com/jakobhviid/verso/blob/main/CREDITS.md): who Verso builds on: Immich Gallery by Alessandro Craciun, with contributions by Jakob Hviid (https://github.com/IGOLz/ImmichGallery); Immich Mount (https://jakob.hviid.phd/immich-mount/); Immich (https://github.com/immich-app/immich)
+
+## Optional
+
+- [Verso's page](https://jakob.hviid.phd/verso/): the page this file accompanies
+- [Releases](https://github.com/jakobhviid/verso-releases/releases)
+- [All software by Jakob Hviid](https://jakob.hviid.phd/software/)

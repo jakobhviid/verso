@@ -1,0 +1,379 @@
+<!doctype html>
+<!-- Verso's page, filled in for one release by site/build.py, which replaces each name in double braces and makes each
+     shot in them (a name and its description) a picture from site/screenshots/, with its dark version where there is
+     one, or a place marked for a picture to come. Its look (DESIGN.md, "The website"): every card is a print with its corner turned to show the
+     back, laid on Mist; the lens is the mark; each platform's own icon stands for that platform. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Verso for Immich: your Immich library in a native app on the iPhone, the iPad, the Mac and Linux</title>
+  <meta name="description" content="Verso is a native app for a self-hosted Immich library on the iPhone, the iPad, the Mac and the Linux desktop: browse, search, organise and share it, back your phone up to it, and keep the whole library as a drive in Files or Finder. Free and MIT licensed. Unofficial and independent.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#e8edf3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#181b21" media="(prefers-color-scheme: dark)">
+  <meta property="og:title" content="Verso for Immich">
+  <meta property="og:description" content="Your Immich library in a native app on the iPhone, the iPad, the Mac and the Linux desktop. Unofficial and independent.">
+  <meta property="og:image" content="{{page}}social-preview.png">
+  <meta property="og:url" content="{{page}}">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
+  <link rel="alternate" type="text/markdown" href="llms.txt" title="For LLMs">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-os="other">
+  <!-- The handwriting on the icon's strip, as the page's wordmark: drawn once, used wherever "Verso" is written. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="written" viewBox="0 1.6 76 31">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2,7 C3.5,3.5 7.5,3.8 9,8.5 C10.6,14 12.3,22.5 14,30 C17.5,22 21.5,12 25.5,5 C26.6,3.2 28.6,3.4 28.2,5.6"/>
+        <path d="M26.4,26.6 C30,26.3 34,23.8 33.6,20.8 C33.2,18 28.8,19.2 28.4,23.8 C28,28.4 31.2,30.4 34.8,28.8 C36.6,28 37.8,26.6 38.8,24.6 C39.8,22.6 40.6,20.4 41.2,18.8 C42.4,19.8 43.6,19.8 45,18.8 C45.2,21 45.4,23 46.6,24 C48.4,24.6 50,21.4 51.4,19 C53.4,22.4 56,25 54.4,28.2 C52.8,31 49,30.6 48.4,28.4 M54.8,28.8 C56.8,28.6 57.8,27.6 58.4,26 C59.4,22.6 61.8,19 64.6,19.2 C67.8,19.4 67.4,24.6 64.8,27.8 C62.6,30.6 58.8,30.2 59,26.4 C59.2,23.4 62.6,21.6 66,21.4 C68.6,21.2 71.4,20.2 73.6,18.4"/>
+      </g>
+    </symbol>
+  </svg>
+
+  <nav class="bar wrap" aria-label="Verso">
+    <a class="brand" href="#top"><img src="mark.svg" alt="" width="30" height="30"><span>Verso</span><span class="for">for Immich</span></a>
+    <span class="links">
+      <a href="#platforms">Platforms</a>
+      <a href="#drive">Verso Drive</a>
+      <a href="#privacy">Privacy</a>
+      <a class="pill" href="#get">Get Verso</a>
+    </span>
+  </nav>
+
+  <header class="hero wrap" id="top">
+    <div class="print hero-print">
+      <div class="picture">
+        <div class="stage">
+          <div class="screen linux-window">{{shot linux-library|Verso on Linux: the Library by year, each year a card of its photos}}</div>
+          <div class="device phone">{{shot iphone-library|Verso on the iPhone: the Library, edge to edge under Liquid Glass}}</div>
+        </div>
+      </div>
+      <div class="strip">
+        <div class="signature">
+          <svg class="written" role="img" aria-label="Verso"><use href="#written"/></svg>
+          <p class="for-immich">for Immich</p>
+        </div>
+        <div class="pitch">
+          <h1>Your Immich library, at home on every device.</h1>
+          <p class="lead">Browse, search, organise and share your photos, back your phone up, and, when you want it, keep
+            the whole library as a drive in Files or Finder. One app, made natively for the iPhone, the iPad, the Mac
+            and the Linux desktop.</p>
+          <ul class="chips" aria-label="Platforms">
+            <li><picture><source srcset="icon-ios-night.png" media="(prefers-color-scheme: dark)"><img src="icon-ios.png" alt="" width="22" height="22"></picture>iPhone</li>
+            <li><picture><source srcset="icon-ios-night.png" media="(prefers-color-scheme: dark)"><img src="icon-ios.png" alt="" width="22" height="22"></picture>iPad</li>
+            <li><picture><source srcset="icon-mac-night.png" media="(prefers-color-scheme: dark)"><img src="icon-mac.png" alt="" width="22" height="22"></picture>Mac</li>
+            <li><picture><source srcset="icon-linux-night.svg" media="(prefers-color-scheme: dark)"><img src="icon-linux.svg" alt="" width="22" height="22"></picture>Linux</li>
+          </ul>
+          <p class="actions">
+            <a class="button" href="#get">Get Verso</a>
+            <a class="button quiet" href="#platforms">See it on each platform</a>
+          </p>
+          <p class="version">Free, and open source. Linux {{version}}, released {{published}}:
+            <a href="{{release_url}}">what is new</a>.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <aside class="notice wrap">
+    <p>Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich
+      project or FUTO. "Immich" is used only to describe the server this software works with, and remains the mark of
+      its owner.</p>
+  </aside>
+
+  <main>
+    <section id="platforms" class="wrap">
+      <header class="heading">
+        <p class="eyebrow"><span class="ring" aria-hidden="true"></span>One app, four homes</p>
+        <h2>Made with each platform's own toolkit</h2>
+        <p class="intro">Verso looks and moves as the apps around it do, because it is made with what they are made
+          with. Underneath, every platform shares one core in Rust: the Immich client, the drive's layout and the
+          arithmetic that places the grid's dates, so Verso behaves alike everywhere.</p>
+      </header>
+      <div class="platforms">
+        <article class="print platform" id="on-iphone">
+          <div class="shot tall">{{shot iphone-viewer|Verso on the iPhone: a photo opened out of its tile, its details a swipe up}}</div>
+          <div class="about">
+            <h3><picture><source srcset="icon-ios-night.png" media="(prefers-color-scheme: dark)"><img src="icon-ios.png" alt="" width="40" height="40"></picture>iPhone<span class="status soon">Coming</span></h3>
+            <p>SwiftUI and UIKit, with Liquid Glass. It looks and moves as Photos does: a photo opens out of its tile
+              and pinches back into it.</p>
+          </div>
+        </article>
+        <article class="print platform" id="on-ipad">
+          <div class="shot wide">{{shot ipad-library|Verso on the iPad: the Library, with the tabs in the floating bar at the top}}</div>
+          <div class="about">
+            <h3><picture><source srcset="icon-ios-night.png" media="(prefers-color-scheme: dark)"><img src="icon-ios.png" alt="" width="40" height="40"></picture>iPad<span class="status soon">Coming</span></h3>
+            <p>Laid out as Photos is on the iPad, with the keyboard's commands in the menu bar, the pointer's effects,
+              and drag and drop between apps.</p>
+          </div>
+        </article>
+        <article class="print platform" id="on-mac">
+          <div class="shot wide">{{shot mac-library|Verso on the Mac: the Library beside its sidebar}}</div>
+          <div class="about">
+            <h3><picture><source srcset="icon-mac-night.png" media="(prefers-color-scheme: dark)"><img src="icon-mac.png" alt="" width="40" height="40"></picture>Mac<span class="status soon">Coming</span></h3>
+            <p>SwiftUI and AppKit, from Immich Gallery. Widgets with your photos, Shortcuts actions, and an icon in the
+              menu bar.</p>
+          </div>
+        </article>
+        <article class="print platform" id="on-linux">
+          <div class="shot wide">{{shot linux-albums|Verso on Linux: Albums, each with its cover}}</div>
+          <div class="about">
+            <h3><picture><source srcset="icon-linux-night.svg" media="(prefers-color-scheme: dark)"><img src="icon-linux.svg" alt="" width="40" height="40"></picture>Linux<span class="status out">Released</span></h3>
+            <p>GTK 4 and libadwaita, made for GNOME. An icon in the top bar keeps Verso Drive working with the window
+              closed, and Verso has a menu of its own in Files.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="tour" class="wrap">
+      <header class="heading">
+        <p class="eyebrow"><span class="ring" aria-hidden="true"></span>A closer look</p>
+        <h2>Your whole library, and a viewer that feels at home</h2>
+      </header>
+      <div class="sheet">
+        <figure class="print snapshot large">
+          {{shot linux-viewer|A photo in Verso's viewer on Linux, with its place on a map below it: the torii at Fushimi Inari, in Kyoto}}
+          <figcaption>A photo, with its place, camera and file a scroll down</figcaption>
+        </figure>
+        <figure class="print snapshot">
+          {{shot linux-map|The map in Verso on Linux, with photos where they were taken}}
+          <figcaption>The map, in your Immich server's own map style</figcaption>
+        </figure>
+        <figure class="print snapshot">
+          {{shot linux-all|Every photo in Verso's Library on Linux, by month, with the date scroller along the edge}}
+          <figcaption>Every photo, with a date scroller along its edge</figcaption>
+        </figure>
+      </div>
+
+      <div class="features">
+        <div class="print feature">
+          <h3>Your whole library</h3>
+          <p>The timeline by year, by month or every photo, with a date scroller along its edge; albums, people, places
+            and the map, memories, tags, folders, shared links, partners, duplicates, the archive, the trash and the
+            Locked Folder.</p>
+        </div>
+        <div class="print feature">
+          <h3>A viewer that feels at home</h3>
+          <p>Photos follow a swipe, the arrow keys or the touchpad; videos and Live Photos play; the photo's people,
+            place, camera and file are a scroll down.</p>
+        </div>
+        <div class="print feature">
+          <h3>Search</h3>
+          <p>By what photos show, by text in them, by file name or description, narrowed by people, places, dates and
+            cameras.</p>
+        </div>
+        <div class="print feature">
+          <h3>Organise and share</h3>
+          <p>Favorites, albums, stacks, dates and locations, the archive, the trash and the Locked Folder; albums shared
+            with people and by link; photos and folders imported from the device.</p>
+        </div>
+        <div class="print feature">
+          <h3>Sign in your way</h3>
+          <p>With your server's single sign-on, with email and password, or with an API key. The sign-in stays in the
+            system's keyring or Keychain.</p>
+        </div>
+        <div class="print feature">
+          <h3>Your account and server</h3>
+          <p>Your profile, password, devices and API keys, and for an admin, the server's administration.</p>
+        </div>
+      </div>
+      <p class="aside-line">With other Immich apps on the Mac and Linux, Verso takes part in
+        <a href="https://jakob.hviid.phd/immich-crosslink/">Immich Crosslink</a>: <strong>Show in</strong> opens the same
+        photo, album, person or place in another app that takes part, and those apps can show theirs in Verso.</p>
+    </section>
+
+    <section id="drive" class="drive">
+      <div class="wrap drive-grid">
+        <div class="drive-text">
+          <p class="eyebrow"><span class="ring" aria-hidden="true"></span>Verso Drive</p>
+          <h2>Your library as folders, for every other app</h2>
+          <p>Switch on Verso Drive, and your library is a drive in Files on Linux, the iPhone and the iPad, and in
+            Finder on the Mac. Attach a photo to an email, open a video in your editor, or drop new pictures into
+            Upload to send them to Immich, without downloading the library first.</p>
+          <ul class="ticks">
+            <li><strong>Thumbnails from the server:</strong> browsing a folder never downloads the photos in it.</li>
+            <li><strong>Originals on demand:</strong> a file is fetched only when something opens it.</li>
+            <li><strong>Off until you want it:</strong> Verso Drive is a switch in Verso's settings.</li>
+          </ul>
+        </div>
+        <div class="drive-pictures">
+          <figure class="print snapshot files">
+            {{shot linux-files|An album in GNOME Files, through Verso Drive, with thumbnails from the server}}
+            <figcaption>An album in Files, through Verso Drive</figcaption>
+          </figure>
+          <div class="print tree" aria-label="Verso Drive's folders">
+            <p class="tree-title"><img src="mark.svg" alt="" width="20" height="20">Verso</p>
+            <ul>
+              <li>Photos<span>2019 / 04 April</span></li>
+              <li>Albums<span>2019 - Japan 2019</span></li>
+              <li>People<span>Hans Christian Andersen</span></li>
+              <li>Places<span>Japan / Kyoto</span></li>
+              <li class="upload">Upload<span>drop photos here</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="backup" class="backup">
+      <div class="wrap backup-grid">
+        <div class="backup-text">
+          <p class="eyebrow"><span class="ring" aria-hidden="true"></span>On the iPhone and the iPad</p>
+          <h2>Back up your photos, then free up space</h2>
+          <p>Verso backs your photos up to Immich in the background, with their Live Photos, edits and favorites, and
+            hidden photos into the Locked Folder. Once they are safely in Immich and old enough, <strong>Free Up
+            Space</strong> offers to remove them from the phone: never without asking, and keeping your favorites, the
+            albums you choose and anything recent.</p>
+          <ul class="ticks">
+            <li><strong>Checked before anything goes:</strong> only photos Immich holds whole leave the phone, and they
+              wait in Recently Deleted for 30 days.</li>
+            <li><strong>Verso in Messages:</strong> pick a photo from your library straight into a message.</li>
+          </ul>
+        </div>
+        <div class="backup-pictures">
+          <div class="device phone">{{shot iphone-backup|Verso's Backup page on the iPhone: the library's status in one bar, In Immich, To upload and the rest}}</div>
+          <div class="device phone">{{shot iphone-free-up|Free Up Space on the iPhone: the photos to remove, by month, each ticked}}</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="get" class="wrap">
+      <header class="heading">
+        <p class="eyebrow"><span class="ring" aria-hidden="true"></span>Get Verso</p>
+        <h2>Free, on every platform</h2>
+        <p class="intro">You need an Immich server, version 3.2 or later: your own, or one a hosting provider runs for
+          you.</p>
+      </header>
+      <div class="gets">
+        <article class="print get" id="get-linux">
+          <h3><picture><source srcset="icon-linux-night.svg" media="(prefers-color-scheme: dark)"><img src="icon-linux.svg" alt="" width="48" height="48"></picture>
+            <span>Linux<small>x86_64, made for GNOME</small></span><span class="yours">Your system</span></h3>
+          <p>With <a href="https://brew.sh">Homebrew</a>, which keeps it up to date:</p>
+          <pre class="command"><code>brew install jakobhviid/tap/verso</code></pre>
+          <p>Then open <strong>Verso</strong> from the app grid and sign in. Or download version {{version}}:</p>
+          <ul class="downloads">
+            <li>{{tarball}}<span>Verso with Verso Drive, the top bar icon and its menu in Files</span></li>
+            <li>{{flatpak}}<span>A test build without Verso Drive, which needs access outside the sandbox</span></li>
+          </ul>
+          <pre class="command"><code>flatpak install --user verso-x86_64.flatpak</code></pre>
+        </article>
+        <article class="print get" id="get-mac">
+          <h3><picture><source srcset="icon-mac-night.png" media="(prefers-color-scheme: dark)"><img src="icon-mac.png" alt="" width="48" height="48"></picture>
+            <span>Mac<small>macOS 15 or later</small></span><span class="yours">Your system</span></h3>
+          {{macos}}
+        </article>
+        <article class="print get" id="get-ios">
+          <h3><picture><source srcset="icon-ios-night.png" media="(prefers-color-scheme: dark)"><img src="icon-ios.png" alt="" width="48" height="48"></picture>
+            <span>iPhone and iPad<small>iOS and iPadOS 26.1 or later</small></span><span class="yours">Your system</span></h3>
+          {{ios}}
+        </article>
+      </div>
+
+      <div class="print requirements" id="requirements">
+        <h3>What Verso needs on Linux</h3>
+        <dl>
+          <dt>New enough</dt>
+          <dd>GNOME 49's libraries or newer (libadwaita 1.8 and GTK 4.18): Fedora 43 and newer, Ubuntu 25.10 and 26.04
+            LTS, Debian 14, Arch and other rolling distributions.</dd>
+          <dt>Too old</dt>
+          <dd>Ubuntu 24.04 LTS and what is built on it (Linux Mint 22, Pop!_OS 24.04, Zorin OS 18), Debian 13, Fedora 42
+            and anything older. There Verso says so when it starts, and the Flatpak, which brings GNOME's own
+            libraries, runs instead, without Verso Drive.</dd>
+          <dt>Verso Drive</dt>
+          <dd>FUSE 3. Verso's menu in Files needs nautilus-python, and the top bar icon a tray: on GNOME, the
+            AppIndicator extension.</dd>
+        </dl>
+      </div>
+    </section>
+
+    <section id="privacy" class="wrap">
+      <header class="heading">
+        <p class="eyebrow"><span class="ring" aria-hidden="true"></span>Privacy</p>
+        <h2>What Verso sends, and to whom</h2>
+        <p class="intro">Verso talks to the Immich server you sign in to. There is no account with us, no analytics, no
+          trackers and no advertising, and Verso looks for no updates of its own.</p>
+      </header>
+      <div class="privacy">
+        <div>
+          <h3>Your sign-in stays on the device</h3>
+          <p>A session token or an API key, never your password: in the keyring on Linux (or a file only you can
+            read), and in the Keychain on the Mac, the iPhone and the iPad, on that device only.</p>
+        </div>
+        <div>
+          <h3>Encrypted unless you choose otherwise</h3>
+          <p>Verso tries https first, and never falls back to plain http for a server beyond your own network, so
+            nobody on the way can take the encryption off. A certificate your system does not trust is never accepted
+            by itself.</p>
+        </div>
+        <div>
+          <h3>Maps</h3>
+          <p>On Linux the map comes from where your Immich server's map setting points, as in Immich's web app, and
+            those hosts learn the areas you look at; nothing is fetched until a map shows. On the Mac, the iPhone and
+            the iPad the map is Apple's, and looking up place names with Apple Maps is off until you switch it on.</p>
+        </div>
+        <div>
+          <h3>Your library changes only when you ask</h3>
+          <p>A favorite, an album, a date or a place change when you change them. Backing up never deletes on the
+            server, and Free Up Space removes photos from the phone only after you review them and iOS asks.</p>
+        </div>
+      </div>
+      <p class="aside-line">Everything Verso keeps, where it connects and what it changes on the server:
+        <a href="{{repository}}/blob/main/SECURITY.md">SECURITY.md</a>. This page sets no cookies, loads nothing from
+        elsewhere, and counts no one.</p>
+    </section>
+  </main>
+
+  <footer>
+   <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <img src="mark.svg" alt="" width="40" height="40">
+      <svg class="written" role="img" aria-label="Verso"><use href="#written"/></svg>
+    </div>
+    <div class="footer-text">
+      <p><strong>Credits.</strong> Verso's Mac app is built from
+        <a href="https://github.com/IGOLz/ImmichGallery">Immich Gallery</a> for the Mac, by Alessandro Craciun, with
+        contributions by Jakob Hviid, and its interface follows it on every platform. Verso Drive, the service and the
+        Immich API layer are <a href="https://jakob.hviid.phd/immich-mount/">Immich Mount</a>'s, which is inspired by
+        <a href="https://github.com/Kartax/immich-desktop-app">Immich Desktop</a> by Kartax, and whose API layer started
+        from <a href="https://github.com/boul2gom/immich-rs">immich-rs</a>. And
+        <a href="https://github.com/immich-app/immich">Immich</a>, the server all of this talks to. More in
+        <a href="{{repository}}/blob/main/CREDITS.md">CREDITS.md</a>.</p>
+      <p><strong>The photos</strong> in the pictures are CC0 and public domain works from Wikimedia Commons, each
+        credited on <a href="photos.html">the photos' page</a>. Map data © OpenStreetMap contributors, as credited on
+        the map.</p>
+      <p><strong>AI disclosure.</strong> Parts of this project were written with the assistance of AI coding agents.
+        All changes are reviewed by the maintainer.</p>
+      <p><strong>MIT license.</strong> Take what you like: Immich's own apps, and anyone else, are welcome to any idea,
+        design or code from Verso. By <a href="https://jakob.hviid.phd/">Jakob Hviid</a>, whose other software is at
+        <a href="https://jakob.hviid.phd/software/">jakob.hviid.phd/software</a>.
+        <a href="{{repository}}">Source</a> · <a href="{{releases_url}}">Releases</a> ·
+        For LLMs: <a href="llms.txt">llms.txt</a>.</p>
+    </div>
+   </div>
+  </footer>
+
+  <script>
+    // The visitor's platform first among the downloads, marked: the Mac, an iPhone or iPad, or Linux.
+    const agent = navigator.userAgent || "";
+    const platform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "";
+    if (/iPhone|iPad|iPod/.test(agent) || (/Mac/.test(platform) && navigator.maxTouchPoints > 1)) document.body.dataset.os = "ios";
+    else if (/mac/i.test(platform)) document.body.dataset.os = "macos";
+    else if (/linux/i.test(platform) && !/android/i.test(agent)) document.body.dataset.os = "linux";
+    // A copy button on every command.
+    for (const block of document.querySelectorAll("pre.command")) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = "Copy";
+      button.addEventListener("click", async () => {
+        await navigator.clipboard.writeText(block.querySelector("code").textContent.trim());
+        button.textContent = "Copied";
+        setTimeout(() => (button.textContent = "Copy"), 1500);
+      });
+      block.append(button);
+    }
+  </script>
+</body>
+</html>

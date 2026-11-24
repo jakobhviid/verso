@@ -180,9 +180,29 @@ Rules:
 
 ## The website
 
-Verso has no web page yet: its page at `jakob.hviid.phd/verso`, presented at the top of `jakob.hviid.phd/software`,
-is planned (ROADMAP.md, M9, step 7). Until then the README is its landing page, and its downloads are the releases
-in `jakobhviid/verso-releases`.
+Verso's page, for `jakob.hviid.phd/verso` and the top of `jakob.hviid.phd/software`, is a draft in `site/`, not live
+yet (ROADMAP.md, M9, step 7). Until it is, the README is Verso's landing page, and its downloads are the releases in
+`jakobhviid/verso-releases`.
+- **A table of prints.** Verso is the back of a photo, so every card on the page is the app icon's print: paper, Day
+  or Night with the page, its bottom right corner turned over to show the back, laid on Mist's calm light blue-grey
+  (`#e8edf3`, and `#1a1d23` in the dark). The first is one large print: the pictures in its picture, on Mist's
+  gradient, and the words on its strip, where "Verso" is written in the icon's own hand (the strip's path, in its
+  ink).
+- **The lens is the mark** (`site/mark.svg`, the small icons' lens) in the bar, the tab and the footer; each
+  platform's own icon stands beside that platform alone, Day or Night with the page.
+- **The ring's colours** mark each section's heading together and in order, and one at a time as a small dot (a
+  feature, a platform's state). The one dark band, backing up, is the lens's glass.
+- **Light and dark** follow the system, and so do the pictures: each has a dark twin, taken in Verso's dark style.
+- **Measured:** text keeps 4.5:1 on its ground in both; a caption's ink is a shade darker than the icon's
+  (`#5f6477`), which the handwriting keeps.
+- **Fast and private:** one HTML file and one stylesheet, the system's fonts, no framework, nothing loaded from
+  elsewhere, no cookies and no counting; the pictures are WebP, those below the first screen loaded as they come near.
+- **Built for the releases there are** by `site/build.py` (`site/build-latest.sh` gathers them): the version and
+  Linux's downloads from the latest release in `jakobhviid/verso-releases`, the Mac's disk image from the newest
+  release with one or else "Coming", the App Store's and TestFlight's links once given, `latest.json` for the update
+  check, and `photos.html`, the credits of the showcase server's photos. A picture not taken yet is a place marked
+  for it, and the build lists those.
+- **The shared link's card** is `site/social-preview.html`, rendered at 1280 by 640 as `site/social-preview.png`.
 
 ## Screenshots
 
@@ -193,6 +213,10 @@ in `jakobhviid/verso-releases`.
 - **Names** start with `verso-` and say what they show: `verso-library.png`, `verso-viewer.png`, `verso-map.png`,
   `verso-files-album.png` (an album in Files, through Verso Drive).
 - **Retaken** when the interface they show changes; keep the file name, so the README needs no change.
+- **The website's** are in `site/screenshots/`, named by platform and place (`linux-library`, `iphone-backup`), each
+  with a `-dark` twin, as WebP: Linux's at the README's sizes, Files' window with its corners clear; the iPhone's and
+  the iPad's as the device takes them; the Mac's as above. They show the showcase server's library (the
+  `lab-immich-server` skill), whose photos the page credits; `site/build.py` names those still to take.
 
 ## The apps' interfaces
 

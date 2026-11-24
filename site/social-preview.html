@@ -1,0 +1,88 @@
+<!doctype html>
+<!-- The card a shared link to Verso's page shows (og:image), and GitHub's social preview for the repository: render at
+     1280 by 640 (a headless browser's screenshot of this page, opened from site/) as social-preview.png, kept beside it.
+     Not part of the page. Its look is the page's: a print on Mist, the picture above, "Verso" written on the strip. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <style>
+    html, body { margin: 0; width: 1280px; height: 640px; overflow: hidden; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Adwaita Sans", Cantarell, "Noto Sans", Ubuntu, sans-serif;
+      background: radial-gradient(ellipse 90% 120% at 20% 0%, #eef3f8 0%, #dde5ee 60%, #cfd9e5 100%);
+      color: #241f31;
+      position: relative;
+    }
+    /* The print, as on the page: paper cut at the fold, the back showing in the turned corner. */
+    .print {
+      position: absolute;
+      left: 64px;
+      top: 56px;
+      width: 640px;
+      height: 528px;
+      filter: drop-shadow(0 0 0.6px rgb(36 31 49 / 0.3)) drop-shadow(0 18px 36px rgb(36 31 49 / 0.18));
+      rotate: -2deg;
+    }
+    .print::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 26px;
+      background: linear-gradient(#ffffff, #f2f0ec);
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 64px), calc(100% - 64px) 100%, 0 100%);
+    }
+    .print::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 82px;
+      height: 82px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Cdefs%3E%3ClinearGradient id='b' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f6efdf'/%3E%3Cstop offset='1' stop-color='%23d8ccb0'/%3E%3C/linearGradient%3E%3Cfilter id='s' x='-40%25' y='-40%25' width='180%25' height='180%25'%3E%3CfeGaussianBlur in='SourceAlpha' stdDeviation='1.4'/%3E%3CfeOffset dx='-1.1' dy='-1.1'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.28'/%3E%3C/feComponentTransfer%3E%3CfeMerge%3E%3CfeMergeNode/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M36,8 L8,36 L8,14 Q8,8 14,8 Z' fill='url(%23b)' filter='url(%23s)'/%3E%3C/svg%3E") no-repeat 0 0 / 100% 100%;
+    }
+    .picture {
+      position: absolute;
+      inset: 16px 16px 96px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(#e6edf5, #c4d0de);
+      box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
+    }
+    .picture img {
+      position: absolute;
+      left: 40px;
+      top: 56px;
+      width: 600px;
+      border-radius: 10px 10px 0 0;
+      box-shadow: 0 0 0 1px rgb(0 0 0 / 0.1), 0 14px 40px rgb(15 13 22 / 0.28);
+    }
+    .text { position: absolute; left: 780px; top: 120px; width: 440px; }
+    .written { display: block; width: 330px; color: #6f7486; }
+    .for { display: flex; align-items: center; gap: 12px; margin: 6px 0 30px 4px; font-size: 20px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #595e6f; }
+    p { margin: 0; font-size: 31px; line-height: 1.25; font-weight: 700; letter-spacing: -0.015em; }
+    .platforms { margin-top: 26px; font-size: 22px; color: #464a59; }
+    .lens { width: 34px; height: 34px; }
+    footer { position: absolute; left: 780px; right: 56px; bottom: 40px; font-size: 16px; color: #595e6f; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="written" viewBox="0 1.6 76 31">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2,7 C3.5,3.5 7.5,3.8 9,8.5 C10.6,14 12.3,22.5 14,30 C17.5,22 21.5,12 25.5,5 C26.6,3.2 28.6,3.4 28.2,5.6"/>
+        <path d="M26.4,26.6 C30,26.3 34,23.8 33.6,20.8 C33.2,18 28.8,19.2 28.4,23.8 C28,28.4 31.2,30.4 34.8,28.8 C36.6,28 37.8,26.6 38.8,24.6 C39.8,22.6 40.6,20.4 41.2,18.8 C42.4,19.8 43.6,19.8 45,18.8 C45.2,21 45.4,23 46.6,24 C48.4,24.6 50,21.4 51.4,19 C53.4,22.4 56,25 54.4,28.2 C52.8,31 49,30.6 48.4,28.4 M54.8,28.8 C56.8,28.6 57.8,27.6 58.4,26 C59.4,22.6 61.8,19 64.6,19.2 C67.8,19.4 67.4,24.6 64.8,27.8 C62.6,30.6 58.8,30.2 59,26.4 C59.2,23.4 62.6,21.6 66,21.4 C68.6,21.2 71.4,20.2 73.6,18.4"/>
+      </g>
+    </symbol>
+  </svg>
+  <div class="print">
+    <div class="picture"><img src="screenshots/linux-library.webp" alt=""></div>
+  </div>
+  <div class="text">
+    <svg class="written" viewBox="0 1.6 76 31"><use href="#written"/></svg>
+    <div class="for"><img class="lens" src="mark.svg" alt="">for Immich</div>
+    <p>Your Immich library, at home on every device.</p>
+    <div class="platforms">iPhone · iPad · Mac · Linux</div>
+  </div>
+  <footer>An independent, unofficial project, not affiliated with the Immich project or FUTO.</footer>
+</body>
+</html>

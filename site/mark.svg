@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="-31 -31 62 62">
+  <!-- Verso's mark: the app icon's lens alone, its barrel the lens's own dark, as the small icons have it (DESIGN.md,
+       "The icon family"; the `lens` group in linux/packaging/icons/dev.hviid.Verso-dark.svg). -->
+  <defs>
+    <radialGradient id="glass" cx="0.42" cy="0.38" r="0.75">
+      <stop offset="0" stop-color="#2d5c9e"/><stop offset="0.6" stop-color="#18294a"/><stop offset="1" stop-color="#0f0d16"/>
+    </radialGradient>
+  </defs>
+  <circle r="30" fill="#3d3846"/>
+  <circle r="28" fill="#241f31"/>
+  <path d="M 1.03 -23.68 A 23.7 23.7 0 0 1 22.20 -8.30" stroke="#FA2921" stroke-width="7.8" fill="none"/>
+  <path d="M 22.84 -6.33 A 23.7 23.7 0 0 1 14.75 18.55" stroke="#ED79B5" stroke-width="7.8" fill="none"/>
+  <path d="M 13.08 19.76 A 23.7 23.7 0 0 1 -13.08 19.76" stroke="#FFB400" stroke-width="7.8" fill="none"/>
+  <path d="M -14.75 18.55 A 23.7 23.7 0 0 1 -22.84 -6.33" stroke="#1E83F7" stroke-width="7.8" fill="none"/>
+  <path d="M -22.20 -8.30 A 23.7 23.7 0 0 1 -1.03 -23.68" stroke="#18C249" stroke-width="7.8" fill="none"/>
+  <circle r="18" fill="url(#glass)"/>
+  <circle r="11.16" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="1.44"/>
+  <ellipse cx="-5.76" cy="-6.48" rx="5.4" ry="3.24" transform="rotate(-35 -5.76 -6.48)" fill="#ffffff" opacity="0.75"/>
+  <circle cx="6.84" cy="5.4" r="1.44" fill="#ffffff" opacity="0.45"/>
+</svg>
