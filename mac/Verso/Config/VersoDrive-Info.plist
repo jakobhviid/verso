@@ -2,6 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- The app's own crosslink scheme, for Finder's Show in Verso (Actions.swift): Verso Dev's differs. -->
+	<key>ImmichCrosslinkScheme</key>
+	<string>$(IMMICH_CROSSLINK_SCHEME)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -58,6 +61,14 @@
 				<string>dev.hviid.Verso.copy-link</string>
 				<key>NSExtensionFileProviderActionName</key>
 				<string>Copy Immich Link</string>
+				<key>NSExtensionFileProviderActionActivationRule</key>
+				<string>fileproviderItems.@count == 1 AND SUBQUERY(fileproviderItems, $item, $item.userInfo.hasWebLink == YES).@count == 1</string>
+			</dict>
+			<dict>
+				<key>NSExtensionFileProviderActionIdentifier</key>
+				<string>dev.hviid.Verso.show-in-verso</string>
+				<key>NSExtensionFileProviderActionName</key>
+				<string>Show in Verso</string>
 				<key>NSExtensionFileProviderActionActivationRule</key>
 				<string>fileproviderItems.@count == 1 AND SUBQUERY(fileproviderItems, $item, $item.userInfo.hasWebLink == YES).@count == 1</string>
 			</dict>

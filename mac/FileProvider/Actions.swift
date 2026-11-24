@@ -15,6 +15,7 @@ extension NSFileProviderExtensionActionIdentifier {
     static let openInImmich = NSFileProviderExtensionActionIdentifier("dev.hviid.Verso.open-in-immich")
     static let copyImmichLink = NSFileProviderExtensionActionIdentifier("dev.hviid.Verso.copy-link")
     static let showInAnotherApp = NSFileProviderExtensionActionIdentifier("dev.hviid.Verso.show-in-another-app")
+    static let showInVerso = NSFileProviderExtensionActionIdentifier("dev.hviid.Verso.show-in-verso")
 }
 
 extension FileProviderExtension: NSFileProviderCustomAction {
@@ -53,12 +54,29 @@ extension FileProviderExtension: NSFileProviderCustomAction {
                 logger.notice("copied \(address, privacy: .public) to the pasteboard: \(copied)")
                 finish(copied ? nil : CocoaError(.featureUnsupported))
             }
+        case .showInVerso:
+            Task { finish(await Self.showInVerso(identifier.bridged)) }
         case .showInAnotherApp:
             Task { finish(await Self.showInAnotherApp(identifier.bridged)) }
         default:
             finish(CocoaError(.featureUnsupported))
         }
         return progress
+    }
+
+    /// Show in Verso: the item's crosslink, in the app's own scheme, handed to Verso, the app this extension is part
+    /// of, alone. One app, so no other app takes part: the link only says which item to show.
+    private static func showInVerso(_ identifier: String) async -> Error? {
+        guard let account = Account.load(),
+              let link = await itemCrosslink(server: account.server, credential: account.credential,
+                                             certificate: account.certificate, identifier: identifier),
+              let scheme = Bundle.main.object(forInfoDictionaryKey: "ImmichCrosslinkScheme") as? String,
+              let url = URL(string: scheme + link.drop(while: { $0 != ":" })) else {
+            return NSFileProviderError(.noSuchItem)
+        }
+        // The extension is the app's PlugIns/<extension>.appex.
+        let app = Bundle.main.bundleURL.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        return await send(url, to: app)
     }
 
     /// Hand Show in Another App… to the app, which sends the item to the one app there is, or asks which.
