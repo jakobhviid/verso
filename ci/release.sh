@@ -280,16 +280,27 @@ build() {
   echo "Next: check the draft, installed in the lab's desktop VMs, then ci/release.sh publish $tag"
 }
 
-# The cask from stdin at version $1, its tarball's sha256 $2.
+# The cask from stdin with version $2 and sha256 $3 in its `on_$1` part (linux: the tarball; macos: the disk image).
+# Each part has a version of its own, as a release carries the Mac only when it was built for it.
 cask_at() {
-  sed -E -e "s/^  version \"[^\"]*\"$/  version \"$1\"/" -e "s/^  sha256 \"[0-9a-f]{64}\"$/  sha256 \"$2\"/"
+  awk -v part="  on_$1 do" -v version="$2" -v sha="$3" '
+    $0 == part { inside = 1 }
+    inside && $0 == "  end" { inside = 0 }
+    inside && /^    version "[^"]*"$/ { $0 = "    version \"" version "\"" }
+    inside && /^    sha256 "[0-9a-f]+"$/ { $0 = "    sha256 \"" sha "\"" }
+    { print }'
+}
+
+# The cask at version $1 with the tarball's sha256 $2, and the disk image's $3 when the release carries one.
+cask_for() {
+  if [ -n "$3" ]; then cask_at linux "$1" "$2" | cask_at macos "$1" "$3"; else cask_at linux "$1" "$2"; fi
 }
 
 bump_cask() {
-  local version=$1 sha=$2 current at updated clone
+  local version=$1 sha=$2 mac_sha=${3:-} current at updated clone
   current=$(gh api "repos/$tap/contents/$cask" --jq .content | base64 --decode)
-  at=$(sed -n 's/^  version "\(.*\)"$/\1/p' <<< "$current")
-  updated=$(printf '%s\n' "$current" | cask_at "$version" "$sha")
+  at=$(printf '%s\n' "$current" | awk '$0 == "  on_linux do" { inside = 1 } inside && /^    version / { gsub(/[^0-9a-z.~-]/, "", $2); print $2; exit }')
+  updated=$(printf '%s\n' "$current" | cask_for "$version" "$sha" "$mac_sha")
   if [ "$current" = "$updated" ]; then
     echo "The cask is at $version already."
     return
@@ -297,7 +308,7 @@ bump_cask() {
     echo "The cask is at $at, after $version: it stays."
     return
   fi
-  grep -q "^  sha256 \"$sha\"$" <<< "$updated" || die "$tap's $cask has no single sha256 line to set; bump it by hand"
+  grep -q "^    sha256 \"$sha\"$" <<< "$updated" || die "$tap's $cask has no on_linux sha256 line to set; bump it by hand"
   echo "The cask's bump, in $tap:"
   diff -u --label "a/$cask" --label "b/$cask" <(printf '%s\n' "$current") <(printf '%s\n' "$updated") || true
   if [ "$dry_run" = yes ]; then
@@ -306,7 +317,7 @@ bump_cask() {
   fi
   clone=$(mktemp -d)
   gh repo clone "$tap" "$clone/tap" -- --quiet --depth 1
-  cask_at "$version" "$sha" < "$clone/tap/$cask" > "$clone/verso.rb"
+  cask_for "$version" "$sha" "$mac_sha" < "$clone/tap/$cask" > "$clone/verso.rb"
   mv "$clone/verso.rb" "$clone/tap/$cask"
   git -C "$clone/tap" commit --quiet --message "verso $version" -- "$cask"
   git -C "$clone/tap" push --quiet origin HEAD
@@ -315,7 +326,7 @@ bump_cask() {
 
 publish() {
   [ $# -eq 1 ] || usage
-  local tag=$1 version repositories release draft digest flatpaks packages first_digest="" latest=(--latest)
+  local tag=$1 version repositories release draft digest flatpaks packages first_digest="" mac_digest latest=(--latest)
   version=$(version_of "$tag")
   signed_in_to_github
   mapfile -t repositories < <(release_repositories)
@@ -347,7 +358,9 @@ publish() {
     echo "A pre-release: the cask stays at the last release."
     return
   fi
-  bump_cask "$version" "${first_digest#sha256:}"
+  mac_digest=$(gh release view "$tag" --repo "${repositories[-1]}" --json assets \
+    --jq ".assets[] | select(.name == \"verso-$version.dmg\") | .digest")
+  bump_cask "$version" "${first_digest#sha256:}" "${mac_digest#sha256:}"
 }
 
 case "${1:-}" in
