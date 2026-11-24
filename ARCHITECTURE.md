@@ -1597,10 +1597,10 @@ ROADMAP, M8, has its status and what is still to come; DESIGN.md, "The apps' int
   only ever means a rating.
 - **Search**, after the Mac gallery's (`search`): smart search, file names, descriptions or the text in photos, and
   filters, each list narrowed by the one above it; filters alone search too. A date order sorts smart search's best
-  250; twenty recent searches are kept for each account. The filters go in the dialect Immich speaks since v3.2
-  (`hasAlbums`, `rating`, `originalFileName` and `description` with `like`, `ocr` with `matches`). Their people show
-  the first twelve in Immich's order, with Show All for the rest, and only the faces shown are made, so a library naming
-  hundreds reads twelve pictures.
+  250; twenty recent searches are kept for each account (`verso_core::recent_searches`). The filters go in the
+  dialect Immich speaks since v3.2 (`hasAlbums`, `rating`, `originalFileName` and `description` with `like`, `ocr`
+  with `matches`). Their people show the first twelve in Immich's order, with Show All for the rest, and only the
+  faces shown are made, so a library naming hundreds reads twelve pictures.
 - **Assign Location** (Utilities) lists the photos without a place, or every photo, to see which have one, and sets the
   place of those selected; the grid reads again once Immich has named it. The timeline's months carry each photo's
   coordinates only when asked (`withCoordinates`; without it every photo reads as having none), so every month is read,
@@ -1703,8 +1703,8 @@ ROADMAP, M8, has its status and what is still to come; DESIGN.md, "The apps' int
   which is not Verso's. An import that left files out opens in place to list them with why (on Linux up to 100, then
   how many more).
   - **Verso's are kept on this computer only,** per account, never sent to Immich: the newest 20, none older than a
-    week (on Linux in `gallery.json` under `notifications.verso.<account key>`; on the Mac in its defaults under
-    `notifications.verso.<account>`). They stay after signing out, as recent searches do.
+    week (`verso_core::notifications`; on Linux in `gallery.json` under `notifications.verso.<account key>`; on the
+    Mac in its defaults under `notifications.verso.<account>`). They stay after signing out, as recent searches do.
   - **The server's** are read when the list opens and every 60 seconds while a window is up, waiting longer after each
     error up to 15 minutes; marked read and deleted on the server (`PUT` and `DELETE /notifications`). A server that
     refuses them (403, a key without the right) or does not know them (404) leaves its section out, and the bell too
@@ -2125,14 +2125,16 @@ to come.
   (`verso_core::places`); the Albums page's filter, groups and order, which groups are collapsed, and a sidebar
   section's first albums (`verso_core::albums`); a photo page's view options, which a page offers and what they mean
   for its grid (`verso_core::grid_options`; the query they make is still the Mac's `TimelineQuery`, ROADMAP, M9, step
-  8); the date scroller (`rail`; "The date scroller"); and the sidebar's layout as Edit Sidebar arranges it, the Mac's
+  8); the date scroller (`rail`; "The date scroller"); the sidebar's layout as Edit Sidebar arranges it, the Mac's
   sidebar and the iPhone's Collections, each platform naming its own built-in sections and pages
-  (`verso_core::sidebar`, through the bridge's `sidebar`). The views hand over plain records (buckets with their
-  counts, photos with their dates, ids and coordinates, choices by the codes the settings keep them by, which are
-  Linux's) and get places back by index; the records are `Identifiable` for SwiftUI's lists
-  (`VersoCore/CoreConnection.swift`). What a platform keeps in a form of its own, the core reads and writes in that
-  form: the Albums page's collapsed groups are one value for every grouping on the Mac and the iPhone
-  (`{"Year":["year-2024"]}`, as Immich's web app keeps them), and a value for each grouping, a group a line, on Linux.
+  (`verso_core::sidebar`, through the bridge's `sidebar`); and what the apps keep on the device for each account, the
+  recent searches and Verso's own notifications (`verso_core::recent_searches`, `verso_core::notifications`, through
+  the bridge's `kept`). The views hand over plain records (buckets with their counts, photos with their dates, ids and
+  coordinates, choices by the codes the settings keep them by, which are Linux's) and get places back by index; the
+  records are `Identifiable` for SwiftUI's lists (`VersoCore/CoreConnection.swift`). What a platform keeps in a form
+  of its own, the core reads and writes in that form: the Albums page's collapsed groups are one value for every
+  grouping on the Mac and the iPhone (`{"Year":["year-2024"]}`, as Immich's web app keeps them), and a value for each
+  grouping, a group a line, on Linux.
   - **The sidebar's layout is kept in each platform's form,** read and written as it is, as a whole layout in another
     form would be lost to an earlier version: one value on the Mac and the iPhone (`sidebarLayout`: the sections with
     whether each is hidden or collapsed, each link with its section, the links, albums and partners hidden, each album
@@ -2142,6 +2144,13 @@ to come.
     them above its albums on the Mac. Collapsed sections, hidden albums and partners, and an album section's count and
     order are the Mac's and the iPhone's alone in the layout; Linux keeps its album sections' count and order beside
     it, ten and by date modified at first, where the Mac lists five by the newest photo.
+  - **The recent searches and Verso's notifications are kept in each platform's form too,** under the same rules (the
+    newest first; 20 searches, and 20 notifications none older than a week). What a recent search is differs on
+    purpose: Linux keeps its words and where they were looked for, a line each (`context\tdog`), the same words in the
+    same place being the same search, and the Mac and the iPhone keep the whole search, its filters and order with it,
+    as their `SearchQuery` encodes it, the same search but for its order being the same one, and one with filters and
+    no words kept too. The notifications are one JSON array on each, with RFC 3339 dates and `caption` on Linux, and
+    Foundation's dates (seconds since 2001), `detail` and UUIDs on the Mac and the iPhone.
   - **A choice kept under two spellings is read in both and written in Linux's,** so nothing kept needs migrating: a
     photo page's view options are written by Linux's lower-case codes (`favorites`, `photos`, `added`, as
     `config.toml`'s are lower-case), and the Mac and the iPhone, which kept Immich's names (`Favorites`, `IMAGE`,

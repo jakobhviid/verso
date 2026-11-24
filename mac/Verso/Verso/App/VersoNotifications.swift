@@ -1,11 +1,12 @@
 import Foundation
 import Observation
+import VersoCore
 
-/// A notification of Verso's own, beside the server's in the bell: for now, an import that ended. It is kept on this
-/// Mac only, never sent to Immich.
-struct VersoNotification: Codable, Identifiable, Equatable, Sendable {
+/// A notification of Verso's own, beside the server's in the bell: an import that ended, and on the iPhone what backing
+/// up needs. It is kept on this device only, never sent to Immich.
+struct VersoNotification: Identifiable, Equatable, Sendable {
     /// A file the import did not bring in, and why.
-    struct File: Codable, Equatable, Sendable {
+    struct File: Equatable, Sendable {
         let name: String
         let reason: String
     }
@@ -20,59 +21,66 @@ struct VersoNotification: Codable, Identifiable, Equatable, Sendable {
     var files: [File] = []
 }
 
-/// Verso's own notifications for one account, kept in the app's defaults: the newest 20, none older than a week. An
-/// import that ended cleanly arrives read, as it was seen happening; one that needs a look arrives unread.
+/// Verso's own notifications for one account, kept in the app's defaults. The shared core keeps them, as on Linux
+/// (`versoNotificationsAdded` and the rest): the newest 20, none older than a week; an import that ended cleanly
+/// arrives read, as it was seen happening, and one that needs a look unread.
 @MainActor @Observable
 final class VersoNotifications {
-    static let kept = 20
-    static let keptFor: TimeInterval = 7 * 24 * 3600
-
     private(set) var items: [VersoNotification] = []
+    private(set) var unreadCount = 0
     @ObservationIgnored private let key: String
+    /// The notifications shown, in the form the defaults keep them: read once, at launch, and changed from there.
+    @ObservationIgnored private var stored = ""
 
     init(account: String) {
-        key = "notifications.verso." + account
-        if let data = UserDefaults.standard.data(forKey: key),
-           let saved = try? JSONDecoder().decode([VersoNotification].self, from: data) {
-            items = saved
-        }
-        prune()
+        key = versoNotificationsKey(account: account)
+        let kept = UserDefaults.standard.data(forKey: key).map { String(decoding: $0, as: UTF8.self) } ?? ""
+        show(versoNotificationsRead(stored: kept, now: Date()))
     }
 
-    var unreadCount: Int { items.filter { $0.readAt == nil }.count }
-
     func add(_ notification: VersoNotification) {
-        var added = notification
-        if !added.needsLook { added.readAt = added.createdAt }
-        items.insert(added, at: 0)
-        prune()
-        save()
+        save(versoNotificationsAdded(stored: stored, notification: KeptNotification(notification), now: Date()))
     }
 
     func markRead(_ ids: [UUID]) {
-        let now = Date()
-        for index in items.indices where ids.contains(items[index].id) && items[index].readAt == nil { items[index].readAt = now }
-        save()
+        save(versoNotificationsMarkedRead(stored: stored, ids: ids.map(\.uuidString), now: Date()))
     }
 
     func markAllRead() { markRead(items.map(\.id)) }
 
     func delete(_ id: UUID) {
-        items.removeAll { $0.id == id }
-        save()
+        save(versoNotificationsDeleted(stored: stored, ids: [id.uuidString]))
     }
 
     func deleteAll() {
-        items = []
-        save()
+        save(versoNotificationsDeleted(stored: stored, ids: items.map(\.id.uuidString)))
     }
 
-    private func prune() {
-        let oldest = Date().addingTimeInterval(-Self.keptFor)
-        items = Array(items.filter { $0.createdAt >= oldest }.prefix(Self.kept))
+    private func save(_ kept: KeptNotifications) {
+        UserDefaults.standard.set(Data(kept.stored.utf8), forKey: key)
+        show(kept)
     }
 
-    private func save() {
-        if let data = try? JSONEncoder().encode(items) { UserDefaults.standard.set(data, forKey: key) }
+    private func show(_ kept: KeptNotifications) {
+        stored = kept.stored
+        items = kept.notifications.compactMap(VersoNotification.init)
+        unreadCount = Int(kept.unread)
+    }
+}
+
+extension VersoNotification {
+    /// A notification the core keeps; none for one whose id is no UUID, which this app never makes.
+    init?(_ kept: KeptNotification) {
+        guard let id = UUID(uuidString: kept.id) else { return nil }
+        self.init(id: id, createdAt: kept.createdAt, title: kept.title, detail: kept.detail, needsLook: kept.needsLook,
+                  readAt: kept.readAt, files: kept.files.map { File(name: $0.name, reason: $0.reason) })
+    }
+}
+
+extension KeptNotification {
+    init(_ notification: VersoNotification) {
+        self.init(id: notification.id.uuidString, createdAt: notification.createdAt, title: notification.title,
+                  detail: notification.detail, needsLook: notification.needsLook, readAt: notification.readAt,
+                  files: notification.files.map { KeptNotificationFile(name: $0.name, reason: $0.reason) })
     }
 }

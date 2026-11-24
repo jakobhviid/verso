@@ -13,7 +13,7 @@ use immich_api::{SuggestionKind, SuggestionQuery};
 use verso_core::grid_options::MediaType;
 use verso_desktop::images::Kind as ImageKind;
 use verso_desktop::library::{Source, Tile};
-use verso_desktop::search::{self, Filters, Mode, Order, Recent};
+use verso_desktop::search::{self, Filters, Mode, Order, Words};
 use verso_desktop::settings;
 use verso_linux::i18n::tr;
 
@@ -253,7 +253,7 @@ impl SearchPage {
         match search::source(self.mode(), &text, &filters, order) {
             Some(source) => {
                 if remember && !text.is_empty() {
-                    search::remember(settings::shared(), &self.account, Recent { mode: self.mode(), text });
+                    search::remember(settings::shared(), &self.account, Words { mode: self.mode(), text });
                     self.show_recent();
                 }
                 self.stack.set_visible_child_name("results");

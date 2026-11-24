@@ -2,7 +2,8 @@
 """Compile/run offline integration regressions without starting Verso, on a Mac: `mac/Verso/check.py`.
 All clients use URLProtocol fixtures; credential access uses in-memory stubs. The endpoint calls go through the
 client's session here, as no check installs the shared core (`CoreTransport`). A check of Swift that asks the core how
-to arrange what it shows (a page's view options) links the core (VersoCore) from what `mac/build-rust.sh` built.
+to arrange what it shows or what to keep (a page's view options, Verso's own notifications) links the core (VersoCore)
+from what `mac/build-rust.sh` built.
 """
 from pathlib import Path
 import subprocess
@@ -55,7 +56,7 @@ cases = {
 
 # The checks that link the shared core, and the core as the app links it: the bridge's bindings with Verso's wrapper and
 # mac/Shared, in a module of their own (VersoCore), and the bridge's library.
-with_core = {'paging-and-services'}
+with_core = {'paging-and-services', 'upload'}
 bridge = repo.parent / 'build'
 core = out / 'core'
 linking_core = ['-I', str(core), '-I', str(bridge / 'headers'), str(core / 'libVersoCore.a'),

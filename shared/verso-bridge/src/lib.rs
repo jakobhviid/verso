@@ -34,6 +34,7 @@ uniffi::setup_scaffolding!();
 
 mod arrangements;
 mod gallery;
+mod kept;
 mod rail;
 mod sidebar;
 

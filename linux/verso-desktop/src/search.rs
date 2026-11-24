@@ -1,43 +1,16 @@
 //! A search as the Mac gallery makes one: words in one of four places (what photos show, file names, descriptions,
 //! the text in photos), narrowed by filters (people, place, camera, dates, media type, not in an album, archived,
-//! favorites, rating), in an order; and the recent searches.
+//! favorites, rating), in an order; and the recent searches, kept as the core keeps them (`verso_core::recent_searches`).
 
 use chrono::{NaiveDate, TimeZone, Utc};
 use immich_api::search::AssetQuery;
 use immich_api::{AssetKind, SmartQuery, Visibility};
 
 use verso_core::grid_options::MediaType;
+use verso_core::recent_searches;
+pub use verso_core::recent_searches::{Mode, Words};
 use crate::library::Source;
 use crate::settings::Settings;
-
-/// Where the words are looked for.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum Mode {
-    /// What photos show (smart search, which needs machine learning).
-    #[default]
-    Context,
-    FileName,
-    Description,
-    /// The text in photos (OCR).
-    Text,
-}
-
-impl Mode {
-    pub const ALL: [Mode; 4] = [Mode::Context, Mode::FileName, Mode::Description, Mode::Text];
-
-    pub fn code(self) -> &'static str {
-        match self {
-            Mode::Context => "context",
-            Mode::FileName => "fileName",
-            Mode::Description => "description",
-            Mode::Text => "ocr",
-        }
-    }
-
-    pub fn from_code(code: &str) -> Option<Mode> {
-        Mode::ALL.into_iter().find(|mode| mode.code() == code)
-    }
-}
 
 /// The results' order: as found (smart search's best first, otherwise newest first), or by date.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -210,44 +183,22 @@ pub fn source(mode: Mode, text: &str, filters: &Filters, order: Order) -> Option
     })
 }
 
-/// A search made, to make again.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Recent {
-    pub mode: Mode,
-    pub text: String,
-}
-
-/// How many recent searches are kept.
-const RECENT: usize = 20;
-
-fn recent_key(account: &str) -> String {
-    format!("search.recent.{account}")
-}
-
 /// The recent searches of an account (one per server and user), newest first.
-pub fn recent(settings: &Settings, account: &str) -> Vec<Recent> {
-    settings
-        .get(&recent_key(account))
-        .map(|text| text.lines().filter_map(|line| line.split_once('\t')).filter_map(|(mode, text)| Some(Recent { mode: Mode::from_code(mode)?, text: text.to_owned() })).collect())
-        .unwrap_or_default()
+pub fn recent(settings: &Settings, account: &str) -> Vec<Words> {
+    settings.get(&recent_searches::linux_key(account)).map(|text| recent_searches::read_words(&text)).unwrap_or_default()
 }
 
-/// Remember a search first; the same words in the same place move up rather than repeat.
-pub fn remember(settings: &Settings, account: &str, search: Recent) {
-    let text = search.text.trim().replace(['\t', '\n'], " ");
-    if text.is_empty() {
-        return;
+/// Remember a search first; the same words in the same place move up rather than repeat (`verso_core::recent_searches`).
+pub fn remember(settings: &Settings, account: &str, search: Words) {
+    let kept = recent(settings, account);
+    let remembered = recent_searches::remember_words(kept.clone(), search);
+    if remembered != kept {
+        settings.set(&recent_searches::linux_key(account), Some(&recent_searches::words_lines(&remembered)));
     }
-    let mut kept = recent(settings, account);
-    kept.retain(|known| !(known.mode == search.mode && known.text == text));
-    kept.insert(0, Recent { mode: search.mode, text });
-    kept.truncate(RECENT);
-    let lines: Vec<String> = kept.iter().map(|known| format!("{}\t{}", known.mode.code(), known.text)).collect();
-    settings.set(&recent_key(account), Some(&lines.join("\n")));
 }
 
 pub fn clear_recent(settings: &Settings, account: &str) {
-    settings.set(&recent_key(account), None);
+    settings.set(&recent_searches::linux_key(account), None);
 }
 
 #[cfg(test)]
@@ -306,9 +257,9 @@ mod tests {
     fn recent_searches_put_the_newest_first_without_repeating() {
         let folder = tempfile::tempdir().unwrap();
         let settings = Settings::open(&folder.path().join("settings.json"));
-        remember(&settings, "me", Recent { mode: Mode::Context, text: "dog".into() });
-        remember(&settings, "me", Recent { mode: Mode::FileName, text: "IMG".into() });
-        remember(&settings, "me", Recent { mode: Mode::Context, text: "dog".into() });
+        remember(&settings, "me", Words { mode: Mode::Context, text: "dog".into() });
+        remember(&settings, "me", Words { mode: Mode::FileName, text: "IMG".into() });
+        remember(&settings, "me", Words { mode: Mode::Context, text: "dog".into() });
         let texts: Vec<String> = recent(&settings, "me").into_iter().map(|search| search.text).collect();
         assert_eq!(texts, ["dog", "IMG"]);
         assert!(recent(&settings, "someone else").is_empty());
