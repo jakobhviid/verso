@@ -1,0 +1,9 @@
+// Settings for every target of Verso on iOS, as the Mac's (mac/Verso/Config/Base.xcconfig): the release line's version
+// that mac/build-rust.sh writes, and a development build signed with the developer's own team, from the git-ignored
+// mac/Config/Local.xcconfig (AGENTS.md, "Development environment").
+
+// The version, until mac/build-rust.sh has written the release line's.
+MARKETING_VERSION = 0.0.0
+CURRENT_PROJECT_VERSION = 1
+#include? "../../mac/build/Version.xcconfig"
+#include? "../../mac/Config/Local.xcconfig"

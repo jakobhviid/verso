@@ -1,0 +1,454 @@
+/* Verso's few styles: the grid's rows and tiles, and the viewer's stage. Colours come from
+   libadwaita's named colours, so light, dark and the accent colour follow the system. */
+
+listview.gallery-grid {
+  background: none;
+  padding: 6px 0 12px 0;
+}
+
+listview.gallery-grid > row {
+  padding: 0;
+  margin: 0;
+  min-height: 0;
+  background: none;
+  border-radius: 0;
+  outline: none;
+}
+
+.gallery-month {
+  font-weight: 800;
+  font-size: 1.25em;
+}
+
+.gallery-tile {
+  background-color: alpha(var(--view-fg-color), 0.06);
+}
+
+.gallery-placeholder {
+  background-color: alpha(var(--view-fg-color), 0.08);
+}
+
+.gallery-tile.selected > picture {
+  opacity: 0.72;
+}
+
+.gallery-tile.cursor {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+.gallery-tile.selected {
+  outline: 3px solid var(--accent-bg-color);
+  outline-offset: -3px;
+}
+
+.gallery-badge {
+  color: white;
+  margin: 6px;
+  font-size: 0.85em;
+  font-weight: 700;
+  -gtk-icon-size: 14px;
+  -gtk-icon-shadow: 0 0 3px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+}
+
+.gallery-check {
+  margin: 6px;
+  min-width: 20px;
+  min-height: 20px;
+  border-radius: 999px;
+  border: 2px solid white;
+  background-color: rgba(0, 0, 0, 0.25);
+  color: white;
+  -gtk-icon-size: 14px;
+}
+
+.gallery-check.checked {
+  background-color: var(--accent-bg-color);
+  border-color: var(--accent-bg-color);
+}
+
+.gallery-stage {
+  /* The window's own colour, as the details below the photo and the Mac gallery's viewer have; black only in Full
+     Screen and the slideshow. */
+  background-color: var(--window-bg-color);
+}
+
+.gallery-stage scrolledwindow,
+.gallery-stage viewport {
+  background: none;
+}
+
+.gallery-card-picture {
+  border-radius: 12px;
+  background-color: alpha(var(--view-fg-color), 0.06);
+}
+
+.gallery-card.person .gallery-card-picture {
+  border-radius: 14px;
+}
+
+.gallery-card .title {
+  font-weight: 700;
+}
+
+.gallery-osd-button {
+  margin: 12px;
+}
+
+/* The viewer's hint that the details are a scroll down: a little quieter than the arrows beside the photo (at 0.55 it
+   was lost on a bright photo), fully there under the pointer. */
+.verso-details-hint {
+  opacity: 0.85;
+}
+
+.verso-details-hint:hover {
+  opacity: 1;
+}
+
+.gallery-sidebar-heading {
+  margin: 12px 12px 3px 12px;
+  font-size: 0.85em;
+  font-weight: 700;
+}
+
+/* A map pin: a photo in a rounded square, as places are, its tail (`map::tail`) on the spot. */
+.gallery-map-marker {
+  border-radius: 12px;
+  border: 3px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+  background-color: #deddda;
+}
+
+.gallery-map-count {
+  background-color: var(--accent-bg-color);
+  color: var(--accent-fg-color);
+  border-radius: 999px;
+  padding: 0 6px;
+  font-size: 0.8em;
+  font-weight: 800;
+}
+
+/* The Library's Years and Months: year cards and month mosaics, after Photos. */
+.gallery-overview-year {
+  margin: 18px;
+  color: white;
+  font-size: 2.2em;
+  font-weight: 800;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+}
+
+.gallery-overview-month {
+  font-weight: 800;
+  font-size: 1.6em;
+}
+
+.gallery-mosaic.empty {
+  border-radius: 10px;
+  background-color: alpha(var(--view-fg-color), 0.06);
+}
+
+button.gallery-mosaic-tile {
+  padding: 0;
+  border-radius: 10px;
+  background-color: alpha(var(--view-fg-color), 0.06);
+}
+
+.gallery-mosaic-day {
+  margin: 12px;
+  color: white;
+  font-size: 1.4em;
+  font-weight: 800;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
+}
+
+listview.gallery-months {
+  background: none;
+}
+
+listview.gallery-months > row {
+  background: none;
+  padding: 0;
+}
+
+.gallery-sidebar-cover {
+  border-radius: 4px;
+  background-color: alpha(var(--view-fg-color), 0.08);
+}
+
+.gallery-sidebar-menu {
+  min-height: 20px;
+  min-width: 20px;
+  padding: 0 4px;
+  margin: 8px 6px 0 0;
+}
+
+.gallery-face {
+  border-radius: 12px;
+  background-color: alpha(var(--view-fg-color), 0.08);
+}
+
+.gallery-place {
+  margin-bottom: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background-color: rgba(0, 0, 0, 0.45);
+  text-shadow: none;
+}
+
+/* The account at the sidebar's foot: no panel at rest; its arrow says it opens a menu, and it lights up under the
+   pointer, as a sidebar row does. The import above it (`imports`) is drawn the same, so the two line up. */
+menubutton.verso-account > button,
+button.verso-import {
+  background: none;
+  border-radius: 10px;
+  padding: 4px 8px 4px 4px;
+}
+
+menubutton.verso-account > button:hover,
+button.verso-import:hover {
+  background-color: alpha(currentColor, 0.07);
+}
+
+menubutton.verso-account > button:active,
+menubutton.verso-account > button:checked,
+button.verso-import:active,
+button.verso-import:checked {
+  background-color: alpha(currentColor, 0.14);
+}
+
+/* A coloured circle with a white symbolic icon (`notifications::Badge`), where the account has its picture: the import
+   at the sidebar's foot, the accent while its files are sent, green once everything came in, orange when something
+   needs a look; and each notification, by its level. The orange is the palette's darker one, so the white reads. */
+.verso-badge {
+  border-radius: 999px;
+  color: white;
+}
+
+.verso-badge.working,
+.verso-badge.info {
+  background-color: var(--accent-bg-color);
+  color: var(--accent-fg-color);
+}
+
+.verso-badge.done {
+  background-color: var(--success-bg-color);
+  color: var(--success-fg-color);
+}
+
+.verso-badge.needs-look {
+  background-color: var(--orange-4);
+}
+
+.verso-badge.error {
+  background-color: var(--error-bg-color);
+  color: var(--error-fg-color);
+}
+
+/* The notifications' bell beside the account: as narrow as an icon button, so the account keeps its room. */
+menubutton.verso-bell > button {
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
+/* The import's progress, where the account has its server: thin, and as narrow as the sidebar lets it be. */
+progressbar.verso-import-progress > trough {
+  min-width: 0;
+}
+
+progressbar.verso-import-progress > trough,
+progressbar.verso-import-progress > trough > progress {
+  min-height: 4px;
+}
+
+/* Edit Sidebar: where a dragged page would land, a line above or below the row it is over. */
+row.verso-drop-before {
+  box-shadow: inset 0 2px var(--accent-bg-color);
+}
+
+row.verso-drop-after {
+  box-shadow: inset 0 -2px var(--accent-bg-color);
+}
+
+/* The viewer's zoom (`motion`): the page it leaves fades on the window's colour, read from here. */
+.verso-flight {
+  color: var(--window-bg-color);
+}
+
+/* Full Screen and the slideshow: the photo on black, the controls over it. */
+.gallery-presentation,
+.gallery-presentation scrolledwindow,
+.gallery-presentation viewport {
+  background: black;
+}
+
+.gallery-presentation-controls {
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+/* Find Similar Photos: the cover's badge on a photo. */
+.gallery-cover-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* A photo's place, below it in the viewer and in the Info panel. */
+.gallery-place-map {
+  border-radius: 12px;
+}
+
+/* Cards (`cards`): Shared Links, Countries, Memories and Albums. The photos are the card: the title and a line or two
+   on a fade at their foot, chips in their top corners, the people it is shared with at the foot on the right; a card
+   that opens as a whole lightens under the pointer. */
+.verso-card .verso-card-photos {
+  padding: 0;
+  border-radius: 0;
+}
+
+.verso-card.expired .verso-card-photos {
+  opacity: 0.6;
+}
+
+.verso-card-fade {
+  background-image: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.68));
+}
+
+.verso-card-title {
+  color: white;
+  font-weight: 800;
+  font-size: 1.08em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.verso-card-line {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* A photo's label (a country's cities): context for the photo, well below the card's title. */
+.verso-card-tag {
+  margin: 8px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.8em;
+  font-weight: 600;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* A chip over the photos: a dark glass, white; a warning red, New in the accent. */
+.verso-card-chip {
+  min-height: 24px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background-color: rgba(0, 0, 0, 0.45);
+  color: white;
+  font-size: 0.85em;
+  font-weight: 700;
+}
+
+.verso-card-chip.warning {
+  background-color: var(--error-bg-color);
+  color: var(--error-fg-color);
+}
+
+.verso-card-chip.accent {
+  background-color: var(--accent-bg-color);
+  color: var(--accent-fg-color);
+}
+
+button.verso-card-chip-button {
+  min-width: 24px;
+  padding: 4px;
+  box-shadow: none;
+}
+
+button.verso-card-chip-button:hover {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* On (a memory kept): its icon filled says so, in the chip's own white, not a star's gold. */
+button.verso-card-chip-button:checked {
+  background-color: rgba(0, 0, 0, 0.45);
+}
+
+.verso-card-people avatar {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9);
+}
+
+.verso-card-more {
+  color: white;
+  font-weight: 700;
+  font-size: 0.85em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.verso-card .verso-card-foot {
+  padding: 6px;
+}
+
+flowbox.verso-cards > flowboxchild {
+  padding: 0;
+  border-radius: 12px;
+}
+
+flowbox.verso-cards > flowboxchild:hover > .verso-card.activatable {
+  filter: brightness(1.06);
+}
+
+/* A card's note (an album's description, `Card::note`): over its photos, dimmed, while the pointer is on the card or
+   it has the keyboard's focus; a short fade, as it answers the pointer. The title and the chips stay clear. */
+.verso-card-dim,
+.verso-card-note {
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+
+.verso-card-dim {
+  background-color: rgba(0, 0, 0, 0.55);
+}
+
+.verso-card-note {
+  color: white;
+  font-size: 0.95em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+flowbox.verso-cards > flowboxchild:hover .verso-card-dim,
+flowbox.verso-cards > flowboxchild:hover .verso-card-note,
+flowbox.verso-cards > flowboxchild:focus-visible .verso-card-dim,
+flowbox.verso-cards > flowboxchild:focus-visible .verso-card-note {
+  opacity: 1;
+}
+
+/* A person's face (`people_page`): a rounded square, as an album or a place, its name on a fade at its foot. An
+   account you share with is round (`avatars`), as a thing apart. */
+.verso-face {
+  border-radius: 14px;
+  background-color: alpha(var(--view-fg-color), 0.08);
+}
+
+.verso-face.hidden {
+  opacity: 0.5;
+}
+
+.verso-face-name {
+  color: white;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.verso-face-line {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.85em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+flowbox.verso-faces > flowboxchild {
+  padding: 0;
+  border-radius: 14px;
+}
+
+flowbox.verso-faces > flowboxchild:hover > .verso-face {
+  filter: brightness(1.08);
+}

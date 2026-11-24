@@ -1,0 +1,35 @@
+name: release
+
+# A pushed tag (ci/release.sh tag) builds Linux's files and makes the draft release, here and in the mirror, as
+# `ci/release.sh build` does on the workstation; the maintainer checks the draft and publishes it with
+# `ci/release.sh publish` (AGENTS.md, "Versioning").
+on:
+  push:
+    tags: ["v[0-9]*"]
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    # The tarball links Fedora 44's GTK and libadwaita, as the cask expects; privileged for flatpak-builder's sandbox.
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:44
+      options: --privileged
+    steps:
+      - name: Build dependencies
+        run: |
+          dnf install -y -q git gcc cargo rust gtk4-devel libadwaita-devel libshumate-devel blueprint-compiler \
+            python3 binutils gh flatpak flatpak-builder
+      - uses: actions/checkout@v5
+        with:
+          # The whole history and the tags: ci/version.sh numbers the tree from them.
+          fetch-depth: 0
+      - name: Build, and make the draft releases
+        env:
+          # A token that may make releases in this repository and in jakobhviid/verso-releases.
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          ci/release.sh build "$GITHUB_REF_NAME"

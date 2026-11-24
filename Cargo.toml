@@ -1,0 +1,23 @@
+[workspace]
+resolver = "2"
+# Shared by more than one platform, then Linux's alone (ROADMAP.md, M9). The Mac's Swift is in mac/.
+members = [
+    "shared/immich-api",
+    "shared/verso-core",
+    "shared/verso-bridge",
+    "linux/verso",
+    "linux/verso-desktop",
+    "linux/verso-linux",
+    "linux/verso-service",
+]
+
+[workspace.package]
+version = "0.0.0"          # CI-stamped from commit history; never hand-bump (AGENTS.md, Versioning)
+edition = "2021"
+license = "MIT"
+homepage = "https://github.com/jakobhviid/verso"
+repository = "https://github.com/jakobhviid/verso"
+
+[profile.release]
+opt-level = 3
+lto = true

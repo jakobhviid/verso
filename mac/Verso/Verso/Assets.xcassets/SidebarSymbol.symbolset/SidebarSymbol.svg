@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Verso Drive's Finder sidebar symbol, the lens of Verso's app icon, written by mac/Verso/make-symbol.py. -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3300 2200">
+ <g id="Notes">
+  <text id="template-version" style="stroke:none;fill:black;font-family:sans-serif;font-size:13;text-anchor:end;" transform="matrix(1 0 0 1 3036 1933)">Template v.6.0</text>
+  <text id="descriptive-name" style="stroke:none;fill:black;font-family:sans-serif;font-size:13;text-anchor:end;" transform="matrix(1 0 0 1 3036 1969)">Verso Drive</text>
+ </g>
+ <g id="Guides">
+  <line id="Baseline-S" style="fill:none;stroke:#27AAE1;opacity:1;stroke-width:0.5;" x1="263" x2="3036" y1="696" y2="696"/>
+  <line id="Capline-S" style="fill:none;stroke:#27AAE1;opacity:1;stroke-width:0.5;" x1="263" x2="3036" y1="625.541" y2="625.541"/>
+  <line id="Baseline-M" style="fill:none;stroke:#27AAE1;opacity:1;stroke-width:0.5;" x1="263" x2="3036" y1="1126" y2="1126"/>
+  <line id="Capline-M" style="fill:none;stroke:#27AAE1;opacity:1;stroke-width:0.5;" x1="263" x2="3036" y1="1055.541" y2="1055.541"/>
+  <line id="Baseline-L" style="fill:none;stroke:#27AAE1;opacity:1;stroke-width:0.5;" x1="263" x2="3036" y1="1556" y2="1556"/>
+  <line id="Capline-L" style="fill:none;stroke:#27AAE1;opacity:1;stroke-width:0.5;" x1="263" x2="3036" y1="1485.541" y2="1485.541"/>
+  <line id="left-margin-Ultralight-S" style="fill:none;stroke:#00AEEF;stroke-width:0.5;opacity:1.0;" x1="515.381" x2="515.381" y1="600.785" y2="720.121"/>
+  <line id="right-margin-Ultralight-S" style="fill:none;stroke:#00AEEF;stroke-width:0.5;opacity:1.0;" x1="604.041" x2="604.041" y1="600.785" y2="720.121"/>
+  <line id="left-margin-Regular-S" style="fill:none;stroke:#00AEEF;stroke-width:0.5;opacity:1.0;" x1="1404.85" x2="1404.85" y1="600.785" y2="720.121"/>
+  <line id="right-margin-Regular-S" style="fill:none;stroke:#00AEEF;stroke-width:0.5;opacity:1.0;" x1="1494.83" x2="1494.83" y1="600.785" y2="720.121"/>
+  <line id="left-margin-Black-S" style="fill:none;stroke:#00AEEF;stroke-width:0.5;opacity:1.0;" x1="2887.66" x2="2887.66" y1="600.785" y2="720.121"/>
+  <line id="right-margin-Black-S" style="fill:none;stroke:#00AEEF;stroke-width:0.5;opacity:1.0;" x1="2979.14" x2="2979.14" y1="600.785" y2="720.121"/>
+ </g>
+ <g id="Symbols">
+  <g id="Ultralight-S" transform="matrix(1 0 0 1 515.381 696)">
+   <path class="monochrome-0 multicolor-0:systemRedColor hierarchical-0:primary" d="M47.529 -75.432 C62.622 -74.231 75.77 -64.678 81.577 -50.696 L74.724 -47.85 C69.986 -59.26 59.257 -67.056 46.941 -68.036 Z"/>
+   <path class="monochrome-1 multicolor-1:systemPinkColor hierarchical-1:primary" d="M83.554 -44.61 C87.075 -29.885 82.053 -14.428 70.549 -4.585 L65.725 -10.223 C75.113 -18.255 79.211 -30.868 76.337 -42.884 Z"/>
+   <path class="monochrome-2 multicolor-2:systemYellowColor hierarchical-2:primary" d="M65.372 -0.824 C52.456 7.075 36.204 7.075 23.288 -0.824 L27.159 -7.154 C37.699 -0.708 50.961 -0.708 61.501 -7.154 Z"/>
+   <path class="monochrome-3 multicolor-3:systemBlueColor hierarchical-3:primary" d="M18.111 -4.585 C6.607 -14.428 1.585 -29.885 5.106 -44.61 L12.323 -42.884 C9.449 -30.868 13.547 -18.255 22.935 -10.223 Z"/>
+   <path class="monochrome-4 multicolor-4:systemGreenColor hierarchical-4:primary" d="M7.083 -50.696 C12.89 -64.678 26.038 -74.231 41.131 -75.432 L41.719 -68.036 C29.403 -67.056 18.674 -59.26 13.936 -47.85 Z"/>
+   <path class="monochrome-5 multicolor-5:tintColor hierarchical-5:primary" d="M44.33 -64.149 C60.302 -64.149 73.25 -51.202 73.25 -35.23 C73.25 -19.257 60.302 -6.31 44.33 -6.31 C28.358 -6.31 15.41 -19.257 15.41 -35.23 C15.41 -51.202 28.358 -64.149 44.33 -64.149 Z M44.33 -61.95 C29.573 -61.95 17.61 -49.987 17.61 -35.23 C17.61 -20.472 29.573 -8.51 44.33 -8.51 C59.087 -8.51 71.05 -20.472 71.05 -35.23 C71.05 -49.987 59.087 -61.95 44.33 -61.95 Z M42.028 -50.132 C40.448 -52.388 36.131 -52.09 32.386 -49.467 C28.64 -46.844 26.883 -42.889 28.463 -40.634 C30.042 -38.378 34.359 -38.676 38.105 -41.299 C41.851 -43.922 43.607 -47.877 42.028 -50.132 Z"/>
+  </g>
+  <g id="Regular-S" transform="matrix(1 0 0 1 1404.85 696)">
+   <path class="monochrome-0 multicolor-0:systemRedColor hierarchical-0:primary" d="M49.026 -76.02 C63.777 -74.561 76.591 -65.251 82.537 -51.673 L71.307 -46.754 C67.139 -56.272 58.158 -62.797 47.819 -63.82 Z"/>
+   <path class="monochrome-1 multicolor-1:systemPinkColor hierarchical-1:primary" d="M85.031 -43.997 C88.202 -29.516 83.307 -14.452 72.231 -4.601 L64.083 -13.762 C71.847 -20.667 75.277 -31.225 73.055 -41.374 Z"/>
+   <path class="monochrome-2 multicolor-2:systemYellowColor hierarchical-2:primary" d="M65.701 0.143 C52.91 7.633 37.07 7.633 24.279 0.143 L30.473 -10.437 C39.439 -5.187 50.541 -5.187 59.507 -10.437 Z"/>
+   <path class="monochrome-3 multicolor-3:systemBlueColor hierarchical-3:primary" d="M17.749 -4.601 C6.673 -14.452 1.778 -29.516 4.949 -43.997 L16.925 -41.374 C14.703 -31.225 18.133 -20.667 25.897 -13.762 Z"/>
+   <path class="monochrome-4 multicolor-4:systemGreenColor hierarchical-4:primary" d="M7.443 -51.673 C13.389 -65.251 26.203 -74.561 40.954 -76.02 L42.161 -63.82 C31.822 -62.797 22.841 -56.272 18.673 -46.754 Z"/>
+   <path class="monochrome-5 multicolor-5:tintColor hierarchical-5:primary" d="M44.99 -57.99 C57.56 -57.99 67.75 -47.8 67.75 -35.23 C67.75 -22.659 57.56 -12.469 44.99 -12.469 C32.42 -12.469 22.23 -22.659 22.23 -35.23 C22.23 -47.8 32.42 -57.99 44.99 -57.99 Z M44.99 -51.39 C36.065 -51.39 28.83 -44.154 28.83 -35.23 C28.83 -26.305 36.065 -19.069 44.99 -19.069 C53.915 -19.069 61.15 -26.305 61.15 -35.23 C61.15 -44.154 53.915 -51.39 44.99 -51.39 Z M44.116 -44.605 C43.027 -46.16 40.076 -45.972 37.524 -44.186 C34.973 -42.399 33.787 -39.69 34.876 -38.135 C35.964 -36.581 38.915 -36.768 41.467 -38.555 C44.018 -40.342 45.204 -43.05 44.116 -44.605 Z"/>
+  </g>
+  <g id="Black-S" transform="matrix(1 0 0 1 2887.66 696)">
+   <path class="monochrome-0 multicolor-0:systemRedColor hierarchical-0:primary" d="M50.755 -76.667 C65.095 -74.932 77.518 -65.906 83.6 -52.804 L67.491 -45.326 C63.997 -52.853 56.859 -58.039 48.621 -59.036 Z"/>
+   <path class="monochrome-1 multicolor-1:systemPinkColor hierarchical-1:primary" d="M86.699 -43.265 C89.48 -29.091 84.735 -14.486 74.153 -4.653 L62.064 -17.663 C68.143 -23.312 70.869 -31.703 69.271 -39.846 Z"/>
+   <path class="monochrome-2 multicolor-2:systemYellowColor hierarchical-2:primary" d="M66.04 1.242 C53.418 8.267 38.062 8.267 25.44 1.242 L34.078 -14.276 C41.329 -10.241 50.151 -10.241 57.402 -14.276 Z"/>
+   <path class="monochrome-3 multicolor-3:systemBlueColor hierarchical-3:primary" d="M17.327 -4.653 C6.745 -14.486 2 -29.091 4.781 -43.265 L22.209 -39.846 C20.611 -31.703 23.337 -23.312 29.416 -17.663 Z"/>
+   <path class="monochrome-4 multicolor-4:systemGreenColor hierarchical-4:primary" d="M7.88 -52.804 C13.962 -65.906 26.385 -74.932 40.725 -76.667 L42.859 -59.036 C34.621 -58.039 27.483 -52.853 23.989 -45.326 Z"/>
+   <path class="monochrome-5 multicolor-5:tintColor hierarchical-5:primary" d="M45.74 -50.99 C54.444 -50.99 61.5 -43.934 61.5 -35.23 C61.5 -26.525 54.444 -19.469 45.74 -19.469 C37.036 -19.469 29.98 -26.525 29.98 -35.23 C29.98 -43.934 37.036 -50.99 45.74 -50.99 Z M45.74 -39.39 C43.442 -39.39 41.58 -37.527 41.58 -35.23 C41.58 -32.932 43.442 -31.069 45.74 -31.069 C48.038 -31.069 49.9 -32.932 49.9 -35.23 C49.9 -37.527 48.038 -39.39 45.74 -39.39 Z M46.488 -38.325 C45.957 -39.083 44.558 -39.02 43.364 -38.184 C42.169 -37.348 41.632 -36.055 42.163 -35.296 C42.694 -34.537 44.093 -34.6 45.287 -35.437 C46.482 -36.273 47.019 -37.566 46.488 -38.325 Z"/>
+  </g>
+ </g>
+</svg>

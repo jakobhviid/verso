@@ -1,0 +1,8 @@
+// Settings for every target of Verso's Mac app. A development build is signed with the developer's own team, from
+// the git-ignored mac/Config/Local.xcconfig (AGENTS.md, "Development environment").
+
+// The version, until mac/build-rust.sh has written the release line's.
+MARKETING_VERSION = 0.0.0
+CURRENT_PROJECT_VERSION = 1
+#include? "../../build/Version.xcconfig"
+#include? "../../Config/Local.xcconfig"

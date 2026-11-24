@@ -1,0 +1,838 @@
+# Verso in vi.
+# This file is part of Verso, under the MIT license. Made by po/i18n.py.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: verso\n"
+"Report-Msgid-Bugs-To: https://github.com/jakobhviid/verso/issues\n"
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: linux/verso-service/src/commands.rs:467
+#: linux/verso-linux/src/daemon.rs:498
+msgid "Verso Drive is not mounted"
+msgstr "Verso Drive chưa được gắn kết"
+
+#: linux/verso-service/src/commands.rs:467
+#: linux/verso-linux/src/daemon.rs:498
+msgid "Switch it on in Verso's Preferences, then open the link again."
+msgstr "Hãy bật ổ đĩa trong Tùy thích của Verso, rồi mở lại liên kết."
+
+#: linux/verso-service/src/online.rs:448
+msgid "The keyring stayed locked. Open {app}, or run “{command}”, to try again."
+msgstr "Chùm chìa khóa vẫn bị khóa. Hãy mở {app} hoặc chạy “{command}” để thử lại."
+
+#: linux/verso-service/src/online.rs:449
+msgid "Immich is not mounted"
+msgstr "Immich chưa được gắn kết"
+
+#: linux/verso-linux/src/daemon.rs:497
+msgid "Links from other apps are off"
+msgstr "Liên kết từ ứng dụng khác đang tắt"
+
+#: linux/verso-linux/src/daemon.rs:497
+msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
+msgstr "Bật Immich Crosslink trong cài đặt của Verso để hiện những gì ứng dụng khác liên kết tới."
+
+#: linux/verso-linux/src/daemon.rs:499
+msgid "A link from another app cannot be opened"
+msgstr "Không thể mở liên kết từ ứng dụng khác"
+
+#: linux/verso-linux/src/daemon.rs:499
+msgid "It is not a valid Immich link."
+msgstr "Đây không phải là liên kết Immich hợp lệ."
+
+#: linux/verso-linux/src/daemon.rs:500
+#: linux/verso-linux/src/daemon.rs:504
+msgid "Nothing to show"
+msgstr "Không có gì để hiển thị"
+
+#: linux/verso-linux/src/daemon.rs:500
+msgid "Verso Drive has no place for what this link points to."
+msgstr "Verso Drive không có chỗ cho nội dung mà liên kết này trỏ tới."
+
+#: linux/verso-linux/src/daemon.rs:501
+msgid "Not signed in to {host}"
+msgstr "Chưa đăng nhập vào {host}"
+
+#: linux/verso-linux/src/daemon.rs:501
+msgid "Verso is signed in to another Immich server."
+msgstr "Verso đang đăng nhập vào một máy chủ Immich khác."
+
+#: linux/verso-linux/src/daemon.rs:502
+msgid "Another Immich account"
+msgstr "Một tài khoản Immich khác"
+
+#: linux/verso-linux/src/daemon.rs:502
+msgid "The link is for another account than the one Verso is signed in with."
+msgstr "Liên kết này dành cho một tài khoản khác với tài khoản mà Verso đang đăng nhập."
+
+#: linux/verso-linux/src/daemon.rs:505
+msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
+msgstr "Ổ đĩa không hiển thị mục này. Có thể mục này bị ẩn, nằm trong một phần đã tắt, hoặc không được chia sẻ với bạn."
+
+#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:583
+msgid "Immich is unreachable"
+msgstr "Không thể kết nối tới Immich"
+
+#: linux/verso-linux/src/daemon.rs:507
+msgid "The Immich server cannot be reached. Try the link again later."
+msgstr "Không thể kết nối máy chủ Immich. Hãy thử lại liên kết sau."
+
+#: linux/verso-linux/src/daemon.rs:584
+msgid "The Immich server cannot be reached. Files you opened before stay available."
+msgstr "Không thể kết nối máy chủ Immich. Các tập tin đã mở trước đó vẫn dùng được."
+
+#: linux/verso-linux/src/daemon.rs:587
+#: linux/verso-linux/src/tray.rs:128
+msgid "Signed out of Immich"
+msgstr "Đã đăng xuất khỏi Immich"
+
+#: linux/verso-linux/src/daemon.rs:588
+msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
+msgstr "Immich không còn chấp nhận lần đăng nhập này. Hãy mở {app} để đăng nhập lại."
+
+#: linux/verso-linux/src/folders.rs:204
+msgid "Uploaded to Immich: {folder}"
+msgstr "Đã tải lên Immich: {folder}"
+
+#: linux/verso-linux/src/folders.rs:206
+msgid "Photos and videos in the timeline: {count}"
+msgstr "Ảnh và video trong dòng thời gian: {count}"
+
+#: linux/verso-linux/src/folders.rs:207
+msgid "Albums it can make: {albums}"
+msgstr "Album có thể tạo: {albums}"
+
+#: linux/verso-linux/src/folders.rs:210
+msgid "Files not uploaded: {count}"
+msgstr "Tập tin chưa tải lên: {count}"
+
+#: linux/verso-linux/src/folders.rs:213
+#: shared/verso-core/src/settings.rs:174
+msgid "Make Albums"
+msgstr "Tạo album"
+
+#: linux/verso-linux/src/folders.rs:213
+#: shared/verso-core/src/settings.rs:173
+msgid "Timeline Only"
+msgstr "Chỉ dòng thời gian"
+
+#: linux/verso-linux/src/folders.rs:234
+msgid "Albums made from {folder}"
+msgstr "Đã tạo album từ {folder}"
+
+#: linux/verso-linux/src/folders.rs:236
+msgid "No albums made from {folder}"
+msgstr "Không tạo album nào từ {folder}"
+
+#: linux/verso-linux/src/folders.rs:242
+msgid "Immich does not let this account make albums ({permission}). The photos and videos are in the timeline."
+msgstr "Immich không cho tài khoản này tạo album ({permission}). Ảnh và video nằm trong dòng thời gian."
+
+#: linux/verso-linux/src/folders.rs:247
+msgid "Signed out of Immich. The photos and videos are in the timeline."
+msgstr "Đã đăng xuất khỏi Immich. Ảnh và video nằm trong dòng thời gian."
+
+#: linux/verso-linux/src/fuse.rs:647
+#: linux/verso-linux/src/fuse.rs:695
+#: linux/verso-linux/src/fuse.rs:701
+#: linux/verso-linux/src/fuse.rs:711
+#: linux/verso-linux/src/fuse.rs:1185
+msgid "Not uploaded: {name}"
+msgstr "Chưa tải lên: {name}"
+
+#: linux/verso-linux/src/fuse.rs:647
+msgid "The file is incomplete, as if its copy was cancelled."
+msgstr "Tập tin chưa hoàn chỉnh, như thể việc sao chép đã bị hủy."
+
+#: linux/verso-linux/src/fuse.rs:663
+msgid "Uploading {name} to Immich"
+msgstr "Đang tải {name} lên Immich"
+
+#: linux/verso-linux/src/fuse.rs:664
+msgid "The copy finishes once Immich has the file."
+msgstr "Việc sao chép kết thúc khi Immich đã nhận tập tin."
+
+#: linux/verso-linux/src/fuse.rs:677
+msgid "Restored from the trash: {name}"
+msgstr "Đã khôi phục từ thùng rác: {name}"
+
+#: linux/verso-linux/src/fuse.rs:678
+msgid "Immich had this photo in its trash, and copying it in brought it back."
+msgstr "Immich đã để ảnh này trong thùng rác, và việc sao chép đã đưa nó trở lại."
+
+#: linux/verso-linux/src/fuse.rs:682
+msgid "Immich has this photo already, so nothing was added."
+msgstr "Immich đã có ảnh này, nên không có gì được thêm vào."
+
+#: linux/verso-linux/src/fuse.rs:683
+msgid "Already in Immich: {name}"
+msgstr "Đã có trong Immich: {name}"
+
+#: linux/verso-linux/src/fuse.rs:692
+msgid "{error}. The file is kept in {folder}."
+msgstr "{error}. Tập tin được giữ trong {folder}."
+
+#: linux/verso-linux/src/fuse.rs:702
+msgid "This computer lets a file operation take at most {seconds} seconds (fs.fuse.default_request_timeout). Set it to 0 for longer uploads. The file is kept in {folder}."
+msgstr "Máy tính này cho phép một thao tác tập tin kéo dài tối đa {seconds} giây (fs.fuse.default_request_timeout). Hãy đặt giá trị này thành 0 để tải lên được lâu hơn. Tập tin được giữ trong {folder}."
+
+#: linux/verso-linux/src/fuse.rs:712
+msgid "The upload took too long. The file is kept in {folder}."
+msgstr "Việc tải lên mất quá nhiều thời gian. Tập tin được giữ trong {folder}."
+
+#: linux/verso-linux/src/fuse.rs:1185
+msgid "Immich takes photos and videos only."
+msgstr "Immich chỉ nhận ảnh và video."
+
+#: linux/verso-linux/src/notify.rs:68
+msgid "The Immich server is not reachable, so it cannot be downloaded now. What you opened before still opens."
+msgstr "Không thể kết nối máy chủ Immich nên lúc này không thể tải tập tin xuống. Những gì bạn đã mở trước đó vẫn mở được."
+
+#: linux/verso-linux/src/notify.rs:73
+msgid "{drive} cannot open “{name}”"
+msgstr "{drive} không thể mở “{name}”"
+
+#: linux/verso-linux/src/notify.rs:73
+#: shared/verso-core/src/settings.rs:195
+msgid "Verso Drive"
+msgstr "Verso Drive"
+
+#: linux/verso-linux/src/tray.rs:126
+msgid "Connected to {server}"
+msgstr "Đã kết nối tới {server}"
+
+#: linux/verso-linux/src/tray.rs:127
+msgid "{server} is not reachable"
+msgstr "Không thể kết nối tới {server}"
+
+#: linux/verso-linux/src/tray.rs:129
+msgid "Signed in to {server}"
+msgstr "Đã đăng nhập vào {server}"
+
+#: linux/verso-linux/src/tray.rs:138
+msgid "Verso Drive is unmounted"
+msgstr "Verso Drive đã được bỏ gắn kết"
+
+#: linux/verso-linux/src/tray.rs:141
+msgid "Server version: Immich {version}"
+msgstr "Phiên bản máy chủ: Immich {version}"
+
+#: linux/verso-linux/src/tray.rs:144
+msgid "Signed in as: {account}"
+msgstr "Đăng nhập với tư cách: {account}"
+
+#: linux/verso-linux/src/tray.rs:148
+msgid "Try Again Now"
+msgstr "Thử lại ngay"
+
+#: linux/verso-linux/src/tray.rs:152
+msgid "Open {app}"
+msgstr "Mở {app}"
+
+#: linux/verso-linux/src/tray.rs:155
+msgid "Open in Files"
+msgstr "Mở trong Tập tin"
+
+#: linux/verso-linux/src/tray.rs:161
+msgid "Unmount Verso Drive"
+msgstr "Bỏ gắn kết Verso Drive"
+
+#: linux/verso-linux/src/tray.rs:163
+msgid "Mount Verso Drive"
+msgstr "Gắn kết Verso Drive"
+
+#: linux/verso-linux/src/tray.rs:166
+msgid "Preferences…"
+msgstr "Tùy thích…"
+
+#: linux/verso-linux/src/tray.rs:169
+msgid "Get {app} {version}…"
+msgstr "Tải {app} {version}…"
+
+#: linux/verso-linux/src/tray.rs:175
+msgid "Sign In…"
+msgstr "Đăng nhập…"
+
+#: linux/verso-linux/src/tray.rs:177
+msgid "Sign Out…"
+msgstr "Đăng xuất…"
+
+#: linux/verso-linux/src/tray.rs:179
+msgid "Quit {app}"
+msgstr "Thoát {app}"
+
+#: linux/verso-linux/src/updates.rs:53
+msgid "{app} {version} is available"
+msgstr "Đã có {app} {version}"
+
+#: linux/verso-linux/src/updates.rs:54
+msgid "Get it from jakob.hviid.phd/verso."
+msgstr "Tải về tại jakob.hviid.phd/verso."
+
+#: linux/verso-desktop/src/preferences.rs:169
+msgid "Custom ({size})"
+msgstr "Tùy chỉnh ({size})"
+
+#: linux/verso-desktop/src/preferences.rs:182
+msgid "Apps that take part are found by themselves. Turn one off to leave it out of Show in. One not found stays listed for 30 days, so it stays off if it comes back; Forget removes it now."
+msgstr "Các ứng dụng tham gia được tự động tìm thấy. Tắt một ứng dụng để loại nó khỏi Hiện trong. Ứng dụng không tìm thấy vẫn nằm trong danh sách 30 ngày, để vẫn tắt nếu quay lại; Quên sẽ gỡ nó ngay."
+
+#: linux/verso-desktop/src/preferences.rs:187
+msgid "Apps That Take Part"
+msgstr "Ứng dụng tham gia"
+
+#: linux/verso-desktop/src/preferences.rs:197
+msgid "Open photos, albums, people and places in Immich's web app in your browser, or copy their address."
+msgstr "Mở ảnh, album, người và địa điểm trong ứng dụng web Immich trên trình duyệt, hoặc sao chép địa chỉ của chúng."
+
+#: linux/verso-desktop/src/preferences.rs:198
+msgid "Show photos, albums, people and places in other apps that take part, and show what they send in Verso."
+msgstr "Hiện ảnh, album, người và địa điểm trong các ứng dụng tham gia khác, và hiện những gì chúng gửi trong Verso."
+
+#: linux/verso-desktop/src/preferences.rs:200
+msgid "Other apps can show photos, albums, people and places in the gallery."
+msgstr "Ứng dụng khác có thể hiện ảnh, album, người và địa điểm trong thư viện ảnh."
+
+#: linux/verso-desktop/src/preferences.rs:201
+msgid "Other apps can show them in Files, while the drive is on."
+msgstr "Ứng dụng khác có thể hiện chúng trong Tập tin khi ổ đĩa đang bật."
+
+#: linux/verso-desktop/src/preferences.rs:204
+msgid "The picture on Verso's icon in the app grid, the dash and its windows. The app grid shows a new one from the next login."
+msgstr "Hình ảnh trên biểu tượng Verso trong lưới ứng dụng, dash và các cửa sổ của Verso. Lưới ứng dụng hiển thị biểu tượng mới từ lần đăng nhập tiếp theo."
+
+#: linux/verso-desktop/src/preferences.rs:240
+msgid "Double-Click Opens"
+msgstr "Bấm đúp sẽ mở"
+
+#: linux/verso-desktop/src/preferences.rs:241
+msgid "Colour"
+msgstr "Màu"
+
+#: linux/verso-desktop/src/preferences.rs:242
+msgid "App Icon"
+msgstr "Biểu tượng ứng dụng"
+
+#: linux/verso-desktop/src/preferences.rs:56
+#: linux/verso-desktop/src/preferences.rs:56
+#: linux/verso-desktop/src/preferences.rs:56
+msgid "Location"
+msgstr "Vị trí"
+
+#: linux/verso-desktop/src/preferences.rs:57
+#: linux/verso-desktop/src/preferences.rs:57
+#: linux/verso-desktop/src/preferences.rs:57
+msgid "Name in the Sidebar"
+msgstr "Tên trên thanh bên"
+
+#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:66
+msgid "Cache Size"
+msgstr "Dung lượng bộ nhớ đệm"
+
+#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:67
+msgid "Sharp Thumbnails"
+msgstr "Ảnh thu nhỏ sắc nét"
+
+#: linux/verso-desktop/src/preferences.rs:74
+#: linux/verso-desktop/src/preferences.rs:74
+#: linux/verso-desktop/src/preferences.rs:74
+msgid "Check for Updates"
+msgstr "Kiểm tra cập nhật"
+
+#: linux/verso-desktop/src/preferences.rs:89
+#: linux/verso-desktop/src/preferences.rs:89
+msgid "Day Folders"
+msgstr "Thư mục ngày"
+
+#: linux/verso-desktop/src/preferences.rs:90
+#: linux/verso-desktop/src/preferences.rs:91
+#: linux/verso-desktop/src/preferences.rs:92
+#: linux/verso-desktop/src/preferences.rs:93
+#: linux/verso-desktop/src/preferences.rs:94
+#: linux/verso-desktop/src/preferences.rs:90
+#: linux/verso-desktop/src/preferences.rs:91
+#: linux/verso-desktop/src/preferences.rs:92
+#: linux/verso-desktop/src/preferences.rs:93
+#: linux/verso-desktop/src/preferences.rs:94
+msgid "Year and Month Folders"
+msgstr "Thư mục năm và tháng"
+
+#: linux/verso-desktop/src/preferences.rs:95
+#: linux/verso-desktop/src/preferences.rs:95
+msgid "Folders Copied Into Upload"
+msgstr "Thư mục sao chép vào Upload"
+
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:102
+msgid "Album Folders"
+msgstr "Thư mục album"
+
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:102
+msgid "File Names"
+msgstr "Tên tập tin"
+
+#: linux/verso-desktop/src/preferences.rs:117
+#: linux/verso-desktop/src/preferences.rs:117
+#: linux/verso-desktop/src/preferences.rs:117
+#: shared/verso-core/src/settings.rs:82
+msgid "Open in Immich and Copy Immich Link"
+msgstr "Mở trong Immich và Sao chép liên kết Immich"
+
+#: linux/verso-desktop/src/session.rs:60
+msgid "Online"
+msgstr "Trực tuyến"
+
+#: linux/verso-desktop/src/session.rs:61
+msgid "Server unreachable; files you opened before stay available"
+msgstr "Không thể kết nối máy chủ; các tập tin đã mở trước đó vẫn dùng được"
+
+#: linux/verso-desktop/src/session.rs:62
+msgid "Signed out; sign in again"
+msgstr "Đã đăng xuất; hãy đăng nhập lại"
+
+#: linux/verso-desktop/src/session.rs:64
+#: linux/verso-desktop/src/session.rs:74
+msgid "Not running"
+msgstr "Không chạy"
+
+#: linux/verso-desktop/src/session.rs:71
+msgid "{used} of {limit}"
+msgstr "{used} / {limit}"
+
+#: linux/verso-desktop/src/session.rs:88
+msgid "writing"
+msgstr "đang ghi"
+
+#: linux/verso-desktop/src/session.rs:88
+msgid "uploading"
+msgstr "đang tải lên"
+
+#: linux/verso-desktop/src/session.rs:89
+msgid "{name}, {phase}"
+msgstr "{name}, {phase}"
+
+#: linux/verso-desktop/src/session.rs:92
+msgid "{name} and {count} more"
+msgstr "{name} và {count} tập tin khác"
+
+#: linux/verso-desktop/src/session.rs:118
+msgid "That address cannot be used: {error}"
+msgstr "Không thể dùng địa chỉ này: {error}"
+
+#: linux/verso-desktop/src/session.rs:166
+#: linux/verso-desktop/src/session.rs:176
+#: linux/verso-desktop/src/session.rs:510
+#: linux/verso-desktop/src/session.rs:513
+msgid "Kept in {file}"
+msgstr "Lưu trong {file}"
+
+#: linux/verso-desktop/src/session.rs:171
+#: linux/verso-desktop/src/session.rs:515
+msgid "Kept in the keyring"
+msgstr "Lưu trong chùm chìa khóa"
+
+#: linux/verso-desktop/src/session.rs:178
+msgid "The keyring stayed locked, so nothing was saved."
+msgstr "Chùm chìa khóa vẫn bị khóa, nên không có gì được lưu."
+
+#: linux/verso-desktop/src/session.rs:256
+msgid "Verso shows its icon in the top bar while you are signed in."
+msgstr "Verso hiện biểu tượng trên thanh trên cùng khi bạn đã đăng nhập."
+
+#: linux/verso-desktop/src/session.rs:257
+#: linux/verso-desktop/src/session.rs:261
+msgid "Signed in, but the background service did not start: {error}"
+msgstr "Đã đăng nhập, nhưng dịch vụ nền không khởi động: {error}"
+
+#: linux/verso-desktop/src/session.rs:260
+msgid "Signed in, but the background service cannot start: {error}."
+msgstr "Đã đăng nhập, nhưng không thể khởi động dịch vụ nền: {error}."
+
+#: linux/verso-desktop/src/session.rs:290
+msgid "Verso Drive is not part of this version of Verso."
+msgstr "Verso Drive không có trong phiên bản Verso này."
+
+#: linux/verso-desktop/src/session.rs:296
+msgid "The background service did not restart: {error}"
+msgstr "Dịch vụ nền không khởi động lại: {error}"
+
+#: linux/verso-desktop/src/session.rs:337
+msgid "Immich Mount is no longer signed in."
+msgstr "Immich Mount không còn đăng nhập."
+
+#: linux/verso-desktop/src/session.rs:342
+msgid "Immich no longer accepts Immich Mount's sign-in; sign in instead."
+msgstr "Immich không còn chấp nhận lần đăng nhập của Immich Mount; hãy tự đăng nhập."
+
+#: linux/verso-desktop/src/session.rs:391
+msgid "Signed in, but the mount cannot start: {error}."
+msgstr "Đã đăng nhập, nhưng không thể bắt đầu gắn kết: {error}."
+
+#: linux/verso-desktop/src/session.rs:395
+msgid "Signed in, but the mount did not start: {error}"
+msgstr "Đã đăng nhập, nhưng việc gắn kết không bắt đầu: {error}"
+
+#: linux/verso-desktop/src/preferences.rs:48
+msgid "General"
+msgstr "Cài đặt chung"
+
+#: linux/verso-desktop/src/preferences.rs:82
+msgid "Folders"
+msgstr "Thư mục"
+
+#: linux/verso-desktop/src/preferences.rs:110
+msgid "Other Apps"
+msgstr "Ứng dụng khác"
+
+#: linux/verso-desktop/src/preferences.rs:52
+msgid "Drive"
+msgstr "Ổ đĩa"
+
+#: linux/verso-desktop/src/preferences.rs:58
+msgid "GVfs leaves the drive out of Files' sidebar, and a bookmark takes its place: no unmount button, but a plain folder icon."
+msgstr "GVfs không đưa ổ đĩa vào thanh bên của Tập tin mà thay bằng một dấu trang: không có nút bỏ gắn kết, nhưng có biểu tượng thư mục đơn giản."
+
+#: linux/verso-desktop/src/preferences.rs:63
+msgid "Storage"
+msgstr "Lưu trữ"
+
+#: linux/verso-desktop/src/preferences.rs:66
+msgid "Opened originals are kept on this computer up to this size."
+msgstr "Ảnh gốc đã mở được giữ trên máy tính này đến dung lượng này."
+
+#: linux/verso-desktop/src/preferences.rs:67
+msgid "Also download larger previews, for big icon sizes. Uses more data."
+msgstr "Tải thêm bản xem trước lớn hơn cho biểu tượng lớn. Dùng nhiều dữ liệu hơn."
+
+#: linux/verso-desktop/src/preferences.rs:72
+msgid "Updates"
+msgstr "Cập nhật"
+
+#: linux/verso-desktop/src/preferences.rs:74
+msgid "Tell me when a new version is out."
+msgstr "Báo cho tôi khi có phiên bản mới."
+
+#: linux/verso-desktop/src/preferences.rs:86
+msgid "Sections"
+msgstr "Các phần"
+
+#: linux/verso-desktop/src/preferences.rs:87
+msgid "The folders the drive shows, and how each splits its photos by date."
+msgstr "Các thư mục ổ đĩa hiển thị và cách mỗi thư mục chia ảnh theo ngày."
+
+#: linux/verso-desktop/src/preferences.rs:89
+msgid "The timeline, by year and month"
+msgstr "Dòng thời gian, theo năm và tháng"
+
+#: linux/verso-desktop/src/preferences.rs:95
+msgid "What is copied into it is uploaded"
+msgstr "Những gì được sao chép vào sẽ được tải lên"
+
+#: linux/verso-desktop/src/preferences.rs:100
+msgid "Names"
+msgstr "Tên"
+
+#: linux/verso-desktop/src/preferences.rs:115
+msgid "Immich Web App"
+msgstr "Ứng dụng web Immich"
+
+#: linux/verso-desktop/src/preferences.rs:55
+#: linux/verso-desktop/src/preferences.rs:55
+msgid "Mount at Login"
+msgstr "Gắn kết khi đăng nhập"
+
+#: linux/verso-desktop/src/preferences.rs:58
+#: linux/verso-desktop/src/preferences.rs:58
+msgid "Bookmark Instead of Drive"
+msgstr "Dấu trang thay cho ổ đĩa"
+
+#: linux/verso/src/drive_preferences.rs:267
+#: linux/verso/src/drive_preferences.rs:271
+msgid "Choose a Folder"
+msgstr "Chọn thư mục"
+
+#: linux/verso/src/drive_preferences.rs:302
+msgid "Learn More"
+msgstr "Tìm hiểu thêm"
+
+#: linux/verso/src/drive_preferences.rs:337
+msgid "Not found"
+msgstr "Không tìm thấy"
+
+#: linux/verso/src/drive_preferences.rs:338
+msgid "Forget"
+msgstr "Quên"
+
+#: linux/verso/src/drive_preferences.rs:365
+msgid "No other app that takes part is installed."
+msgstr "Không có ứng dụng tham gia nào khác được cài đặt."
+
+#: linux/verso/src/drive_preferences.rs:366
+msgid "Find Apps That Take Part"
+msgstr "Tìm ứng dụng tham gia"
+
+#: linux/files-extension/verso-nautilus.c:232
+#: linux/files-extension/verso-nautilus.py:177
+msgid "Show in {app}"
+msgstr "Hiện trong {app}"
+
+#: linux/files-extension/verso-nautilus.c:273
+#: linux/files-extension/verso-nautilus.py:201
+#: mac/Verso/Config/VersoDrive-Info.plist (NSExtensionFileProviderActionName)
+msgid "Open in Immich"
+msgstr "Mở trong Immich"
+
+#: linux/files-extension/verso-nautilus.c:276
+#: linux/files-extension/verso-nautilus.py:203
+#: mac/Verso/Config/VersoDrive-Info.plist (NSExtensionFileProviderActionName)
+msgid "Copy Immich Link"
+msgstr "Sao chép liên kết Immich"
+
+#: linux/files-extension/verso-nautilus.py:160
+msgid "{app} is no longer installed."
+msgstr "{app} không còn được cài đặt."
+
+#: linux/files-extension/verso-nautilus.py:169
+msgid "Verso could not open {app}: {error}"
+msgstr "Verso không thể mở {app}: {error}"
+
+#: shared/verso-core/src/settings.rs:57
+msgid "The Immich server; /api is added"
+msgstr "Máy chủ Immich; /api được thêm vào"
+
+#: shared/verso-core/src/settings.rs:58
+msgid "Show the library as a drive in the file manager"
+msgstr "Hiện thư viện dưới dạng ổ đĩa trong trình quản lý tập tin"
+
+#: shared/verso-core/src/settings.rs:59
+msgid "Where the mount appears"
+msgstr "Nơi ổ đĩa xuất hiện"
+
+#: shared/verso-core/src/settings.rs:60
+msgid "The drive's name in the sidebar"
+msgstr "Tên ổ đĩa trong thanh bên"
+
+#: shared/verso-core/src/settings.rs:61
+msgid "Mount when the session starts"
+msgstr "Gắn kết khi phiên làm việc bắt đầu"
+
+#: shared/verso-core/src/settings.rs:62
+msgid "List the drive in Files' sidebar as a drive, with its unmount button; off, as a bookmark"
+msgstr "Liệt kê ổ đĩa trong thanh bên của Tập tin dưới dạng ổ đĩa, có nút bỏ gắn kết; khi tắt, dưới dạng dấu trang"
+
+#: shared/verso-core/src/settings.rs:63
+msgid "Show the Photos section"
+msgstr "Hiện phần Photos"
+
+#: shared/verso-core/src/settings.rs:64
+msgid "Show the Albums section"
+msgstr "Hiện phần Albums"
+
+#: shared/verso-core/src/settings.rs:65
+msgid "Show the People section"
+msgstr "Hiện phần People"
+
+#: shared/verso-core/src/settings.rs:66
+msgid "Show the Places section"
+msgstr "Hiện phần Places"
+
+#: shared/verso-core/src/settings.rs:67
+msgid "Show the Favorites section"
+msgstr "Hiện phần Favorites"
+
+#: shared/verso-core/src/settings.rs:68
+msgid "Show the Archive section"
+msgstr "Hiện phần Archive"
+
+#: shared/verso-core/src/settings.rs:69
+msgid "Day folders inside months"
+msgstr "Thư mục ngày bên trong tháng"
+
+#: shared/verso-core/src/settings.rs:70
+msgid "Year and month folders inside albums"
+msgstr "Thư mục năm và tháng bên trong album"
+
+#: shared/verso-core/src/settings.rs:71
+msgid "Year and month folders inside people"
+msgstr "Thư mục năm và tháng bên trong thư mục người"
+
+#: shared/verso-core/src/settings.rs:72
+msgid "Year and month folders inside cities"
+msgstr "Thư mục năm và tháng bên trong thành phố"
+
+#: shared/verso-core/src/settings.rs:73
+msgid "Year and month folders inside favorites"
+msgstr "Thư mục năm và tháng bên trong mục yêu thích"
+
+#: shared/verso-core/src/settings.rs:74
+msgid "Year and month folders inside the archive"
+msgstr "Thư mục năm và tháng bên trong kho lưu trữ"
+
+#: shared/verso-core/src/settings.rs:75
+msgid "How album folders are named and grouped"
+msgstr "Cách đặt tên và nhóm thư mục album"
+
+#: shared/verso-core/src/settings.rs:76
+msgid "How files are named"
+msgstr "Cách đặt tên tập tin"
+
+#: shared/verso-core/src/settings.rs:77
+msgid "The content cache's size limit"
+msgstr "Giới hạn dung lượng bộ nhớ đệm nội dung"
+
+#: shared/verso-core/src/settings.rs:78
+msgid "Show the Upload folder, and upload what is copied into it"
+msgstr "Hiện thư mục Upload, và tải lên những gì được chép vào đó"
+
+#: shared/verso-core/src/settings.rs:79
+msgid "Folders copied into Upload"
+msgstr "Thư mục sao chép vào Upload"
+
+#: shared/verso-core/src/settings.rs:80
+msgid "Also seed 1024 px thumbnails from the preview"
+msgstr "Cũng tạo ảnh thu nhỏ 1024 px từ bản xem trước"
+
+#: shared/verso-core/src/settings.rs:81
+msgid "Refuse thumbnailer reads of originals"
+msgstr "Không cho trình tạo ảnh thu nhỏ đọc bản gốc"
+
+#: shared/verso-core/src/settings.rs:83
+msgid "What a double click on Verso's top bar icon opens"
+msgstr "Những gì mở ra khi bấm đúp vào biểu tượng Verso trên thanh trên cùng"
+
+#: shared/verso-core/src/settings.rs:84
+msgid "Verso's top bar icon in colour: the lens's five colours, grey while the server cannot be reached"
+msgstr "Biểu tượng Verso trên thanh trên cùng có màu: năm màu của ống kính, màu xám khi không thể kết nối máy chủ"
+
+#: shared/verso-core/src/settings.rs:85
+msgid "Verso's app icon, by the picture on its print"
+msgstr "Biểu tượng ứng dụng của Verso, theo hình ảnh trên bản in"
+
+#: shared/verso-core/src/settings.rs:86
+msgid "Show what other apps link to (Immich Crosslink)"
+msgstr "Hiện những gì ứng dụng khác liên kết tới (Immich Crosslink)"
+
+#: shared/verso-core/src/settings.rs:87
+msgid "Verso: take part as Verso Gallery, so other apps show items in it"
+msgstr "Verso: tham gia dưới tên Verso Gallery, để ứng dụng khác hiện các mục trong đó"
+
+#: shared/verso-core/src/settings.rs:88
+msgid "Verso: take part as Verso Drive, so other apps show items in Files while the drive is on"
+msgstr "Verso: tham gia dưới tên Verso Drive, để ứng dụng khác hiện các mục trong Tập tin khi ổ đĩa đang bật"
+
+#: shared/verso-core/src/settings.rs:89
+msgid "Apps left out of Show in, by their desktop entry or bundle id, separated by ;"
+msgstr "Các ứng dụng bị loại khỏi Hiện trong, theo id mục desktop hoặc gói, cách nhau bằng ;"
+
+#: shared/verso-core/src/settings.rs:90
+msgid "Tell me when a new version is out"
+msgstr "Báo cho tôi khi có phiên bản mới"
+
+#: shared/verso-core/src/settings.rs:91
+msgid "Headless only: a 0600 file holding the credential"
+msgstr "Chỉ khi không có giao diện đồ họa: một tập tin 0600 chứa thông tin đăng nhập"
+
+#: shared/verso-core/src/settings.rs:164
+msgid "Never"
+msgstr "Không bao giờ"
+
+#: shared/verso-core/src/settings.rs:165
+msgid "From 500 Items"
+msgstr "Từ 500 mục"
+
+#: shared/verso-core/src/settings.rs:166
+msgid "Always"
+msgstr "Luôn luôn"
+
+#: shared/verso-core/src/settings.rs:167
+msgid "Year in the Name (2023 - Trip)"
+msgstr "Năm trong tên (2023 - Chuyến đi)"
+
+#: shared/verso-core/src/settings.rs:168
+msgid "Year Folders (2023/Trip)"
+msgstr "Thư mục năm (2023/Chuyến đi)"
+
+#: shared/verso-core/src/settings.rs:169
+msgid "Name Only (Trip)"
+msgstr "Chỉ tên (Chuyến đi)"
+
+#: shared/verso-core/src/settings.rs:170
+msgid "Date and Time Taken"
+msgstr "Ngày và giờ chụp"
+
+#: shared/verso-core/src/settings.rs:171
+msgid "Original File Names"
+msgstr "Tên tập tin gốc"
+
+#: shared/verso-core/src/settings.rs:172
+msgid "Ask Each Time"
+msgstr "Hỏi mỗi lần"
+
+#: shared/verso-core/src/settings.rs:176
+#: shared/verso-core/src/settings.rs:196
+msgid "Verso"
+msgstr "Verso"
+
+#: shared/verso-core/src/settings.rs:177
+msgid "Verso Drive in Files"
+msgstr "Verso Drive trong Tập tin"
+
+#: shared/verso-core/src/settings.rs:178
+msgid "Preferences"
+msgstr "Tùy thích"
+
+#: shared/verso-core/src/settings.rs:179
+msgid "Mist"
+msgstr "Sương mù"
+
+#: shared/verso-core/src/settings.rs:180
+msgid "Sand"
+msgstr "Cát"
+
+#: shared/verso-core/src/settings.rs:181
+msgid "Dark"
+msgstr "Tối"
+
+#: shared/verso-core/src/settings.rs:182
+msgid "Paper"
+msgstr "Giấy"
+
+#: shared/verso-core/src/settings.rs:183
+msgid "Frame"
+msgstr "Khung"
+
+#: shared/verso-core/src/settings.rs:184
+msgid "Slate"
+msgstr "Đá phiến"
+
+#: shared/verso-core/src/settings.rs:185
+msgid "Sky"
+msgstr "Bầu trời"
+
+#: linux/packaging/desktop/dev.hviid.Verso.desktop.in (Comment)
+msgid "Browse, search and organise your Immich photos and videos, with your library as a drive in Files"
+msgstr ""
+
+#: linux/packaging/desktop/dev.hviid.Verso.desktop.in (Keywords)
+msgid "Immich;photos;videos;gallery;albums;people;drive;"
+msgstr ""
+
+#: mac/Verso/Config/Info.plist (NSHumanReadableCopyright)
+msgid "Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO. “Immich” is used only to describe the server this software works with, and remains the mark of its owner."
+msgstr ""
+
+#: mac/Verso/Config/Info.plist (NSLocalNetworkUsageDescription)
+msgid "Verso connects to your Immich server, which may be on your local network."
+msgstr ""

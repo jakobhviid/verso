@@ -1,0 +1,153 @@
+{
+  "fill-specializations": [
+    {
+      "value": {
+        "linear-gradient": [
+          "srgb:1.00000,1.00000,1.00000,1.00000",
+          "srgb:0.90196,0.89412,0.87843,1.00000"
+        ],
+        "orientation": {
+          "start": {
+            "x": 0.5,
+            "y": 0
+          },
+          "stop": {
+            "x": 0.5,
+            "y": 1
+          }
+        }
+      }
+    },
+    {
+      "appearance": "dark",
+      "value": {
+        "linear-gradient": [
+          "srgb:0.32157,0.31765,0.33333,1.00000",
+          "srgb:0.20000,0.19608,0.21176,1.00000"
+        ],
+        "orientation": {
+          "start": {
+            "x": 0.5,
+            "y": 0
+          },
+          "stop": {
+            "x": 0.5,
+            "y": 1
+          }
+        }
+      }
+    }
+  ],
+  "groups": [
+    {
+      "name": "Corner",
+      "layers": [
+        {
+          "name": "Flap",
+          "image-name-specializations": [
+            {
+              "value": "corner.svg"
+            },
+            {
+              "appearance": "dark",
+              "value": "corner-dark.svg"
+            }
+          ],
+          "glass": false
+        }
+      ],
+      "shadow": {
+        "kind": "none",
+        "opacity": 0.5
+      },
+      "translucency": {
+        "enabled": false,
+        "value": 0.5
+      }
+    },
+    {
+      "name": "Lens",
+      "layers": [
+        {
+          "name": "Glass",
+          "image-name": "lens-glass.svg",
+          "glass": true
+        },
+        {
+          "name": "Ring",
+          "image-name": "lens-ring.svg",
+          "glass": false
+        }
+      ],
+      "lighting": "individual",
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.5
+      },
+      "translucency": {
+        "enabled": false,
+        "value": 0.5
+      }
+    },
+    {
+      "name": "Print",
+      "layers": [
+        {
+          "name": "Word",
+          "image-name-specializations": [
+            {
+              "value": "word.svg"
+            },
+            {
+              "appearance": "dark",
+              "value": "word-dark.svg"
+            }
+          ],
+          "glass": false
+        },
+        {
+          "name": "Picture",
+          "image-name": "photo.svg",
+          "glass": false
+        }
+      ],
+      "shadow": {
+        "kind": "none",
+        "opacity": 0.5
+      },
+      "translucency": {
+        "enabled": false,
+        "value": 0.5
+      }
+    },
+    {
+      "name": "Beneath",
+      "layers": [
+        {
+          "name": "Beneath",
+          "image-name-specializations": [
+            {
+              "value": "under.svg"
+            },
+            {
+              "appearance": "dark",
+              "value": "under-dark.svg"
+            }
+          ],
+          "glass": false
+        }
+      ],
+      "shadow": {
+        "kind": "none",
+        "opacity": 0.5
+      },
+      "translucency": {
+        "enabled": false,
+        "value": 0.5
+      }
+    }
+  ],
+  "supported-platforms": {
+    "squares": "shared"
+  }
+}

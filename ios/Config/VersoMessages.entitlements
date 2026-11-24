@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- The app's App Group and Keychain group (Verso.entitlements), as Verso Drive's extension has them: the app keeps
+	     its account in the Keychain group (mac/Verso/Verso/App/AccountVault.swift), which the picker reads to sign in.
+	     The App Group holds nothing of the picker's yet: it holds backing up's store, which says which of the phone's
+	     own photos are in Immich, for the phone's photos beside the library's later (ROADMAP.md, M10). -->
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>$(VERSO_APP_GROUP)</string>
+	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)$(VERSO_IDENTITY)</string>
+	</array>
+</dict>
+</plist>

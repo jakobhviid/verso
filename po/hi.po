@@ -1,0 +1,838 @@
+# Verso in hi.
+# This file is part of Verso, under the MIT license. Made by po/i18n.py.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: verso\n"
+"Report-Msgid-Bugs-To: https://github.com/jakobhviid/verso/issues\n"
+"Language: hi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: linux/verso-service/src/commands.rs:467
+#: linux/verso-linux/src/daemon.rs:498
+msgid "Verso Drive is not mounted"
+msgstr "Verso Drive माउंट नहीं है"
+
+#: linux/verso-service/src/commands.rs:467
+#: linux/verso-linux/src/daemon.rs:498
+msgid "Switch it on in Verso's Preferences, then open the link again."
+msgstr "Verso की प्राथमिकताओं में ड्राइव चालू करें, फिर लिंक दोबारा खोलें।"
+
+#: linux/verso-service/src/online.rs:448
+msgid "The keyring stayed locked. Open {app}, or run “{command}”, to try again."
+msgstr "कीरिंग लॉक रही। फिर से कोशिश करने के लिए {app} खोलें, या “{command}” चलाएं।"
+
+#: linux/verso-service/src/online.rs:449
+msgid "Immich is not mounted"
+msgstr "Immich माउंट नहीं है"
+
+#: linux/verso-linux/src/daemon.rs:497
+msgid "Links from other apps are off"
+msgstr "दूसरे ऐप्स के लिंक बंद हैं"
+
+#: linux/verso-linux/src/daemon.rs:497
+msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
+msgstr "दूसरे ऐप्स जिसकी ओर लिंक करते हैं उसे दिखाने के लिए Verso की सेटिंग्स में Immich Crosslink चालू करें।"
+
+#: linux/verso-linux/src/daemon.rs:499
+msgid "A link from another app cannot be opened"
+msgstr "किसी दूसरे ऐप का लिंक खोला नहीं जा सकता"
+
+#: linux/verso-linux/src/daemon.rs:499
+msgid "It is not a valid Immich link."
+msgstr "यह एक मान्य Immich लिंक नहीं है।"
+
+#: linux/verso-linux/src/daemon.rs:500
+#: linux/verso-linux/src/daemon.rs:504
+msgid "Nothing to show"
+msgstr "दिखाने के लिए कुछ नहीं है"
+
+#: linux/verso-linux/src/daemon.rs:500
+msgid "Verso Drive has no place for what this link points to."
+msgstr "यह लिंक जिस चीज़ की ओर इशारा करता है, उसके लिए Verso Drive में कोई जगह नहीं है।"
+
+#: linux/verso-linux/src/daemon.rs:501
+msgid "Not signed in to {host}"
+msgstr "{host} में साइन इन नहीं किया गया"
+
+#: linux/verso-linux/src/daemon.rs:501
+msgid "Verso is signed in to another Immich server."
+msgstr "Verso किसी दूसरे Immich सर्वर में साइन इन है।"
+
+#: linux/verso-linux/src/daemon.rs:502
+msgid "Another Immich account"
+msgstr "कोई दूसरा Immich खाता"
+
+#: linux/verso-linux/src/daemon.rs:502
+msgid "The link is for another account than the one Verso is signed in with."
+msgstr "यह लिंक किसी दूसरे खाते के लिए है, उस खाते के लिए नहीं जिससे Verso साइन इन है।"
+
+#: linux/verso-linux/src/daemon.rs:505
+msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
+msgstr "ड्राइव इसे नहीं दिखाती। हो सकता है यह छिपा हो, किसी बंद किए गए अनुभाग में हो, या आपके साथ साझा न किया गया हो।"
+
+#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:583
+msgid "Immich is unreachable"
+msgstr "Immich तक नहीं पहुंचा जा सकता"
+
+#: linux/verso-linux/src/daemon.rs:507
+msgid "The Immich server cannot be reached. Try the link again later."
+msgstr "Immich सर्वर तक नहीं पहुंचा जा सकता। बाद में लिंक को फिर से आज़माएं।"
+
+#: linux/verso-linux/src/daemon.rs:584
+msgid "The Immich server cannot be reached. Files you opened before stay available."
+msgstr "Immich सर्वर तक नहीं पहुंचा जा सकता। पहले खोली गई फ़ाइलें उपलब्ध रहेंगी।"
+
+#: linux/verso-linux/src/daemon.rs:587
+#: linux/verso-linux/src/tray.rs:128
+msgid "Signed out of Immich"
+msgstr "Immich से साइन आउट हो गया"
+
+#: linux/verso-linux/src/daemon.rs:588
+msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
+msgstr "Immich अब यह साइन-इन स्वीकार नहीं करता। फिर से साइन इन करने के लिए {app} खोलें।"
+
+#: linux/verso-linux/src/folders.rs:204
+msgid "Uploaded to Immich: {folder}"
+msgstr "Immich पर अपलोड हुआ: {folder}"
+
+#: linux/verso-linux/src/folders.rs:206
+msgid "Photos and videos in the timeline: {count}"
+msgstr "टाइमलाइन में फ़ोटो और वीडियो: {count}"
+
+#: linux/verso-linux/src/folders.rs:207
+msgid "Albums it can make: {albums}"
+msgstr "इससे बन सकने वाले एल्बम: {albums}"
+
+#: linux/verso-linux/src/folders.rs:210
+msgid "Files not uploaded: {count}"
+msgstr "अपलोड न हुई फ़ाइलें: {count}"
+
+#: linux/verso-linux/src/folders.rs:213
+#: shared/verso-core/src/settings.rs:174
+msgid "Make Albums"
+msgstr "एल्बम बनाएँ"
+
+#: linux/verso-linux/src/folders.rs:213
+#: shared/verso-core/src/settings.rs:173
+msgid "Timeline Only"
+msgstr "केवल टाइमलाइन"
+
+#: linux/verso-linux/src/folders.rs:234
+msgid "Albums made from {folder}"
+msgstr "{folder} से एल्बम बनाए गए"
+
+#: linux/verso-linux/src/folders.rs:236
+msgid "No albums made from {folder}"
+msgstr "{folder} से कोई एल्बम नहीं बना"
+
+#: linux/verso-linux/src/folders.rs:242
+msgid "Immich does not let this account make albums ({permission}). The photos and videos are in the timeline."
+msgstr "Immich इस खाते को एल्बम बनाने नहीं देता ({permission})। फ़ोटो और वीडियो टाइमलाइन में हैं।"
+
+#: linux/verso-linux/src/folders.rs:247
+msgid "Signed out of Immich. The photos and videos are in the timeline."
+msgstr "Immich से साइन आउट हो गया। फ़ोटो और वीडियो टाइमलाइन में हैं।"
+
+#: linux/verso-linux/src/fuse.rs:647
+#: linux/verso-linux/src/fuse.rs:695
+#: linux/verso-linux/src/fuse.rs:701
+#: linux/verso-linux/src/fuse.rs:711
+#: linux/verso-linux/src/fuse.rs:1185
+msgid "Not uploaded: {name}"
+msgstr "अपलोड नहीं हुआ: {name}"
+
+#: linux/verso-linux/src/fuse.rs:647
+msgid "The file is incomplete, as if its copy was cancelled."
+msgstr "फ़ाइल अधूरी है, मानो उसकी कॉपी रद्द कर दी गई हो।"
+
+#: linux/verso-linux/src/fuse.rs:663
+msgid "Uploading {name} to Immich"
+msgstr "{name} को Immich पर अपलोड किया जा रहा है"
+
+#: linux/verso-linux/src/fuse.rs:664
+msgid "The copy finishes once Immich has the file."
+msgstr "Immich को फ़ाइल मिलते ही कॉपी पूरी हो जाएगी।"
+
+#: linux/verso-linux/src/fuse.rs:677
+msgid "Restored from the trash: {name}"
+msgstr "ट्रैश से बहाल किया गया: {name}"
+
+#: linux/verso-linux/src/fuse.rs:678
+msgid "Immich had this photo in its trash, and copying it in brought it back."
+msgstr "यह फ़ोटो Immich के ट्रैश में थी, और इसे कॉपी करने से यह वापस आ गई।"
+
+#: linux/verso-linux/src/fuse.rs:682
+msgid "Immich has this photo already, so nothing was added."
+msgstr "यह फ़ोटो Immich में पहले से है, इसलिए कुछ नहीं जोड़ा गया।"
+
+#: linux/verso-linux/src/fuse.rs:683
+msgid "Already in Immich: {name}"
+msgstr "Immich में पहले से है: {name}"
+
+#: linux/verso-linux/src/fuse.rs:692
+msgid "{error}. The file is kept in {folder}."
+msgstr "{error}। फ़ाइल {folder} में रखी गई है।"
+
+#: linux/verso-linux/src/fuse.rs:702
+msgid "This computer lets a file operation take at most {seconds} seconds (fs.fuse.default_request_timeout). Set it to 0 for longer uploads. The file is kept in {folder}."
+msgstr "यह कंप्यूटर किसी फ़ाइल ऑपरेशन को अधिकतम {seconds} सेकंड देता है (fs.fuse.default_request_timeout)। लंबे अपलोड के लिए इसे 0 पर सेट करें। फ़ाइल {folder} में रखी गई है।"
+
+#: linux/verso-linux/src/fuse.rs:712
+msgid "The upload took too long. The file is kept in {folder}."
+msgstr "अपलोड में बहुत ज़्यादा समय लगा। फ़ाइल {folder} में रखी गई है।"
+
+#: linux/verso-linux/src/fuse.rs:1185
+msgid "Immich takes photos and videos only."
+msgstr "Immich केवल फ़ोटो और वीडियो लेता है।"
+
+#: linux/verso-linux/src/notify.rs:68
+msgid "The Immich server is not reachable, so it cannot be downloaded now. What you opened before still opens."
+msgstr "Immich सर्वर तक नहीं पहुंचा जा सकता, इसलिए फ़ाइल अभी डाउनलोड नहीं हो सकती। जो आपने पहले खोला था, वह अब भी खुलता है।"
+
+#: linux/verso-linux/src/notify.rs:73
+msgid "{drive} cannot open “{name}”"
+msgstr "{drive} में “{name}” नहीं खुल सकती"
+
+#: linux/verso-linux/src/notify.rs:73
+#: shared/verso-core/src/settings.rs:195
+msgid "Verso Drive"
+msgstr "Verso Drive"
+
+#: linux/verso-linux/src/tray.rs:126
+msgid "Connected to {server}"
+msgstr "{server} से कनेक्ट है"
+
+#: linux/verso-linux/src/tray.rs:127
+msgid "{server} is not reachable"
+msgstr "{server} तक नहीं पहुंचा जा सकता"
+
+#: linux/verso-linux/src/tray.rs:129
+msgid "Signed in to {server}"
+msgstr "{server} में साइन इन किया गया"
+
+#: linux/verso-linux/src/tray.rs:138
+msgid "Verso Drive is unmounted"
+msgstr "Verso Drive अनमाउंट की गई है"
+
+#: linux/verso-linux/src/tray.rs:141
+msgid "Server version: Immich {version}"
+msgstr "सर्वर संस्करण: Immich {version}"
+
+#: linux/verso-linux/src/tray.rs:144
+msgid "Signed in as: {account}"
+msgstr "साइन इन किया गया खाता: {account}"
+
+#: linux/verso-linux/src/tray.rs:148
+msgid "Try Again Now"
+msgstr "अभी फिर से कोशिश करें"
+
+#: linux/verso-linux/src/tray.rs:152
+msgid "Open {app}"
+msgstr "{app} खोलें"
+
+#: linux/verso-linux/src/tray.rs:155
+msgid "Open in Files"
+msgstr "फाइल्स में खोलें"
+
+#: linux/verso-linux/src/tray.rs:161
+msgid "Unmount Verso Drive"
+msgstr "Verso Drive अनमाउंट करें"
+
+#: linux/verso-linux/src/tray.rs:163
+msgid "Mount Verso Drive"
+msgstr "Verso Drive माउंट करें"
+
+#: linux/verso-linux/src/tray.rs:166
+msgid "Preferences…"
+msgstr "प्राथमिकताएं…"
+
+#: linux/verso-linux/src/tray.rs:169
+msgid "Get {app} {version}…"
+msgstr "{app} {version} डाउनलोड करें…"
+
+#: linux/verso-linux/src/tray.rs:175
+msgid "Sign In…"
+msgstr "साइन इन करें…"
+
+#: linux/verso-linux/src/tray.rs:177
+msgid "Sign Out…"
+msgstr "साइन आउट करें…"
+
+#: linux/verso-linux/src/tray.rs:179
+msgid "Quit {app}"
+msgstr "{app} छोड़ें"
+
+#: linux/verso-linux/src/updates.rs:53
+msgid "{app} {version} is available"
+msgstr "{app} {version} उपलब्ध है"
+
+#: linux/verso-linux/src/updates.rs:54
+msgid "Get it from jakob.hviid.phd/verso."
+msgstr "इसे jakob.hviid.phd/verso से डाउनलोड करें।"
+
+#: linux/verso-desktop/src/preferences.rs:169
+msgid "Custom ({size})"
+msgstr "कस्टम ({size})"
+
+#: linux/verso-desktop/src/preferences.rs:182
+msgid "Apps that take part are found by themselves. Turn one off to leave it out of Show in. One not found stays listed for 30 days, so it stays off if it comes back; Forget removes it now."
+msgstr "भाग लेने वाले ऐप अपने आप मिल जाते हैं। किसी ऐप को \"… में दिखाएँ\" से बाहर रखने के लिए उसे बंद करें। जो ऐप नहीं मिलता, वह 30 दिन तक सूची में रहता है, ताकि लौटने पर भी बंद रहे; \"भूल जाएँ\" उसे अभी हटा देता है।"
+
+#: linux/verso-desktop/src/preferences.rs:187
+msgid "Apps That Take Part"
+msgstr "भाग लेने वाले ऐप"
+
+#: linux/verso-desktop/src/preferences.rs:197
+msgid "Open photos, albums, people and places in Immich's web app in your browser, or copy their address."
+msgstr "फ़ोटो, एल्बम, लोग और स्थान अपने ब्राउज़र में Immich के वेब ऐप में खोलें, या उनका पता कॉपी करें।"
+
+#: linux/verso-desktop/src/preferences.rs:198
+msgid "Show photos, albums, people and places in other apps that take part, and show what they send in Verso."
+msgstr "भाग लेने वाले दूसरे ऐप्स में फ़ोटो, एल्बम, लोग और स्थान दिखाएँ, और वे जो भेजते हैं उसे Verso में दिखाएँ।"
+
+#: linux/verso-desktop/src/preferences.rs:200
+msgid "Other apps can show photos, albums, people and places in the gallery."
+msgstr "दूसरे ऐप्स गैलरी में फ़ोटो, एल्बम, लोग और स्थान दिखा सकते हैं।"
+
+#: linux/verso-desktop/src/preferences.rs:201
+msgid "Other apps can show them in Files, while the drive is on."
+msgstr "जब तक ड्राइव चालू है, दूसरे ऐप्स उन्हें फाइल्स में दिखा सकते हैं।"
+
+#: linux/verso-desktop/src/preferences.rs:204
+msgid "The picture on Verso's icon in the app grid, the dash and its windows. The app grid shows a new one from the next login."
+msgstr "ऐप ग्रिड, डैश और Verso की विंडो में Verso के आइकन पर दिखने वाली तस्वीर। ऐप ग्रिड में नया आइकन अगले लॉगिन से दिखता है।"
+
+#: linux/verso-desktop/src/preferences.rs:240
+msgid "Double-Click Opens"
+msgstr "डबल-क्लिक पर खोलें"
+
+#: linux/verso-desktop/src/preferences.rs:241
+msgid "Colour"
+msgstr "रंगीन"
+
+#: linux/verso-desktop/src/preferences.rs:242
+msgid "App Icon"
+msgstr "ऐप आइकन"
+
+#: linux/verso-desktop/src/preferences.rs:56
+#: linux/verso-desktop/src/preferences.rs:56
+#: linux/verso-desktop/src/preferences.rs:56
+msgid "Location"
+msgstr "स्थान"
+
+#: linux/verso-desktop/src/preferences.rs:57
+#: linux/verso-desktop/src/preferences.rs:57
+#: linux/verso-desktop/src/preferences.rs:57
+msgid "Name in the Sidebar"
+msgstr "साइडबार में नाम"
+
+#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:66
+msgid "Cache Size"
+msgstr "कैश का आकार"
+
+#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:67
+msgid "Sharp Thumbnails"
+msgstr "स्पष्ट थंबनेल"
+
+#: linux/verso-desktop/src/preferences.rs:74
+#: linux/verso-desktop/src/preferences.rs:74
+#: linux/verso-desktop/src/preferences.rs:74
+msgid "Check for Updates"
+msgstr "अपडेट जाँचें"
+
+#: linux/verso-desktop/src/preferences.rs:89
+#: linux/verso-desktop/src/preferences.rs:89
+msgid "Day Folders"
+msgstr "दिन के फ़ोल्डर"
+
+#: linux/verso-desktop/src/preferences.rs:90
+#: linux/verso-desktop/src/preferences.rs:91
+#: linux/verso-desktop/src/preferences.rs:92
+#: linux/verso-desktop/src/preferences.rs:93
+#: linux/verso-desktop/src/preferences.rs:94
+#: linux/verso-desktop/src/preferences.rs:90
+#: linux/verso-desktop/src/preferences.rs:91
+#: linux/verso-desktop/src/preferences.rs:92
+#: linux/verso-desktop/src/preferences.rs:93
+#: linux/verso-desktop/src/preferences.rs:94
+msgid "Year and Month Folders"
+msgstr "वर्ष और महीने के फ़ोल्डर"
+
+#: linux/verso-desktop/src/preferences.rs:95
+#: linux/verso-desktop/src/preferences.rs:95
+msgid "Folders Copied Into Upload"
+msgstr "Upload में कॉपी किए गए फ़ोल्डर"
+
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:102
+msgid "Album Folders"
+msgstr "एल्बम फ़ोल्डर"
+
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:102
+msgid "File Names"
+msgstr "फ़ाइल नाम"
+
+#: linux/verso-desktop/src/preferences.rs:117
+#: linux/verso-desktop/src/preferences.rs:117
+#: linux/verso-desktop/src/preferences.rs:117
+#: shared/verso-core/src/settings.rs:82
+msgid "Open in Immich and Copy Immich Link"
+msgstr "Immich में खोलें और Immich लिंक कॉपी करें"
+
+#: linux/verso-desktop/src/session.rs:60
+msgid "Online"
+msgstr "ऑनलाइन"
+
+#: linux/verso-desktop/src/session.rs:61
+msgid "Server unreachable; files you opened before stay available"
+msgstr "सर्वर तक नहीं पहुंचा जा सकता; पहले खोली गई फ़ाइलें उपलब्ध रहेंगी"
+
+#: linux/verso-desktop/src/session.rs:62
+msgid "Signed out; sign in again"
+msgstr "साइन आउट हो गया; फिर से साइन इन करें"
+
+#: linux/verso-desktop/src/session.rs:64
+#: linux/verso-desktop/src/session.rs:74
+msgid "Not running"
+msgstr "नहीं चल रहा"
+
+#: linux/verso-desktop/src/session.rs:71
+msgid "{used} of {limit}"
+msgstr "{limit} में से {used}"
+
+#: linux/verso-desktop/src/session.rs:88
+msgid "writing"
+msgstr "लिखा जा रहा है"
+
+#: linux/verso-desktop/src/session.rs:88
+msgid "uploading"
+msgstr "अपलोड हो रहा है"
+
+#: linux/verso-desktop/src/session.rs:89
+msgid "{name}, {phase}"
+msgstr "{name}, {phase}"
+
+#: linux/verso-desktop/src/session.rs:92
+msgid "{name} and {count} more"
+msgstr "{name} और {count} अन्य"
+
+#: linux/verso-desktop/src/session.rs:118
+msgid "That address cannot be used: {error}"
+msgstr "यह पता इस्तेमाल नहीं किया जा सकता: {error}"
+
+#: linux/verso-desktop/src/session.rs:166
+#: linux/verso-desktop/src/session.rs:176
+#: linux/verso-desktop/src/session.rs:510
+#: linux/verso-desktop/src/session.rs:513
+msgid "Kept in {file}"
+msgstr "{file} में रखा गया"
+
+#: linux/verso-desktop/src/session.rs:171
+#: linux/verso-desktop/src/session.rs:515
+msgid "Kept in the keyring"
+msgstr "कीरिंग में रखा गया"
+
+#: linux/verso-desktop/src/session.rs:178
+msgid "The keyring stayed locked, so nothing was saved."
+msgstr "कीरिंग लॉक रही, इसलिए कुछ भी सहेजा नहीं गया।"
+
+#: linux/verso-desktop/src/session.rs:256
+msgid "Verso shows its icon in the top bar while you are signed in."
+msgstr "जब तक आप साइन इन हैं, Verso टॉप बार में अपना आइकन दिखाता है।"
+
+#: linux/verso-desktop/src/session.rs:257
+#: linux/verso-desktop/src/session.rs:261
+msgid "Signed in, but the background service did not start: {error}"
+msgstr "साइन इन हो गया, लेकिन पृष्ठभूमि सेवा शुरू नहीं हुई: {error}"
+
+#: linux/verso-desktop/src/session.rs:260
+msgid "Signed in, but the background service cannot start: {error}."
+msgstr "साइन इन हो गया, लेकिन पृष्ठभूमि सेवा शुरू नहीं हो सकती: {error}।"
+
+#: linux/verso-desktop/src/session.rs:290
+msgid "Verso Drive is not part of this version of Verso."
+msgstr "Verso Drive, Verso के इस संस्करण का हिस्सा नहीं है।"
+
+#: linux/verso-desktop/src/session.rs:296
+msgid "The background service did not restart: {error}"
+msgstr "पृष्ठभूमि सेवा फिर से शुरू नहीं हुई: {error}"
+
+#: linux/verso-desktop/src/session.rs:337
+msgid "Immich Mount is no longer signed in."
+msgstr "Immich Mount अब साइन इन नहीं है।"
+
+#: linux/verso-desktop/src/session.rs:342
+msgid "Immich no longer accepts Immich Mount's sign-in; sign in instead."
+msgstr "Immich अब Immich Mount का साइन-इन स्वीकार नहीं करता; इसके बजाय साइन इन करें।"
+
+#: linux/verso-desktop/src/session.rs:391
+msgid "Signed in, but the mount cannot start: {error}."
+msgstr "साइन इन हो गया, लेकिन माउंट शुरू नहीं हो सकता: {error}।"
+
+#: linux/verso-desktop/src/session.rs:395
+msgid "Signed in, but the mount did not start: {error}"
+msgstr "साइन इन हो गया, लेकिन माउंट शुरू नहीं हुआ: {error}"
+
+#: linux/verso-desktop/src/preferences.rs:48
+msgid "General"
+msgstr "सामान्य"
+
+#: linux/verso-desktop/src/preferences.rs:82
+msgid "Folders"
+msgstr "फ़ोल्डर"
+
+#: linux/verso-desktop/src/preferences.rs:110
+msgid "Other Apps"
+msgstr "दूसरे ऐप्स"
+
+#: linux/verso-desktop/src/preferences.rs:52
+msgid "Drive"
+msgstr "ड्राइव"
+
+#: linux/verso-desktop/src/preferences.rs:58
+msgid "GVfs leaves the drive out of Files' sidebar, and a bookmark takes its place: no unmount button, but a plain folder icon."
+msgstr "GVfs ड्राइव को फाइल्स के साइडबार से बाहर रखता है, और उसकी जगह एक बुकमार्क आ जाता है: कोई अनमाउंट बटन नहीं, बल्कि एक सादा फ़ोल्डर आइकन।"
+
+#: linux/verso-desktop/src/preferences.rs:63
+msgid "Storage"
+msgstr "स्टोरेज"
+
+#: linux/verso-desktop/src/preferences.rs:66
+msgid "Opened originals are kept on this computer up to this size."
+msgstr "खोली गई मूल फ़ाइलें इस कंप्यूटर पर इस आकार तक रखी जाती हैं।"
+
+#: linux/verso-desktop/src/preferences.rs:67
+msgid "Also download larger previews, for big icon sizes. Uses more data."
+msgstr "बड़े आइकनों के लिए बड़े पूर्वावलोकन भी डाउनलोड करें। अधिक डेटा लगता है।"
+
+#: linux/verso-desktop/src/preferences.rs:72
+msgid "Updates"
+msgstr "अपडेट"
+
+#: linux/verso-desktop/src/preferences.rs:74
+msgid "Tell me when a new version is out."
+msgstr "नया संस्करण आने पर मुझे बताएं।"
+
+#: linux/verso-desktop/src/preferences.rs:86
+msgid "Sections"
+msgstr "अनुभाग"
+
+#: linux/verso-desktop/src/preferences.rs:87
+msgid "The folders the drive shows, and how each splits its photos by date."
+msgstr "ड्राइव कौन से फ़ोल्डर दिखाती है, और हर फ़ोल्डर अपनी तस्वीरों को तारीख़ से कैसे बाँटता है।"
+
+#: linux/verso-desktop/src/preferences.rs:89
+msgid "The timeline, by year and month"
+msgstr "टाइमलाइन, वर्ष और महीने के अनुसार"
+
+#: linux/verso-desktop/src/preferences.rs:95
+msgid "What is copied into it is uploaded"
+msgstr "इसमें कॉपी की गई चीज़ें अपलोड होती हैं"
+
+#: linux/verso-desktop/src/preferences.rs:100
+msgid "Names"
+msgstr "नाम"
+
+#: linux/verso-desktop/src/preferences.rs:115
+msgid "Immich Web App"
+msgstr "Immich वेब ऐप"
+
+#: linux/verso-desktop/src/preferences.rs:55
+#: linux/verso-desktop/src/preferences.rs:55
+msgid "Mount at Login"
+msgstr "लॉगिन पर माउंट करें"
+
+#: linux/verso-desktop/src/preferences.rs:58
+#: linux/verso-desktop/src/preferences.rs:58
+msgid "Bookmark Instead of Drive"
+msgstr "ड्राइव के बजाय बुकमार्क"
+
+#: linux/verso/src/drive_preferences.rs:267
+#: linux/verso/src/drive_preferences.rs:271
+msgid "Choose a Folder"
+msgstr "फ़ोल्डर चुनें"
+
+#: linux/verso/src/drive_preferences.rs:302
+msgid "Learn More"
+msgstr "और जानें"
+
+#: linux/verso/src/drive_preferences.rs:337
+msgid "Not found"
+msgstr "नहीं मिला"
+
+#: linux/verso/src/drive_preferences.rs:338
+msgid "Forget"
+msgstr "भूल जाएँ"
+
+#: linux/verso/src/drive_preferences.rs:365
+msgid "No other app that takes part is installed."
+msgstr "भाग लेने वाला कोई अन्य ऐप इंस्टॉल नहीं है।"
+
+#: linux/verso/src/drive_preferences.rs:366
+msgid "Find Apps That Take Part"
+msgstr "भाग लेने वाले ऐप खोजें"
+
+#: linux/files-extension/verso-nautilus.c:232
+#: linux/files-extension/verso-nautilus.py:177
+msgid "Show in {app}"
+msgstr "{app} में दिखाएँ"
+
+#: linux/files-extension/verso-nautilus.c:273
+#: linux/files-extension/verso-nautilus.py:201
+#: mac/Verso/Config/VersoDrive-Info.plist (NSExtensionFileProviderActionName)
+msgid "Open in Immich"
+msgstr "Immich में खोलें"
+
+#: linux/files-extension/verso-nautilus.c:276
+#: linux/files-extension/verso-nautilus.py:203
+#: mac/Verso/Config/VersoDrive-Info.plist (NSExtensionFileProviderActionName)
+msgid "Copy Immich Link"
+msgstr "Immich लिंक कॉपी करें"
+
+#: linux/files-extension/verso-nautilus.py:160
+msgid "{app} is no longer installed."
+msgstr "{app} अब इंस्टॉल नहीं है।"
+
+#: linux/files-extension/verso-nautilus.py:169
+msgid "Verso could not open {app}: {error}"
+msgstr "Verso {app} नहीं खोल सका: {error}"
+
+#: shared/verso-core/src/settings.rs:57
+msgid "The Immich server; /api is added"
+msgstr "Immich सर्वर; /api जोड़ा जाता है"
+
+#: shared/verso-core/src/settings.rs:58
+msgid "Show the library as a drive in the file manager"
+msgstr "लाइब्रेरी को फ़ाइल प्रबंधक में ड्राइव के रूप में दिखाएँ"
+
+#: shared/verso-core/src/settings.rs:59
+msgid "Where the mount appears"
+msgstr "माउंट कहां दिखता है"
+
+#: shared/verso-core/src/settings.rs:60
+msgid "The drive's name in the sidebar"
+msgstr "साइडबार में ड्राइव का नाम"
+
+#: shared/verso-core/src/settings.rs:61
+msgid "Mount when the session starts"
+msgstr "सत्र शुरू होने पर माउंट करें"
+
+#: shared/verso-core/src/settings.rs:62
+msgid "List the drive in Files' sidebar as a drive, with its unmount button; off, as a bookmark"
+msgstr "ड्राइव को फाइल्स के साइडबार में अनमाउंट बटन के साथ ड्राइव के रूप में दिखाएँ; बंद होने पर बुकमार्क के रूप में"
+
+#: shared/verso-core/src/settings.rs:63
+msgid "Show the Photos section"
+msgstr "Photos अनुभाग दिखाएं"
+
+#: shared/verso-core/src/settings.rs:64
+msgid "Show the Albums section"
+msgstr "Albums अनुभाग दिखाएं"
+
+#: shared/verso-core/src/settings.rs:65
+msgid "Show the People section"
+msgstr "People अनुभाग दिखाएं"
+
+#: shared/verso-core/src/settings.rs:66
+msgid "Show the Places section"
+msgstr "Places अनुभाग दिखाएं"
+
+#: shared/verso-core/src/settings.rs:67
+msgid "Show the Favorites section"
+msgstr "Favorites अनुभाग दिखाएं"
+
+#: shared/verso-core/src/settings.rs:68
+msgid "Show the Archive section"
+msgstr "Archive अनुभाग दिखाएं"
+
+#: shared/verso-core/src/settings.rs:69
+msgid "Day folders inside months"
+msgstr "महीनों के अंदर दिन के फ़ोल्डर"
+
+#: shared/verso-core/src/settings.rs:70
+msgid "Year and month folders inside albums"
+msgstr "एल्बमों के अंदर वर्ष और महीने के फ़ोल्डर"
+
+#: shared/verso-core/src/settings.rs:71
+msgid "Year and month folders inside people"
+msgstr "लोगों के अंदर वर्ष और महीने के फ़ोल्डर"
+
+#: shared/verso-core/src/settings.rs:72
+msgid "Year and month folders inside cities"
+msgstr "शहरों के अंदर वर्ष और महीने के फ़ोल्डर"
+
+#: shared/verso-core/src/settings.rs:73
+msgid "Year and month folders inside favorites"
+msgstr "पसंदीदा के अंदर वर्ष और महीने के फ़ोल्डर"
+
+#: shared/verso-core/src/settings.rs:74
+msgid "Year and month folders inside the archive"
+msgstr "संग्रह के अंदर वर्ष और महीने के फ़ोल्डर"
+
+#: shared/verso-core/src/settings.rs:75
+msgid "How album folders are named and grouped"
+msgstr "एल्बम फ़ोल्डरों के नाम कैसे रखे जाएं और उन्हें कैसे समूहित किया जाए"
+
+#: shared/verso-core/src/settings.rs:76
+msgid "How files are named"
+msgstr "फ़ाइलों के नाम कैसे रखे जाएं"
+
+#: shared/verso-core/src/settings.rs:77
+msgid "The content cache's size limit"
+msgstr "सामग्री कैश की आकार सीमा"
+
+#: shared/verso-core/src/settings.rs:78
+msgid "Show the Upload folder, and upload what is copied into it"
+msgstr "Upload फ़ोल्डर दिखाएं, और उसमें कॉपी की गई चीज़ें अपलोड करें"
+
+#: shared/verso-core/src/settings.rs:79
+msgid "Folders copied into Upload"
+msgstr "Upload में कॉपी किए गए फ़ोल्डर"
+
+#: shared/verso-core/src/settings.rs:80
+msgid "Also seed 1024 px thumbnails from the preview"
+msgstr "पूर्वावलोकन से 1024 px थंबनेल भी तैयार करें"
+
+#: shared/verso-core/src/settings.rs:81
+msgid "Refuse thumbnailer reads of originals"
+msgstr "थंबनेलर को मूल फ़ाइलें पढ़ने से रोकें"
+
+#: shared/verso-core/src/settings.rs:83
+msgid "What a double click on Verso's top bar icon opens"
+msgstr "Verso के टॉप बार आइकन पर डबल-क्लिक करने से क्या खुलता है"
+
+#: shared/verso-core/src/settings.rs:84
+msgid "Verso's top bar icon in colour: the lens's five colours, grey while the server cannot be reached"
+msgstr "Verso का टॉप बार आइकन रंगीन: लेंस के पांच रंग, और जब सर्वर तक नहीं पहुंचा जा सकता तब धूसर"
+
+#: shared/verso-core/src/settings.rs:85
+msgid "Verso's app icon, by the picture on its print"
+msgstr "Verso का ऐप आइकन, उसके प्रिंट पर बनी तस्वीर के अनुसार"
+
+#: shared/verso-core/src/settings.rs:86
+msgid "Show what other apps link to (Immich Crosslink)"
+msgstr "दूसरे ऐप्स जिसकी ओर लिंक करते हैं उसे दिखाएँ (Immich Crosslink)"
+
+#: shared/verso-core/src/settings.rs:87
+msgid "Verso: take part as Verso Gallery, so other apps show items in it"
+msgstr "Verso: Verso Gallery के रूप में भाग लें, ताकि दूसरे ऐप्स उसमें आइटम दिखाएँ"
+
+#: shared/verso-core/src/settings.rs:88
+msgid "Verso: take part as Verso Drive, so other apps show items in Files while the drive is on"
+msgstr "Verso: Verso Drive के रूप में भाग लें, ताकि ड्राइव चालू रहते हुए दूसरे ऐप्स फाइल्स में आइटम दिखाएँ"
+
+#: shared/verso-core/src/settings.rs:89
+msgid "Apps left out of Show in, by their desktop entry or bundle id, separated by ;"
+msgstr "\"दिखाएँ\" से बाहर रखे गए ऐप, डेस्कटॉप एंट्री या बंडल आईडी से, ; से अलग"
+
+#: shared/verso-core/src/settings.rs:90
+msgid "Tell me when a new version is out"
+msgstr "नया संस्करण आने पर मुझे बताएं"
+
+#: shared/verso-core/src/settings.rs:91
+msgid "Headless only: a 0600 file holding the credential"
+msgstr "केवल हेडलेस: क्रेडेंशियल रखने वाली 0600 फ़ाइल"
+
+#: shared/verso-core/src/settings.rs:164
+msgid "Never"
+msgstr "कभी नहीं"
+
+#: shared/verso-core/src/settings.rs:165
+msgid "From 500 Items"
+msgstr "500 आइटम से"
+
+#: shared/verso-core/src/settings.rs:166
+msgid "Always"
+msgstr "हमेशा"
+
+#: shared/verso-core/src/settings.rs:167
+msgid "Year in the Name (2023 - Trip)"
+msgstr "नाम में वर्ष (2023 - यात्रा)"
+
+#: shared/verso-core/src/settings.rs:168
+msgid "Year Folders (2023/Trip)"
+msgstr "वर्ष फ़ोल्डर (2023/यात्रा)"
+
+#: shared/verso-core/src/settings.rs:169
+msgid "Name Only (Trip)"
+msgstr "केवल नाम (यात्रा)"
+
+#: shared/verso-core/src/settings.rs:170
+msgid "Date and Time Taken"
+msgstr "लिए जाने की तारीख और समय"
+
+#: shared/verso-core/src/settings.rs:171
+msgid "Original File Names"
+msgstr "मूल फ़ाइल नाम"
+
+#: shared/verso-core/src/settings.rs:172
+msgid "Ask Each Time"
+msgstr "हर बार पूछें"
+
+#: shared/verso-core/src/settings.rs:176
+#: shared/verso-core/src/settings.rs:196
+msgid "Verso"
+msgstr "Verso"
+
+#: shared/verso-core/src/settings.rs:177
+msgid "Verso Drive in Files"
+msgstr "फाइल्स में Verso Drive"
+
+#: shared/verso-core/src/settings.rs:178
+msgid "Preferences"
+msgstr "प्राथमिकताएं"
+
+#: shared/verso-core/src/settings.rs:179
+msgid "Mist"
+msgstr "धुंध"
+
+#: shared/verso-core/src/settings.rs:180
+msgid "Sand"
+msgstr "रेत"
+
+#: shared/verso-core/src/settings.rs:181
+msgid "Dark"
+msgstr "गहरा"
+
+#: shared/verso-core/src/settings.rs:182
+msgid "Paper"
+msgstr "कागज़"
+
+#: shared/verso-core/src/settings.rs:183
+msgid "Frame"
+msgstr "फ़्रेम"
+
+#: shared/verso-core/src/settings.rs:184
+msgid "Slate"
+msgstr "स्लेट"
+
+#: shared/verso-core/src/settings.rs:185
+msgid "Sky"
+msgstr "आकाश"
+
+#: linux/packaging/desktop/dev.hviid.Verso.desktop.in (Comment)
+msgid "Browse, search and organise your Immich photos and videos, with your library as a drive in Files"
+msgstr ""
+
+#: linux/packaging/desktop/dev.hviid.Verso.desktop.in (Keywords)
+msgid "Immich;photos;videos;gallery;albums;people;drive;"
+msgstr ""
+
+#: mac/Verso/Config/Info.plist (NSHumanReadableCopyright)
+msgid "Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO. “Immich” is used only to describe the server this software works with, and remains the mark of its owner."
+msgstr ""
+
+#: mac/Verso/Config/Info.plist (NSLocalNetworkUsageDescription)
+msgid "Verso connects to your Immich server, which may be on your local network."
+msgstr ""

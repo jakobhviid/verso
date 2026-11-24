@@ -1,0 +1,416 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "%@": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@"
+          }
+        }
+      }
+    },
+    "Album": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        }
+      }
+    },
+    "Albums": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        }
+      }
+    },
+    "Choose photos in Verso with Show in Widget.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli le foto in Verso con Mostra nel widget."
+          }
+        }
+      }
+    },
+    "Choose the album to show.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli l’album da mostrare."
+          }
+        }
+      }
+    },
+    "Choose the person or pet to show.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli la persona o l’animale da mostrare."
+          }
+        }
+      }
+    },
+    "Choose the place to show.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli il luogo da mostrare."
+          }
+        }
+      }
+    },
+    "Choose which photos the widget shows.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli quali foto mostra il widget."
+          }
+        }
+      }
+    },
+    "Chosen Photos": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto scelte"
+          }
+        }
+      }
+    },
+    "Edit the widget to choose what it shows.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modifica il widget per scegliere cosa mostrare."
+          }
+        }
+      }
+    },
+    "Favorites": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preferiti"
+          }
+        }
+      }
+    },
+    "Featured": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In evidenza"
+          }
+        }
+      }
+    },
+    "Featured Photos": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto in evidenza"
+          }
+        }
+      }
+    },
+    "How many photos and videos you have, and how full the server is.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quante foto e video hai e quanto è pieno il server."
+          }
+        }
+      }
+    },
+    "Library": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libreria"
+          }
+        }
+      }
+    },
+    "Next Photo": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto successiva"
+          }
+        }
+      }
+    },
+    "Open Verso to load these photos.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apri Verso per caricare queste foto."
+          }
+        }
+      }
+    },
+    "Open Verso to see your library here.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apri Verso per vedere qui la tua libreria."
+          }
+        }
+      }
+    },
+    "Open Verso to see your photos here.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apri Verso per vedere qui le tue foto."
+          }
+        }
+      }
+    },
+    "People": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Persone"
+          }
+        }
+      }
+    },
+    "Person": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Persona"
+          }
+        }
+      }
+    },
+    "Photo Mosaic": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mosaico di foto"
+          }
+        }
+      }
+    },
+    "Photos": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto"
+          }
+        }
+      }
+    },
+    "Photos from an album. Right-click the widget to choose which one.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le foto di un album. Fai clic con il tasto destro sul widget per scegliere quale."
+          }
+        }
+      }
+    },
+    "Photos of a person or pet. Right-click the widget to choose who.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le foto di una persona o di un animale. Fai clic con il tasto destro sul widget per scegliere chi."
+          }
+        }
+      }
+    },
+    "Photos taken in a place. Right-click the widget to choose where.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le foto scattate in un luogo. Fai clic con il tasto destro sul widget per scegliere dove."
+          }
+        }
+      }
+    },
+    "Photos you add with Show in Widget in Verso.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le foto che aggiungi con Mostra nel widget in Verso."
+          }
+        }
+      }
+    },
+    "Place": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Luogo"
+          }
+        }
+      }
+    },
+    "Server %@": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Server %@"
+          }
+        }
+      }
+    },
+    "Server storage: %@ of %@": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spazio sul server: %@ di %@"
+          }
+        }
+      }
+    },
+    "Several photos at once. Right-click the widget to choose which ones.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Più foto insieme. Fai clic con il tasto destro sul widget per scegliere quali."
+          }
+        }
+      }
+    },
+    "Show": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra"
+          }
+        }
+      }
+    },
+    "Show ${source}": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra ${source}"
+          }
+        }
+      }
+    },
+    "Show ${source}: ${album}": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra ${source}: ${album}"
+          }
+        }
+      }
+    },
+    "Show ${source}: ${person}": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra ${source}: ${person}"
+          }
+        }
+      }
+    },
+    "Show ${source}: ${place}": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra ${source}: ${place}"
+          }
+        }
+      }
+    },
+    "There are no photos to show here.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non ci sono foto da mostrare qui."
+          }
+        }
+      }
+    },
+    "Today's memories and highlights from your library.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I ricordi di oggi e i momenti migliori della tua libreria."
+          }
+        }
+      }
+    },
+    "Videos": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video"
+          }
+        }
+      }
+    },
+    "Your favorite photos.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le tue foto preferite."
+          }
+        }
+      }
+    },
+    "Your library: %@": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La tua libreria: %@"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

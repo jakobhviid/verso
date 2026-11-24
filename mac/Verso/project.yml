@@ -1,0 +1,166 @@
+# Verso's Mac app (ARCHITECTURE.md, "Verso on the Mac"), made from Immich Gallery (CREDITS.md). `xcodegen` here writes
+# Verso.xcodeproj from this file after `mac/build-rust.sh` has built the bridge; neither result is committed.
+name: Verso
+options:
+  bundleIdPrefix: dev.hviid
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+
+configFiles:
+  Debug: Config/Base.xcconfig
+  Release: Config/Base.xcconfig
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_HARDENED_RUNTIME: YES
+    DEAD_CODE_STRIPPING: YES
+    # The app's identity, which the Info.plists and entitlements read: its bundle identifier, name, App Group and
+    # URL schemes. A Debug build is Verso Dev, with an identity of its own, so it signs in, keeps its settings and
+    # adds its Finder location apart from an installed release.
+    VERSO_IDENTITY: dev.hviid.Verso
+    IMMICH_APP_NAME: Verso
+    VERSO_APP_GROUP: $(TeamIdentifierPrefix)dev.hviid.Verso
+    IMMICH_URL_SCHEME: verso
+    IMMICH_CROSSLINK_SCHEME: immich-crosslink
+    IMMICH_CROSSLINK_VERSION: "0.2"
+    APP_ICON: AppIcon
+    SIDEBAR_SYMBOL: SidebarSymbol
+  configs:
+    Debug:
+      VERSO_IDENTITY: dev.hviid.Verso.Dev
+      IMMICH_APP_NAME: Verso Dev
+      VERSO_APP_GROUP: $(TeamIdentifierPrefix)dev.hviid.Verso.Dev
+      IMMICH_URL_SCHEME: verso-dev
+      IMMICH_CROSSLINK_SCHEME: immich-crosslink-dev
+      IMMICH_CROSSLINK_VERSION: 0.2-dev
+      APP_ICON: AppIconDev
+
+targets:
+  # The bridge's generated Swift bindings with Verso's wrapper, in a module of their own: the bindings' `Credential`
+  # and `Item` would meet the app's types of the same names in the app's module. mac/Shared comes with them, for
+  # Verso Drive's account and settings (DriveCore).
+  VersoCore:
+    type: library.static
+    platform: macOS
+    sources:
+      - VersoCore
+      - ../build/Generated
+      - ../Shared
+    settings:
+      base:
+        PRODUCT_NAME: VersoCore
+        # uniffi writes its bindings for Swift 5's checking.
+        SWIFT_VERSION: "5.0"
+    dependencies:
+      - framework: ../build/VersoBridge.xcframework
+        embed: false
+
+  Verso:
+    type: application
+    platform: macOS
+    sources:
+      - path: Verso
+        excludes: [AppIcon.icon, AppIconDev.icon]
+      # The Icon Composer icons are documents, not folders of resources; macOS 26 and later show them, and the asset
+      # catalog's AppIcon sets stay for macOS 15.
+      - path: Verso/AppIcon.icon
+        type: file
+        buildPhase: resources
+        optional: true
+      - path: Verso/AppIconDev.icon
+        type: file
+        buildPhase: resources
+        optional: true
+      - Shared
+      - path: ../../THIRD-PARTY-NOTICES.md
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(VERSO_IDENTITY)
+        PRODUCT_NAME: $(IMMICH_APP_NAME)
+        PRODUCT_MODULE_NAME: Verso
+        INFOPLIST_FILE: Config/Info.plist
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_ENTITLEMENTS: Config/Verso.entitlements
+        # Empty in a development build, signed automatically.
+        PROVISIONING_PROFILE_SPECIFIER: $(APP_PROFILE)
+        ASSETCATALOG_COMPILER_APPICON_NAME: $(APP_ICON)
+        # The app icon's six other designs, the PNG sets of this build's own (AppIcon-Sand, or AppIconDev-Sand in
+        # Verso Dev), which Settings puts in the Dock while Verso runs (AppIconChoice.swift). Only the sets named are
+        # compiled, so a release carries none of Verso Dev's.
+        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: $(APP_ICON)-Sand $(APP_ICON)-Dark $(APP_ICON)-Paper $(APP_ICON)-Frame $(APP_ICON)-Slate $(APP_ICON)-Sky
+        COMBINE_HIDPI_IMAGES: YES
+        ENABLE_PREVIEWS: YES
+    dependencies:
+      - target: VersoCore
+      - target: VersoDrive
+        embed: true
+      - target: VersoWidget
+        embed: true
+      - framework: ../build/VersoBridge.xcframework
+        embed: false
+      - sdk: Security.framework
+      # Linked by name, so Xcode extracts the Shortcuts actions' metadata (MacIntegrationIntents.swift).
+      - sdk: AppIntents.framework
+
+  # Verso Drive: the File Provider extension and the files it shares with the app (ARCHITECTURE.md, "Verso on the
+  # Mac").
+  VersoDrive:
+    type: app-extension
+    platform: macOS
+    sources:
+      - ../FileProvider
+      - ../Shared
+      - ../build/Generated
+      # Finder's sidebar symbol, and the app's icon for System Settings' list of file providers.
+      - Verso/Assets.xcassets
+      # The names of Finder's actions, which Finder looks up in the extension's Localizable.strings.
+      - path: ../build/Localization
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(VERSO_IDENTITY).Drive
+        # The same in both configurations: the app embeds the extension by the file name fixed when the project is
+        # generated.
+        PRODUCT_NAME: VersoDrive
+        INFOPLIST_FILE: Config/VersoDrive-Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        CODE_SIGN_ENTITLEMENTS: Config/VersoDrive.entitlements
+        PROVISIONING_PROFILE_SPECIFIER: $(EXTENSION_PROFILE)
+        ASSETCATALOG_COMPILER_APPICON_NAME: $(APP_ICON)
+        # Written for Swift 5's checking.
+        SWIFT_VERSION: "5.0"
+        SKIP_INSTALL: YES
+    dependencies:
+      - framework: ../build/VersoBridge.xcframework
+        embed: false
+      - sdk: Security.framework
+
+  VersoWidget:
+    type: app-extension
+    platform: macOS
+    sources:
+      - Widget
+      - Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(VERSO_IDENTITY).Widget
+        PRODUCT_NAME: VersoWidget
+        INFOPLIST_FILE: Config/VersoWidget-Info.plist
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_ENTITLEMENTS: Config/VersoWidget.entitlements
+        PROVISIONING_PROFILE_SPECIFIER: $(WIDGET_PROFILE)
+        SKIP_INSTALL: YES
+
+schemes:
+  Verso:
+    build:
+      targets:
+        Verso: all
+    run:
+      config: Debug
+    archive:
+      config: Release

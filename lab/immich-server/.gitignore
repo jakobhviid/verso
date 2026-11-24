@@ -1,0 +1,6 @@
+.env.local
+.env.*.local
+.assets.tsv
+.assets.*.tsv
+fixtures/cache/
+fixtures/showcase/cache/

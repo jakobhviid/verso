@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <!-- The Date Scroller's toggle: a calendar with a timeline at its trailing edge, the mark where the grid is. -->
+  <path fill="#222" fill-rule="evenodd" d="M3 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h5a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-.5 4h6v6a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5z"/>
+  <rect fill="#222" x="3.5" y="7.5" width="1.5" height="1.5"/>
+  <rect fill="#222" x="6" y="7.5" width="1.5" height="1.5"/>
+  <rect fill="#222" x="3.5" y="10" width="1.5" height="1.5"/>
+  <rect fill="#222" x="13" y="1" width="1" height="14" rx=".5"/>
+  <rect fill="#222" x="11.5" y="5" width="4" height="2" rx="1"/>
+</svg>

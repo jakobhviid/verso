@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=Verso
+Comment=Browse, search and organise your Immich photos and videos, with your library as a drive in Files
+Keywords=Immich;photos;videos;gallery;albums;people;drive;
+Exec=@BINDIR@/verso %u
+Icon=dev.hviid.Verso
+Terminal=false
+Type=Application
+Categories=Graphics;Photography;Viewer;
+StartupNotify=true
+# app.immich is the browser sign-in's redirect, shared with Immich Mount. Verso takes part in Immich Crosslink through
+# two entries of its own, Verso Gallery and Verso Drive, which it writes while it takes part
+# (https://jakob.hviid.phd/immich-crosslink/), so this one, the app in the app grid, announces nothing.
+MimeType=x-scheme-handler/app.immich;

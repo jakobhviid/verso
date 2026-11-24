@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<defs><radialGradient id="glass" cx="0.42" cy="0.38" r="0.75">
+    <stop offset="0" stop-color="#2d5c9e"/><stop offset="0.6" stop-color="#18294a"/><stop offset="1" stop-color="#0f0d16"/>
+  </radialGradient></defs>
+<g transform="translate(-73.143 -73.143) scale(9.142857)"><g transform="translate(64 56) scale(1.1)"><circle r="18" fill="url(#glass)"/>
+  <circle r="11.16" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="1.44"/>
+  <ellipse cx="-5.76" cy="-6.48" rx="5.4" ry="3.24" transform="rotate(-35 -5.76 -6.48)" fill="#ffffff" opacity="0.75"/>
+  <circle cx="6.84" cy="5.4" r="1.44" fill="#ffffff" opacity="0.45"/></g></g>
+</svg>

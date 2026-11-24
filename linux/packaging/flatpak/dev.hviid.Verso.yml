@@ -1,0 +1,85 @@
+# Verso as a Flatpak, for our own builds and testing (ARCHITECTURE.md, "Verso as a Flatpak"): both programs built
+# with the `flatpak` feature, which leaves the drive out. Not the manifest for Flathub: Flathub's rules (2026-11) want
+# the maintainer to write that one, and forbid fetching during the build, which this one does for the crates.
+#
+# Beside this file, the source as an archive with one top folder, without the build folder, with its version:
+#   linux/packaging/flatpak/source-archive.sh OUT_DIR
+# then, with the cache off (flatpak-builder takes a changed local archive for the one it built before):
+#   flatpak-builder --force-clean --disable-cache --repo=repo build dev.hviid.Verso.yml
+#   flatpak build-bundle repo verso-x86_64.flatpak dev.hviid.Verso --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo
+app-id: dev.hviid.Verso
+runtime: org.gnome.Platform
+runtime-version: '51'
+sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+command: verso
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  # The top bar icon, and the service's notifications.
+  - --talk-name=org.kde.StatusNotifierWatcher
+  - --talk-name=org.freedesktop.Notifications
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin
+modules:
+  # libshumate needs it to build, though Verso's map draws raster tiles: the library alone, without its compiler.
+  - name: protobuf-c
+    config-opts:
+      - --disable-protoc
+    sources:
+      - type: archive
+        url: https://github.com/protobuf-c/protobuf-c/releases/download/v1.5.2/protobuf-c-1.5.2.tar.gz
+        sha256: e2c86271873a79c92b58fef7ebf8de1aa0df4738347a8bd5d4e65a80a16d0d24
+  # The map's library, which the runtime does not have; raster tiles only, as Verso's map uses them.
+  - name: libshumate
+    buildsystem: meson
+    config-opts:
+      - -Dgir=false
+      - -Dvapi=false
+      - -Dgtk_doc=false
+      - -Ddemos=false
+      - -Dvector_renderer=false
+      - -Dsysprof=disabled
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/libshumate/1.7/libshumate-1.7.0.tar.xz
+        sha256: 3896cc4b6a7bf83141c27df23ce48cdd68467603bc6b764960307cdcbbef80e5
+  - name: verso
+    buildsystem: simple
+    build-options:
+      # Cargo fetches the crates (our own builds only).
+      build-args:
+        - --share=network
+      env:
+        CARGO_HOME: /run/build/verso/cargo
+    build-commands:
+      # The version the source was made as (`linux/packaging/flatpak/source-archive.sh`), as it has no history to count.
+      - VERSO_VERSION="$(cat VERSION 2>/dev/null)" cargo build --release --locked --features flatpak -p verso -p verso-service
+      - install -Dm755 target/release/verso /app/bin/verso
+      # The service's, the top bar's and Preferences' texts in the person's language, in /app/share/locale.
+      - python3 po/i18n.py mo /app/share/locale
+      - install -Dm755 target/release/verso-service /app/bin/verso-service
+      - install -Dm644 linux/packaging/flatpak/dev.hviid.Verso.desktop /app/share/applications/dev.hviid.Verso.desktop
+      - |
+        for size in 16 32 64 128 256 512; do
+          install -Dm644 linux/packaging/icons/hicolor/$size/dev.hviid.Verso.png /app/share/icons/hicolor/${size}x${size}/apps/dev.hviid.Verso.png
+        done
+      - install -Dm644 linux/packaging/icons/dev.hviid.Verso-symbolic.svg /app/share/icons/hicolor/symbolic/apps/dev.hviid.Verso-symbolic.svg
+      - |
+        for state in unmounted offline signed-out; do
+          install -Dm644 linux/packaging/icons/dev.hviid.Verso-$state-symbolic.svg /app/share/icons/hicolor/symbolic/apps/dev.hviid.Verso-$state-symbolic.svg
+        done
+        for icon in dev.hviid.Verso-tray dev.hviid.Verso-tray-unmounted dev.hviid.Verso-tray-offline dev.hviid.Verso-tray-signed-out; do
+          install -Dm644 linux/packaging/icons/$icon.svg /app/share/icons/hicolor/scalable/apps/$icon.svg
+        done
+      - |
+        for icon in linux/packaging/icons/verso-*-symbolic.svg; do
+          install -Dm644 "$icon" /app/share/icons/hicolor/symbolic/apps/$(basename "$icon")
+        done
+    sources:
+      - type: archive
+        path: verso-source.tar.gz

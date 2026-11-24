@@ -1,0 +1,38 @@
+[package]
+name = "verso-service"
+description = "Verso's service: the drive, the tray and the command line"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "verso-service"
+path = "src/main.rs"
+
+[features]
+# Verso as a Flatpak: what its sandbox cannot reach is left out (ARCHITECTURE.md, "Verso as a Flatpak").
+flatpak = []
+
+[dependencies]
+verso-linux = { path = "../verso-linux" }
+verso-core = { path = "../../shared/verso-core" }
+immich-api = { path = "../../shared/immich-api" }
+# The look for a newer release (src/updates.rs); TLS comes with immich-api's default feature.
+reqwest = { version = "0.12", default-features = false, features = ["json"] }
+tokio = { version = "1", features = ["rt-multi-thread", "time"] }
+log = "0.4"
+rpassword = "7"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+clap = { version = "4", features = ["derive", "wrap_help"] }
+clap_complete = "4"
+clap_mangen = "0.2"
+
+[dev-dependencies]
+assert_cmd = "2"
+predicates = "3"
+tempfile = "3"
+serde_json = "1"

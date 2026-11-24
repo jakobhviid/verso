@@ -1,0 +1,297 @@
+using Gtk 4.0;
+using Adw 1;
+
+translation-domain "verso";
+
+template $ImmichGalleryWindow: Adw.ApplicationWindow {
+  title: _("Verso");
+  default-width: 1180;
+  default-height: 780;
+  width-request: 360;
+  height-request: 294;
+
+  Adw.Breakpoint {
+    condition ("max-width: 640sp")
+
+    setters {
+      split_view.collapsed: true;
+    }
+  }
+
+  content: Adw.ToastOverlay toasts {
+    // Pages switch in place, as on the Mac: only what the user does to what is shown moves (`motion`).
+    child: Adw.NavigationView navigation {
+      animate-transitions: false;
+
+      Adw.NavigationPage {
+        tag: "loading";
+        title: _("Verso");
+
+        child: Adw.ToolbarView {
+          [top]
+          Adw.HeaderBar {}
+
+          content: Adw.Spinner {
+            halign: center;
+            valign: center;
+            width-request: 48;
+            height-request: 48;
+          };
+        };
+      }
+
+      Adw.NavigationPage {
+        tag: "connect";
+        title: _("Verso");
+
+        child: Adw.ToolbarView {
+          [top]
+          Adw.HeaderBar {
+            [end]
+            MenuButton {
+              primary: true;
+              icon-name: "open-menu-symbolic";
+              tooltip-text: _("Main Menu");
+              menu-model: start_menu;
+            }
+          }
+
+          content: Adw.StatusPage welcome {
+            icon-name: "dev.hviid.Verso";
+            title: _("Your Immich Library");
+            description: _("Browse, search and organise your photos and videos. Sign in to your Immich server to begin.");
+
+            child: Adw.Clamp {
+              maximum-size: 420;
+
+              child: Box {
+                orientation: vertical;
+                spacing: 24;
+
+                Adw.PreferencesGroup {
+                  Adw.EntryRow server_row {
+                    title: _("Server Address");
+                    input-purpose: url;
+                    entry-activated => $on_connect() swapped;
+                  }
+                }
+
+                Button connect_button {
+                  label: _("_Continue");
+                  use-underline: true;
+                  halign: center;
+                  clicked => $on_connect() swapped;
+
+                  styles [
+                    "pill",
+                    "suggested-action",
+                  ]
+                }
+
+                Adw.PreferencesGroup takeover_group {
+                  visible: false;
+                  title: _("Immich Mount Is Signed In");
+
+                  Adw.ButtonRow {
+                    title: _("Use Immich Mount's Account");
+                    activated => $on_take_over() swapped;
+                  }
+                }
+              };
+            };
+          };
+        };
+      }
+
+      Adw.NavigationPage {
+        tag: "sign-in";
+        title: _("Sign In");
+
+        child: Adw.ToolbarView {
+          [top]
+          Adw.HeaderBar {}
+
+          content: Adw.PreferencesPage {
+            Adw.PreferencesGroup browser_group {
+              description: _("Opens your browser, where you sign in as usual, with a passkey or a password manager.");
+
+              Button browser_button {
+                halign: center;
+                clicked => $on_browser_sign_in() swapped;
+
+                styles [
+                  "pill",
+                  "suggested-action",
+                ]
+              }
+            }
+
+            Adw.PreferencesGroup password_group {
+              title: _("Email and Password");
+              description: _("For two-factor sign-in, use your server's single sign-on instead.");
+
+              Adw.EntryRow email_row {
+                title: _("Email");
+                input-purpose: email;
+              }
+
+              Adw.PasswordEntryRow password_row {
+                title: _("Password");
+                entry-activated => $on_password_sign_in() swapped;
+              }
+
+              Adw.ButtonRow {
+                title: _("Sign _In");
+                use-underline: true;
+                activated => $on_password_sign_in() swapped;
+              }
+            }
+
+            Adw.PreferencesGroup {
+              Adw.ExpanderRow {
+                title: _("Use an API Key Instead");
+                subtitle: _("Its permissions limit what the gallery can change");
+
+                Adw.PasswordEntryRow api_key_row {
+                  title: _("API Key");
+                  entry-activated => $on_api_key_sign_in() swapped;
+                }
+
+                Adw.ButtonRow {
+                  title: _("Sign In With _Key");
+                  use-underline: true;
+                  activated => $on_api_key_sign_in() swapped;
+                }
+              }
+            }
+          };
+        };
+      }
+
+      Adw.NavigationPage {
+        tag: "library";
+        title: _("Verso");
+        can-pop: false;
+
+        // At its narrowest the sidebar's foot still holds the account's name beside the bell and the pencil, and an
+        // import's title beside Retry and its cross: at 200 they read "Lab…" and "Importe…".
+        child: Adw.NavigationSplitView split_view {
+          min-sidebar-width: 250;
+          max-sidebar-width: 280;
+
+          sidebar: Adw.NavigationPage {
+            title: _("Verso");
+
+            child: Adw.ToolbarView {
+              [top]
+              Adw.HeaderBar {
+                // Search where GNOME Files has it. An import shows at the sidebar's foot (`imports`).
+                [start]
+                Button {
+                  icon-name: "system-search-symbolic";
+                  tooltip-text: _("Search");
+                  action-name: "win.search";
+                }
+
+                [end]
+                MenuButton {
+                  primary: true;
+                  icon-name: "open-menu-symbolic";
+                  tooltip-text: _("Main Menu");
+                  menu-model: primary_menu;
+                }
+              }
+
+              content: ScrolledWindow {
+                hscrollbar-policy: never;
+
+                // Single, not browse: Search, from the header, is a page no row stands for, and none is marked then.
+                child: ListBox sidebar {
+                  selection-mode: single;
+                  row-selected => $on_sidebar_selected() swapped;
+
+                  styles [
+                    "navigation-sidebar",
+                  ]
+                };
+              };
+            };
+          };
+
+          content: Adw.NavigationPage content_page {
+            title: _("Library");
+
+            // The viewer's zoom flies over the pages (`motion`).
+            child: Overlay content_overlay {
+              child: Adw.NavigationView content_view {
+                animate-transitions: false;
+              };
+            };
+          };
+        };
+      }
+    };
+  };
+}
+
+// The main menu: what is the app's, where everything app-wide can be found. The photos shown have their own toolbar
+// and its More menu, a photo its right-click menu, and the account its menu at the sidebar's foot.
+menu primary_menu {
+  section {
+    item {
+      label: _("_New Window");
+      action: "app.new-window";
+    }
+
+    item {
+      label: _("New _Album…");
+      action: "win.new-album";
+    }
+
+    item {
+      label: _("_Import…");
+      action: "win.import";
+    }
+
+    item {
+      label: _("Import _Folders…");
+      action: "win.import-folders";
+    }
+
+    item {
+      label: _("_Edit Sidebar");
+      action: "win.edit-sidebar";
+    }
+  }
+
+  section {
+    item {
+      label: _("_Preferences");
+      action: "app.preferences";
+    }
+
+    item {
+      label: _("_Keyboard Shortcuts");
+      action: "app.shortcuts";
+    }
+
+    item {
+      label: _("_About Verso");
+      action: "app.about";
+    }
+  }
+}
+
+menu start_menu {
+  section {
+    item {
+      label: _("_Keyboard Shortcuts");
+      action: "app.shortcuts";
+    }
+
+    item {
+      label: _("_About Verso");
+      action: "app.about";
+    }
+  }
+}

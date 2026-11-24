@@ -1,0 +1,838 @@
+# Verso in id.
+# This file is part of Verso, under the MIT license. Made by po/i18n.py.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: verso\n"
+"Report-Msgid-Bugs-To: https://github.com/jakobhviid/verso/issues\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: linux/verso-service/src/commands.rs:467
+#: linux/verso-linux/src/daemon.rs:498
+msgid "Verso Drive is not mounted"
+msgstr "Verso Drive tidak dikaitkan"
+
+#: linux/verso-service/src/commands.rs:467
+#: linux/verso-linux/src/daemon.rs:498
+msgid "Switch it on in Verso's Preferences, then open the link again."
+msgstr "Nyalakan di Preferensi Verso, lalu buka tautan itu lagi."
+
+#: linux/verso-service/src/online.rs:448
+msgid "The keyring stayed locked. Open {app}, or run “{command}”, to try again."
+msgstr "Ring kunci tetap terkunci. Buka {app} atau jalankan “{command}” untuk mencoba lagi."
+
+#: linux/verso-service/src/online.rs:449
+msgid "Immich is not mounted"
+msgstr "Immich tidak dikaitkan"
+
+#: linux/verso-linux/src/daemon.rs:497
+msgid "Links from other apps are off"
+msgstr "Tautan dari aplikasi lain dimatikan"
+
+#: linux/verso-linux/src/daemon.rs:497
+msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
+msgstr "Nyalakan Immich Crosslink di pengaturan Verso untuk menampilkan apa yang ditautkan aplikasi lain."
+
+#: linux/verso-linux/src/daemon.rs:499
+msgid "A link from another app cannot be opened"
+msgstr "Tautan dari aplikasi lain tidak dapat dibuka"
+
+#: linux/verso-linux/src/daemon.rs:499
+msgid "It is not a valid Immich link."
+msgstr "Ini bukan tautan Immich yang valid."
+
+#: linux/verso-linux/src/daemon.rs:500
+#: linux/verso-linux/src/daemon.rs:504
+msgid "Nothing to show"
+msgstr "Tidak ada yang dapat ditampilkan"
+
+#: linux/verso-linux/src/daemon.rs:500
+msgid "Verso Drive has no place for what this link points to."
+msgstr "Verso Drive tidak memiliki tempat untuk hal yang dituju tautan ini."
+
+#: linux/verso-linux/src/daemon.rs:501
+msgid "Not signed in to {host}"
+msgstr "Belum masuk ke {host}"
+
+#: linux/verso-linux/src/daemon.rs:501
+msgid "Verso is signed in to another Immich server."
+msgstr "Verso sudah masuk ke server Immich lain."
+
+#: linux/verso-linux/src/daemon.rs:502
+msgid "Another Immich account"
+msgstr "Akun Immich lain"
+
+#: linux/verso-linux/src/daemon.rs:502
+msgid "The link is for another account than the one Verso is signed in with."
+msgstr "Tautan ini untuk akun yang berbeda dari akun yang digunakan Verso untuk masuk."
+
+#: linux/verso-linux/src/daemon.rs:505
+msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
+msgstr "Kandar tidak menampilkan ini. Mungkin tersembunyi, berada di bagian yang dinonaktifkan, atau tidak dibagikan dengan Anda."
+
+#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:583
+msgid "Immich is unreachable"
+msgstr "Immich tidak dapat dijangkau"
+
+#: linux/verso-linux/src/daemon.rs:507
+msgid "The Immich server cannot be reached. Try the link again later."
+msgstr "Server Immich tidak dapat dijangkau. Coba tautan itu lagi nanti."
+
+#: linux/verso-linux/src/daemon.rs:584
+msgid "The Immich server cannot be reached. Files you opened before stay available."
+msgstr "Server Immich tidak dapat dijangkau. Berkas yang pernah Anda buka tetap tersedia."
+
+#: linux/verso-linux/src/daemon.rs:587
+#: linux/verso-linux/src/tray.rs:128
+msgid "Signed out of Immich"
+msgstr "Telah keluar dari Immich"
+
+#: linux/verso-linux/src/daemon.rs:588
+msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
+msgstr "Immich tidak lagi menerima proses masuk ini. Buka {app} untuk masuk lagi."
+
+#: linux/verso-linux/src/folders.rs:204
+msgid "Uploaded to Immich: {folder}"
+msgstr "Diunggah ke Immich: {folder}"
+
+#: linux/verso-linux/src/folders.rs:206
+msgid "Photos and videos in the timeline: {count}"
+msgstr "Foto dan video di linimasa: {count}"
+
+#: linux/verso-linux/src/folders.rs:207
+msgid "Albums it can make: {albums}"
+msgstr "Album yang dapat dibuat: {albums}"
+
+#: linux/verso-linux/src/folders.rs:210
+msgid "Files not uploaded: {count}"
+msgstr "Berkas yang tidak diunggah: {count}"
+
+#: linux/verso-linux/src/folders.rs:213
+#: shared/verso-core/src/settings.rs:174
+msgid "Make Albums"
+msgstr "Buat album"
+
+#: linux/verso-linux/src/folders.rs:213
+#: shared/verso-core/src/settings.rs:173
+msgid "Timeline Only"
+msgstr "Hanya linimasa"
+
+#: linux/verso-linux/src/folders.rs:234
+msgid "Albums made from {folder}"
+msgstr "Album dibuat dari {folder}"
+
+#: linux/verso-linux/src/folders.rs:236
+msgid "No albums made from {folder}"
+msgstr "Tidak ada album dibuat dari {folder}"
+
+#: linux/verso-linux/src/folders.rs:242
+msgid "Immich does not let this account make albums ({permission}). The photos and videos are in the timeline."
+msgstr "Immich tidak mengizinkan akun ini membuat album ({permission}). Foto dan video ada di linimasa."
+
+#: linux/verso-linux/src/folders.rs:247
+msgid "Signed out of Immich. The photos and videos are in the timeline."
+msgstr "Telah keluar dari Immich. Foto dan video ada di linimasa."
+
+#: linux/verso-linux/src/fuse.rs:647
+#: linux/verso-linux/src/fuse.rs:695
+#: linux/verso-linux/src/fuse.rs:701
+#: linux/verso-linux/src/fuse.rs:711
+#: linux/verso-linux/src/fuse.rs:1185
+msgid "Not uploaded: {name}"
+msgstr "Tidak diunggah: {name}"
+
+#: linux/verso-linux/src/fuse.rs:647
+msgid "The file is incomplete, as if its copy was cancelled."
+msgstr "Berkas tidak lengkap, seolah-olah penyalinannya dibatalkan."
+
+#: linux/verso-linux/src/fuse.rs:663
+msgid "Uploading {name} to Immich"
+msgstr "Mengunggah {name} ke Immich"
+
+#: linux/verso-linux/src/fuse.rs:664
+msgid "The copy finishes once Immich has the file."
+msgstr "Penyalinan selesai setelah Immich menerima berkas."
+
+#: linux/verso-linux/src/fuse.rs:677
+msgid "Restored from the trash: {name}"
+msgstr "Dipulihkan dari sampah: {name}"
+
+#: linux/verso-linux/src/fuse.rs:678
+msgid "Immich had this photo in its trash, and copying it in brought it back."
+msgstr "Immich menyimpan foto ini di sampahnya, dan menyalinnya mengembalikannya."
+
+#: linux/verso-linux/src/fuse.rs:682
+msgid "Immich has this photo already, so nothing was added."
+msgstr "Immich sudah memiliki foto ini, jadi tidak ada yang ditambahkan."
+
+#: linux/verso-linux/src/fuse.rs:683
+msgid "Already in Immich: {name}"
+msgstr "Sudah ada di Immich: {name}"
+
+#: linux/verso-linux/src/fuse.rs:692
+msgid "{error}. The file is kept in {folder}."
+msgstr "{error}. Berkas disimpan di {folder}."
+
+#: linux/verso-linux/src/fuse.rs:702
+msgid "This computer lets a file operation take at most {seconds} seconds (fs.fuse.default_request_timeout). Set it to 0 for longer uploads. The file is kept in {folder}."
+msgstr "Komputer ini mengizinkan operasi berkas berlangsung paling lama {seconds} detik (fs.fuse.default_request_timeout). Atur ke 0 untuk unggahan yang lebih lama. Berkas disimpan di {folder}."
+
+#: linux/verso-linux/src/fuse.rs:712
+msgid "The upload took too long. The file is kept in {folder}."
+msgstr "Unggahan memakan waktu terlalu lama. Berkas disimpan di {folder}."
+
+#: linux/verso-linux/src/fuse.rs:1185
+msgid "Immich takes photos and videos only."
+msgstr "Immich hanya menerima foto dan video."
+
+#: linux/verso-linux/src/notify.rs:68
+msgid "The Immich server is not reachable, so it cannot be downloaded now. What you opened before still opens."
+msgstr "Server Immich tidak dapat dijangkau, jadi berkas ini tidak dapat diunduh sekarang. Yang pernah Anda buka tetap dapat dibuka."
+
+#: linux/verso-linux/src/notify.rs:73
+msgid "{drive} cannot open “{name}”"
+msgstr "{drive} tidak dapat membuka “{name}”"
+
+#: linux/verso-linux/src/notify.rs:73
+#: shared/verso-core/src/settings.rs:195
+msgid "Verso Drive"
+msgstr "Verso Drive"
+
+#: linux/verso-linux/src/tray.rs:126
+msgid "Connected to {server}"
+msgstr "Terhubung ke {server}"
+
+#: linux/verso-linux/src/tray.rs:127
+msgid "{server} is not reachable"
+msgstr "{server} tidak dapat dijangkau"
+
+#: linux/verso-linux/src/tray.rs:129
+msgid "Signed in to {server}"
+msgstr "Sudah masuk ke {server}"
+
+#: linux/verso-linux/src/tray.rs:138
+msgid "Verso Drive is unmounted"
+msgstr "Verso Drive dilepas kaitnya"
+
+#: linux/verso-linux/src/tray.rs:141
+msgid "Server version: Immich {version}"
+msgstr "Versi server: Immich {version}"
+
+#: linux/verso-linux/src/tray.rs:144
+msgid "Signed in as: {account}"
+msgstr "Masuk sebagai: {account}"
+
+#: linux/verso-linux/src/tray.rs:148
+msgid "Try Again Now"
+msgstr "Coba lagi sekarang"
+
+#: linux/verso-linux/src/tray.rs:152
+msgid "Open {app}"
+msgstr "Buka {app}"
+
+#: linux/verso-linux/src/tray.rs:155
+msgid "Open in Files"
+msgstr "Buka di Berkas"
+
+#: linux/verso-linux/src/tray.rs:161
+msgid "Unmount Verso Drive"
+msgstr "Lepas kait Verso Drive"
+
+#: linux/verso-linux/src/tray.rs:163
+msgid "Mount Verso Drive"
+msgstr "Kaitkan Verso Drive"
+
+#: linux/verso-linux/src/tray.rs:166
+msgid "Preferences…"
+msgstr "Preferensi…"
+
+#: linux/verso-linux/src/tray.rs:169
+msgid "Get {app} {version}…"
+msgstr "Unduh {app} {version}…"
+
+#: linux/verso-linux/src/tray.rs:175
+msgid "Sign In…"
+msgstr "Masuk…"
+
+#: linux/verso-linux/src/tray.rs:177
+msgid "Sign Out…"
+msgstr "Keluar dari akun…"
+
+#: linux/verso-linux/src/tray.rs:179
+msgid "Quit {app}"
+msgstr "Keluar dari {app}"
+
+#: linux/verso-linux/src/updates.rs:53
+msgid "{app} {version} is available"
+msgstr "{app} {version} tersedia"
+
+#: linux/verso-linux/src/updates.rs:54
+msgid "Get it from jakob.hviid.phd/verso."
+msgstr "Unduh dari jakob.hviid.phd/verso."
+
+#: linux/verso-desktop/src/preferences.rs:169
+msgid "Custom ({size})"
+msgstr "Khusus ({size})"
+
+#: linux/verso-desktop/src/preferences.rs:182
+msgid "Apps that take part are found by themselves. Turn one off to leave it out of Show in. One not found stays listed for 30 days, so it stays off if it comes back; Forget removes it now."
+msgstr "Aplikasi yang ikut serta ditemukan dengan sendirinya. Matikan salah satunya agar tidak muncul di Tampilkan di. Aplikasi yang tidak ditemukan tetap tercantum selama 30 hari, agar tetap mati jika kembali; Lupakan menghapusnya sekarang."
+
+#: linux/verso-desktop/src/preferences.rs:187
+msgid "Apps That Take Part"
+msgstr "Aplikasi yang Ikut Serta"
+
+#: linux/verso-desktop/src/preferences.rs:197
+msgid "Open photos, albums, people and places in Immich's web app in your browser, or copy their address."
+msgstr "Buka foto, album, orang, dan tempat di aplikasi web Immich di peramban, atau salin alamatnya."
+
+#: linux/verso-desktop/src/preferences.rs:198
+msgid "Show photos, albums, people and places in other apps that take part, and show what they send in Verso."
+msgstr "Tampilkan foto, album, orang, dan tempat di aplikasi lain yang ikut serta, dan tampilkan apa yang dikirim aplikasi itu di Verso."
+
+#: linux/verso-desktop/src/preferences.rs:200
+msgid "Other apps can show photos, albums, people and places in the gallery."
+msgstr "Aplikasi lain dapat menampilkan foto, album, orang, dan tempat di galeri."
+
+#: linux/verso-desktop/src/preferences.rs:201
+msgid "Other apps can show them in Files, while the drive is on."
+msgstr "Aplikasi lain dapat menampilkannya di Berkas, selama kandar menyala."
+
+#: linux/verso-desktop/src/preferences.rs:204
+msgid "The picture on Verso's icon in the app grid, the dash and its windows. The app grid shows a new one from the next login."
+msgstr "Gambar pada ikon Verso di kisi aplikasi, dash, dan jendela Verso. Kisi aplikasi menampilkan yang baru sejak login berikutnya."
+
+#: linux/verso-desktop/src/preferences.rs:240
+msgid "Double-Click Opens"
+msgstr "Klik Ganda Membuka"
+
+#: linux/verso-desktop/src/preferences.rs:241
+msgid "Colour"
+msgstr "Warna"
+
+#: linux/verso-desktop/src/preferences.rs:242
+msgid "App Icon"
+msgstr "Ikon aplikasi"
+
+#: linux/verso-desktop/src/preferences.rs:56
+#: linux/verso-desktop/src/preferences.rs:56
+#: linux/verso-desktop/src/preferences.rs:56
+msgid "Location"
+msgstr "Lokasi"
+
+#: linux/verso-desktop/src/preferences.rs:57
+#: linux/verso-desktop/src/preferences.rs:57
+#: linux/verso-desktop/src/preferences.rs:57
+msgid "Name in the Sidebar"
+msgstr "Nama di Bilah Samping"
+
+#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:66
+msgid "Cache Size"
+msgstr "Ukuran Cache"
+
+#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:67
+msgid "Sharp Thumbnails"
+msgstr "Gambar Mini Tajam"
+
+#: linux/verso-desktop/src/preferences.rs:74
+#: linux/verso-desktop/src/preferences.rs:74
+#: linux/verso-desktop/src/preferences.rs:74
+msgid "Check for Updates"
+msgstr "Periksa Pembaruan"
+
+#: linux/verso-desktop/src/preferences.rs:89
+#: linux/verso-desktop/src/preferences.rs:89
+msgid "Day Folders"
+msgstr "Folder Hari"
+
+#: linux/verso-desktop/src/preferences.rs:90
+#: linux/verso-desktop/src/preferences.rs:91
+#: linux/verso-desktop/src/preferences.rs:92
+#: linux/verso-desktop/src/preferences.rs:93
+#: linux/verso-desktop/src/preferences.rs:94
+#: linux/verso-desktop/src/preferences.rs:90
+#: linux/verso-desktop/src/preferences.rs:91
+#: linux/verso-desktop/src/preferences.rs:92
+#: linux/verso-desktop/src/preferences.rs:93
+#: linux/verso-desktop/src/preferences.rs:94
+msgid "Year and Month Folders"
+msgstr "Folder Tahun dan Bulan"
+
+#: linux/verso-desktop/src/preferences.rs:95
+#: linux/verso-desktop/src/preferences.rs:95
+msgid "Folders Copied Into Upload"
+msgstr "Folder yang Disalin ke Upload"
+
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:102
+msgid "Album Folders"
+msgstr "Folder Album"
+
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:102
+msgid "File Names"
+msgstr "Nama Berkas"
+
+#: linux/verso-desktop/src/preferences.rs:117
+#: linux/verso-desktop/src/preferences.rs:117
+#: linux/verso-desktop/src/preferences.rs:117
+#: shared/verso-core/src/settings.rs:82
+msgid "Open in Immich and Copy Immich Link"
+msgstr "Buka di Immich dan Salin Tautan Immich"
+
+#: linux/verso-desktop/src/session.rs:60
+msgid "Online"
+msgstr "Daring"
+
+#: linux/verso-desktop/src/session.rs:61
+msgid "Server unreachable; files you opened before stay available"
+msgstr "Server tidak dapat dijangkau; berkas yang pernah Anda buka tetap tersedia"
+
+#: linux/verso-desktop/src/session.rs:62
+msgid "Signed out; sign in again"
+msgstr "Telah keluar; silakan masuk lagi"
+
+#: linux/verso-desktop/src/session.rs:64
+#: linux/verso-desktop/src/session.rs:74
+msgid "Not running"
+msgstr "Tidak berjalan"
+
+#: linux/verso-desktop/src/session.rs:71
+msgid "{used} of {limit}"
+msgstr "{used} dari {limit}"
+
+#: linux/verso-desktop/src/session.rs:88
+msgid "writing"
+msgstr "menulis"
+
+#: linux/verso-desktop/src/session.rs:88
+msgid "uploading"
+msgstr "mengunggah"
+
+#: linux/verso-desktop/src/session.rs:89
+msgid "{name}, {phase}"
+msgstr "{name}, {phase}"
+
+#: linux/verso-desktop/src/session.rs:92
+msgid "{name} and {count} more"
+msgstr "{name} dan {count} lainnya"
+
+#: linux/verso-desktop/src/session.rs:118
+msgid "That address cannot be used: {error}"
+msgstr "Alamat itu tidak dapat digunakan: {error}"
+
+#: linux/verso-desktop/src/session.rs:166
+#: linux/verso-desktop/src/session.rs:176
+#: linux/verso-desktop/src/session.rs:510
+#: linux/verso-desktop/src/session.rs:513
+msgid "Kept in {file}"
+msgstr "Disimpan di {file}"
+
+#: linux/verso-desktop/src/session.rs:171
+#: linux/verso-desktop/src/session.rs:515
+msgid "Kept in the keyring"
+msgstr "Disimpan di ring kunci"
+
+#: linux/verso-desktop/src/session.rs:178
+msgid "The keyring stayed locked, so nothing was saved."
+msgstr "Ring kunci tetap terkunci, jadi tidak ada yang disimpan."
+
+#: linux/verso-desktop/src/session.rs:256
+msgid "Verso shows its icon in the top bar while you are signed in."
+msgstr "Verso menampilkan ikonnya di bilah atas selama Anda sudah masuk."
+
+#: linux/verso-desktop/src/session.rs:257
+#: linux/verso-desktop/src/session.rs:261
+msgid "Signed in, but the background service did not start: {error}"
+msgstr "Sudah masuk, tetapi layanan latar belakang tidak dimulai: {error}"
+
+#: linux/verso-desktop/src/session.rs:260
+msgid "Signed in, but the background service cannot start: {error}."
+msgstr "Sudah masuk, tetapi layanan latar belakang tidak dapat dimulai: {error}."
+
+#: linux/verso-desktop/src/session.rs:290
+msgid "Verso Drive is not part of this version of Verso."
+msgstr "Verso Drive tidak termasuk dalam versi Verso ini."
+
+#: linux/verso-desktop/src/session.rs:296
+msgid "The background service did not restart: {error}"
+msgstr "Layanan latar belakang tidak dimulai ulang: {error}"
+
+#: linux/verso-desktop/src/session.rs:337
+msgid "Immich Mount is no longer signed in."
+msgstr "Immich Mount tidak lagi masuk."
+
+#: linux/verso-desktop/src/session.rs:342
+msgid "Immich no longer accepts Immich Mount's sign-in; sign in instead."
+msgstr "Immich tidak lagi menerima proses masuk Immich Mount; silakan masuk sendiri."
+
+#: linux/verso-desktop/src/session.rs:391
+msgid "Signed in, but the mount cannot start: {error}."
+msgstr "Sudah masuk, tetapi pengaitan tidak dapat dimulai: {error}."
+
+#: linux/verso-desktop/src/session.rs:395
+msgid "Signed in, but the mount did not start: {error}"
+msgstr "Sudah masuk, tetapi pengaitan tidak dimulai: {error}"
+
+#: linux/verso-desktop/src/preferences.rs:48
+msgid "General"
+msgstr "Umum"
+
+#: linux/verso-desktop/src/preferences.rs:82
+msgid "Folders"
+msgstr "Folder"
+
+#: linux/verso-desktop/src/preferences.rs:110
+msgid "Other Apps"
+msgstr "Aplikasi lain"
+
+#: linux/verso-desktop/src/preferences.rs:52
+msgid "Drive"
+msgstr "Kandar"
+
+#: linux/verso-desktop/src/preferences.rs:58
+msgid "GVfs leaves the drive out of Files' sidebar, and a bookmark takes its place: no unmount button, but a plain folder icon."
+msgstr "GVfs tidak menampilkan kandar di bilah sisi Berkas, dan markah menggantikannya: tanpa tombol lepas kait, tetapi dengan ikon folder biasa."
+
+#: linux/verso-desktop/src/preferences.rs:63
+msgid "Storage"
+msgstr "Penyimpanan"
+
+#: linux/verso-desktop/src/preferences.rs:66
+msgid "Opened originals are kept on this computer up to this size."
+msgstr "Asli yang dibuka disimpan di komputer ini hingga ukuran ini."
+
+#: linux/verso-desktop/src/preferences.rs:67
+msgid "Also download larger previews, for big icon sizes. Uses more data."
+msgstr "Unduh juga pratinjau yang lebih besar, untuk ikon besar. Memakai lebih banyak data."
+
+#: linux/verso-desktop/src/preferences.rs:72
+msgid "Updates"
+msgstr "Pembaruan"
+
+#: linux/verso-desktop/src/preferences.rs:74
+msgid "Tell me when a new version is out."
+msgstr "Beri tahu saya saat versi baru tersedia."
+
+#: linux/verso-desktop/src/preferences.rs:86
+msgid "Sections"
+msgstr "Bagian"
+
+#: linux/verso-desktop/src/preferences.rs:87
+msgid "The folders the drive shows, and how each splits its photos by date."
+msgstr "Folder yang ditampilkan drive, dan cara masing-masing membagi fotonya menurut tanggal."
+
+#: linux/verso-desktop/src/preferences.rs:89
+msgid "The timeline, by year and month"
+msgstr "Lini masa, per tahun dan bulan"
+
+#: linux/verso-desktop/src/preferences.rs:95
+msgid "What is copied into it is uploaded"
+msgstr "Yang disalin ke dalamnya akan diunggah"
+
+#: linux/verso-desktop/src/preferences.rs:100
+msgid "Names"
+msgstr "Nama"
+
+#: linux/verso-desktop/src/preferences.rs:115
+msgid "Immich Web App"
+msgstr "Aplikasi Web Immich"
+
+#: linux/verso-desktop/src/preferences.rs:55
+#: linux/verso-desktop/src/preferences.rs:55
+msgid "Mount at Login"
+msgstr "Kaitkan saat Masuk"
+
+#: linux/verso-desktop/src/preferences.rs:58
+#: linux/verso-desktop/src/preferences.rs:58
+msgid "Bookmark Instead of Drive"
+msgstr "Markah alih-alih Kandar"
+
+#: linux/verso/src/drive_preferences.rs:267
+#: linux/verso/src/drive_preferences.rs:271
+msgid "Choose a Folder"
+msgstr "Pilih Folder"
+
+#: linux/verso/src/drive_preferences.rs:302
+msgid "Learn More"
+msgstr "Pelajari Selengkapnya"
+
+#: linux/verso/src/drive_preferences.rs:337
+msgid "Not found"
+msgstr "Tidak ditemukan"
+
+#: linux/verso/src/drive_preferences.rs:338
+msgid "Forget"
+msgstr "Lupakan"
+
+#: linux/verso/src/drive_preferences.rs:365
+msgid "No other app that takes part is installed."
+msgstr "Tidak ada aplikasi lain yang ikut serta terpasang."
+
+#: linux/verso/src/drive_preferences.rs:366
+msgid "Find Apps That Take Part"
+msgstr "Temukan Aplikasi yang Ikut Serta"
+
+#: linux/files-extension/verso-nautilus.c:232
+#: linux/files-extension/verso-nautilus.py:177
+msgid "Show in {app}"
+msgstr "Tampilkan di {app}"
+
+#: linux/files-extension/verso-nautilus.c:273
+#: linux/files-extension/verso-nautilus.py:201
+#: mac/Verso/Config/VersoDrive-Info.plist (NSExtensionFileProviderActionName)
+msgid "Open in Immich"
+msgstr "Buka di Immich"
+
+#: linux/files-extension/verso-nautilus.c:276
+#: linux/files-extension/verso-nautilus.py:203
+#: mac/Verso/Config/VersoDrive-Info.plist (NSExtensionFileProviderActionName)
+msgid "Copy Immich Link"
+msgstr "Salin Tautan Immich"
+
+#: linux/files-extension/verso-nautilus.py:160
+msgid "{app} is no longer installed."
+msgstr "{app} tidak lagi terpasang."
+
+#: linux/files-extension/verso-nautilus.py:169
+msgid "Verso could not open {app}: {error}"
+msgstr "Verso tidak dapat membuka {app}: {error}"
+
+#: shared/verso-core/src/settings.rs:57
+msgid "The Immich server; /api is added"
+msgstr "Server Immich; /api ditambahkan"
+
+#: shared/verso-core/src/settings.rs:58
+msgid "Show the library as a drive in the file manager"
+msgstr "Tampilkan pustaka sebagai kandar di pengelola berkas"
+
+#: shared/verso-core/src/settings.rs:59
+msgid "Where the mount appears"
+msgstr "Tempat kandar muncul"
+
+#: shared/verso-core/src/settings.rs:60
+msgid "The drive's name in the sidebar"
+msgstr "Nama kandar di bilah sisi"
+
+#: shared/verso-core/src/settings.rs:61
+msgid "Mount when the session starts"
+msgstr "Kaitkan saat sesi dimulai"
+
+#: shared/verso-core/src/settings.rs:62
+msgid "List the drive in Files' sidebar as a drive, with its unmount button; off, as a bookmark"
+msgstr "Cantumkan kandar di bilah sisi Berkas sebagai kandar, dengan tombol lepas kaitnya; jika mati, sebagai markah"
+
+#: shared/verso-core/src/settings.rs:63
+msgid "Show the Photos section"
+msgstr "Tampilkan bagian Photos"
+
+#: shared/verso-core/src/settings.rs:64
+msgid "Show the Albums section"
+msgstr "Tampilkan bagian Albums"
+
+#: shared/verso-core/src/settings.rs:65
+msgid "Show the People section"
+msgstr "Tampilkan bagian People"
+
+#: shared/verso-core/src/settings.rs:66
+msgid "Show the Places section"
+msgstr "Tampilkan bagian Places"
+
+#: shared/verso-core/src/settings.rs:67
+msgid "Show the Favorites section"
+msgstr "Tampilkan bagian Favorites"
+
+#: shared/verso-core/src/settings.rs:68
+msgid "Show the Archive section"
+msgstr "Tampilkan bagian Archive"
+
+#: shared/verso-core/src/settings.rs:69
+msgid "Day folders inside months"
+msgstr "Folder hari di dalam bulan"
+
+#: shared/verso-core/src/settings.rs:70
+msgid "Year and month folders inside albums"
+msgstr "Folder tahun dan bulan di dalam album"
+
+#: shared/verso-core/src/settings.rs:71
+msgid "Year and month folders inside people"
+msgstr "Folder tahun dan bulan di dalam folder orang"
+
+#: shared/verso-core/src/settings.rs:72
+msgid "Year and month folders inside cities"
+msgstr "Folder tahun dan bulan di dalam kota"
+
+#: shared/verso-core/src/settings.rs:73
+msgid "Year and month folders inside favorites"
+msgstr "Folder tahun dan bulan di dalam favorit"
+
+#: shared/verso-core/src/settings.rs:74
+msgid "Year and month folders inside the archive"
+msgstr "Folder tahun dan bulan di dalam arsip"
+
+#: shared/verso-core/src/settings.rs:75
+msgid "How album folders are named and grouped"
+msgstr "Cara folder album diberi nama dan dikelompokkan"
+
+#: shared/verso-core/src/settings.rs:76
+msgid "How files are named"
+msgstr "Cara berkas diberi nama"
+
+#: shared/verso-core/src/settings.rs:77
+msgid "The content cache's size limit"
+msgstr "Batas ukuran cache konten"
+
+#: shared/verso-core/src/settings.rs:78
+msgid "Show the Upload folder, and upload what is copied into it"
+msgstr "Tampilkan folder Upload, dan unggah apa yang disalin ke dalamnya"
+
+#: shared/verso-core/src/settings.rs:79
+msgid "Folders copied into Upload"
+msgstr "Folder yang disalin ke Upload"
+
+#: shared/verso-core/src/settings.rs:80
+msgid "Also seed 1024 px thumbnails from the preview"
+msgstr "Juga buat gambar mini 1024 px dari pratinjau"
+
+#: shared/verso-core/src/settings.rs:81
+msgid "Refuse thumbnailer reads of originals"
+msgstr "Tolak pembacaan berkas asli oleh pembuat gambar mini"
+
+#: shared/verso-core/src/settings.rs:83
+msgid "What a double click on Verso's top bar icon opens"
+msgstr "Apa yang dibuka oleh klik ganda pada ikon Verso di bilah atas"
+
+#: shared/verso-core/src/settings.rs:84
+msgid "Verso's top bar icon in colour: the lens's five colours, grey while the server cannot be reached"
+msgstr "Ikon Verso di bilah atas berwarna: lima warna lensa, abu-abu selama server tidak dapat dijangkau"
+
+#: shared/verso-core/src/settings.rs:85
+msgid "Verso's app icon, by the picture on its print"
+msgstr "Ikon aplikasi Verso, menurut gambar pada cetakannya"
+
+#: shared/verso-core/src/settings.rs:86
+msgid "Show what other apps link to (Immich Crosslink)"
+msgstr "Tampilkan apa yang ditautkan aplikasi lain (Immich Crosslink)"
+
+#: shared/verso-core/src/settings.rs:87
+msgid "Verso: take part as Verso Gallery, so other apps show items in it"
+msgstr "Verso: ikut serta sebagai Verso Gallery, agar aplikasi lain menampilkan item di dalamnya"
+
+#: shared/verso-core/src/settings.rs:88
+msgid "Verso: take part as Verso Drive, so other apps show items in Files while the drive is on"
+msgstr "Verso: ikut serta sebagai Verso Drive, agar aplikasi lain menampilkan item di Berkas selama kandar menyala"
+
+#: shared/verso-core/src/settings.rs:89
+msgid "Apps left out of Show in, by their desktop entry or bundle id, separated by ;"
+msgstr "Aplikasi yang dikecualikan dari Tampilkan di, menurut id entri desktop atau bundel, dipisahkan dengan ;"
+
+#: shared/verso-core/src/settings.rs:90
+msgid "Tell me when a new version is out"
+msgstr "Beri tahu saya saat versi baru tersedia"
+
+#: shared/verso-core/src/settings.rs:91
+msgid "Headless only: a 0600 file holding the credential"
+msgstr "Hanya tanpa desktop: berkas 0600 yang menyimpan kredensial"
+
+#: shared/verso-core/src/settings.rs:164
+msgid "Never"
+msgstr "Tidak pernah"
+
+#: shared/verso-core/src/settings.rs:165
+msgid "From 500 Items"
+msgstr "Mulai 500 item"
+
+#: shared/verso-core/src/settings.rs:166
+msgid "Always"
+msgstr "Selalu"
+
+#: shared/verso-core/src/settings.rs:167
+msgid "Year in the Name (2023 - Trip)"
+msgstr "Tahun di nama (2023 - Perjalanan)"
+
+#: shared/verso-core/src/settings.rs:168
+msgid "Year Folders (2023/Trip)"
+msgstr "Folder tahun (2023/Perjalanan)"
+
+#: shared/verso-core/src/settings.rs:169
+msgid "Name Only (Trip)"
+msgstr "Nama saja (Perjalanan)"
+
+#: shared/verso-core/src/settings.rs:170
+msgid "Date and Time Taken"
+msgstr "Tanggal dan waktu pengambilan"
+
+#: shared/verso-core/src/settings.rs:171
+msgid "Original File Names"
+msgstr "Nama berkas asli"
+
+#: shared/verso-core/src/settings.rs:172
+msgid "Ask Each Time"
+msgstr "Tanya setiap kali"
+
+#: shared/verso-core/src/settings.rs:176
+#: shared/verso-core/src/settings.rs:196
+msgid "Verso"
+msgstr "Verso"
+
+#: shared/verso-core/src/settings.rs:177
+msgid "Verso Drive in Files"
+msgstr "Verso Drive di Berkas"
+
+#: shared/verso-core/src/settings.rs:178
+msgid "Preferences"
+msgstr "Preferensi"
+
+#: shared/verso-core/src/settings.rs:179
+msgid "Mist"
+msgstr "Kabut"
+
+#: shared/verso-core/src/settings.rs:180
+msgid "Sand"
+msgstr "Pasir"
+
+#: shared/verso-core/src/settings.rs:181
+msgid "Dark"
+msgstr "Gelap"
+
+#: shared/verso-core/src/settings.rs:182
+msgid "Paper"
+msgstr "Kertas"
+
+#: shared/verso-core/src/settings.rs:183
+msgid "Frame"
+msgstr "Bingkai"
+
+#: shared/verso-core/src/settings.rs:184
+msgid "Slate"
+msgstr "Batu tulis"
+
+#: shared/verso-core/src/settings.rs:185
+msgid "Sky"
+msgstr "Langit"
+
+#: linux/packaging/desktop/dev.hviid.Verso.desktop.in (Comment)
+msgid "Browse, search and organise your Immich photos and videos, with your library as a drive in Files"
+msgstr ""
+
+#: linux/packaging/desktop/dev.hviid.Verso.desktop.in (Keywords)
+msgid "Immich;photos;videos;gallery;albums;people;drive;"
+msgstr ""
+
+#: mac/Verso/Config/Info.plist (NSHumanReadableCopyright)
+msgid "Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO. “Immich” is used only to describe the server this software works with, and remains the mark of its owner."
+msgstr ""
+
+#: mac/Verso/Config/Info.plist (NSLocalNetworkUsageDescription)
+msgid "Verso connects to your Immich server, which may be on your local network."
+msgstr ""

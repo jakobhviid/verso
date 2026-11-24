@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <!-- A server, two units in a rack with their lights, for the server's Administration in Preferences. -->
+  <path fill="#222" fill-rule="evenodd" d="M3.5 1.5h9a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2zm0 1.5a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5z"/>
+  <path fill="#222" fill-rule="evenodd" d="M3.5 8.5h9a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2zm0 1.5a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5z"/>
+  <circle fill="#222" cx="5" cy="4.5" r="1"/>
+  <circle fill="#222" cx="5" cy="11.5" r="1"/>
+  <path fill="#222" d="M8 4h3.5v1H8zM8 11h3.5v1H8z"/>
+</svg>

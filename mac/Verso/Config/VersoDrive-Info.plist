@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>$(IMMICH_APP_NAME)</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>XPC!</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+	<!-- Finder's sidebar shows the location with this symbol, from the asset catalog (mac/Verso/make-symbol.py). -->
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleSymbolName</key>
+			<string>$(SIDEBAR_SYMBOL)</string>
+		</dict>
+	</dict>
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.fileprovider-nonui</string>
+		<key>NSExtensionPrincipalClass</key>
+		<string>$(PRODUCT_MODULE_NAME).FileProviderExtension</string>
+		<key>NSExtensionFileProviderDocumentGroup</key>
+		<string>$(VERSO_APP_GROUP)</string>
+		<key>NSExtensionFileProviderSupportsEnumeration</key>
+		<true/>
+		<!-- Finder's Open in Immich and Copy Immich Link, on one item with a web address (FileProviderItem's userInfo).
+		     Finder looks their names up in the extension's Localizable.strings, made from po/ by po/i18n.py. -->
+		<key>NSExtensionFileProviderActions</key>
+		<array>
+			<dict>
+				<key>NSExtensionFileProviderActionIdentifier</key>
+				<string>dev.hviid.Verso.open-in-immich</string>
+				<key>NSExtensionFileProviderActionName</key>
+				<string>Open in Immich</string>
+				<key>NSExtensionFileProviderActionActivationRule</key>
+				<string>fileproviderItems.@count == 1 AND SUBQUERY(fileproviderItems, $item, $item.userInfo.hasWebLink == YES).@count == 1</string>
+			</dict>
+			<dict>
+				<key>NSExtensionFileProviderActionIdentifier</key>
+				<string>dev.hviid.Verso.copy-link</string>
+				<key>NSExtensionFileProviderActionName</key>
+				<string>Copy Immich Link</string>
+				<key>NSExtensionFileProviderActionActivationRule</key>
+				<string>fileproviderItems.@count == 1 AND SUBQUERY(fileproviderItems, $item, $item.userInfo.hasWebLink == YES).@count == 1</string>
+			</dict>
+		</array>
+	</dict>
+	<!-- Verso Drive (ARCHITECTURE.md, "Verso on the Mac"): its App Group and Keychain group, the app's. Finder's Show in
+	     Another App... waits for the app's side of it (ROADMAP.md, "Verso on the Mac"). -->
+	<key>VersoAppGroup</key>
+	<string>$(VERSO_APP_GROUP)</string>
+	<key>VersoKeychainGroup</key>
+	<string>$(AppIdentifierPrefix)$(VERSO_IDENTITY)</string>
+</dict>
+</plist>

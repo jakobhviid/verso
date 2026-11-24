@@ -1,0 +1,838 @@
+# Verso in ta.
+# This file is part of Verso, under the MIT license. Made by po/i18n.py.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: verso\n"
+"Report-Msgid-Bugs-To: https://github.com/jakobhviid/verso/issues\n"
+"Language: ta\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: linux/verso-service/src/commands.rs:467
+#: linux/verso-linux/src/daemon.rs:498
+msgid "Verso Drive is not mounted"
+msgstr "Verso Drive மவுண்ட் செய்யப்படவில்லை"
+
+#: linux/verso-service/src/commands.rs:467
+#: linux/verso-linux/src/daemon.rs:498
+msgid "Switch it on in Verso's Preferences, then open the link again."
+msgstr "Verso-இன் விருப்பங்களில் டிரைவை இயக்கி, பிறகு இணைப்பை மீண்டும் திறக்கவும்."
+
+#: linux/verso-service/src/online.rs:448
+msgid "The keyring stayed locked. Open {app}, or run “{command}”, to try again."
+msgstr "கீரிங் பூட்டியே இருந்தது. மீண்டும் முயல {app}-ஐத் திறக்கவும், அல்லது “{command}” கட்டளையை இயக்கவும்."
+
+#: linux/verso-service/src/online.rs:449
+msgid "Immich is not mounted"
+msgstr "Immich மவுண்ட் செய்யப்படவில்லை"
+
+#: linux/verso-linux/src/daemon.rs:497
+msgid "Links from other apps are off"
+msgstr "பிற பயன்பாடுகளிலிருந்து வரும் இணைப்புகள் முடக்கப்பட்டுள்ளன"
+
+#: linux/verso-linux/src/daemon.rs:497
+msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
+msgstr "பிற பயன்பாடுகள் இணைப்பதைக் காட்ட Verso அமைப்புகளில் Immich Crosslink-ஐ இயக்கவும்."
+
+#: linux/verso-linux/src/daemon.rs:499
+msgid "A link from another app cannot be opened"
+msgstr "பிற பயன்பாட்டிலிருந்து வந்த இணைப்பைத் திறக்க முடியவில்லை"
+
+#: linux/verso-linux/src/daemon.rs:499
+msgid "It is not a valid Immich link."
+msgstr "இது சரியான Immich இணைப்பு அல்ல."
+
+#: linux/verso-linux/src/daemon.rs:500
+#: linux/verso-linux/src/daemon.rs:504
+msgid "Nothing to show"
+msgstr "காட்ட எதுவும் இல்லை"
+
+#: linux/verso-linux/src/daemon.rs:500
+msgid "Verso Drive has no place for what this link points to."
+msgstr "இந்த இணைப்பு சுட்டுவதற்கு Verso Drive-இல் இடம் இல்லை."
+
+#: linux/verso-linux/src/daemon.rs:501
+msgid "Not signed in to {host}"
+msgstr "{host} இல் உள்நுழையவில்லை"
+
+#: linux/verso-linux/src/daemon.rs:501
+msgid "Verso is signed in to another Immich server."
+msgstr "Verso வேறொரு Immich சேவையகத்தில் உள்நுழைந்துள்ளது."
+
+#: linux/verso-linux/src/daemon.rs:502
+msgid "Another Immich account"
+msgstr "வேறொரு Immich கணக்கு"
+
+#: linux/verso-linux/src/daemon.rs:502
+msgid "The link is for another account than the one Verso is signed in with."
+msgstr "இந்த இணைப்பு Verso உள்நுழைந்துள்ள கணக்கிற்கானது அல்ல, வேறொரு கணக்கிற்கானது."
+
+#: linux/verso-linux/src/daemon.rs:505
+msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
+msgstr "டிரைவ் இதைக் காட்டவில்லை. இது மறைக்கப்பட்டிருக்கலாம், முடக்கப்பட்ட பிரிவில் இருக்கலாம், அல்லது உங்களுடன் பகிரப்படாமல் இருக்கலாம்."
+
+#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:583
+msgid "Immich is unreachable"
+msgstr "Immich-ஐ அணுக முடியவில்லை"
+
+#: linux/verso-linux/src/daemon.rs:507
+msgid "The Immich server cannot be reached. Try the link again later."
+msgstr "Immich சேவையகத்தை அணுக முடியவில்லை. பின்னர் இணைப்பை மீண்டும் முயலவும்."
+
+#: linux/verso-linux/src/daemon.rs:584
+msgid "The Immich server cannot be reached. Files you opened before stay available."
+msgstr "Immich சேவையகத்தை அணுக முடியவில்லை. முன்பு திறந்த கோப்புகள் தொடர்ந்து கிடைக்கும்."
+
+#: linux/verso-linux/src/daemon.rs:587
+#: linux/verso-linux/src/tray.rs:128
+msgid "Signed out of Immich"
+msgstr "Immich-இலிருந்து வெளியேறிவிட்டீர்கள்"
+
+#: linux/verso-linux/src/daemon.rs:588
+msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
+msgstr "Immich இனி இந்த உள்நுழைவை ஏற்கவில்லை. மீண்டும் உள்நுழைய {app}-ஐத் திறக்கவும்."
+
+#: linux/verso-linux/src/folders.rs:204
+msgid "Uploaded to Immich: {folder}"
+msgstr "Immich-இல் பதிவேற்றப்பட்டது: {folder}"
+
+#: linux/verso-linux/src/folders.rs:206
+msgid "Photos and videos in the timeline: {count}"
+msgstr "காலவரிசையில் உள்ள படங்களும் வீடியோக்களும்: {count}"
+
+#: linux/verso-linux/src/folders.rs:207
+msgid "Albums it can make: {albums}"
+msgstr "உருவாக்கக்கூடிய ஆல்பங்கள்: {albums}"
+
+#: linux/verso-linux/src/folders.rs:210
+msgid "Files not uploaded: {count}"
+msgstr "பதிவேற்றப்படாத கோப்புகள்: {count}"
+
+#: linux/verso-linux/src/folders.rs:213
+#: shared/verso-core/src/settings.rs:174
+msgid "Make Albums"
+msgstr "ஆல்பங்களை உருவாக்கு"
+
+#: linux/verso-linux/src/folders.rs:213
+#: shared/verso-core/src/settings.rs:173
+msgid "Timeline Only"
+msgstr "காலவரிசை மட்டும்"
+
+#: linux/verso-linux/src/folders.rs:234
+msgid "Albums made from {folder}"
+msgstr "{folder}-இலிருந்து ஆல்பங்கள் உருவாக்கப்பட்டன"
+
+#: linux/verso-linux/src/folders.rs:236
+msgid "No albums made from {folder}"
+msgstr "{folder}-இலிருந்து ஆல்பங்கள் எதுவும் உருவாக்கப்படவில்லை"
+
+#: linux/verso-linux/src/folders.rs:242
+msgid "Immich does not let this account make albums ({permission}). The photos and videos are in the timeline."
+msgstr "இந்தக் கணக்கு ஆல்பங்களை உருவாக்க Immich அனுமதிக்கவில்லை ({permission}). படங்களும் வீடியோக்களும் காலவரிசையில் உள்ளன."
+
+#: linux/verso-linux/src/folders.rs:247
+msgid "Signed out of Immich. The photos and videos are in the timeline."
+msgstr "Immich-இலிருந்து வெளியேறிவிட்டீர்கள். படங்களும் வீடியோக்களும் காலவரிசையில் உள்ளன."
+
+#: linux/verso-linux/src/fuse.rs:647
+#: linux/verso-linux/src/fuse.rs:695
+#: linux/verso-linux/src/fuse.rs:701
+#: linux/verso-linux/src/fuse.rs:711
+#: linux/verso-linux/src/fuse.rs:1185
+msgid "Not uploaded: {name}"
+msgstr "பதிவேற்றப்படவில்லை: {name}"
+
+#: linux/verso-linux/src/fuse.rs:647
+msgid "The file is incomplete, as if its copy was cancelled."
+msgstr "கோப்பு முழுமையடையவில்லை, அதன் நகலெடுப்பு ரத்துசெய்யப்பட்டது போல."
+
+#: linux/verso-linux/src/fuse.rs:663
+msgid "Uploading {name} to Immich"
+msgstr "{name} Immich-இல் பதிவேற்றப்படுகிறது"
+
+#: linux/verso-linux/src/fuse.rs:664
+msgid "The copy finishes once Immich has the file."
+msgstr "Immich-க்குக் கோப்பு கிடைத்ததும் நகலெடுப்பு முடியும்."
+
+#: linux/verso-linux/src/fuse.rs:677
+msgid "Restored from the trash: {name}"
+msgstr "குப்பையிலிருந்து மீட்டெடுக்கப்பட்டது: {name}"
+
+#: linux/verso-linux/src/fuse.rs:678
+msgid "Immich had this photo in its trash, and copying it in brought it back."
+msgstr "இந்தப் படம் Immich-இன் குப்பையில் இருந்தது; அதை நகலெடுத்ததால் அது திரும்ப வந்தது."
+
+#: linux/verso-linux/src/fuse.rs:682
+msgid "Immich has this photo already, so nothing was added."
+msgstr "இந்தப் படம் ஏற்கெனவே Immich-இல் உள்ளது, எனவே எதுவும் சேர்க்கப்படவில்லை."
+
+#: linux/verso-linux/src/fuse.rs:683
+msgid "Already in Immich: {name}"
+msgstr "ஏற்கெனவே Immich-இல் உள்ளது: {name}"
+
+#: linux/verso-linux/src/fuse.rs:692
+msgid "{error}. The file is kept in {folder}."
+msgstr "{error}. கோப்பு {folder} இல் வைக்கப்பட்டுள்ளது."
+
+#: linux/verso-linux/src/fuse.rs:702
+msgid "This computer lets a file operation take at most {seconds} seconds (fs.fuse.default_request_timeout). Set it to 0 for longer uploads. The file is kept in {folder}."
+msgstr "இந்தக் கணினி ஒரு கோப்புச் செயல்பாட்டுக்கு அதிகபட்சம் {seconds} வினாடிகள் மட்டுமே அனுமதிக்கிறது (fs.fuse.default_request_timeout). நீண்ட பதிவேற்றங்களுக்கு இதை 0 என அமைக்கவும். கோப்பு {folder} இல் வைக்கப்பட்டுள்ளது."
+
+#: linux/verso-linux/src/fuse.rs:712
+msgid "The upload took too long. The file is kept in {folder}."
+msgstr "பதிவேற்றம் மிக அதிக நேரம் எடுத்தது. கோப்பு {folder} இல் வைக்கப்பட்டுள்ளது."
+
+#: linux/verso-linux/src/fuse.rs:1185
+msgid "Immich takes photos and videos only."
+msgstr "Immich படங்களையும் வீடியோக்களையும் மட்டுமே ஏற்கும்."
+
+#: linux/verso-linux/src/notify.rs:68
+msgid "The Immich server is not reachable, so it cannot be downloaded now. What you opened before still opens."
+msgstr "Immich சேவையகத்தை அணுக முடியவில்லை, எனவே இதை இப்போது பதிவிறக்க முடியாது. முன்பு திறந்தவை தொடர்ந்து திறக்கும்."
+
+#: linux/verso-linux/src/notify.rs:73
+msgid "{drive} cannot open “{name}”"
+msgstr "{drive} ஆல் “{name}”-ஐத் திறக்க முடியவில்லை"
+
+#: linux/verso-linux/src/notify.rs:73
+#: shared/verso-core/src/settings.rs:195
+msgid "Verso Drive"
+msgstr "Verso Drive"
+
+#: linux/verso-linux/src/tray.rs:126
+msgid "Connected to {server}"
+msgstr "{server} உடன் இணைக்கப்பட்டுள்ளது"
+
+#: linux/verso-linux/src/tray.rs:127
+msgid "{server} is not reachable"
+msgstr "{server} ஐ அணுக முடியவில்லை"
+
+#: linux/verso-linux/src/tray.rs:129
+msgid "Signed in to {server}"
+msgstr "{server} இல் உள்நுழைந்துள்ளீர்கள்"
+
+#: linux/verso-linux/src/tray.rs:138
+msgid "Verso Drive is unmounted"
+msgstr "Verso Drive அன்மவுண்ட் செய்யப்பட்டுள்ளது"
+
+#: linux/verso-linux/src/tray.rs:141
+msgid "Server version: Immich {version}"
+msgstr "சேவையகப் பதிப்பு: Immich {version}"
+
+#: linux/verso-linux/src/tray.rs:144
+msgid "Signed in as: {account}"
+msgstr "உள்நுழைந்துள்ள கணக்கு: {account}"
+
+#: linux/verso-linux/src/tray.rs:148
+msgid "Try Again Now"
+msgstr "இப்போதே மீண்டும் முயல்"
+
+#: linux/verso-linux/src/tray.rs:152
+msgid "Open {app}"
+msgstr "{app}-ஐத் திற"
+
+#: linux/verso-linux/src/tray.rs:155
+msgid "Open in Files"
+msgstr "கோப்புகள் பயன்பாட்டில் திற"
+
+#: linux/verso-linux/src/tray.rs:161
+msgid "Unmount Verso Drive"
+msgstr "Verso Drive-ஐ அன்மவுண்ட் செய்"
+
+#: linux/verso-linux/src/tray.rs:163
+msgid "Mount Verso Drive"
+msgstr "Verso Drive-ஐ மவுண்ட் செய்"
+
+#: linux/verso-linux/src/tray.rs:166
+msgid "Preferences…"
+msgstr "விருப்பங்கள்…"
+
+#: linux/verso-linux/src/tray.rs:169
+msgid "Get {app} {version}…"
+msgstr "{app} {version}-ஐப் பதிவிறக்கு…"
+
+#: linux/verso-linux/src/tray.rs:175
+msgid "Sign In…"
+msgstr "உள்நுழைக…"
+
+#: linux/verso-linux/src/tray.rs:177
+msgid "Sign Out…"
+msgstr "வெளியேறு…"
+
+#: linux/verso-linux/src/tray.rs:179
+msgid "Quit {app}"
+msgstr "{app}-ஐ மூடு"
+
+#: linux/verso-linux/src/updates.rs:53
+msgid "{app} {version} is available"
+msgstr "{app} {version} கிடைக்கிறது"
+
+#: linux/verso-linux/src/updates.rs:54
+msgid "Get it from jakob.hviid.phd/verso."
+msgstr "jakob.hviid.phd/verso இலிருந்து பதிவிறக்கவும்."
+
+#: linux/verso-desktop/src/preferences.rs:169
+msgid "Custom ({size})"
+msgstr "தனிப்பயன் ({size})"
+
+#: linux/verso-desktop/src/preferences.rs:182
+msgid "Apps that take part are found by themselves. Turn one off to leave it out of Show in. One not found stays listed for 30 days, so it stays off if it comes back; Forget removes it now."
+msgstr "பங்கேற்கும் பயன்பாடுகள் தானாகவே கண்டறியப்படும். ஒரு பயன்பாட்டை \"…-இல் காட்டு\" என்பதிலிருந்து விலக்க அதை அணைக்கவும். கண்டறியப்படாத பயன்பாடு 30 நாட்கள் பட்டியலில் இருக்கும், எனவே திரும்ப வந்தாலும் அணைந்தே இருக்கும்; \"மறந்துவிடு\" அதை இப்போதே நீக்கும்."
+
+#: linux/verso-desktop/src/preferences.rs:187
+msgid "Apps That Take Part"
+msgstr "பங்கேற்கும் பயன்பாடுகள்"
+
+#: linux/verso-desktop/src/preferences.rs:197
+msgid "Open photos, albums, people and places in Immich's web app in your browser, or copy their address."
+msgstr "புகைப்படங்கள், ஆல்பங்கள், நபர்கள், இடங்களை உலாவியில் Immich வலைப் பயன்பாட்டில் திறக்கவும், அல்லது அவற்றின் முகவரியை நகலெடுக்கவும்."
+
+#: linux/verso-desktop/src/preferences.rs:198
+msgid "Show photos, albums, people and places in other apps that take part, and show what they send in Verso."
+msgstr "புகைப்படங்கள், ஆல்பங்கள், நபர்கள், இடங்களைப் பங்கேற்கும் பிற பயன்பாடுகளில் காட்டவும், அவை அனுப்புவதை Verso-இல் காட்டவும்."
+
+#: linux/verso-desktop/src/preferences.rs:200
+msgid "Other apps can show photos, albums, people and places in the gallery."
+msgstr "பிற பயன்பாடுகள் புகைப்படங்கள், ஆல்பங்கள், நபர்கள், இடங்களைக் கேலரியில் காட்டலாம்."
+
+#: linux/verso-desktop/src/preferences.rs:201
+msgid "Other apps can show them in Files, while the drive is on."
+msgstr "டிரைவ் இயக்கத்தில் இருக்கும்போது, பிற பயன்பாடுகள் அவற்றைக் கோப்புகள் பயன்பாட்டில் காட்டலாம்."
+
+#: linux/verso-desktop/src/preferences.rs:204
+msgid "The picture on Verso's icon in the app grid, the dash and its windows. The app grid shows a new one from the next login."
+msgstr "பயன்பாட்டுக் கட்டம், டேஷ், Verso சாளரங்கள் ஆகியவற்றில் Verso-இன் ஐகானில் உள்ள படம். பயன்பாட்டுக் கட்டத்தில் புதியது அடுத்த உள்நுழைவிலிருந்து தெரியும்."
+
+#: linux/verso-desktop/src/preferences.rs:240
+msgid "Double-Click Opens"
+msgstr "இருமுறை கிளிக் செய்தால் திறப்பது"
+
+#: linux/verso-desktop/src/preferences.rs:241
+msgid "Colour"
+msgstr "வண்ணம்"
+
+#: linux/verso-desktop/src/preferences.rs:242
+msgid "App Icon"
+msgstr "பயன்பாட்டு ஐகான்"
+
+#: linux/verso-desktop/src/preferences.rs:56
+#: linux/verso-desktop/src/preferences.rs:56
+#: linux/verso-desktop/src/preferences.rs:56
+msgid "Location"
+msgstr "இருப்பிடம்"
+
+#: linux/verso-desktop/src/preferences.rs:57
+#: linux/verso-desktop/src/preferences.rs:57
+#: linux/verso-desktop/src/preferences.rs:57
+msgid "Name in the Sidebar"
+msgstr "பக்கப்பட்டியில் பெயர்"
+
+#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:66
+#: linux/verso-desktop/src/preferences.rs:66
+msgid "Cache Size"
+msgstr "தற்காலிகச் சேமிப்பின் அளவு"
+
+#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:67
+#: linux/verso-desktop/src/preferences.rs:67
+msgid "Sharp Thumbnails"
+msgstr "தெளிவான சிறுபடங்கள்"
+
+#: linux/verso-desktop/src/preferences.rs:74
+#: linux/verso-desktop/src/preferences.rs:74
+#: linux/verso-desktop/src/preferences.rs:74
+msgid "Check for Updates"
+msgstr "புதுப்பிப்புகளைச் சரிபார்"
+
+#: linux/verso-desktop/src/preferences.rs:89
+#: linux/verso-desktop/src/preferences.rs:89
+msgid "Day Folders"
+msgstr "நாள் கோப்புறைகள்"
+
+#: linux/verso-desktop/src/preferences.rs:90
+#: linux/verso-desktop/src/preferences.rs:91
+#: linux/verso-desktop/src/preferences.rs:92
+#: linux/verso-desktop/src/preferences.rs:93
+#: linux/verso-desktop/src/preferences.rs:94
+#: linux/verso-desktop/src/preferences.rs:90
+#: linux/verso-desktop/src/preferences.rs:91
+#: linux/verso-desktop/src/preferences.rs:92
+#: linux/verso-desktop/src/preferences.rs:93
+#: linux/verso-desktop/src/preferences.rs:94
+msgid "Year and Month Folders"
+msgstr "ஆண்டு, மாதக் கோப்புறைகள்"
+
+#: linux/verso-desktop/src/preferences.rs:95
+#: linux/verso-desktop/src/preferences.rs:95
+msgid "Folders Copied Into Upload"
+msgstr "Upload-இல் நகலெடுக்கப்பட்ட கோப்புறைகள்"
+
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:102
+msgid "Album Folders"
+msgstr "ஆல்பம் கோப்புறைகள்"
+
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:102
+#: linux/verso-desktop/src/preferences.rs:102
+msgid "File Names"
+msgstr "கோப்புப் பெயர்கள்"
+
+#: linux/verso-desktop/src/preferences.rs:117
+#: linux/verso-desktop/src/preferences.rs:117
+#: linux/verso-desktop/src/preferences.rs:117
+#: shared/verso-core/src/settings.rs:82
+msgid "Open in Immich and Copy Immich Link"
+msgstr "Immich-இல் திற மற்றும் Immich இணைப்பை நகலெடு"
+
+#: linux/verso-desktop/src/session.rs:60
+msgid "Online"
+msgstr "ஆன்லைன்"
+
+#: linux/verso-desktop/src/session.rs:61
+msgid "Server unreachable; files you opened before stay available"
+msgstr "சேவையகத்தை அணுக முடியவில்லை; முன்பு திறந்த கோப்புகள் தொடர்ந்து கிடைக்கும்"
+
+#: linux/verso-desktop/src/session.rs:62
+msgid "Signed out; sign in again"
+msgstr "வெளியேறிவிட்டீர்கள்; மீண்டும் உள்நுழையவும்"
+
+#: linux/verso-desktop/src/session.rs:64
+#: linux/verso-desktop/src/session.rs:74
+msgid "Not running"
+msgstr "இயங்கவில்லை"
+
+#: linux/verso-desktop/src/session.rs:71
+msgid "{used} of {limit}"
+msgstr "{limit} இல் {used}"
+
+#: linux/verso-desktop/src/session.rs:88
+msgid "writing"
+msgstr "எழுதுகிறது"
+
+#: linux/verso-desktop/src/session.rs:88
+msgid "uploading"
+msgstr "பதிவேற்றுகிறது"
+
+#: linux/verso-desktop/src/session.rs:89
+msgid "{name}, {phase}"
+msgstr "{name}, {phase}"
+
+#: linux/verso-desktop/src/session.rs:92
+msgid "{name} and {count} more"
+msgstr "{name} மற்றும் மேலும் {count}"
+
+#: linux/verso-desktop/src/session.rs:118
+msgid "That address cannot be used: {error}"
+msgstr "அந்த முகவரியைப் பயன்படுத்த முடியாது: {error}"
+
+#: linux/verso-desktop/src/session.rs:166
+#: linux/verso-desktop/src/session.rs:176
+#: linux/verso-desktop/src/session.rs:510
+#: linux/verso-desktop/src/session.rs:513
+msgid "Kept in {file}"
+msgstr "{file} இல் வைக்கப்பட்டுள்ளது"
+
+#: linux/verso-desktop/src/session.rs:171
+#: linux/verso-desktop/src/session.rs:515
+msgid "Kept in the keyring"
+msgstr "கீரிங்கில் வைக்கப்பட்டுள்ளது"
+
+#: linux/verso-desktop/src/session.rs:178
+msgid "The keyring stayed locked, so nothing was saved."
+msgstr "கீரிங் பூட்டியே இருந்தது, எனவே எதுவும் சேமிக்கப்படவில்லை."
+
+#: linux/verso-desktop/src/session.rs:256
+msgid "Verso shows its icon in the top bar while you are signed in."
+msgstr "நீங்கள் உள்நுழைந்திருக்கும்போது Verso தன் ஐகானை மேல் பட்டியில் காட்டும்."
+
+#: linux/verso-desktop/src/session.rs:257
+#: linux/verso-desktop/src/session.rs:261
+msgid "Signed in, but the background service did not start: {error}"
+msgstr "உள்நுழைந்துவிட்டீர்கள், ஆனால் பின்னணிச் சேவை தொடங்கவில்லை: {error}"
+
+#: linux/verso-desktop/src/session.rs:260
+msgid "Signed in, but the background service cannot start: {error}."
+msgstr "உள்நுழைந்துவிட்டீர்கள், ஆனால் பின்னணிச் சேவையைத் தொடங்க முடியாது: {error}."
+
+#: linux/verso-desktop/src/session.rs:290
+msgid "Verso Drive is not part of this version of Verso."
+msgstr "Verso-இன் இந்தப் பதிப்பில் Verso Drive இல்லை."
+
+#: linux/verso-desktop/src/session.rs:296
+msgid "The background service did not restart: {error}"
+msgstr "பின்னணிச் சேவை மீண்டும் தொடங்கவில்லை: {error}"
+
+#: linux/verso-desktop/src/session.rs:337
+msgid "Immich Mount is no longer signed in."
+msgstr "Immich Mount இப்போது உள்நுழைந்த நிலையில் இல்லை."
+
+#: linux/verso-desktop/src/session.rs:342
+msgid "Immich no longer accepts Immich Mount's sign-in; sign in instead."
+msgstr "Immich இனி Immich Mount-இன் உள்நுழைவை ஏற்கவில்லை; அதற்குப் பதிலாக உள்நுழையவும்."
+
+#: linux/verso-desktop/src/session.rs:391
+msgid "Signed in, but the mount cannot start: {error}."
+msgstr "உள்நுழைந்துவிட்டீர்கள், ஆனால் மவுண்ட்டைத் தொடங்க முடியாது: {error}."
+
+#: linux/verso-desktop/src/session.rs:395
+msgid "Signed in, but the mount did not start: {error}"
+msgstr "உள்நுழைந்துவிட்டீர்கள், ஆனால் மவுண்ட் தொடங்கவில்லை: {error}"
+
+#: linux/verso-desktop/src/preferences.rs:48
+msgid "General"
+msgstr "பொது"
+
+#: linux/verso-desktop/src/preferences.rs:82
+msgid "Folders"
+msgstr "கோப்புறைகள்"
+
+#: linux/verso-desktop/src/preferences.rs:110
+msgid "Other Apps"
+msgstr "பிற பயன்பாடுகள்"
+
+#: linux/verso-desktop/src/preferences.rs:52
+msgid "Drive"
+msgstr "டிரைவ்"
+
+#: linux/verso-desktop/src/preferences.rs:58
+msgid "GVfs leaves the drive out of Files' sidebar, and a bookmark takes its place: no unmount button, but a plain folder icon."
+msgstr "GVfs டிரைவைக் கோப்புகள் பயன்பாட்டின் பக்கப்பட்டியிலிருந்து விலக்கி, அதன் இடத்தில் ஒரு புக்மார்க்கை வைக்கும்: அன்மவுண்ட் பொத்தான் இருக்காது, ஆனால் எளிய கோப்புறை ஐகான் இருக்கும்."
+
+#: linux/verso-desktop/src/preferences.rs:63
+msgid "Storage"
+msgstr "சேமிப்பகம்"
+
+#: linux/verso-desktop/src/preferences.rs:66
+msgid "Opened originals are kept on this computer up to this size."
+msgstr "திறந்த அசல் கோப்புகள் இந்தக் கணினியில் இந்த அளவு வரை வைக்கப்படும்."
+
+#: linux/verso-desktop/src/preferences.rs:67
+msgid "Also download larger previews, for big icon sizes. Uses more data."
+msgstr "பெரிய ஐகான்களுக்காகப் பெரிய முன்னோட்டங்களையும் பதிவிறக்கு. அதிகத் தரவைப் பயன்படுத்தும்."
+
+#: linux/verso-desktop/src/preferences.rs:72
+msgid "Updates"
+msgstr "புதுப்பிப்புகள்"
+
+#: linux/verso-desktop/src/preferences.rs:74
+msgid "Tell me when a new version is out."
+msgstr "புதிய பதிப்பு வெளியானால் எனக்குத் தெரிவி."
+
+#: linux/verso-desktop/src/preferences.rs:86
+msgid "Sections"
+msgstr "பிரிவுகள்"
+
+#: linux/verso-desktop/src/preferences.rs:87
+msgid "The folders the drive shows, and how each splits its photos by date."
+msgstr "இயக்ககம் காட்டும் கோப்புறைகள், ஒவ்வொன்றும் தன் படங்களைத் தேதிப்படி எப்படிப் பிரிக்கிறது என்பது."
+
+#: linux/verso-desktop/src/preferences.rs:89
+msgid "The timeline, by year and month"
+msgstr "காலவரிசை, ஆண்டு மற்றும் மாதவாரியாக"
+
+#: linux/verso-desktop/src/preferences.rs:95
+msgid "What is copied into it is uploaded"
+msgstr "இதில் நகலெடுக்கப்படுவது பதிவேற்றப்படும்"
+
+#: linux/verso-desktop/src/preferences.rs:100
+msgid "Names"
+msgstr "பெயர்கள்"
+
+#: linux/verso-desktop/src/preferences.rs:115
+msgid "Immich Web App"
+msgstr "Immich வலைப் பயன்பாடு"
+
+#: linux/verso-desktop/src/preferences.rs:55
+#: linux/verso-desktop/src/preferences.rs:55
+msgid "Mount at Login"
+msgstr "உள்நுழையும்போது மவுண்ட் செய்"
+
+#: linux/verso-desktop/src/preferences.rs:58
+#: linux/verso-desktop/src/preferences.rs:58
+msgid "Bookmark Instead of Drive"
+msgstr "டிரைவுக்குப் பதிலாகப் புக்மார்க்"
+
+#: linux/verso/src/drive_preferences.rs:267
+#: linux/verso/src/drive_preferences.rs:271
+msgid "Choose a Folder"
+msgstr "கோப்புறையைத் தேர்ந்தெடு"
+
+#: linux/verso/src/drive_preferences.rs:302
+msgid "Learn More"
+msgstr "மேலும் அறிக"
+
+#: linux/verso/src/drive_preferences.rs:337
+msgid "Not found"
+msgstr "கிடைக்கவில்லை"
+
+#: linux/verso/src/drive_preferences.rs:338
+msgid "Forget"
+msgstr "மறந்துவிடு"
+
+#: linux/verso/src/drive_preferences.rs:365
+msgid "No other app that takes part is installed."
+msgstr "பங்கேற்கும் வேறு பயன்பாடு எதுவும் நிறுவப்படவில்லை."
+
+#: linux/verso/src/drive_preferences.rs:366
+msgid "Find Apps That Take Part"
+msgstr "பங்கேற்கும் பயன்பாடுகளைக் கண்டறி"
+
+#: linux/files-extension/verso-nautilus.c:232
+#: linux/files-extension/verso-nautilus.py:177
+msgid "Show in {app}"
+msgstr "{app}-இல் காட்டு"
+
+#: linux/files-extension/verso-nautilus.c:273
+#: linux/files-extension/verso-nautilus.py:201
+#: mac/Verso/Config/VersoDrive-Info.plist (NSExtensionFileProviderActionName)
+msgid "Open in Immich"
+msgstr "Immich-இல் திற"
+
+#: linux/files-extension/verso-nautilus.c:276
+#: linux/files-extension/verso-nautilus.py:203
+#: mac/Verso/Config/VersoDrive-Info.plist (NSExtensionFileProviderActionName)
+msgid "Copy Immich Link"
+msgstr "Immich இணைப்பை நகலெடு"
+
+#: linux/files-extension/verso-nautilus.py:160
+msgid "{app} is no longer installed."
+msgstr "{app} இனி நிறுவப்படவில்லை."
+
+#: linux/files-extension/verso-nautilus.py:169
+msgid "Verso could not open {app}: {error}"
+msgstr "Verso ஆல் {app}-ஐத் திறக்க முடியவில்லை: {error}"
+
+#: shared/verso-core/src/settings.rs:57
+msgid "The Immich server; /api is added"
+msgstr "Immich சேவையகம்; /api சேர்க்கப்படும்"
+
+#: shared/verso-core/src/settings.rs:58
+msgid "Show the library as a drive in the file manager"
+msgstr "லைப்ரரியைக் கோப்பு மேலாளரில் டிரைவாகக் காட்டு"
+
+#: shared/verso-core/src/settings.rs:59
+msgid "Where the mount appears"
+msgstr "மவுண்ட் தோன்றும் இடம்"
+
+#: shared/verso-core/src/settings.rs:60
+msgid "The drive's name in the sidebar"
+msgstr "பக்கப்பட்டியில் டிரைவின் பெயர்"
+
+#: shared/verso-core/src/settings.rs:61
+msgid "Mount when the session starts"
+msgstr "அமர்வு தொடங்கும்போது மவுண்ட் செய்"
+
+#: shared/verso-core/src/settings.rs:62
+msgid "List the drive in Files' sidebar as a drive, with its unmount button; off, as a bookmark"
+msgstr "கோப்புகள் பயன்பாட்டின் பக்கப்பட்டியில் டிரைவை அன்மவுண்ட் பொத்தானுடன் ஒரு டிரைவாகப் பட்டியலிடு; முடக்கினால், புக்மார்க்காக"
+
+#: shared/verso-core/src/settings.rs:63
+msgid "Show the Photos section"
+msgstr "Photos பிரிவைக் காட்டு"
+
+#: shared/verso-core/src/settings.rs:64
+msgid "Show the Albums section"
+msgstr "Albums பிரிவைக் காட்டு"
+
+#: shared/verso-core/src/settings.rs:65
+msgid "Show the People section"
+msgstr "People பிரிவைக் காட்டு"
+
+#: shared/verso-core/src/settings.rs:66
+msgid "Show the Places section"
+msgstr "Places பிரிவைக் காட்டு"
+
+#: shared/verso-core/src/settings.rs:67
+msgid "Show the Favorites section"
+msgstr "Favorites பிரிவைக் காட்டு"
+
+#: shared/verso-core/src/settings.rs:68
+msgid "Show the Archive section"
+msgstr "Archive பிரிவைக் காட்டு"
+
+#: shared/verso-core/src/settings.rs:69
+msgid "Day folders inside months"
+msgstr "மாதங்களுக்குள் நாள் கோப்புறைகள்"
+
+#: shared/verso-core/src/settings.rs:70
+msgid "Year and month folders inside albums"
+msgstr "ஆல்பங்களுக்குள் ஆண்டு, மாதக் கோப்புறைகள்"
+
+#: shared/verso-core/src/settings.rs:71
+msgid "Year and month folders inside people"
+msgstr "நபர்களுக்குள் ஆண்டு, மாதக் கோப்புறைகள்"
+
+#: shared/verso-core/src/settings.rs:72
+msgid "Year and month folders inside cities"
+msgstr "நகரங்களுக்குள் ஆண்டு, மாதக் கோப்புறைகள்"
+
+#: shared/verso-core/src/settings.rs:73
+msgid "Year and month folders inside favorites"
+msgstr "பிடித்தவைக்குள் ஆண்டு, மாதக் கோப்புறைகள்"
+
+#: shared/verso-core/src/settings.rs:74
+msgid "Year and month folders inside the archive"
+msgstr "காப்பகத்துக்குள் ஆண்டு, மாதக் கோப்புறைகள்"
+
+#: shared/verso-core/src/settings.rs:75
+msgid "How album folders are named and grouped"
+msgstr "ஆல்பக் கோப்புறைகளுக்குப் பெயரிடுவதும் குழுவாக்குவதும் எப்படி"
+
+#: shared/verso-core/src/settings.rs:76
+msgid "How files are named"
+msgstr "கோப்புகளுக்குப் பெயரிடுவது எப்படி"
+
+#: shared/verso-core/src/settings.rs:77
+msgid "The content cache's size limit"
+msgstr "உள்ளடக்கத் தற்காலிகச் சேமிப்பின் அளவு வரம்பு"
+
+#: shared/verso-core/src/settings.rs:78
+msgid "Show the Upload folder, and upload what is copied into it"
+msgstr "Upload கோப்புறையைக் காட்டு, அதில் நகலெடுக்கப்படுவதைப் பதிவேற்று"
+
+#: shared/verso-core/src/settings.rs:79
+msgid "Folders copied into Upload"
+msgstr "Upload-இல் நகலெடுக்கப்பட்ட கோப்புறைகள்"
+
+#: shared/verso-core/src/settings.rs:80
+msgid "Also seed 1024 px thumbnails from the preview"
+msgstr "முன்னோட்டத்திலிருந்து 1024 px சிறுபடங்களையும் உருவாக்கு"
+
+#: shared/verso-core/src/settings.rs:81
+msgid "Refuse thumbnailer reads of originals"
+msgstr "அசல் கோப்புகளைச் சிறுபட உருவாக்கிகள் படிப்பதை மறு"
+
+#: shared/verso-core/src/settings.rs:83
+msgid "What a double click on Verso's top bar icon opens"
+msgstr "Verso-இன் மேல் பட்டி ஐகானை இருமுறை கிளிக் செய்தால் திறப்பது"
+
+#: shared/verso-core/src/settings.rs:84
+msgid "Verso's top bar icon in colour: the lens's five colours, grey while the server cannot be reached"
+msgstr "Verso-இன் மேல் பட்டி ஐகான் வண்ணத்தில்: லென்ஸின் ஐந்து வண்ணங்கள், சேவையகத்தை அணுக முடியாதபோது சாம்பல் நிறம்"
+
+#: shared/verso-core/src/settings.rs:85
+msgid "Verso's app icon, by the picture on its print"
+msgstr "Verso-இன் பயன்பாட்டு ஐகான், அதன் அச்சுப் படத்தின்படி"
+
+#: shared/verso-core/src/settings.rs:86
+msgid "Show what other apps link to (Immich Crosslink)"
+msgstr "பிற பயன்பாடுகள் இணைப்பதைக் காட்டு (Immich Crosslink)"
+
+#: shared/verso-core/src/settings.rs:87
+msgid "Verso: take part as Verso Gallery, so other apps show items in it"
+msgstr "Verso: Verso Gallery-ஆகப் பங்கேற்று, பிற பயன்பாடுகள் அதில் உருப்படிகளைக் காட்ட அனுமதி"
+
+#: shared/verso-core/src/settings.rs:88
+msgid "Verso: take part as Verso Drive, so other apps show items in Files while the drive is on"
+msgstr "Verso: Verso Drive-ஆகப் பங்கேற்று, டிரைவ் இயக்கத்தில் இருக்கும்போது பிற பயன்பாடுகள் கோப்புகள் பயன்பாட்டில் உருப்படிகளைக் காட்ட அனுமதி"
+
+#: shared/verso-core/src/settings.rs:89
+msgid "Apps left out of Show in, by their desktop entry or bundle id, separated by ;"
+msgstr "\"காட்டு\" இலிருந்து விலக்கிய பயன்பாடுகள், டெஸ்க்டாப் உள்ளீடு அல்லது தொகுப்பு அடையாளத்தால், ; ஆல் பிரித்து"
+
+#: shared/verso-core/src/settings.rs:90
+msgid "Tell me when a new version is out"
+msgstr "புதிய பதிப்பு வெளியானால் எனக்குத் தெரிவி"
+
+#: shared/verso-core/src/settings.rs:91
+msgid "Headless only: a 0600 file holding the credential"
+msgstr "ஹெட்லெஸ் மட்டும்: அனுமதிச் சான்றைக் கொண்ட 0600 கோப்பு"
+
+#: shared/verso-core/src/settings.rs:164
+msgid "Never"
+msgstr "ஒருபோதும் இல்லை"
+
+#: shared/verso-core/src/settings.rs:165
+msgid "From 500 Items"
+msgstr "500 உருப்படிகளிலிருந்து"
+
+#: shared/verso-core/src/settings.rs:166
+msgid "Always"
+msgstr "எப்போதும்"
+
+#: shared/verso-core/src/settings.rs:167
+msgid "Year in the Name (2023 - Trip)"
+msgstr "பெயரில் ஆண்டு (2023 - பயணம்)"
+
+#: shared/verso-core/src/settings.rs:168
+msgid "Year Folders (2023/Trip)"
+msgstr "ஆண்டுக் கோப்புறைகள் (2023/பயணம்)"
+
+#: shared/verso-core/src/settings.rs:169
+msgid "Name Only (Trip)"
+msgstr "பெயர் மட்டும் (பயணம்)"
+
+#: shared/verso-core/src/settings.rs:170
+msgid "Date and Time Taken"
+msgstr "எடுத்த தேதியும் நேரமும்"
+
+#: shared/verso-core/src/settings.rs:171
+msgid "Original File Names"
+msgstr "அசல் கோப்புப் பெயர்கள்"
+
+#: shared/verso-core/src/settings.rs:172
+msgid "Ask Each Time"
+msgstr "ஒவ்வொரு முறையும் கேள்"
+
+#: shared/verso-core/src/settings.rs:176
+#: shared/verso-core/src/settings.rs:196
+msgid "Verso"
+msgstr "Verso"
+
+#: shared/verso-core/src/settings.rs:177
+msgid "Verso Drive in Files"
+msgstr "கோப்புகள் பயன்பாட்டில் Verso Drive"
+
+#: shared/verso-core/src/settings.rs:178
+msgid "Preferences"
+msgstr "விருப்பங்கள்"
+
+#: shared/verso-core/src/settings.rs:179
+msgid "Mist"
+msgstr "மூடுபனி"
+
+#: shared/verso-core/src/settings.rs:180
+msgid "Sand"
+msgstr "மணல்"
+
+#: shared/verso-core/src/settings.rs:181
+msgid "Dark"
+msgstr "அடர்"
+
+#: shared/verso-core/src/settings.rs:182
+msgid "Paper"
+msgstr "காகிதம்"
+
+#: shared/verso-core/src/settings.rs:183
+msgid "Frame"
+msgstr "சட்டகம்"
+
+#: shared/verso-core/src/settings.rs:184
+msgid "Slate"
+msgstr "சிலேட்"
+
+#: shared/verso-core/src/settings.rs:185
+msgid "Sky"
+msgstr "வானம்"
+
+#: linux/packaging/desktop/dev.hviid.Verso.desktop.in (Comment)
+msgid "Browse, search and organise your Immich photos and videos, with your library as a drive in Files"
+msgstr ""
+
+#: linux/packaging/desktop/dev.hviid.Verso.desktop.in (Keywords)
+msgid "Immich;photos;videos;gallery;albums;people;drive;"
+msgstr ""
+
+#: mac/Verso/Config/Info.plist (NSHumanReadableCopyright)
+msgid "Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO. “Immich” is used only to describe the server this software works with, and remains the mark of its owner."
+msgstr ""
+
+#: mac/Verso/Config/Info.plist (NSLocalNetworkUsageDescription)
+msgid "Verso connects to your Immich server, which may be on your local network."
+msgstr ""

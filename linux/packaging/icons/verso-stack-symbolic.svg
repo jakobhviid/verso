@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <!-- A stack's badge on its cover in the grid: a photo with two more behind it, as the Mac gallery's stack symbol. -->
+  <path fill="#222" d="M4 6h8a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/>
+  <path fill="#222" d="M4.5 3.25h7a1.25 1.25 0 0 1 1.25 1.25v.5h-9.5v-.5A1.25 1.25 0 0 1 4.5 3.25z"/>
+  <path fill="#222" d="M6 .75h4A1.25 1.25 0 0 1 11.25 2v.25h-6.5V2A1.25 1.25 0 0 1 6 .75z"/>
+</svg>

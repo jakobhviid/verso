@@ -1,0 +1,16 @@
+/target/
+*.swp
+.env.local
+lab/**/fixtures/cache/
+lab/**/screenshots/
+.claude/worktrees/
+lab/**/evidence/
+# The Mac's generated files (mac/build-rust.sh, xcodegen) and the developer's own signing team.
+/mac/build/
+/mac/Config/Local.xcconfig
+/mac/Verso/build/
+/mac/Verso/*.xcodeproj/
+# iOS's generated project and build output.
+/ios/build/
+/ios/*.xcodeproj/
+__pycache__/

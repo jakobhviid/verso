@@ -1,0 +1,105 @@
+name: ci
+
+# Every branch, main among them, and pull requests: releases are cut by a tag (release.yml, AGENTS.md, "Versioning").
+on:
+  push:
+  pull_request:
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+          targets: aarch64-apple-darwin
+      # Dependencies and build products kept between runs, so a release compiles only what changed.
+      - uses: Swatinem/rust-cache@v2
+      - name: clippy (warnings are errors)
+        run: cargo clippy --workspace --exclude verso --all-targets -- -D warnings
+      - name: tests
+        run: cargo test --workspace --exclude verso
+      - name: the core stays portable
+        run: cargo check -p immich-api -p verso-core --no-default-features --target aarch64-apple-darwin
+      - name: the translations match the sources, placeholders kept
+        run: python3 po/i18n.py check
+
+  contract:
+    # immich-api against a real Immich server: the lab's seed in the runner's Docker (lab/immich-server/ci.sh), then
+    # every contract test, the spec check included, on the oldest supported version and the current one.
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        immich: [v3.2.0, v3.3.6]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+      # Restored and saved apart, so the downloads are kept even when a later step fails.
+      - name: Fixture cache (Commons photos, pinned by sha1)
+        id: fixtures
+        uses: actions/cache/restore@v4
+        with:
+          path: lab/immich-server/fixtures/cache
+          key: fixtures-${{ hashFiles('lab/immich-server/fixtures/manifest.json') }}
+      - name: Fixtures, every one (the contract tests count both videos)
+        run: FIXTURES_ALL=1 FIXTURES_LENIENT=1 lab/immich-server/fixtures.sh
+      - name: Save the fixture cache
+        if: steps.fixtures.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: lab/immich-server/fixtures/cache
+          key: fixtures-${{ hashFiles('lab/immich-server/fixtures/manifest.json') }}
+      - name: Immich ${{ matrix.immich }}, seeded
+        run: lab/immich-server/ci.sh ${{ matrix.immich }}
+      - name: Contract tests
+        run: |
+          set -a; . lab/immich-server/.env.local; set +a
+          cargo test -p immich-api --tests -- --ignored --test-threads=1
+
+  fedora-apps:
+    # Verso's window and its settings pages need newer libraries than Ubuntu's (GTK 4.18, libadwaita 1.8 and
+    # blueprint-compiler), so they are checked in the distribution they are developed against.
+    runs-on: ubuntu-latest
+    container: fedora:44
+    steps:
+      - name: Build dependencies
+        run: |
+          dnf install -y -q git gcc cargo rust clippy gtk4-devel libadwaita-devel libshumate-devel blueprint-compiler nautilus-devel
+      - uses: actions/checkout@v5
+      - name: Green gate for the apps - clippy (warnings are errors) and tests
+        run: |
+          cargo clippy -p verso --all-targets -- -D warnings
+          cargo test -p verso
+      - name: Files' extension (warnings are errors)
+        run: linux/files-extension/build.sh "$RUNNER_TEMP/libverso-nautilus.so"
+
+  macos:
+    # Verso on the Mac (ARCHITECTURE.md, "Verso on the Mac"): the portable crates' and the bridge's clippy and tests on
+    # a Mac, then the app, Verso Drive's extension and the widget built unsigned against the bridge, and the app's
+    # offline checks. A Rust change is checked against the Swift side here, without a Mac at hand.
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+      # Dependencies and build products kept between runs, so a release compiles only what changed.
+      - uses: Swatinem/rust-cache@v2
+      - name: clippy (warnings are errors) and tests of the portable crates and the bridge
+        run: |
+          cargo clippy -p immich-api -p verso-core -p verso-bridge --all-targets -- -D warnings
+          cargo test -p immich-api -p verso-core -p verso-bridge
+      - name: The bridge for Xcode
+        run: mac/build-rust.sh debug
+      - name: The app and its extensions, unsigned
+        run: |
+          xcodebuild -version
+          brew install xcodegen
+          cd mac/Verso && xcodegen
+          xcodebuild -project Verso.xcodeproj -scheme Verso -configuration Debug -destination 'platform=macOS' \
+            CODE_SIGNING_ALLOWED=NO build
+      - name: The app's offline checks
+        run: cd mac/Verso && python3 check.py

@@ -1,0 +1,14 @@
+[Unit]
+Description=Verso: the tray, and the Immich library as a drive when it is on
+
+[Service]
+Type=simple
+ExecStart=@BINDIR@/verso-service daemon
+Restart=on-failure
+RestartSec=5
+# 75: the program was upgraded, and the service left once idle so that the new one starts.
+SuccessExitStatus=75
+RestartForceExitStatus=75
+
+[Install]
+WantedBy=default.target

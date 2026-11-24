@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>$(IMMICH_APP_NAME)</string>
+	<!-- The name under the icon on the Home Screen. -->
+	<key>CFBundleDisplayName</key>
+	<string>$(IMMICH_APP_NAME)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<!-- Verso's own links, the scheme the Mac's widgets open photos with. -->
+			<key>CFBundleURLName</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER).widget</string>
+			<key>CFBundleURLSchemes</key>
+			<array><string>$(IMMICH_URL_SCHEME)</string></array>
+		</dict>
+	</array>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<!-- Self-hosted Immich servers are often reached over plain HTTP on a LAN or VPN. -->
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<!-- Verso Drive (mac/Shared): the App Group and Keychain group the app and its extensions share. -->
+	<key>VersoAppGroup</key>
+	<string>$(VERSO_APP_GROUP)</string>
+	<key>VersoKeychainGroup</key>
+	<string>$(AppIdentifierPrefix)$(VERSO_IDENTITY)</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO. “Immich” is used only to describe the server this software works with, and remains the mark of its owner.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Verso connects to your Immich server, which may be on your local network.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Verso uses Face ID to open your Locked Folder again without its PIN.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Verso saves the photos and videos you choose from Immich into your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Verso reads the photos and videos you choose to import them into your Immich library, and, when you switch backing up on, all of them to back them up there.</string>
+	<!-- An import goes on in the background with the system's own progress (BGContinuedProcessingTask), one task per
+	     import, named <bundle identifier>.import.<a UUID> (ios/Verso/Import/ImportCoordinator.swift). Backing up has
+	     the same for Back Up Now and the first run (<bundle identifier>.backup.now.<a UUID>), and background processing
+	     and refresh for backing up on its own (ios/Verso/Backup/BackupScheduler.swift). -->
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER).import.*</string>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER).backup.now.*</string>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER).backup.overnight</string>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER).backup.refresh</string>
+	</array>
+	<!-- Backing up on its own: background refresh (fetch) and background processing. Its uploads go on in a background
+	     URLSession, which needs no mode. -->
+	<!-- Backing up's Live Activity (ios/Widgets), which the app starts while it is open. -->
+	<key>NSSupportsLiveActivities</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+	</array>
+	<!-- The system's plain launch screen, in the app's background colour. -->
+	<key>UILaunchScreen</key>
+	<dict/>
+	<!-- Several windows on iPad. -->
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<true/>
+	</dict>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+</dict>
+</plist>

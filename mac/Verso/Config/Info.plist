@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>$(IMMICH_APP_NAME)</string>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>dev.hviid.Verso.asset-ids</string>
+			<key>UTTypeDescription</key>
+			<string>Verso Asset Selection</string>
+			<key>UTTypeConformsTo</key>
+			<array><string>public.data</string></array>
+		</dict>
+		<dict>
+			<!-- The mark on the app's own drags of originals, which its upload targets turn down (UploadDropPolicy). -->
+			<key>UTTypeIdentifier</key>
+			<string>dev.hviid.Verso.original-drag</string>
+			<key>UTTypeDescription</key>
+			<string>Verso Original Drag</string>
+			<key>UTTypeConformsTo</key>
+			<array><string>public.data</string></array>
+		</dict>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<!-- Clicks on the desktop widget. -->
+			<key>CFBundleURLName</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER).widget</string>
+			<key>CFBundleURLSchemes</key>
+			<array><string>$(IMMICH_URL_SCHEME)</string></array>
+		</dict>
+		<dict>
+			<!-- Crosslink: links from other Immich apps (https://jakob.hviid.phd/immich-crosslink/). -->
+			<key>CFBundleURLName</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER).crosslink</string>
+			<key>CFBundleURLSchemes</key>
+			<array><string>$(IMMICH_CROSSLINK_SCHEME)</string></array>
+		</dict>
+	</array>
+	<!-- Crosslink: the announcement other Immich apps read without starting this one. Dev's version is one no app
+	     follows, and its scheme its own, so Dev never takes the public app's place (project build settings). -->
+	<key>ImmichCrosslink</key>
+	<dict>
+		<key>Version</key>
+		<string>$(IMMICH_CROSSLINK_VERSION)</string>
+		<key>Shows</key>
+		<array>
+			<string>asset</string>
+			<string>album</string>
+			<string>person</string>
+			<string>place</string>
+			<string>page</string>
+		</array>
+	</dict>
+	<key>ImmichAppGroup</key>
+	<string>$(VERSO_APP_GROUP)</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<!-- Self-hosted Immich servers are often reached over plain HTTP on a LAN or VPN. -->
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<!-- Verso Drive (mac/Shared): the App Group and Keychain group the app and its extension share. -->
+	<key>VersoAppGroup</key>
+	<string>$(VERSO_APP_GROUP)</string>
+	<key>VersoKeychainGroup</key>
+	<string>$(AppIdentifierPrefix)$(VERSO_IDENTITY)</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO. “Immich” is used only to describe the server this software works with, and remains the mark of its owner.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Verso connects to your Immich server, which may be on your local network.</string>
+</dict>
+</plist>

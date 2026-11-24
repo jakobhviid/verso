@@ -1,0 +1,16 @@
+[Desktop Entry]
+Name=Verso
+Comment=Browse, search and organise your Immich photos and videos
+Keywords=Immich;photos;videos;gallery;albums;people;
+Exec=verso %u
+Icon=dev.hviid.Verso
+Terminal=false
+Type=Application
+Categories=Graphics;Photography;Viewer;
+StartupNotify=true
+# The Flatpak's one entry (ARCHITECTURE.md, "Verso as a Flatpak"): app.immich is the browser sign-in's redirect, and it
+# announces Verso Gallery to Immich Crosslink (https://jakob.hviid.phd/immich-crosslink/), as a sandbox cannot write
+# entries of its own while it runs.
+MimeType=x-scheme-handler/app.immich;x-scheme-handler/immich-crosslink;
+X-Immich-Crosslink-Version=0.2
+X-Immich-Crosslink-Shows=asset;album;person;place;page;
