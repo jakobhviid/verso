@@ -8,7 +8,8 @@ output folder to be served as it is. Standard library only.
 
 site/build-latest.sh gathers releases.json and runs this. Linux's files come from the newest published release that
 carries the tarball, and the Mac's disk image from the newest one that carries a disk image (ARCHITECTURE.md,
-"Verso's releases"); without one, the page shows the Mac as coming, so it never offers a file that is not there. The
+"Verso's releases"); without one, the page shows the Mac as coming, so it never offers a file that is not there. With
+the disk image's update file beside it (ci/sign-mac-update.sh), the page also carries appcast.xml, Sparkle's feed. The
 iPhone and the iPad come from the App Store and TestFlight, never from GitHub: their links are given here once they
 exist.
 
@@ -17,12 +18,14 @@ the dark appearance where there is one; a picture not taken yet is a place marke
 """
 
 import argparse
+import email.utils
 import html
 import json
 import re
 import shutil
 import struct
 import sys
+import urllib.request
 from datetime import datetime
 from pathlib import Path
 
@@ -71,6 +74,40 @@ def asset_url(release, name):
         if asset["name"] == name:
             return asset["browser_download_url"]
     return None
+
+
+def appcast(mac, disk_image):
+    """Sparkle's feed with the one update, from the disk image's update file (ci/sign-mac-update.sh): the version
+    Sparkle compares is the build number, and the disk image's size and signature are what the app checks before
+    installing it. None when the release carries no update file."""
+    name = disk_image.rsplit("/", 1)[-1]
+    update_url = asset_url(mac, name + ".update")
+    if update_url is None:
+        return None
+    with urllib.request.urlopen(update_url, timeout=60) as response:
+        text = response.read().decode()
+    update = dict(line.split("=", 1) for line in text.split() if "=" in line)
+    size = next(asset["size"] for asset in mac["assets"] if asset["name"] == name)
+    version = mac["tag_name"].lstrip("v")
+    published = datetime.fromisoformat(mac["published_at"].replace("Z", "+00:00"))
+    return f"""<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>Verso</title>
+    <link>{PAGE}</link>
+    <item>
+      <title>Verso {html.escape(version)}</title>
+      <pubDate>{email.utils.format_datetime(published)}</pubDate>
+      <sparkle:version>{html.escape(update["build"])}</sparkle:version>
+      <sparkle:shortVersionString>{html.escape(version)}</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <sparkle:releaseNotesLink>{html.escape(mac["html_url"])}</sparkle:releaseNotesLink>
+      <enclosure url="{html.escape(disk_image)}" length="{size}" type="application/octet-stream"
+                 sparkle:edSignature="{html.escape(update["signature"])}"/>
+    </item>
+  </channel>
+</rss>
+"""
 
 
 def link(url, text):
@@ -261,6 +298,9 @@ def main(releases_file, output, app_store=None, testflight=None):
     (output / "photos.html").write_text(photo_credits())
     # What a Linux package from this page looks at to tell of a newer release (ARCHITECTURE.md, "Updates on Linux").
     (output / "latest.json").write_text(json.dumps({"version": version, "page": PAGE}) + "\n")
+    feed = appcast(mac, disk_image) if disk_image else None
+    if feed:
+        (output / "appcast.xml").write_text(feed)
     for name in ("style.css", "mark.svg", "llms.txt"):
         shutil.copy(SITE / name, output / name)
     social = SITE / "social-preview.png"

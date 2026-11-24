@@ -35,6 +35,8 @@ code and notes shaped the drive's design. No code is shared between the two. Tha
 - **[Zephyr](https://github.com/RISCfuture/Zephyr)** by RISCfuture (MIT), a Dropbox client for macOS, and
   **[PermissionFlow](https://github.com/jaywcjlove/PermissionFlow)** by jaywcjlove (MIT): the System Settings
   address that opens its list of file providers, Immich Mount's Mac app's fallback. No code is copied.
+- **[Sparkle](https://sparkle-project.org)** (MIT): Verso's updates on the Mac. Its notice, with those of the parts it
+  includes, is in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md), which the app carries.
 - **The Rust crates we depend on** are listed with their licenses in `THIRD-PARTY-LICENSES.md`, generated from
   `Cargo.lock` (`linux/packaging/third-party-licenses.py`), which the tarball ships; the Flatpak and the rpm and deb
   packages ship it with their release pipeline (ROADMAP.md, M9, step 6).

@@ -73,5 +73,11 @@
 	<string>Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO. “Immich” is used only to describe the server this software works with, and remains the mark of its owner.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Verso connects to your Immich server, which may be on your local network.</string>
+	<key>SUFeedURL</key>
+	<string>https://jakob.hviid.phd/verso/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>PJoCDD2PMbi9HPHqAXw3d4qZt/a+cAedVw1wJsYNaEM=</string>
+	<key>SUEnableInstallerLauncherService</key>
+	<true/>
 </dict>
 </plist>

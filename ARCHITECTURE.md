@@ -2293,9 +2293,13 @@ to come.
     (`viewer.livePhotosStill`); with Reduce Motion on it reads OFF.
   - Not chosen: the transcoded video Immich plays, which shows the Camera's stabilised crop, 10% too large, and jumps
     where it meets the photo.
-- **No in-app updates yet:** Immich Gallery updates itself with Sparkle from its own feed, signed with its own key, so
-  a copy keeping it would install Immich Gallery over Verso. Sparkle waits for a feed of Verso's own Mac releases
-  ("Verso's releases").
+- **Updates with Sparkle, from Verso's own feed:** the release run from Applications checks the appcast on Verso's
+  page (`jakob.hviid.phd/verso/appcast.xml`, which `site/build.py` makes from the newest release carrying a disk image
+  and its update file) and replaces itself in place, as Immich Mount's Mac app does. The disk image is signed with
+  Verso's own Ed25519 key (`ci/sign-mac-update.sh`; the key stays on the maintainer's workstation, outside the
+  repository), never Immich Gallery's or Immich Mount's, so no other app's feed can install over Verso. Verso Dev
+  never updates itself, so no release replaces it. A copy Homebrew installed updates itself too: the cask says so
+  (`auto_updates`), and `brew upgrade` leaves it to Sparkle.
 - **The map goes under the toolbar as content that does not scroll** (`ExploreMapView`): laid out in the window's
   safe area, its edges carried on under the toolbar and the sidebar as a mirrored, blurred copy
   (`backgroundExtensionEffect`), so its top has the light blur with no edge the scrolling pages have. Under the

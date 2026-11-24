@@ -4,7 +4,7 @@
 # Sparkle compares with the installed one's. Both go beside the disk image as DMG.update, which is attached to the
 # release with it; the download page's appcast is made from them.
 #
-#   ci/sign-mac-update.sh mac/build/release/immich-mount-2.15.0.dmg KEY.pem [BUILD]
+#   ci/sign-mac-update.sh mac/build/release/verso-0.73.0.dmg KEY.pem [BUILD]
 #
 # BUILD is the build number the disk image's app carries (CFBundleVersion, the build's UTC time, which
 # mac/build-rust.sh writes into mac/build/Version.xcconfig); the release job passes the one it built with. Without
@@ -14,7 +14,7 @@ set -eu
 [ $# -eq 2 ] || [ $# -eq 3 ] || { echo "usage: ci/sign-mac-update.sh DMG KEY.pem [BUILD]" >&2; exit 2; }
 dmg=$1
 key=$2
-version=$(basename "$dmg" .dmg | sed 's/^immich-mount-//')
+version=$(basename "$dmg" .dmg | sed 's/^verso-//')
 if [ $# -eq 3 ]; then
   build=$3
 else

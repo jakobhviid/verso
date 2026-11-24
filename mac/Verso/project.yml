@@ -7,6 +7,12 @@ options:
     macOS: "15.0"
   createIntermediateGroups: true
 
+# Sparkle (MIT) updates the release in place from the appcast on Verso's page (ARCHITECTURE.md, "Verso on the Mac").
+packages:
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    exactVersion: 2.10.1
+
 configFiles:
   Debug: Config/Base.xcconfig
   Release: Config/Base.xcconfig
@@ -105,6 +111,7 @@ targets:
       - sdk: Security.framework
       # Linked by name, so Xcode extracts the Shortcuts actions' metadata (MacIntegrationIntents.swift).
       - sdk: AppIntents.framework
+      - package: Sparkle
 
   # Verso Drive: the File Provider extension and the files it shares with the app (ARCHITECTURE.md, "Verso on the
   # Mac").

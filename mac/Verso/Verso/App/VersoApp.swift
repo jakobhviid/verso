@@ -30,7 +30,7 @@ struct VersoApp: App {
             CrosslinkReceiver.accountChanged() // Crosslink: links of the account before are dropped
             openPendingIntents(); openWidgetLinks(); openCrosslinks()
         }
-        .commands { AppCommands(app: app); AdminCommands(app: app); UploadCommands(app: app); ViewerCommands(); MacIntegrationCommands(); AboutCommands() }
+        .commands { AppCommands(app: app); AdminCommands(app: app); UploadCommands(app: app); ViewerCommands(); MacIntegrationCommands(); AboutCommands(); UpdateCommands() }
 
         AdminScene(app: app) // Admin
 

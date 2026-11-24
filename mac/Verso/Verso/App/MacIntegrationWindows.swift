@@ -107,6 +107,7 @@ final class MacIntegrationLifecycle: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         MacSelectAll.install()
+        Updates.start()
         AppIconChoice.applyAtLaunch() // the app icon's looks chosen in Settings, in the Dock
         cleanupTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in MacTransferCache.prune() }
         // A widget click can launch the app without a library window, whose view would restore the account.
