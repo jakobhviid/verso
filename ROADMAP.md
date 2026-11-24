@@ -307,10 +307,10 @@ Immich Crosslink, the protocol between apps, and the takeover of Immich Mount's 
    own rather than a list: Verso on each platform in pictures from the lab's showcase server, a download for each
    (the Flatpak, the tarball, Homebrew, the Mac's disk image, the App Store), what Verso Drive is, the non-affiliation
    notice and the credits. Drafted in `site/` (DESIGN.md, "The website"), with the pictures of Linux, the iPhone
-   (its Library, viewer, Backup page and Free Up Space) and the iPad (its Library) in light and dark.
+   (its Library, viewer, Backup page and Free Up Space), the iPad (its Library) and the Mac (its Library, a window as
+   macOS draws it) in light and dark.
    Served at `jakob.hviid.phd/verso/` from this repository's GitHub Pages (`.github/workflows/pages.yml`, on a push
-   that changes `site/`, or `gh workflow run pages.yml`). Left: the Mac's Library, the maintainer's picture to take,
-   whose place the page leaves out until then; its place at the top of `jakob.hviid.phd/software`; and
+   that changes `site/`, or `gh workflow run pages.yml`). Left: its place at the top of `jakob.hviid.phd/software`; and
    `ci/release.sh publish` running the page's workflow, so `latest.json` follows each release.
 8. Next after the releases (the maintainer: very near), an area at a time: what the Mac does in Swift and Linux in
    Rust moves into `verso-core`, the Mac and the iPhone call it through the bridge (`arrangements`, or a module of the
