@@ -19,7 +19,7 @@ The Mac is a personal laptop the maintainer carries and uses every day, not a la
   `mac/Verso/build/`.
 - **Do on Linux what Linux can do:** Rust builds and tests, the bridge's lab tests, docs. The Mac is for the bridge's
   Mac build, Xcode builds, `check.py` and `check-core.sh`, running the app and its extensions, Finder and logs. CI's
-  `macos` job builds the Swift side unsigned, but GitHub Actions is off in this repository, so a change to `mac/` is
+  `macos` job builds the Swift side unsigned, but that workflow is switched off in this repository, so a change to `mac/` is
   built and checked on the Mac.
 - **It may be asleep or away:** start with a short SSH command, and never assume it is there.
 - **Test with Verso Dev, never a release build:** the Debug build has an identity of its own (AGENTS.md,
@@ -41,7 +41,7 @@ authorized. Homebrew's tools are on the PATH only in a login shell, so every com
 ssh "$MAC_HOST" 'zsh -lc "cd ~/Developer/Private/verso && ..."'
 ```
 
-**The checkout comes from Linux.** The repository is private and GitHub refuses the Mac's SSH key ("Permission
+**The checkout comes from Linux,** work not yet pushed included, and GitHub refuses the Mac's SSH key ("Permission
 denied (publickey)"), so `rsync` copies the working tree over from the repository's root on
 Linux, `.git` included (`ci/version.sh`, which `mac/build-rust.sh` runs, reads the history and its tags), without
 `--delete`, so what only the Mac has stays (its `mac/Config/Local.xcconfig` among it). A file deleted on Linux is

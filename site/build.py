@@ -127,7 +127,7 @@ def find_shot(name):
 
 
 class Shots:
-    """The page's pictures: each {{shot NAME|ALT}} made a <picture>, or a place marked for one to come."""
+    """The page's pictures: each {{shot NAME|ALT}} made a <picture>; one not taken yet leaves its place out."""
 
     def __init__(self):
         self.used = []
@@ -138,8 +138,7 @@ class Shots:
         light = find_shot(name)
         if light is None:
             self.missing.append(name)
-            return (f'<div class="to-come" role="img" aria-label="{html.escape(alt)}">'
-                    f'<strong>Picture to come</strong><span>{html.escape(alt)}</span></div>')
+            return "<!-- to come -->"
         dark = find_shot(f"{name}-dark")
         self.used += [path for path in (light, dark) if path]
         width, height = picture_size(light)
@@ -246,6 +245,8 @@ def main(releases_file, output, app_store=None, testflight=None):
     page = (SITE / "index.html").read_text()
     shots = Shots()
     page = re.sub(r"\{\{shot ([a-z0-9-]+)\|([^}]*)\}\}", shots, page)
+    # A published page shows no empty frame: a picture's place, and the frame around it, wait for the picture.
+    page = re.sub(r'<div class="shot[^"]*"><!-- to come --></div>\n?\s*', "", page)
     for name, value in values.items():
         page = page.replace("{{" + name + "}}", value)
     left = re.findall(r"\{\{[^}]*\}\}", page)

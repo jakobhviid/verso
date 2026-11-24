@@ -120,19 +120,18 @@ the import panel, Change Password and the profile picture.
    - a map whose tiles allow the traffic: done, Linux's maps draw the Immich server's own map setting (ARCHITECTURE,
      "Verso's window", the map)
    - every release built by the release workflow (`.github/workflows/release.yml`), as Immich Mount's are, in place
-     of the builds on the workstation: Actions is switched off in this repository. It builds the tarball, the rpm,
+     of the builds on the workstation: in this repository Actions runs only the page's workflow, and `ci.yml` and
+     `release.yml` are switched off. It builds the tarball, the rpm,
      the deb and the Flatpak; the Mac's disk image, signed and notarized on GitHub's Mac runner, joins it (M9, step
      6)
    - `jakobhviid/verso-releases` retired: the releases come from `jakobhviid/verso`, so the cask's `url` and
      `homepage`, Preferences' "Installing Verso with Homebrew" link (`preferences.rs`) and the requirements' address
      the tarball's launcher gives (`linux/packaging/verso-launcher.sh`), point there
    - decided with the maintainer:
-     - **The history:** cleaned into one commit at the public launch, as Immich Mount's was (M5), tagged `v1.0.0`;
-       every earlier tag goes, with this repository's releases. Before the history is rewritten, all of it (every
-       branch and tag) is kept as a git bundle on the workstation's disk (`~/developer/Backups/verso/`, with every
-       release's files), for a while after. Only the one commit's tree goes public: right before the squash it is
-       scanned for keys, credentials, private addresses and personal photos. Prepared on a branch; `main` is
-       overwritten on the maintainer's word at that moment.
+     - **The history:** public since 2026-11-24, with what came before 23 November at 13:45 in one commit and
+       the commits since kept, tagged from `v0.72.1`. The whole earlier history, every branch, tag and release's
+       files, is kept in git bundles on the workstation's disk (`~/developer/Backups/verso/`) and in the private
+       `jakobhviid/verso-history`.
      - **The releases before the launch:** evaluation builds the maintainer alone uses, so `verso-releases` is retired
        at the launch with them, and this repository's tags and releases go with its history.
      - **The license:** MIT, as today (`LICENSE`, the workspace's `Cargo.toml`), with the notices of the code taken
@@ -294,7 +293,7 @@ Immich Crosslink, the protocol between apps, and the takeover of Immich Mount's 
    that may come, which takes the drive's Plasma integration from Immich Mount's repository ("Parked on purpose").
 6. Releases cut by a tag, Linux and the Mac together (below). Built: `ci/release.sh` with every step and `--dry-run`,
    `ci/version.sh`, the Mac's and iOS's build number as the build's UTC time, and `.github/workflows/release.yml`
-   building Linux's files (written, not yet run: Actions is off) (AGENTS.md, "Versioning"), and the rpm and the deb,
+   building Linux's files (written, not yet run: switched off) (AGENTS.md, "Versioning"), and the rpm and the deb,
    which `build` makes beside the tarball, each in a container of its distribution (ARCHITECTURE.md, "The rpm and the
    deb"), with the packaging matrix that checks them (`lab/packaging/`). Left: `mac/release.sh` and `ios/release.sh`;
    the Flatpak on the workstation, which has no flatpak (the GNOME VM builds it from the source archive `build` leaves
@@ -306,10 +305,10 @@ Immich Crosslink, the protocol between apps, and the takeover of Immich Mount's 
    (the Flatpak, the tarball, Homebrew, the Mac's disk image, the App Store), what Verso Drive is, the non-affiliation
    notice and the credits. Drafted in `site/` (DESIGN.md, "The website"), with the pictures of Linux, the iPhone
    (its Library, viewer, Backup page and Free Up Space) and the iPad (its Library) in light and dark.
-   Left: the maintainer's look at the draft; the Mac's Library, the maintainer's picture to take, which the page
-   marks as to come; where it is served,
-   as Verso's own repository is private, and its place at the top of `jakob.hviid.phd/software`; its links into the
-   repository, which answer only once Verso is public; and `ci/release.sh publish` building it.
+   Served at `jakob.hviid.phd/verso/` from this repository's GitHub Pages (`.github/workflows/pages.yml`, on a push
+   that changes `site/`, or `gh workflow run pages.yml`). Left: the Mac's Library, the maintainer's picture to take,
+   whose place the page leaves out until then; its place at the top of `jakob.hviid.phd/software`; and
+   `ci/release.sh publish` running the page's workflow, so `latest.json` follows each release.
 8. Next after the releases (the maintainer: very near), an area at a time: what the Mac does in Swift and Linux in
    Rust moves into `verso-core`, the Mac and the iPhone call it through the bridge (`arrangements`, or a module of the
    area's own, as the date scroller's `rail`), and the Swift twin goes (ARCHITECTURE.md, "Verso on the Mac", "What the
@@ -648,7 +647,6 @@ Agreed with the maintainer; each item's detail is where it points.
 4. Verso's page, with its design (M9, step 7).
 5. Verso in the system's places, and the smaller gaps on the iPhone (M10).
 6. The walkthrough video (M10).
-7. The history cleaned at the public launch (M8, "Going public").
 
 ## The full Immich API
 

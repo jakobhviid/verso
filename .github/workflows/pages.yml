@@ -1,0 +1,40 @@
+name: pages
+
+# Verso's page (jakob.hviid.phd/verso; DESIGN.md, "The website"), built by site/build-latest.sh for the latest release,
+# with latest.json, which the rpm's and the deb's update check reads. A push that changes site/ runs it, and
+# `gh workflow run pages.yml` after a release. It needs GitHub Pages on, with GitHub Actions as its source.
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: The page for the latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          site/build-latest.sh _site
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@v5

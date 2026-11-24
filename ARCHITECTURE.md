@@ -2553,7 +2553,7 @@ architectures, joins them with `lipo`, generates the Swift bindings with uniffi 
 XcodeGen writes the Xcode project from `mac/Verso/project.yml`, so the project is a text file that reviews well. The
 team ID stays out of the repository, in the git-ignored `mac/Config/Local.xcconfig`. **CI's `macos` job builds all of
 it on GitHub's macOS runner,** unsigned, and runs the core's and the bridge's tests and the app's offline checks, so a
-Rust change is checked against the Swift side without a Mac at hand; while Actions is off (ROADMAP, M9), the Mac runs
+Rust change is checked against the Swift side without a Mac at hand; while `ci.yml` is switched off (ROADMAP, M9), the Mac runs
 the same steps (the mac-dev skill).
 
 **The development build** is Verso Dev (`mac/Verso/dev-app.sh`; AGENTS.md, "Development environment"), with an
@@ -3337,7 +3337,7 @@ check before a release needs a person.
 is numbered, and a push releases nothing. `ci/release.sh` suggests the next version from the commit subjects since the
 last tag (`ci/version.sh`), tags the number the maintainer agrees to, builds Linux's files from the tag into a
 **draft** release, and publishes it after the maintainer's check; AGENTS.md, "Versioning", has the steps and the
-version rules. Until Verso goes public, each release is published both here and in the public
+version rules. Until the public launch, each release is published both here and in the public
 `jakobhviid/verso-releases`, which Homebrew's `verso` cask downloads from (ROADMAP, M8, "Going public"). No Mac
 release has gone out yet; the Mac's disk image, and the rpm and deb packages, are not part of the release step
 (ROADMAP, M9, step 6).

@@ -89,11 +89,8 @@ The bump is a suggestion: the maintainer tags it, or another number after the la
 not scanned; mark breaking changes with `!` in the subject. Subjects stay Conventional Commits, because they make the
 release notes (`ci/release-notes.sh`: `feat` under New, `fix` under Fixed). A pre-release is a tag such as
 `v1.0.0-beta.1`, published as a pre-release and kept out of the cask; the tree after it numbers itself as the release
-it leads to (1.0.0). Verso stays at 0.x until it is public; 1.0.0 is the public launch. Before the first tag cut
-this way, a bump for every commit had reached 0.71.1 at `3662c11`, past the last tag (`v0.41.1`), and builds said
-so: `ci/version.sh` counts from there while the last tag is older, so a number never goes back. A history without
-the tags counts from Verso's last release numbered by hand, 0.5.19 at `b4440a9`, a bump for every commit, and
-`ci/version.sh` says so.
+it leads to (1.0.0). Verso stays at 0.x until its public launch; 1.0.0 is that launch. A checkout without the tags
+has no version: `ci/version.sh` stops and asks for them.
 
 **A push releases nothing.** The maintainer cuts a release with `ci/release.sh`, on the Linux workstation; `--dry-run`
 on any step shows what it would do and changes nothing outside the checkout:
@@ -140,12 +137,13 @@ cargo check -p immich-api -p verso-core --no-default-features --target aarch64-a
 CI (`.github/workflows/ci.yml`) runs the first two lines with `--exclude verso` on Ubuntu, and checks Verso's window
 separately in a `fedora:44` container, because it needs GTK 4.18, libadwaita 1.8 and `blueprint-compiler`, and builds
 the Files extension there. It also checks the translations against the sources (`python3 po/i18n.py check`) and runs
-`immich-api`'s contract tests against Immich in Docker. GitHub Actions is off in this repository, so CI runs only
-once it is switched on; until then the local gate is the only one. The toolbox has every library, so the local gate
+`immich-api`'s contract tests against Immich in Docker. In this repository GitHub Actions runs only the page's
+workflow (`pages.yml`): `ci.yml` and `release.yml` are switched off until they have been run through once, so the
+local gate is the only one. The toolbox has every library, so the local gate
 covers the whole workspace.
 
 The macOS side (`mac/`, and the bridge built for macOS) has no gate on Linux. CI's `macos` job builds the app and its
-extensions unsigned and runs `mac/Verso/check.py` on a Mac runner; while Actions is off, a change to it is built and
+extensions unsigned and runs `mac/Verso/check.py` on a Mac runner; while `ci.yml` is off, a change to it is built and
 checked on the Mac (the `mac-dev` skill).
 
 There is deliberately no `cargo fmt` gate. Readability is a review concern; readable names are required (no
@@ -219,8 +217,7 @@ Build on Fedora 44, or in a Fedora 44 toolbox (the easy way on an immutable host
     `mac/Verso/dev-app.sh --remove` quits and deletes it. It signs in and out from launch arguments
     (`-signInServer` with `-signInAPIKey`, or with `-signInEmail` and `-signInPassword`; `-signOut`), as the
     `mac-dev` skill shows.
-  - While this repository is private, the Mac's copy of it comes from Linux with `rsync`, as the `mac-dev` skill
-    says.
+  - The Mac's copy of it comes from Linux with `rsync`, work not yet pushed included, as the `mac-dev` skill says.
 - **Verso on iOS** (`ios/`; ROADMAP.md, M10) builds on the same Mac, from the same bridge (`mac/build-rust.sh debug
   --ios`) and `xcodegen` in `ios/`. Its Simulator build needs no signing and runs over SSH; the UI tests in
   `ios/VersoUITests` walk the app against Immich's demo with launch arguments and keep a screenshot of each place.
