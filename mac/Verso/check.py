@@ -88,8 +88,16 @@ def check(item):
     binary = out / name
     log = out / (name + '.log')
     with log.open('w') as stream:
-        build = subprocess.run(['swiftc', '-parse-as-library', *sources, '-o', str(binary)], cwd=repo, stdout=stream, stderr=subprocess.STDOUT)
-        result = build.returncode or subprocess.run([str(binary)], cwd=repo, stdout=stream, stderr=subprocess.STDOUT).returncode
+        # Each step has its time: a check that waits for ever (on a runner without what it needs) fails, and names itself.
+        try:
+            build = subprocess.run(['swiftc', '-parse-as-library', *sources, '-o', str(binary)], cwd=repo, stdout=stream,
+                                   stderr=subprocess.STDOUT, timeout=600)
+            result = build.returncode or subprocess.run([str(binary)], cwd=repo, stdout=stream, stderr=subprocess.STDOUT,
+                                                        timeout=120).returncode
+        except subprocess.TimeoutExpired as expired:
+            stream.write(f'\ntimed out after {expired.timeout} s: {expired.cmd[0]}\n')
+            result = 1
+    print(f'{"FAIL" if result else "PASS"} {name}', flush=True)
     return name, result, log
 
 if with_core & cases.keys():
