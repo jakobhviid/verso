@@ -11,95 +11,95 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: linux/verso-service/src/commands.rs:471
-#: linux/verso-linux/src/daemon.rs:508
+#: linux/verso-linux/src/daemon.rs:518
 msgid "Verso Drive is not mounted"
 msgstr "O Verso Drive não está montado"
 
 #: linux/verso-service/src/commands.rs:471
-#: linux/verso-linux/src/daemon.rs:508
+#: linux/verso-linux/src/daemon.rs:518
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "Ative-o nas Preferências do Verso e abra o link novamente."
 
-#: linux/verso-service/src/online.rs:543
+#: linux/verso-service/src/online.rs:544
 msgid "The keyring stayed locked. Open {app}, or run “{command}”, to try again."
 msgstr "O chaveiro continuou bloqueado. Abra o {app} ou execute “{command}” para tentar novamente."
 
-#: linux/verso-service/src/online.rs:544
+#: linux/verso-service/src/online.rs:545
 msgid "Immich is not mounted"
 msgstr "O Immich não está montado"
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:517
 msgid "Links from other apps are off"
 msgstr "Os links de outros apps estão desligados"
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:517
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "Ative o Immich Crosslink nos ajustes do Verso para mostrar o que outros apps indicam."
 
-#: linux/verso-linux/src/daemon.rs:509
+#: linux/verso-linux/src/daemon.rs:519
 msgid "A link from another app cannot be opened"
 msgstr "Não é possível abrir um link de outro app"
 
-#: linux/verso-linux/src/daemon.rs:509
+#: linux/verso-linux/src/daemon.rs:519
 msgid "It is not a valid Immich link."
 msgstr "Não é um link válido do Immich."
 
-#: linux/verso-linux/src/daemon.rs:510
-#: linux/verso-linux/src/daemon.rs:514
+#: linux/verso-linux/src/daemon.rs:520
+#: linux/verso-linux/src/daemon.rs:524
 msgid "Nothing to show"
 msgstr "Nada para mostrar"
 
-#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:520
 msgid "Verso Drive has no place for what this link points to."
 msgstr "O Verso Drive não tem lugar para aquilo para onde este link aponta."
 
-#: linux/verso-linux/src/daemon.rs:511
+#: linux/verso-linux/src/daemon.rs:521
 msgid "Not signed in to {host}"
 msgstr "Sessão não iniciada em {host}"
 
-#: linux/verso-linux/src/daemon.rs:511
+#: linux/verso-linux/src/daemon.rs:521
 msgid "Verso is signed in to another Immich server."
 msgstr "O Verso está com a sessão iniciada em outro servidor Immich."
 
-#: linux/verso-linux/src/daemon.rs:512
+#: linux/verso-linux/src/daemon.rs:522
 msgid "Another Immich account"
 msgstr "Outra conta do Immich"
 
-#: linux/verso-linux/src/daemon.rs:512
+#: linux/verso-linux/src/daemon.rs:522
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "O link é de uma conta diferente daquela com que o Verso iniciou a sessão."
 
-#: linux/verso-linux/src/daemon.rs:515
+#: linux/verso-linux/src/daemon.rs:525
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "A unidade não mostra isto. Pode estar oculto, em uma seção desativada ou não compartilhado com você."
 
-#: linux/verso-linux/src/daemon.rs:517
-#: linux/verso-linux/src/daemon.rs:603
+#: linux/verso-linux/src/daemon.rs:527
+#: linux/verso-linux/src/daemon.rs:613
 msgid "Immich is unreachable"
 msgstr "O Immich está inacessível"
 
-#: linux/verso-linux/src/daemon.rs:517
+#: linux/verso-linux/src/daemon.rs:527
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "O servidor Immich está inacessível. Tente o link novamente mais tarde."
 
-#: linux/verso-linux/src/daemon.rs:599
+#: linux/verso-linux/src/daemon.rs:609
 msgid "Immich's certificate is not trusted"
 msgstr "O certificado do Immich não é confiável"
 
-#: linux/verso-linux/src/daemon.rs:600
+#: linux/verso-linux/src/daemon.rs:610
 msgid "The Immich server presented a certificate {app} does not trust, so nothing is sent to it. Open {app} to check the certificate. Files you opened before stay available."
 msgstr "O servidor do Immich apresentou um certificado em que o {app} não confia, então nada é enviado a ele. Abra o {app} para verificar o certificado. Os arquivos que você abriu antes continuam disponíveis."
 
-#: linux/verso-linux/src/daemon.rs:604
+#: linux/verso-linux/src/daemon.rs:614
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "O servidor Immich está inacessível. Os arquivos que você abriu antes continuam disponíveis."
 
-#: linux/verso-linux/src/daemon.rs:607
+#: linux/verso-linux/src/daemon.rs:617
 #: linux/verso-linux/src/tray.rs:128
 msgid "Signed out of Immich"
 msgstr "Sessão do Immich encerrada"
 
-#: linux/verso-linux/src/daemon.rs:608
+#: linux/verso-linux/src/daemon.rs:618
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "O Immich não aceita mais este início de sessão. Abra o {app} para iniciar a sessão novamente."
 
@@ -966,4 +966,8 @@ msgstr ""
 
 #: mac/Verso/Config/Info.plist (NSLocalNetworkUsageDescription)
 msgid "Verso connects to your Immich server, which may be on your local network."
+msgstr ""
+
+#: mac/Verso/Config/VersoDrive-Info.plist (NSExtensionFileProviderActionName)
+msgid "Show in Verso"
 msgstr ""

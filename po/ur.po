@@ -11,95 +11,95 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: linux/verso-service/src/commands.rs:471
-#: linux/verso-linux/src/daemon.rs:508
+#: linux/verso-linux/src/daemon.rs:518
 msgid "Verso Drive is not mounted"
 msgstr "Verso Drive ماؤنٹ نہیں ہے"
 
 #: linux/verso-service/src/commands.rs:471
-#: linux/verso-linux/src/daemon.rs:508
+#: linux/verso-linux/src/daemon.rs:518
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "Verso کی ترجیحات میں ڈرائیو آن کریں، پھر لنک دوبارہ کھولیں۔"
 
-#: linux/verso-service/src/online.rs:543
+#: linux/verso-service/src/online.rs:544
 msgid "The keyring stayed locked. Open {app}, or run “{command}”, to try again."
 msgstr "کی رِنگ مقفل رہی۔ دوبارہ کوشش کرنے کے لیے {app} کھولیں، یا “{command}” چلائیں۔"
 
-#: linux/verso-service/src/online.rs:544
+#: linux/verso-service/src/online.rs:545
 msgid "Immich is not mounted"
 msgstr "Immich ماؤنٹ نہیں ہے"
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:517
 msgid "Links from other apps are off"
 msgstr "دوسری ایپس کے لنک بند ہیں"
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:517
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "دوسری ایپس جس کا لنک دیتی ہیں اسے دکھانے کے لیے Verso کی ترتیبات میں Immich Crosslink آن کریں۔"
 
-#: linux/verso-linux/src/daemon.rs:509
+#: linux/verso-linux/src/daemon.rs:519
 msgid "A link from another app cannot be opened"
 msgstr "کسی دوسری ایپ کا لنک نہیں کھل سکتا"
 
-#: linux/verso-linux/src/daemon.rs:509
+#: linux/verso-linux/src/daemon.rs:519
 msgid "It is not a valid Immich link."
 msgstr "یہ درست Immich لنک نہیں ہے۔"
 
-#: linux/verso-linux/src/daemon.rs:510
-#: linux/verso-linux/src/daemon.rs:514
+#: linux/verso-linux/src/daemon.rs:520
+#: linux/verso-linux/src/daemon.rs:524
 msgid "Nothing to show"
 msgstr "دکھانے کے لیے کچھ نہیں"
 
-#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:520
 msgid "Verso Drive has no place for what this link points to."
 msgstr "یہ لنک جس چیز کی طرف اشارہ کرتا ہے، اس کے لیے Verso Drive میں کوئی جگہ نہیں۔"
 
-#: linux/verso-linux/src/daemon.rs:511
+#: linux/verso-linux/src/daemon.rs:521
 msgid "Not signed in to {host}"
 msgstr "{host} میں سائن ان نہیں"
 
-#: linux/verso-linux/src/daemon.rs:511
+#: linux/verso-linux/src/daemon.rs:521
 msgid "Verso is signed in to another Immich server."
 msgstr "Verso کسی دوسرے Immich سرور میں سائن ان ہے۔"
 
-#: linux/verso-linux/src/daemon.rs:512
+#: linux/verso-linux/src/daemon.rs:522
 msgid "Another Immich account"
 msgstr "کوئی دوسرا Immich اکاؤنٹ"
 
-#: linux/verso-linux/src/daemon.rs:512
+#: linux/verso-linux/src/daemon.rs:522
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "یہ لنک کسی دوسرے اکاؤنٹ کے لیے ہے، اس اکاؤنٹ کے لیے نہیں جس سے Verso سائن ان ہے۔"
 
-#: linux/verso-linux/src/daemon.rs:515
+#: linux/verso-linux/src/daemon.rs:525
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "ڈرائیو یہ نہیں دکھاتی۔ ہو سکتا ہے یہ چھپا ہوا ہو، کسی بند حصے میں ہو، یا آپ کے ساتھ شیئر نہ کیا گیا ہو۔"
 
-#: linux/verso-linux/src/daemon.rs:517
-#: linux/verso-linux/src/daemon.rs:603
+#: linux/verso-linux/src/daemon.rs:527
+#: linux/verso-linux/src/daemon.rs:613
 msgid "Immich is unreachable"
 msgstr "Immich تک رسائی ممکن نہیں"
 
-#: linux/verso-linux/src/daemon.rs:517
+#: linux/verso-linux/src/daemon.rs:527
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "Immich سرور تک رسائی ممکن نہیں۔ بعد میں لنک دوبارہ آزمائیں۔"
 
-#: linux/verso-linux/src/daemon.rs:599
+#: linux/verso-linux/src/daemon.rs:609
 msgid "Immich's certificate is not trusted"
 msgstr "Immich کا سرٹیفکیٹ قابلِ اعتماد نہیں"
 
-#: linux/verso-linux/src/daemon.rs:600
+#: linux/verso-linux/src/daemon.rs:610
 msgid "The Immich server presented a certificate {app} does not trust, so nothing is sent to it. Open {app} to check the certificate. Files you opened before stay available."
 msgstr "Immich سرور نے ایسا سرٹیفکیٹ پیش کیا جس پر {app} بھروسا نہیں کرتا، اس لیے اسے کچھ نہیں بھیجا جاتا۔ سرٹیفکیٹ جانچنے کے لیے {app} کھولیں۔ پہلے کھولی گئی فائلیں دستیاب رہتی ہیں۔"
 
-#: linux/verso-linux/src/daemon.rs:604
+#: linux/verso-linux/src/daemon.rs:614
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "Immich سرور تک رسائی ممکن نہیں۔ پہلے کھولی گئی فائلیں دستیاب رہیں گی۔"
 
-#: linux/verso-linux/src/daemon.rs:607
+#: linux/verso-linux/src/daemon.rs:617
 #: linux/verso-linux/src/tray.rs:128
 msgid "Signed out of Immich"
 msgstr "Immich سے سائن آؤٹ ہو گیا"
 
-#: linux/verso-linux/src/daemon.rs:608
+#: linux/verso-linux/src/daemon.rs:618
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "Immich اب یہ سائن ان قبول نہیں کرتا۔ دوبارہ سائن ان کرنے کے لیے {app} کھولیں۔"
 
@@ -966,4 +966,8 @@ msgstr ""
 
 #: mac/Verso/Config/Info.plist (NSLocalNetworkUsageDescription)
 msgid "Verso connects to your Immich server, which may be on your local network."
+msgstr ""
+
+#: mac/Verso/Config/VersoDrive-Info.plist (NSExtensionFileProviderActionName)
+msgid "Show in Verso"
 msgstr ""

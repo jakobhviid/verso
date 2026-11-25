@@ -80,9 +80,16 @@ jobs:
     # Verso on the Mac (ARCHITECTURE.md, "Verso on the Mac"): the portable crates' and the bridge's clippy and tests on
     # a Mac, then the app, Verso Drive's extension and the widget built unsigned against the bridge, and the app's
     # offline checks. A Rust change is checked against the Swift side here, without a Mac at hand.
-    runs-on: macos-latest
+    # The newest image, and its newest Xcode: Xcode 26's Swift compiler crashes on the app (in IR generation), which
+    # Xcode 27, the one the app is built with on the maintainer's Mac, compiles.
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v5
+      - name: The newest Xcode
+        run: |
+          ls -d /Applications/Xcode*.app
+          newest=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          echo "DEVELOPER_DIR=$newest/Contents/Developer" >> "$GITHUB_ENV"
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy

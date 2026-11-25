@@ -11,95 +11,95 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: linux/verso-service/src/commands.rs:471
-#: linux/verso-linux/src/daemon.rs:508
+#: linux/verso-linux/src/daemon.rs:518
 msgid "Verso Drive is not mounted"
 msgstr "Verso Drive మౌంట్ చేయబడలేదు"
 
 #: linux/verso-service/src/commands.rs:471
-#: linux/verso-linux/src/daemon.rs:508
+#: linux/verso-linux/src/daemon.rs:518
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "Verso ప్రాధాన్యతలలో డ్రైవ్‌ను ఆన్ చేసి, ఆపై లింక్‌ను మళ్లీ తెరవండి."
 
-#: linux/verso-service/src/online.rs:543
+#: linux/verso-service/src/online.rs:544
 msgid "The keyring stayed locked. Open {app}, or run “{command}”, to try again."
 msgstr "కీరింగ్ లాక్ అయ్యే ఉంది. మళ్లీ ప్రయత్నించడానికి {app}ను తెరవండి, లేదా “{command}” రన్ చేయండి."
 
-#: linux/verso-service/src/online.rs:544
+#: linux/verso-service/src/online.rs:545
 msgid "Immich is not mounted"
 msgstr "Immich మౌంట్ చేయబడలేదు"
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:517
 msgid "Links from other apps are off"
 msgstr "ఇతర యాప్‌ల నుండి లింక్‌లు ఆఫ్‌లో ఉన్నాయి"
 
-#: linux/verso-linux/src/daemon.rs:507
+#: linux/verso-linux/src/daemon.rs:517
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "ఇతర యాప్‌లు లింక్ చేసేవాటిని చూపించడానికి Verso సెట్టింగ్‌లలో Immich Crosslink ఆన్ చేయండి."
 
-#: linux/verso-linux/src/daemon.rs:509
+#: linux/verso-linux/src/daemon.rs:519
 msgid "A link from another app cannot be opened"
 msgstr "మరొక యాప్ నుండి వచ్చిన లింక్‌ను తెరవడం సాధ్యం కాదు"
 
-#: linux/verso-linux/src/daemon.rs:509
+#: linux/verso-linux/src/daemon.rs:519
 msgid "It is not a valid Immich link."
 msgstr "ఇది చెల్లుబాటు అయ్యే Immich లింక్ కాదు."
 
-#: linux/verso-linux/src/daemon.rs:510
-#: linux/verso-linux/src/daemon.rs:514
+#: linux/verso-linux/src/daemon.rs:520
+#: linux/verso-linux/src/daemon.rs:524
 msgid "Nothing to show"
 msgstr "చూపించడానికి ఏమీ లేదు"
 
-#: linux/verso-linux/src/daemon.rs:510
+#: linux/verso-linux/src/daemon.rs:520
 msgid "Verso Drive has no place for what this link points to."
 msgstr "ఈ లింక్ సూచించే దానికి Verso Driveలో స్థానం లేదు."
 
-#: linux/verso-linux/src/daemon.rs:511
+#: linux/verso-linux/src/daemon.rs:521
 msgid "Not signed in to {host}"
 msgstr "{host}కు సైన్ ఇన్ చేయలేదు"
 
-#: linux/verso-linux/src/daemon.rs:511
+#: linux/verso-linux/src/daemon.rs:521
 msgid "Verso is signed in to another Immich server."
 msgstr "Verso మరొక Immich సర్వర్‌కు సైన్ ఇన్ అయి ఉంది."
 
-#: linux/verso-linux/src/daemon.rs:512
+#: linux/verso-linux/src/daemon.rs:522
 msgid "Another Immich account"
 msgstr "మరొక Immich ఖాతా"
 
-#: linux/verso-linux/src/daemon.rs:512
+#: linux/verso-linux/src/daemon.rs:522
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "ఈ లింక్ Verso సైన్ ఇన్ అయిన ఖాతాకు కాదు, మరొక ఖాతాకు చెందినది."
 
-#: linux/verso-linux/src/daemon.rs:515
+#: linux/verso-linux/src/daemon.rs:525
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "డ్రైవ్ దీన్ని చూపించడం లేదు. ఇది దాచబడి ఉండవచ్చు, ఆఫ్ చేసిన విభాగంలో ఉండవచ్చు, లేదా మీతో షేర్ చేయబడకపోవచ్చు."
 
-#: linux/verso-linux/src/daemon.rs:517
-#: linux/verso-linux/src/daemon.rs:603
+#: linux/verso-linux/src/daemon.rs:527
+#: linux/verso-linux/src/daemon.rs:613
 msgid "Immich is unreachable"
 msgstr "Immich అందుబాటులో లేదు"
 
-#: linux/verso-linux/src/daemon.rs:517
+#: linux/verso-linux/src/daemon.rs:527
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "Immich సర్వర్ అందుబాటులో లేదు. తర్వాత లింక్‌ను మళ్లీ ప్రయత్నించండి."
 
-#: linux/verso-linux/src/daemon.rs:599
+#: linux/verso-linux/src/daemon.rs:609
 msgid "Immich's certificate is not trusted"
 msgstr "Immich సర్టిఫికెట్ నమ్మదగినది కాదు"
 
-#: linux/verso-linux/src/daemon.rs:600
+#: linux/verso-linux/src/daemon.rs:610
 msgid "The Immich server presented a certificate {app} does not trust, so nothing is sent to it. Open {app} to check the certificate. Files you opened before stay available."
 msgstr "{app} నమ్మని సర్టిఫికెట్‌ను Immich సర్వర్ చూపింది, కాబట్టి దానికి ఏమీ పంపబడదు. సర్టిఫికెట్‌ను తనిఖీ చేయడానికి {app}ను తెరవండి. మీరు ఇంతకు ముందు తెరిచిన ఫైళ్లు అందుబాటులో ఉంటాయి."
 
-#: linux/verso-linux/src/daemon.rs:604
+#: linux/verso-linux/src/daemon.rs:614
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "Immich సర్వర్ అందుబాటులో లేదు. మీరు ఇంతకు ముందు తెరిచిన ఫైల్‌లు అందుబాటులో ఉంటాయి."
 
-#: linux/verso-linux/src/daemon.rs:607
+#: linux/verso-linux/src/daemon.rs:617
 #: linux/verso-linux/src/tray.rs:128
 msgid "Signed out of Immich"
 msgstr "Immich నుండి సైన్ అవుట్ అయ్యారు"
 
-#: linux/verso-linux/src/daemon.rs:608
+#: linux/verso-linux/src/daemon.rs:618
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "Immich ఇకపై ఈ సైన్-ఇన్‌ను అంగీకరించడం లేదు. మళ్లీ సైన్ ఇన్ చేయడానికి {app}ను తెరవండి."
 
@@ -966,4 +966,8 @@ msgstr ""
 
 #: mac/Verso/Config/Info.plist (NSLocalNetworkUsageDescription)
 msgid "Verso connects to your Immich server, which may be on your local network."
+msgstr ""
+
+#: mac/Verso/Config/VersoDrive-Info.plist (NSExtensionFileProviderActionName)
+msgid "Show in Verso"
 msgstr ""
