@@ -39,11 +39,7 @@ struct HDRImageLayer: NSViewRepresentable {
         if let layer = view.layer {
             layer.contentsGravity = .resizeAspect
             layer.minificationFilter = .trilinear
-            if #available(macOS 26, *) {
-                layer.preferredDynamicRange = .high
-            } else {
-                layer.wantsExtendedDynamicRangeContent = true
-            }
+            HDRLayers.showHigh(layer)
         }
         return view
     }
@@ -54,5 +50,24 @@ struct HDRImageLayer: NSViewRepresentable {
 
     final class LayerView: NSView {
         override func hitTest(_ point: NSPoint) -> NSView? { nil }
+    }
+}
+
+/// A layer that shows an HDR photo as bright as the display allows: macOS 26's dynamic range where there is one, the
+/// extended range before it.
+enum HDRLayers {
+    static func showHigh(_ layer: CALayer) {
+        if #available(macOS 26, *) {
+            preferHigh(layer)
+        } else {
+            layer.wantsExtendedDynamicRangeContent = true
+        }
+    }
+
+    /// Never inlined: `.high` is a constant macOS 15 does not have, and once inlined the optimiser read it ahead of
+    /// the availability check, at address 0, which crashed opening any photo on macOS 15.
+    @available(macOS 26, *) @inline(never)
+    private static func preferHigh(_ layer: CALayer) {
+        layer.preferredDynamicRange = .high
     }
 }
