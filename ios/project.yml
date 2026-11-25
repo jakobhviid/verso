@@ -6,6 +6,7 @@ options:
   bundleIdPrefix: dev.hviid
   deploymentTarget:
     iOS: "26.1"
+    tvOS: "26.0"
   createIntermediateGroups: true
 
 configFiles:
@@ -286,7 +287,61 @@ targets:
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "The walk puts a photo into the library and takes it out after."
         INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: "The walk puts a photo into the library."
 
+  # The core's bindings for the Apple TV, as VersoCore is for the iPhone (`mac/build-rust.sh --tvos` adds its slices).
+  VersoCoreTV:
+    type: library.static
+    platform: tvOS
+    sources:
+      - ../mac/Verso/VersoCore
+      - ../mac/build/Generated
+      - ../mac/Shared
+    settings:
+      base:
+        PRODUCT_NAME: VersoCore
+        PRODUCT_MODULE_NAME: VersoCore
+        SWIFT_VERSION: "5.0"
+    dependencies:
+      - framework: ../mac/build/VersoBridge.xcframework
+        embed: false
+
+  # Verso on the Apple TV (ROADMAP.md, "Verso on the Apple TV"): its own views, and the iPhone's API layer, core
+  # transport and pictures. The same bundle identifier as the iPhone's, so one App Store record carries both.
+  VersoTV:
+    type: application
+    platform: tvOS
+    sources:
+      - TV
+      - ../mac/Verso/Verso/API
+      - ../mac/Verso/Verso/Core
+      - ../mac/Verso/Verso/Support/Formatters.swift
+      - ../mac/Verso/Verso/Support/ImagePipeline.swift
+      - ../mac/Verso/Verso/Support/ThumbHash.swift
+      - ../mac/Verso/Verso/Support/VideoStream.swift
+      - ../mac/Verso/Verso/App/CoreTimeline.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(VERSO_IDENTITY)
+        PRODUCT_NAME: $(IMMICH_APP_NAME)
+        PRODUCT_MODULE_NAME: VersoTV
+        TARGETED_DEVICE_FAMILY: "3"
+        INFOPLIST_FILE: Config/TV-Info.plist
+        GENERATE_INFOPLIST_FILE: YES
+        "EXCLUDED_ARCHS[sdk=appletvsimulator*]": x86_64
+    dependencies:
+      - target: VersoCoreTV
+      - framework: ../mac/build/VersoBridge.xcframework
+        embed: false
+      - sdk: Security.framework
+
 schemes:
+  VersoTV:
+    build:
+      targets:
+        VersoTV: all
+    run:
+      config: Debug
+    archive:
+      config: Release
   Verso:
     build:
       targets:

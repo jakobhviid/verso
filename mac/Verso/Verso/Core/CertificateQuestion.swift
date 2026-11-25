@@ -6,7 +6,7 @@
 
 import Foundation
 import VersoCore
-#if os(iOS)
+#if canImport(UIKit)
 import UIKit
 #endif
 
@@ -85,10 +85,12 @@ struct CertificateQuestion: Identifiable, Equatable, Sendable {
         date.formatted(date: .long, time: .omitted)
     }
 
-    /// "Mac", "iPhone" or "iPad", as the question names the device that does not trust the certificate.
+    /// "Mac", "Apple TV", "iPhone" or "iPad", as the question names the device that does not trust the certificate.
     @MainActor private static var thisDevice: String {
         #if os(macOS)
         "Mac"
+        #elseif os(tvOS)
+        "Apple TV"
         #else
         UIDevice.current.userInterfaceIdiom == .pad ? "iPad" : "iPhone"
         #endif
