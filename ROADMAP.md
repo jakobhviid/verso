@@ -129,7 +129,8 @@ the import panel, Change Password and the profile picture.
        files, is kept in git bundles on the workstation's disk (`~/developer/Backups/verso/`) and in the private
        `jakobhviid/verso-history`.
      - **The releases before the launch:** evaluation builds the maintainer alone uses; `verso-releases`, which
-       carried them, is archived, read-only, and the releases come from this repository.
+       carried them, is private and archived, to be deleted after 25 May 2027; the releases come from this
+       repository.
      - **The license:** MIT, as today (`LICENSE`, the workspace's `Cargo.toml`), with the notices of the code taken
        from others in THIRD-PARTY-NOTICES.md, so anyone, Immich's own apps first, may take any idea, design or code
        from Verso (README, "License").
