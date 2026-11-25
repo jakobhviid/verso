@@ -139,6 +139,23 @@ final class VersoDrive {
     }
 
     #if os(macOS)
+    /// Whether Quit Verso disconnects the drive (Settings, Verso Drive); on by default.
+    static let disconnectOnQuitKey = "drive.disconnectOnQuit"
+
+    /// Quit Verso: the location disconnected, so Finder shows it unavailable and serves nothing from it until Verso
+    /// runs again and connects it (`bringUp`); its items and downloads stay. ⌘Q, which closes the windows alone,
+    /// leaves it connected.
+    func disconnectForQuit() async {
+        guard isOn, UserDefaults.standard.object(forKey: Self.disconnectOnQuitKey) as? Bool ?? true,
+              let manager = NSFileProviderManager(for: domain) else { return }
+        do {
+            try await manager.disconnect(reason: String(localized: "Verso is not running."), options: [])
+            log.notice("Verso Drive disconnected as Verso quits")
+        } catch {
+            log.error("Verso Drive was not disconnected: \(String(describing: error), privacy: .public)")
+        }
+    }
+
     /// Show in Verso Drive: what `link` names selected in Finder, where the drive has it, asked twice as Immich Mount
     /// does (the system may answer "database is locked" while it reads the location again); the location itself
     /// when the drive has no place for it.
@@ -234,6 +251,10 @@ final class VersoDrive {
             UserDefaults.standard.set(key, forKey: Self.keptAccountKey)
             // Adding the location again updates it in place: its name follows `mount.name`, and its items stay.
             try await NSFileProviderManager.add(domain)
+            #if os(macOS)
+            // Connected again after Quit Verso disconnected it (`disconnectForQuit`).
+            try? await NSFileProviderManager(for: domain)?.reconnect()
+            #endif
             await readItemsAgainAfterUpdate()
             await refreshState()
             log.notice("Verso Drive is up as \(self.name, privacy: .public)")

@@ -8,11 +8,16 @@ struct VersoDriveSettingsView: View {
     @State private var drive = VersoDrive.shared
     @State private var panes: SettingsPanes?
 
+    @AppStorage(VersoDrive.disconnectOnQuitKey) private var disconnectOnQuit = true
+
     var body: some View {
         Form {
             Section {
                 Toggle("Verso Drive", isOn: Binding(get: { drive.isOn }, set: { on in Task { await drive.setOn(on) } }))
                     .disabled(app.services == nil || drive.busy)
+                if drive.isOn {
+                    Toggle("Disconnect When Verso Quits", isOn: $disconnectOnQuit)
+                }
             } footer: {
                 Text("Your library as a location in Finder's sidebar, and in every app's Open and Save dialogs. Photos download only when you open them.")
                     .font(.caption).foregroundStyle(.secondary)

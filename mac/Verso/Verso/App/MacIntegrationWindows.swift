@@ -119,6 +119,15 @@ final class MacIntegrationLifecycle: NSObject, NSApplicationDelegate {
         Task { await MacIntegrationRouter.shared.app?.followLaunchArguments() }
         #endif
     }
+    /// Quitting disconnects Verso Drive first, unless switched off in Settings (`VersoDrive.disconnectOnQuit`).
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        Task {
+            await VersoDrive.shared.disconnectForQuit()
+            NSApp.reply(toApplicationShouldTerminate: true)
+        }
+        return .terminateLater
+    }
+
     @objc private func windowBecameKey(_ notification: Notification) {
         guard let window = notification.object as? NSWindow, window.styleMask.contains(.titled),
               NSApp.activationPolicy() != .regular else { return }
