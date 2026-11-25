@@ -306,7 +306,8 @@ Immich Crosslink, the protocol between apps, and the takeover of Immich Mount's 
    building Linux's files (written, not yet run: switched off) (AGENTS.md, "Versioning"), and the rpm and the deb,
    which `build` makes beside the tarball, each in a container of its distribution (ARCHITECTURE.md, "The rpm and the
    deb"), with the packaging matrix that checks them (`lab/packaging/`). `mac/release.sh`, which builds the Mac's disk image signed with Developer ID, notarized and stapled, and Sparkle's
-   update file beside it (`ci/sign-mac-update.sh`). Left: `ios/release.sh`;
+   update file beside it (`ci/sign-mac-update.sh`). `ios/release.sh`, which builds the iPhone and iPad app signed with the four App Store profiles and uploads it
+   for TestFlight with an App Store Connect API key. Left:
    the Flatpak on the workstation, which has no flatpak (the GNOME VM builds it from the source archive `build` leaves
    in `target/dist/`, and it is attached to the drafts by hand); Verso's release check, for the check of a draft,
    built after Immich Mount's (`lab/check/` and `lab/mac/check.sh` in its repository); publishing's rebuild of the
