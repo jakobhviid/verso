@@ -43,6 +43,15 @@ final class FileProviderItem: NSObject, NSFileProviderItem {
     var parentItemIdentifier: NSFileProviderItemIdentifier { NSFileProviderItemIdentifier(bridged: item.parentIdentifier) }
     var filename: String { item.name }
 
+    /// `CACHEDIR.TAG`, which keeps backup tools that honour it (restic, borg, Arq) out of the drive, hidden in Finder
+    /// as any hidden file is; the tools still find it. Not the root alone: the tag is one name wherever it is.
+    var fileSystemFlags: NSFileProviderFileSystemFlags {
+        var flags: NSFileProviderFileSystemFlags = item.isFolder ? [.userReadable, .userExecutable] : [.userReadable]
+        if capabilities.contains(.allowsAddingSubItems) { flags.insert(.userWritable) }
+        if !item.isFolder, item.name == "CACHEDIR.TAG" { flags.insert(.hidden) }
+        return flags
+    }
+
     var contentType: UTType {
         if item.isFolder { return .folder }
         return UTType(filenameExtension: (item.name as NSString).pathExtension) ?? .data

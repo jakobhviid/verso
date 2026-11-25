@@ -202,9 +202,6 @@ video bar stay the iPhone's (the Mac's floating video controls are its own nativ
    `mac/FileProvider/Actions.swift`), not Verso's (`.Drive`); the app neither takes that address nor handles the
    request (Immich Mount's `ReceivedLinks` and `CrosslinkApps`, to port); and Verso's own gallery is to be offered
    among the apps, as on Linux, where Files' menu offers Verso Gallery.
-2. **Verso Drive's `CACHEDIR.TAG` out of sight in Finder:** the tag that keeps backup tools out of the drive shows in
-   its root on the Mac; how to hide it (a hidden flag on the item, a name Finder hides, or no tag where the system
-   already keeps backups out of File Provider locations) is to be settled.
 **Next, with the maintainer at the Mac:** the library and the viewer as they look, the widget, the icons as macOS
 draws them, and the pages built after Linux's designs (ARCHITECTURE, "Verso on the Mac", "Pages after Linux's
 designs"), which build and pass the checks but nobody has looked at yet: a link's page and the photo picker, the Share
