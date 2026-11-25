@@ -707,6 +707,20 @@ the daemon's own look can stop for them.
 3. **Then:** packages from a repository are built without the `package` feature, so they do not look for releases
    themselves (ARCHITECTURE.md, "Updates on Linux").
 
+## An AppImage beside the Flatpak
+
+For the people who prefer an AppImage to a Flatpak: the same Verso as the Flatpak's (the gallery, no Verso Drive, no
+service, no Files menu), for the same systems, older ones like Ubuntu 24.04 among them.
+1. **Built beside the tarball** by `ci/release.sh build`, in the Fedora 44 toolbox, from the same build: go-appimage's
+   deploy mode bundles every library the window needs, the C library with its loader included, so it runs on systems
+   older than the build's; the graphics drivers stay the host's. No GNOME VM, unlike the Flatpak.
+2. **A product of its own** (`verso_core::product`): the Flatpak's feature set without its sandbox, so the sign-in is
+   kept in the keyring as the tarball keeps it, not through the Flatpak's portal.
+3. **Checked in the packaging matrix** (`lab/packaging/`): on Ubuntu 24.04, the window starts under its headless
+   display and signs in to a lab server.
+4. **On the release** as `verso-x86_64.AppImage`, offered on Verso's page and in the notes beside the Flatpak, with
+   a zsync file for AppImage updaters.
+
 ## Watch upstream
 
 - **Blueprint and GTK 5 interface definitions.** The GNOME app's screens are written in Blueprint, which still
