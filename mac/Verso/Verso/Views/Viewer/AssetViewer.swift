@@ -72,6 +72,9 @@ struct AssetViewer: View {
                                 .padding(.vertical, 12)
                         }
                     }
+                    // No scroll bar on a photo's page, as Photos has none: with scroll bars shown always (a mouse), each
+                    // new page took one once its switch settled, and the photo and its details moved sideways.
+                    .scrollIndicators(.never)
                     // A zoomed photo pans with two fingers instead.
                     .scrollDisabled(isZoomed)
                 }
