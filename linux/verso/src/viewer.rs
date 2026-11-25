@@ -280,7 +280,8 @@ pub fn viewer_page(window: &Window, tiles: Vec<Tile>, index: usize, kind: Kind, 
         let Some(bounds) = state.picture.compute_bounds(layer) else { return Vec::new() };
         let frame = (f64::from(bounds.x()), f64::from(bounds.y()), f64::from(bounds.width()), f64::from(bounds.height()));
         let shown = match state.texture.borrow().as_ref() {
-            Some(texture) if state.zoom.get() <= 0.0 => presentation::fitted(f64::from(texture.width()), f64::from(texture.height()), frame),
+            // Where the photo is drawn in the picture, fitted and zoomed alike: zoomed, it may sit centred in a larger one.
+            Some(texture) => presentation::fitted(f64::from(texture.width()), f64::from(texture.height()), frame),
             _ => frame,
         };
         let faces = state.faces.borrow().clone();
@@ -1103,7 +1104,9 @@ impl State {
         };
         let (centre_x, centre_y) = if self.scrolled.hscrollbar_policy() == gtk::PolicyType::Never { (0.5, 0.5) } else { (centre(&h_adjustment), centre(&v_adjustment)) };
         self.scrolled.set_policy(gtk::PolicyType::Automatic, gtk::PolicyType::Automatic);
-        self.picture.set_content_fit(gtk::ContentFit::Fill);
+        // Contain, not Fill: the picture expands to the stage wherever the zoomed photo is still smaller than it, and
+        // filling that stretched the photo (issue #5); contained, it keeps its proportions, centred there.
+        self.picture.set_content_fit(gtk::ContentFit::Contain);
         let (width, height) = ((texture.width() as f64 * zoom) as i32, (texture.height() as f64 * zoom) as i32);
         self.picture.set_size_request(width, height);
         let (h_adjustment, v_adjustment) = (h_adjustment.clone(), v_adjustment.clone());
