@@ -687,6 +687,45 @@ platform. SPEC.md, "Links to Immich", has the map; the protocol's test links
 - **Mac (step 3):** how soon Finder offers or drops an action after an app is installed or removed: the menu bar app
   re-reads the items when it sees an app launch, which an install alone does not do.
 
+## Verso on the Apple TV
+
+A viewer for the living room: the library browsed and watched, nothing changed. It is the iPhone's app in another
+form: the same Rust core through the same Swift bindings, built for tvOS as for iOS, and the iPhone's Swift beside it
+where it applies; one App Store record with the iPhone, the iPad and the Mac (`dev.hviid.Verso`), through TestFlight
+first.
+
+**What it holds,** by priority (not the menu's order): Library, Albums, Search, People, Places, Memories, Favorites
+and Archive. Search is tvOS's own search screen, with its keyboard and the Siri Remote's dictation, answered by
+Immich's smart search. The Library follows the user's partners as Immich has them set ("show in my timeline"), with no
+setting of its own. Left out on purpose: the Locked Folder and editing, uploads and backup, Verso Drive, sharing,
+the trash and administration. No zoom and no pinch between sizes: one grid size for the sofa, and the photo fills the
+screen. The places sit in tvOS's sidebar-style tab view.
+
+**Sign-in, from the iPhone alone.** The TV never asks for a server, a password or an OIDC sign-in, and the user never
+sees an API key:
+- the iPhone's **Set Up Apple TV** makes a key of the TV's own through the phone's sign-in (`POST /api-keys`, which
+  every user may do), named for the TV ("Verso on Apple TV (Living room)") and allowed to read only: view, download
+  the full-size image, search, albums, people, memories, the timeline. Not the phone's session passed on: that would
+  sign the TV out with the phone, could not be revoked for the TV alone, and could change and delete, and reach the
+  Locked Folder once the phone's PIN was given. A key never reaches the Locked Folder, which needs a PIN-elevated
+  session.
+- it travels to the TV over the local network with Apple's DeviceDiscoveryUI (tvOS 16 and later): the TV offers
+  "Set up with your iPhone", the iPhone running Verso shows up, and the person accepts on the phone.
+- the TV keeps it in its Keychain; **Forget This Apple TV** on the phone, or deleting the key in Immich, ends it
+  without touching the phone.
+
+**Steps:**
+1. **The core for tvOS:** `mac/build-rust.sh --tvos` (Rust's tvOS targets have no prebuilt standard library: the
+   nightly compiler builds it, `-Z build-std`, for the device and the simulator), and a tvOS target sharing the
+   iPhone's Swift.
+2. **Sign-in:** the iPhone's Set Up Apple TV and the TV's side of DeviceDiscoveryUI, first, as the riskiest piece.
+3. **The places and the viewer,** built for focus and the remote: the Library by years and months as rows of large
+   tiles, Memories playing as slideshows, the covers of Albums, People and Places (cities, not a map), Search,
+   Favorites and Archive; the viewer with Immich's full-size image on a 4K screen (the preview first), Live Photos and
+   video through AVPlayer, HDR included; a Top Shelf extension with memories or recent photos; a TestFlight build.
+
+Thumbnails live in the cache, which tvOS may empty when space runs low; they are fetched again.
+
 ## Linux, to match the Mac
 
 Changes made on the Mac in 0.74.0 and 0.75.0, each to be reviewed against Verso on Linux and discussed with the
