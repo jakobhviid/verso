@@ -82,14 +82,17 @@ struct TVSetUpView: View {
 struct TVItem: Identifiable, Hashable, Sendable {
     let id: String
     let isVideo: Bool
+    /// A Live Photo's movie, which the remote's play/pause plays.
+    var livePhotoVideoID: String?
 
-    init(id: String, isVideo: Bool) {
+    init(id: String, isVideo: Bool, livePhotoVideoID: String? = nil) {
         self.id = id
         self.isVideo = isVideo
+        self.livePhotoVideoID = livePhotoVideoID
     }
 
     init(_ asset: AssetResponse) {
-        self.init(id: asset.id, isVideo: asset.type == .video)
+        self.init(id: asset.id, isVideo: asset.type == .video, livePhotoVideoID: asset.livePhotoVideoId)
     }
 }
 
@@ -119,7 +122,10 @@ struct TVTimeline: View {
                     VStack(alignment: .leading, spacing: 20) {
                         Text(TVFormat.month(bucket.timeBucket)).font(.title3).bold()
                         TVItemGrid(items: items[bucket.timeBucket] ?? []) { index in
-                            viewing = TVViewing(items: items[bucket.timeBucket] ?? [], index: index)
+                            // The months read so far, in order, so the viewer steps on past this one.
+                            let before = buckets.prefix { $0.timeBucket != bucket.timeBucket }
+                                .reduce(0) { $0 + (items[$1.timeBucket]?.count ?? 0) }
+                            viewing = TVViewing(items: buckets.flatMap { items[$0.timeBucket] ?? [] }, index: before + index)
                         }
                     }
                     .task { await load(bucket.timeBucket) }
@@ -134,7 +140,9 @@ struct TVTimeline: View {
 
     private func load(_ bucket: String) async {
         guard items[bucket] == nil, let assets = (try? await model.client?.timeBucket(bucket, query)) ?? nil else { return }
-        items[bucket] = assets.id.indices.map { TVItem(id: assets.id[$0], isVideo: !assets.isImage[$0]) }
+        items[bucket] = assets.id.indices.map {
+            TVItem(id: assets.id[$0], isVideo: !assets.isImage[$0], livePhotoVideoID: assets.livePhotoVideoId[$0])
+        }
     }
 }
 
@@ -370,8 +378,21 @@ struct TVViewer: View {
             default: break
             }
         }
+        .onPlayPauseCommand { playLive() }
         .onExitCommand { dismiss() }
         .task(id: index) { await show() }
+    }
+
+    /// A Live Photo's movie, once, over the photo; then the photo again.
+    private func playLive() {
+        guard items.indices.contains(index), let live = items[index].livePhotoVideoID, let client = model.client else { return }
+        let item = AVPlayerItem(asset: VideoStream.asset(client.videoURL(live), headers: client.credential?.headers ?? [:]))
+        let player = AVPlayer(playerItem: item)
+        self.player = player
+        NotificationCenter.default.addObserver(forName: AVPlayerItem.didPlayToEndTimeNotification, object: item, queue: .main) { _ in
+            Task { @MainActor in if self.player === player { self.player = nil } }
+        }
+        player.play()
     }
 
     private func step(_ by: Int) {

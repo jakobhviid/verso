@@ -721,8 +721,7 @@ full-size image; videos; memories as slideshows), the TV's key in its Keychain, 
 server. **Left:**
 1. **Set Up Apple TV on a real Apple TV and iPhone** (DeviceDiscoveryUI does not run in the Simulator), and the
    Developer ID team's App ID capability it may ask for.
-2. **Live Photos** playing on the viewer's play/pause, and the viewer stepping across the months of a timeline.
-3. **The TV's icon** (tvOS's layered App Icon and Top Shelf image), a **Top Shelf** extension with memories or recent
+2. **The TV's icon** (tvOS's layered App Icon and Top Shelf image), a **Top Shelf** extension with memories or recent
    photos, and a **TestFlight** build (`ios/release.sh` for tvOS, with an App Store profile for the TV).
 
 Thumbnails live in the cache, which tvOS may empty when space runs low; they are fetched again.
