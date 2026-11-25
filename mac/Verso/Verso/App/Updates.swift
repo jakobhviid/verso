@@ -24,6 +24,21 @@ enum Updates {
     static func start() { _ = controller }
 }
 
+/// ⌘Q closes Verso's windows and leaves the menu bar icon running, Verso Drive's account with it, as Immich Mount's app
+/// does; Quit Verso in the icon's menu quits it all. The system's own quits (logging out, an update) still quit.
+struct QuitCommands: Commands {
+    var body: some Commands {
+        CommandGroup(replacing: .appTermination) {
+            Button("Quit Verso Gallery") {
+                for window in NSApp.windows where window.isVisible && window.styleMask.contains(.titled) { window.close() }
+                // No window left: the Dock icon goes too, until a window opens again (MacIntegrationLifecycle).
+                NSApp.setActivationPolicy(.accessory)
+            }
+            .keyboardShortcut("q")
+        }
+    }
+}
+
 struct UpdateCommands: Commands {
     var body: some Commands {
         CommandGroup(after: .appInfo) {

@@ -108,6 +108,9 @@ final class MacIntegrationLifecycle: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         MacSelectAll.install()
         Updates.start()
+        // A window opening after Quit Verso Gallery brings the Dock icon and the menus back.
+        NotificationCenter.default.addObserver(self, selector: #selector(windowBecameKey(_:)),
+                                               name: NSWindow.didBecomeKeyNotification, object: nil)
         AppIconChoice.applyAtLaunch() // the app icon's looks chosen in Settings, in the Dock
         cleanupTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in MacTransferCache.prune() }
         // A widget click can launch the app without a library window, whose view would restore the account.
@@ -116,6 +119,13 @@ final class MacIntegrationLifecycle: NSObject, NSApplicationDelegate {
         Task { await MacIntegrationRouter.shared.app?.followLaunchArguments() }
         #endif
     }
+    @objc private func windowBecameKey(_ notification: Notification) {
+        guard let window = notification.object as? NSWindow, window.styleMask.contains(.titled),
+              NSApp.activationPolicy() != .regular else { return }
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate()
+    }
+
     func applicationWillTerminate(_ notification: Notification) {
         MacQuickLook.shared.dismiss()
         MacTransferCache.prune()

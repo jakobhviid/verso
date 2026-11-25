@@ -23,14 +23,17 @@ struct AccountMenu: View {
     @Environment(\.openSettings) private var openSettings
     @Environment(\.openWindow) private var openWindow
     @AppStorage(AccountSettingsTabs.selectionKey) private var settingsTab = "general"
+    @State private var serverVersion: String?
 
     var body: some View {
         Menu {
             if let user = services.user {
                 Text(user.email)
-                if let storage = storageText(user) { Text(storage) }
-                Divider()
+                if let storage = AccountMenu.storageText(user) { Text(storage) }
             }
+            Text(services.client.serverURL.absoluteString)
+            if let serverVersion { Text("Immich \(serverVersion)") }
+            Divider()
             Button("Account Settings…") { settingsTab = "account"; openSettings() }
             // The app's Settings, also in the app menu (⌘,), found with the account's own.
             Button("Settings…") { openSettings() }
@@ -47,9 +50,13 @@ struct AccountMenu: View {
         .menuIndicator(.hidden)
         .frame(maxWidth: .infinity, alignment: .leading)
         .help("Account")
+        .task(id: services.client.serverURL) {
+            if let version = try? await services.client.serverVersion() { serverVersion = version.description }
+        }
     }
 
-    private func storageText(_ user: User) -> String? {
+    /// The storage used, and of how much where the account has a quota: under the name, and in the menu.
+    static func storageText(_ user: User) -> String? {
         guard let used = user.quotaUsageInBytes else { return nil }
         let usedText = used.formatted(.byteCount(style: .file))
         if let quota = user.quotaSizeInBytes, quota > 0 {
@@ -67,8 +74,10 @@ private struct AccountMenuLabel: View {
             AccountAvatar(services: services, size: 28)
             VStack(alignment: .leading, spacing: 1) {
                 Text(displayName).lineLimit(1)
-                Text(services.client.serverURL.host() ?? services.client.serverURL.absoluteString)
-                    .font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                // The storage used, which says more at a glance than the server's address, now in the menu.
+                if let storage = services.user.flatMap(AccountMenu.storageText) {
+                    Text(storage).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                }
             }
             Spacer(minLength: 0)
             // Says that it opens, and where: the account's menu, with Settings, opens upward from the sidebar's foot.

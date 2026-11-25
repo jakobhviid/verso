@@ -61,6 +61,8 @@ private struct VersoMenu: View {
             Divider()
         }
         SettingsLink { Text("Settings…") }
+        Button("Check for Updates…") { Updates.controller.checkForUpdates(nil) }
+            .disabled(!Updates.enabled)
         Divider()
         Button("Quit Verso") { NSApp.terminate(nil) }
             .keyboardShortcut("q")
