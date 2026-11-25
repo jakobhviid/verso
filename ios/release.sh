@@ -3,7 +3,10 @@
 # the App Store, never on GitHub) and upload it to App Store Connect, where TestFlight takes it once Apple has
 # processed it. On the maintainer's Mac in a Terminal window, where the login keychain is open (the mac-dev skill).
 #
-#   ios/release.sh [--no-upload]
+#   ios/release.sh [--tvos] [--no-upload]
+#
+# --tvos builds Verso on the Apple TV instead (the VersoTV target), signed with its App Store profile, "Verso TV App
+# Store Provisioning Profile" (tvOS, for dev.hviid.Verso), into the same App Store record.
 #
 # The archive is signed for the App Store with the four App Store profiles, made in the developer portal and installed,
 # and the export uploads it with an App Store Connect API key. It reads from the environment:
@@ -16,11 +19,14 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 upload=yes
-case "${1:-}" in
-  "") ;;
-  --no-upload) upload=no ;;
-  *) echo "usage: ios/release.sh [--no-upload]" >&2; exit 2 ;;
-esac
+tvos=no
+for argument in "$@"; do
+  case "$argument" in
+    --no-upload) upload=no ;;
+    --tvos) tvos=yes ;;
+    *) echo "usage: ios/release.sh [--tvos] [--no-upload]" >&2; exit 2 ;;
+  esac
+done
 : "${TEAM_ID:?TEAM_ID is the Apple Developer Program team}"
 if [ "$upload" = yes ]; then
   : "${ASC_KEY_ID:?ASC_KEY_ID is the App Store Connect API key's ID}"
@@ -33,15 +39,26 @@ archive="$out/Verso.xcarchive"
 rm -rf "$out"
 mkdir -p "$out"
 
-../mac/build-rust.sh release --ios
+../mac/build-rust.sh release --ios --tvos
 xcodegen -q
 # Signed with the App Store profiles from the start: Xcode makes no profiles for an individual membership's Admin
 # role ("No Accounts"), so nothing is signed automatically.
-xcodebuild archive -quiet -project Verso.xcodeproj -scheme Verso -configuration Release \
-  -destination 'generic/platform=iOS' -archivePath "$archive" DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Manual \
-  CODE_SIGN_IDENTITY="Apple Distribution" APP_PROFILE="Verso App Store Provisioning Profile" \
-  DRIVE_PROFILE="Verso Drive App Store Provisioning Profile" MESSAGES_PROFILE="Verso Messages App Store Provisioning Profile" \
-  WIDGETS_PROFILE="Verso Widgets App Store Provisioning Profile"
+if [ "$tvos" = yes ]; then
+  xcodebuild archive -quiet -project Verso.xcodeproj -scheme VersoTV -configuration Release \
+    -destination 'generic/platform=tvOS' -archivePath "$archive" DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Manual \
+    CODE_SIGN_IDENTITY="Apple Distribution" TV_PROFILE="Verso TV App Store Provisioning Profile"
+  profiles="<key>dev.hviid.Verso</key><string>Verso TV App Store Provisioning Profile</string>"
+else
+  xcodebuild archive -quiet -project Verso.xcodeproj -scheme Verso -configuration Release \
+    -destination 'generic/platform=iOS' -archivePath "$archive" DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Manual \
+    CODE_SIGN_IDENTITY="Apple Distribution" APP_PROFILE="Verso App Store Provisioning Profile" \
+    DRIVE_PROFILE="Verso Drive App Store Provisioning Profile" MESSAGES_PROFILE="Verso Messages App Store Provisioning Profile" \
+    WIDGETS_PROFILE="Verso Widgets App Store Provisioning Profile"
+  profiles="<key>dev.hviid.Verso</key><string>Verso App Store Provisioning Profile</string>
+    <key>dev.hviid.Verso.Drive</key><string>Verso Drive App Store Provisioning Profile</string>
+    <key>dev.hviid.Verso.Messages</key><string>Verso Messages App Store Provisioning Profile</string>
+    <key>dev.hviid.Verso.Widgets</key><string>Verso Widgets App Store Provisioning Profile</string>"
+fi
 
 # Each part with its App Store profile: the App Group and the Keychain group they share are entitlements only a
 # profile grants.
@@ -57,10 +74,7 @@ cat >"$out/export.plist" <<PLIST
   <key>signingCertificate</key><string>Apple Distribution</string>
   <key>provisioningProfiles</key>
   <dict>
-    <key>dev.hviid.Verso</key><string>Verso App Store Provisioning Profile</string>
-    <key>dev.hviid.Verso.Drive</key><string>Verso Drive App Store Provisioning Profile</string>
-    <key>dev.hviid.Verso.Messages</key><string>Verso Messages App Store Provisioning Profile</string>
-    <key>dev.hviid.Verso.Widgets</key><string>Verso Widgets App Store Provisioning Profile</string>
+    $profiles
   </dict>
   <key>manageAppVersionAndBuildNumber</key><false/>
 </dict>

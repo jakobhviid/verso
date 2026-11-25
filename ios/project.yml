@@ -325,6 +325,8 @@ targets:
         PRODUCT_NAME: $(IMMICH_APP_NAME)
         PRODUCT_MODULE_NAME: VersoTV
         TARGETED_DEVICE_FAMILY: "3"
+        # The App Store profile ios/release.sh --tvos names; empty in a development build, signed automatically.
+        PROVISIONING_PROFILE_SPECIFIER: $(TV_PROFILE)
         # tvOS's layered icon and Top Shelf images, drawn by TV/make-tv-icons.py.
         ASSETCATALOG_COMPILER_APPICON_NAME: App Icon & Top Shelf Image
         INFOPLIST_FILE: Config/TV-Info.plist

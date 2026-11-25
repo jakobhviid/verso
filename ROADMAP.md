@@ -720,7 +720,9 @@ server. **Left:**
 1. **Set Up Apple TV on a real Apple TV and iPhone** (DeviceDiscoveryUI does not run in the Simulator), and the
    Developer ID team's App ID capability it may ask for.
 2. A **Top Shelf** extension with memories or recent photos (the static Top Shelf image is there), and a **TestFlight**
-   build (`ios/release.sh` for tvOS, with an App Store profile for the TV).
+   build: `ios/release.sh --tvos` builds and uploads it once the TV's App Store profile exists (the maintainer's, in
+   the developer portal: App Store Connect, tvOS, for `dev.hviid.Verso`, named "Verso TV App Store Provisioning
+   Profile").
 
 Thumbnails live in the cache, which tvOS may empty when space runs low; they are fetched again.
 
