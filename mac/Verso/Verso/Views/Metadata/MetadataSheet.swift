@@ -70,7 +70,8 @@ struct MetadataDateEditor: View {
                     .environment(\.timeZone, timeZone)
                 if ids.count > 1 { Text("All selected items will receive the same date and time.").font(.caption) }
             }
-            Picker("Time zone", selection: Binding(get: { zone }, set: changeTimeZone)) {
+            // A closure, not the method itself: Xcode 26's compiler crashed turning it into the binding's setter.
+            Picker("Time zone", selection: Binding(get: { zone }, set: { changeTimeZone($0) })) {
                 if !TimeZone.knownTimeZoneIdentifiers.contains(zone) { Text(zone).tag(zone) }
                 ForEach(TimeZone.knownTimeZoneIdentifiers, id: \.self) { name in Text(name).tag(name) }
             }
