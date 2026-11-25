@@ -121,6 +121,9 @@ final class MacIntegrationLifecycle: NSObject, NSApplicationDelegate {
     }
     /// Quitting disconnects Verso Drive first, unless switched off in Settings (`VersoDrive.disconnectOnQuit`).
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        // A drag still under way holds promised originals, which AppKit delivers before quitting and, with no
+        // receiver, waits for for ever (issue #2): the drag's pasteboard is emptied first.
+        NSPasteboard(name: .drag).clearContents()
         Task {
             await VersoDrive.shared.disconnectForQuit()
             NSApp.reply(toApplicationShouldTerminate: true)

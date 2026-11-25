@@ -651,6 +651,9 @@ final class PhotoGridScrollView: NSScrollView {
         switch press {
         case .photo(_, let place, let start, _):
             guard hypot(point.x - start.x, point.y - start.y) > 3 else { return }
+            // Not once the viewer has opened over the grid: a double-click's second press, moved a little, would drag
+            // the photo out under it, and a Quit during that drag waited for its promised file for ever (issue #2).
+            guard model?.viewerID == nil else { press = nil; return }
             press = .dragging
             beginDrag(from: place, event: event)
         case .space(let start, let base, let mode, _):
