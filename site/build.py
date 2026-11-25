@@ -74,7 +74,33 @@ def asset_url(release, name):
     return None
 
 
-def appcast(mac, disk_image):
+def mac_notes(releases):
+    """The update window's notes: the macOS section of each release with a disk image, newest first (the latest
+    three), as one small page in the system's font, for Sparkle to show as it is. Empty when none has one."""
+    parts = []
+    for release in [r for r in releases if any(re.fullmatch(DISK_IMAGE, a["name"]) for a in r.get("assets", []))][:3]:
+        body = release.get("body") or ""
+        found = re.search(r"^## macOS\s*\n(.*?)(?=^## |\Z)", body, re.M | re.S)
+        if not found:
+            continue
+        blocks = []
+        for block in re.split(r"\n\s*\n", found.group(1).strip()):
+            lines = [line for line in block.splitlines() if line.strip()]
+            inline = lambda text: re.sub(r"`([^`]+)`", r"<code>\1</code>", html.escape(text))
+            if lines and all(line.lstrip().startswith("- ") for line in lines):
+                blocks.append("<ul>" + "".join(f"<li>{inline(line.lstrip()[2:])}</li>" for line in lines) + "</ul>")
+            else:
+                blocks.append(f"<p>{inline(' '.join(lines))}</p>")
+        parts.append(f"<h3>Verso {html.escape(release['tag_name'].lstrip('v'))}</h3>" + "".join(blocks))
+    if not parts:
+        return ""
+    style = ("<style>:root{color-scheme:light dark}body{font:13px -apple-system,sans-serif;margin:8px 10px}"
+             "h3{font-size:13px;margin:12px 0 4px}h3:first-child{margin-top:0}p,ul{margin:4px 0}"
+             "code{font:12px ui-monospace,monospace}</style>")
+    return '<!doctype html><meta charset="utf-8">' + style + "".join(parts)
+
+
+def appcast(mac, disk_image, notes=""):
     """Sparkle's feed with the one update, from the disk image's update file (ci/sign-mac-update.sh): the version
     Sparkle compares is the build number, and the disk image's size and signature are what the app checks before
     installing it. None when the release carries no update file."""
@@ -88,6 +114,8 @@ def appcast(mac, disk_image):
     size = next(asset["size"] for asset in mac["assets"] if asset["name"] == name)
     version = mac["tag_name"].lstrip("v")
     published = datetime.fromisoformat(mac["published_at"].replace("Z", "+00:00"))
+    # CDATA keeps the notes' HTML as it is; their text is escaped, so "]]>" cannot occur in it.
+    description = f"      <description><![CDATA[{notes}]]></description>\n" if notes else ""
     return f"""<?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
   <channel>
@@ -99,8 +127,7 @@ def appcast(mac, disk_image):
       <sparkle:version>{html.escape(update["build"])}</sparkle:version>
       <sparkle:shortVersionString>{html.escape(version)}</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-      <sparkle:releaseNotesLink>{html.escape(mac["html_url"])}</sparkle:releaseNotesLink>
-      <enclosure url="{html.escape(disk_image)}" length="{size}" type="application/octet-stream"
+{description}      <enclosure url="{html.escape(disk_image)}" length="{size}" type="application/octet-stream"
                  sparkle:edSignature="{html.escape(update["signature"])}"/>
     </item>
   </channel>
@@ -298,7 +325,7 @@ def main(releases_file, output, app_store=None, testflight=None):
     (output / "photos.html").write_text(photo_credits())
     # What a Linux package from this page looks at to tell of a newer release (ARCHITECTURE.md, "Updates on Linux").
     (output / "latest.json").write_text(json.dumps({"version": version, "page": PAGE}) + "\n")
-    feed = appcast(mac, disk_image) if disk_image else None
+    feed = appcast(mac, disk_image, mac_notes(releases)) if disk_image else None
     if feed:
         (output / "appcast.xml").write_text(feed)
     for name in ("style.css", "mark.svg", "llms.txt"):
