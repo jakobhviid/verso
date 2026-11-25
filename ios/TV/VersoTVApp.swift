@@ -56,8 +56,15 @@ final class TVModel {
     /// on the iPhone and the Mac, until the iPhone's Set Up Apple TV hands the key over.
     private func followLaunchArguments() {
         let defaults = UserDefaults.standard
-        guard let server = defaults.string(forKey: "signInServer"), let key = defaults.string(forKey: "signInAPIKey") else { return }
-        signIn(TVAccount(server: server, key: key))
+        guard let server = defaults.string(forKey: "signInServer"), let url = URL(string: server) else { return }
+        if let key = defaults.string(forKey: "signInAPIKey") {
+            signIn(TVAccount(server: server, key: key))
+        } else if let token = defaults.string(forKey: "signInAccessToken") {
+            // A session from logging in (`-signInAccessToken`), for servers such as Immich's demo that make no keys.
+            let client = ImmichClient(serverURL: url, apiURL: url.appendingPathComponent("api"), credential: .accessToken(token))
+            self.client = client
+            images = ImagePipeline(client: client)
+        }
     }
     #endif
 }
