@@ -40,6 +40,8 @@ FLATPAK = "verso-x86_64.flatpak"
 RPM = "verso-{version}.x86_64.rpm"
 DEB = "verso_{version}_amd64.deb"
 DISK_IMAGE = r"(?i)verso[-_ ].*\.dmg"
+# Verso's public TestFlight link, for the iPhone and the iPad until the App Store has Verso.
+TESTFLIGHT = "https://testflight.apple.com/join/7z1ppMM8"
 
 # The brand and each platform's icon for that platform (DESIGN.md, "The website"): Mist on Day paper in both
 # appearances, as people know the icon from their system.
@@ -256,7 +258,7 @@ def photo_credits():
 """
 
 
-def main(releases_file, output, app_store=None, testflight=None):
+def main(releases_file, output, app_store=None, testflight=TESTFLIGHT):
     releases = published(json.loads(Path(releases_file).read_text()))
     linux, tarball = newest_with(releases, re.escape(TARBALL))
     if linux is None:
@@ -284,7 +286,10 @@ def main(releases_file, output, app_store=None, testflight=None):
         ios = "".join([
             f'<p><a class="button" href="{html.escape(app_store)}">Download on the App Store</a></p>' if app_store else "",
             f'<p>Or try the next version first, in <a href="{html.escape(testflight)}">TestFlight</a>.</p>'
-            if testflight else "",
+            if testflight and app_store else "",
+            f'<p><a class="button" href="{html.escape(testflight)}">Join the beta in TestFlight</a></p>'
+            '<p class="small">Install Apple\'s TestFlight app, open the link on the iPhone or the iPad, and accept.</p>'
+            if testflight and not app_store else "",
         ])
     else:
         ios = (
@@ -303,6 +308,9 @@ def main(releases_file, output, app_store=None, testflight=None):
         "tarball": link(tarball, f"The tarball, {TARBALL}"),
         "flatpak": link(asset_url(linux, FLATPAK), f"The Flatpak, {FLATPAK}"),
         "macos": macos,
+        "ios_status": ('<span class="status out">App Store</span>' if app_store
+                       else '<span class="status out">TestFlight</span>' if testflight
+                       else '<span class="status soon">Coming</span>'),
         "mac_status": '<span class="status out">Released</span>' if disk_image else '<span class="status soon">Coming</span>',
         "ios": ios,
     }
@@ -352,6 +360,6 @@ if __name__ == "__main__":
     parser.add_argument("releases", help="the releases, as gh api repos/jakobhviid/verso/releases writes them")
     parser.add_argument("output")
     parser.add_argument("--app-store", help="Verso's page in the App Store, once it is there")
-    parser.add_argument("--testflight", help="Verso's public TestFlight link, once there is one")
+    parser.add_argument("--testflight", default=TESTFLIGHT, help="Verso's public TestFlight link")
     arguments = parser.parse_args()
     main(arguments.releases, arguments.output, arguments.app_store, arguments.testflight)
