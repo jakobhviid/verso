@@ -117,4 +117,6 @@ jobs:
           xcodebuild -project Verso.xcodeproj -scheme Verso -configuration Debug -destination 'platform=macOS' \
             CODE_SIGNING_ALLOWED=NO build
       - name: The app's offline checks
+        # A minute on the maintainer's Mac: a check that waits on something the runner lacks fails here, with its log.
+        timeout-minutes: 15
         run: cd mac/Verso && python3 check.py
