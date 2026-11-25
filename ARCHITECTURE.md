@@ -2557,8 +2557,8 @@ architectures, joins them with `lipo`, generates the Swift bindings with uniffi 
 XcodeGen writes the Xcode project from `mac/Verso/project.yml`, so the project is a text file that reviews well. The
 team ID stays out of the repository, in the git-ignored `mac/Config/Local.xcconfig`. **CI's `macos` job builds all of
 it on GitHub's macOS runner,** unsigned, and runs the core's and the bridge's tests and the app's offline checks, so a
-Rust change is checked against the Swift side without a Mac at hand; while `ci.yml` is switched off (ROADMAP, M9), the Mac runs
-the same steps (the mac-dev skill).
+Rust change is checked against the Swift side without a Mac at hand; the Mac runs the same steps too (the mac-dev
+skill).
 
 **The development build** is Verso Dev (`mac/Verso/dev-app.sh`; AGENTS.md, "Development environment"), with an
 identity of its own from the Debug configuration (`dev.hviid.Verso.Dev`, with its App Group, Keychain group, URL

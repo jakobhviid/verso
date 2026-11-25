@@ -101,9 +101,11 @@ on any step shows what it would do and changes nothing outside the checkout:
    where `flatpak-builder` is) into `target/dist/TAG`, and makes a draft release
    of them, "Verso 0.72.0 (Linux)", here, which Homebrew's `verso` cask and Verso's page download from. The release
    workflow
-   (`.github/workflows/release.yml`) runs this step on a pushed tag, once GitHub Actions is on in this repository.
-   The workstation has no flatpak: there the Flatpak is built in the GNOME VM from the source archive and attached to
-   both drafts, as the step prints.
+   (`.github/workflows/release.yml`) runs this step on every pushed tag, the Flatpak included, and adds the Mac's disk
+   image, signed and notarized, once the Mac's secrets are set (its `macos` job names them); so after `tag`, this
+   step is the workflow's, not the workstation's. By hand, the workflow rehearses a tag with `--dry-run`. On the
+   workstation, which has no flatpak, the Flatpak is built in the GNOME VM from the source archive, as the step
+   prints.
 4. The maintainer checks the draft, installed in the lab's desktop VMs, and `ci/release.sh publish TAG` publishes both
    drafts and bumps the cask in `jakobhviid/homebrew-tap`.
 
@@ -138,14 +140,14 @@ cargo check -p immich-api -p verso-core --no-default-features --target aarch64-a
 CI (`.github/workflows/ci.yml`) runs the first two lines with `--exclude verso` on Ubuntu, and checks Verso's window
 separately in a `fedora:44` container, because it needs GTK 4.18, libadwaita 1.8 and `blueprint-compiler`, and builds
 the Files extension there. It also checks the translations against the sources (`python3 po/i18n.py check`) and runs
-`immich-api`'s contract tests against Immich in Docker. In this repository GitHub Actions runs only the page's
-workflow (`pages.yml`): `ci.yml` and `release.yml` are switched off until they have been run through once, so the
-local gate is the only one. The toolbox has every library, so the local gate
-covers the whole workspace.
+`immich-api`'s contract tests against Immich in Docker. CI runs on every push to `main` and on pull requests, a newer
+push cancelling an older run; the local gate still comes first, before every push. The toolbox has every library,
+so the local gate covers the whole workspace.
 
 The macOS side (`mac/`, and the bridge built for macOS) has no gate on Linux. CI's `macos` job builds the app and its
-extensions unsigned and runs `mac/Verso/check.py` on a Mac runner; while `ci.yml` is off, a change to it is built and
-checked on the Mac (the `mac-dev` skill).
+extensions unsigned and runs `mac/Verso/check.py` on a Mac runner, with the newest Xcode GitHub has (older than the
+Mac's: what both compile is what CI checks); a change to it is still built and checked on the Mac (the `mac-dev`
+skill).
 
 There is deliberately no `cargo fmt` gate. Readability is a review concern; readable names are required (no
 single-letter bindings), per the house style.

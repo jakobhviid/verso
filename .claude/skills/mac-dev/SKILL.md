@@ -19,7 +19,7 @@ The Mac is a personal laptop the maintainer carries and uses every day, not a la
   `mac/Verso/build/`.
 - **Do on Linux what Linux can do:** Rust builds and tests, the bridge's lab tests, docs. The Mac is for the bridge's
   Mac build, Xcode builds, `check.py` and `check-core.sh`, running the app and its extensions, Finder and logs. CI's
-  `macos` job builds the Swift side unsigned, but that workflow is switched off in this repository, so a change to `mac/` is
+  `macos` job builds the Swift side unsigned, with GitHub's newest Xcode, which is older than the Mac's, so a change to `mac/` is
   built and checked on the Mac.
 - **It may be asleep or away:** start with a short SSH command, and never assume it is there.
 - **Test with Verso Dev, never a release build:** the Debug build has an identity of its own (AGENTS.md,

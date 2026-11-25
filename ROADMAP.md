@@ -119,10 +119,8 @@ the import panel, Change Password and the profile picture.
    - a map whose tiles allow the traffic: done, Linux's maps draw the Immich server's own map setting (ARCHITECTURE,
      "Verso's window", the map)
    - every release built by the release workflow (`.github/workflows/release.yml`), as Immich Mount's are, in place
-     of the builds on the workstation: in this repository Actions runs only the page's workflow, and `ci.yml` and
-     `release.yml` are switched off. It builds the tarball, the rpm,
-     the deb and the Flatpak; the Mac's disk image, signed and notarized on GitHub's Mac runner, joins it (M9, step
-     6)
+     of the builds on the workstation: built (Linux's files with the Flatpak, and the Mac's disk image once the Mac's
+     secrets are set); left, its first run on a tag, after a rehearsal by hand (`--dry-run`), and the secrets
    - decided with the maintainer:
      - **The history:** public since 2026-11-24, with what came before 23 November at 13:45 in one commit and
        the commits since kept, tagged from `v0.72.1`. The whole earlier history, every branch, tag and release's
@@ -293,7 +291,7 @@ Immich Crosslink, the protocol between apps, and the takeover of Immich Mount's 
    that may come, which takes the drive's Plasma integration from Immich Mount's repository ("Parked on purpose").
 6. Releases cut by a tag, Linux and the Mac together (below). Built: `ci/release.sh` with every step and `--dry-run`,
    `ci/version.sh`, the Mac's and iOS's build number as the build's UTC time, and `.github/workflows/release.yml`
-   building Linux's files (written, not yet run: switched off) (AGENTS.md, "Versioning"), and the rpm and the deb,
+   building Linux's files and the Mac's (AGENTS.md, "Versioning"), and the rpm and the deb,
    which `build` makes beside the tarball, each in a container of its distribution (ARCHITECTURE.md, "The rpm and the
    deb"), with the packaging matrix that checks them (`lab/packaging/`). `mac/release.sh`, which builds the Mac's disk image signed with Developer ID, notarized and stapled, and Sparkle's
    update file beside it (`ci/sign-mac-update.sh`). `ios/release.sh`, which builds the iPhone and iPad app signed with the four App Store profiles and uploads it

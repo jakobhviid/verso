@@ -7,6 +7,16 @@ name: release
 on:
   push:
     tags: ["v[0-9]*"]
+  # A rehearsal by hand: every file built from a tag, and no draft made, nothing attached (ci/release.sh --dry-run).
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "The tag to build, such as v0.75.0"
+        required: true
+      dry_run:
+        description: "Build only: no draft, nothing attached"
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -28,12 +38,14 @@ jobs:
         with:
           # The whole history and the tags: ci/version.sh numbers the tree from them.
           fetch-depth: 0
-      - name: Build, and make the draft releases
+      - name: Build, and make the draft release
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag || github.ref_name }}
+          DRY_RUN: ${{ inputs.dry_run && '--dry-run' || '' }}
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          ci/release.sh build "$GITHUB_REF_NAME"
+          ci/release.sh build "$TAG" $DRY_RUN
 
   macos:
     # The Mac's disk image (mac/release.sh), on the draft the linux job made. Its secrets (Settings, Secrets and
@@ -46,7 +58,8 @@ jobs:
     runs-on: macos-26
     env:
       GH_TOKEN: ${{ github.token }}
-      TAG: ${{ github.ref_name }}
+      TAG: ${{ inputs.tag || github.ref_name }}
+      DRY_RUN: ${{ inputs.dry_run && 'yes' || '' }}
     steps:
       - name: The Mac's secrets
         id: secrets
@@ -63,6 +76,7 @@ jobs:
         if: steps.secrets.outputs.present == 'yes'
         with:
           fetch-depth: 0
+          ref: ${{ inputs.tag || github.ref }}
       - name: The newest Xcode, and the tools
         if: steps.secrets.outputs.present == 'yes'
         run: |
@@ -117,7 +131,7 @@ jobs:
           APP_PROFILE="Verso Provisioning Profile" EXTENSION_PROFILE="Verso Drive Provisioning Profile" \
             NOTARY_KEY="$RUNNER_TEMP/keys/notary.p8" mac/release.sh
       - name: Signed for Sparkle, and on the draft
-        if: steps.secrets.outputs.present == 'yes'
+        if: steps.secrets.outputs.present == 'yes' && env.DRY_RUN != 'yes'
         run: |
           version=${TAG#v}
           dmg="mac/build/release/verso-$version.dmg"
