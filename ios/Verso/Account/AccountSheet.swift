@@ -89,6 +89,11 @@ struct AccountSheet: View {
                     } label: {
                         Label("Password and Security", systemImage: "lock")
                     }
+                    NavigationLink {
+                        AccountAppleTVPage(services: services)
+                    } label: {
+                        Label("Set Up Apple TV", systemImage: "appletv")
+                    }
                     if services.user?.isAdmin == true {
                         NavigationLink {
                             AccountAdministrationPage(services: services)

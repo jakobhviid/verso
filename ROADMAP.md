@@ -714,15 +714,16 @@ sees an API key:
 - the TV keeps it in its Keychain; **Forget This Apple TV** on the phone, or deleting the key in Immich, ends it
   without touching the phone.
 
-**Steps:**
-1. **The core for tvOS:** `mac/build-rust.sh --tvos` (Rust's tvOS targets have no prebuilt standard library: the
-   nightly compiler builds it, `-Z build-std`, for the device and the simulator), and a tvOS target sharing the
-   iPhone's Swift.
-2. **Sign-in:** the iPhone's Set Up Apple TV and the TV's side of DeviceDiscoveryUI, first, as the riskiest piece.
-3. **The places and the viewer,** built for focus and the remote: the Library by years and months as rows of large
-   tiles, Memories playing as slideshows, the covers of Albums, People and Places (cities, not a map), Search,
-   Favorites and Archive; the viewer with Immich's full-size image on a 4K screen (the preview first), Live Photos and
-   video through AVPlayer, HDR included; a Top Shelf extension with memories or recent photos; a TestFlight build.
+**Built** (`ios/TV/`, the `VersoTV` target of the iOS project, with the core's bindings as `VersoCoreTV`): the core for
+tvOS (`mac/build-rust.sh --tvos`), the eight places in tvOS's sidebar-style tab view, the viewer (the preview, then the
+full-size image; videos; memories as slideshows), the TV's key in its Keychain, the iPhone's **Set Up Apple TV**
+(Account) and the TV's **Set Up with iPhone** (DeviceDiscoveryUI's picker); it runs in the tvOS Simulator against a
+server. **Left:**
+1. **Set Up Apple TV on a real Apple TV and iPhone** (DeviceDiscoveryUI does not run in the Simulator), and the
+   Developer ID team's App ID capability it may ask for.
+2. **Live Photos** playing on the viewer's play/pause, and the viewer stepping across the months of a timeline.
+3. **The TV's icon** (tvOS's layered App Icon and Top Shelf image), a **Top Shelf** extension with memories or recent
+   photos, and a **TestFlight** build (`ios/release.sh` for tvOS, with an App Store profile for the TV).
 
 Thumbnails live in the cache, which tvOS may empty when space runs low; they are fetched again.
 

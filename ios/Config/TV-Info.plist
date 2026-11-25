@@ -12,5 +12,22 @@
 	<string>Verso connects to your Immich server, which may be on your local network.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO.</string>
+	<!-- Set Up with iPhone: the iPhones nearby with Verso's Set Up Apple TV open (DeviceDiscoveryUI). -->
+	<key>NSApplicationServices</key>
+	<dict>
+		<key>Browses</key>
+		<array>
+			<dict>
+				<key>NSApplicationServiceIdentifier</key>
+				<string>verso-tv-setup</string>
+				<key>NSApplicationServicePlatformSupport</key>
+				<array>
+					<string>iOS</string>
+				</array>
+				<key>NSApplicationServiceUsageDescription</key>
+				<string>Verso signs in with the iPhone you choose.</string>
+			</dict>
+		</array>
+	</dict>
 </dict>
 </plist>

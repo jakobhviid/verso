@@ -106,5 +106,18 @@
 	     question per build. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- Set Up Apple TV: Verso on an Apple TV finds this iPhone while the page is open (DeviceDiscoveryUI). -->
+	<key>NSApplicationServices</key>
+	<dict>
+		<key>Advertises</key>
+		<array>
+			<dict>
+				<key>NSApplicationServiceIdentifier</key>
+				<string>verso-tv-setup</string>
+				<key>NSApplicationServiceUsageDescription</key>
+				<string>Verso sets up the Apple TV you choose with a key of its own, which may only view your library.</string>
+			</dict>
+		</array>
+	</dict>
 </dict>
 </plist>
