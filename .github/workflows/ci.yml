@@ -1,10 +1,17 @@
 name: ci
 
-# Every branch, main among them, and pull requests: releases are cut by a tag (release.yml, AGENTS.md, "Versioning").
+# main and pull requests (work pushed to other branches reaches main too, and is checked there once); releases are cut
+# by a tag (release.yml, AGENTS.md, "Versioning").
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
+
+# A newer push to the same branch makes an older run's result moot.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   gate:

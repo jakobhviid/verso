@@ -5,17 +5,23 @@
 # Runs on a Mac with the Rust targets added; xcodegen reads the results from mac/build/, for the Mac's project and for
 # iOS's (ios/).
 #
-#   mac/build-rust.sh [debug|release] [--ios]      (release when not given)
+#   mac/build-rust.sh [debug|release] [--ios] [--tvos]      (release when not given)
+#
+# --tvos adds the Apple TV and its Simulator (ROADMAP.md, "Verso on the Apple TV"). Rust ships no standard library for
+# tvOS, so those two are built with the nightly toolchain, which builds its own (`-Z build-std`):
+# `rustup toolchain install nightly --profile minimal --component rust-src`, once.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-usage="usage: mac/build-rust.sh [debug|release] [--ios]"
+usage="usage: mac/build-rust.sh [debug|release] [--ios] [--tvos]"
 profile=release
 ios=no
+tvos=no
 for argument in "$@"; do
   case "$argument" in
     release | debug) profile=$argument ;;
     --ios) ios=yes ;;
+    --tvos) tvos=yes ;;
     *) echo "$usage" >&2; exit 2 ;;
   esac
 done
@@ -32,6 +38,7 @@ export VERSO_VERSION=$(ci/version.sh)
 # ring and oslog both read them. Without them the C parts are built for the SDK's own version, newer than the apps'.
 export MACOSX_DEPLOYMENT_TARGET=15.0
 export IPHONEOS_DEPLOYMENT_TARGET=26.1
+export TVOS_DEPLOYMENT_TARGET=26.0
 
 # Where Homebrew's `rust` formula is installed beside Homebrew's rustup, its cargo comes first on the PATH and has only
 # the host's standard library; rustup's own cargo has both targets. Put it first, for this script only.
@@ -41,6 +48,8 @@ fi
 targets=(aarch64-apple-darwin x86_64-apple-darwin)
 # The iPhone, and the Simulator on an Apple silicon Mac (the only Macs that build Verso for iOS).
 ios_targets=(aarch64-apple-ios aarch64-apple-ios-sim)
+# The Apple TV, and its Simulator on an Apple silicon Mac.
+tvos_targets=(aarch64-apple-tvos aarch64-apple-tvos-sim)
 
 libraries=()
 for target in "${targets[@]}"; do
@@ -53,6 +62,12 @@ platforms=(-library "$out/universal/libverso_bridge.a" -headers "$out/headers")
 if [ "$ios" = yes ]; then
   for target in "${ios_targets[@]}"; do
     cargo build -p verso-bridge --lib "${cargo_profile[@]}" --target "$target"
+    platforms+=(-library "target/$target/$profile/libverso_bridge.a" -headers "$out/headers")
+  done
+fi
+if [ "$tvos" = yes ]; then
+  for target in "${tvos_targets[@]}"; do
+    cargo +nightly build -p verso-bridge --lib "${cargo_profile[@]}" -Z build-std=std,panic_abort --target "$target"
     platforms+=(-library "target/$target/$profile/libverso_bridge.a" -headers "$out/headers")
   done
 fi
@@ -78,4 +93,4 @@ python3 po/i18n.py apple "$out/Localization"
 # between two builds of one version; Config/Base.xcconfig reads them.
 printf 'MARKETING_VERSION = %s\nCURRENT_PROJECT_VERSION = %s\n' "$(ci/version.sh)" "$(date -u +%Y%m%d.%H%M)" \
   > "$out/Version.xcconfig"
-echo "built $out/VersoBridge.xcframework and $out/Generated/verso_bridge.swift ($profile$([ "$ios" = yes ] && echo ', with iOS'))"
+echo "built $out/VersoBridge.xcframework and $out/Generated/verso_bridge.swift ($profile$([ "$ios" = yes ] && echo ', with iOS')$([ "$tvos" = yes ] && echo ', with tvOS'))"
