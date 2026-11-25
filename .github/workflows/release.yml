@@ -1,8 +1,9 @@
 name: release
 
-# A pushed tag (ci/release.sh tag) builds Linux's files and makes the draft release, here and in the mirror, as
-# `ci/release.sh build` does on the workstation; the maintainer checks the draft and publishes it with
-# `ci/release.sh publish` (AGENTS.md, "Versioning").
+# A pushed tag (ci/release.sh tag) builds Linux's files and makes the draft release, as `ci/release.sh build` does on
+# the workstation, the Flatpak included; then the Mac's disk image, signed, notarized and signed for Sparkle, joins the
+# draft when the Mac's secrets are set. The maintainer checks the draft and publishes it with `ci/release.sh publish`
+# (AGENTS.md, "Versioning").
 on:
   push:
     tags: ["v[0-9]*"]
@@ -29,8 +30,114 @@ jobs:
           fetch-depth: 0
       - name: Build, and make the draft releases
         env:
-          # A token that may make releases in this repository.
-          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           ci/release.sh build "$GITHUB_REF_NAME"
+
+  macos:
+    # The Mac's disk image (mac/release.sh), on the draft the linux job made. Its secrets (Settings, Secrets and
+    # variables, Actions): MAC_CERTIFICATE_P12 and MAC_CERTIFICATE_PASSWORD (the Developer ID Application certificate
+    # with its key, exported from Keychain Access, base64), MAC_TEAM_ID, MAC_APP_PROFILE and MAC_DRIVE_PROFILE (the
+    # Developer ID profiles "Verso Provisioning Profile" and "Verso Drive Provisioning Profile", base64), ASC_KEY_P8,
+    # ASC_KEY_ID and ASC_ISSUER_ID (an App Store Connect API key, for the notary service; the .p8 base64), and
+    # SPARKLE_KEY_PEM (Verso's Ed25519 key for Sparkle's updates). Without them the job says so and stops.
+    needs: linux
+    runs-on: macos-26
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ github.ref_name }}
+    steps:
+      - name: The Mac's secrets
+        id: secrets
+        env:
+          CERTIFICATE: ${{ secrets.MAC_CERTIFICATE_P12 }}
+        run: |
+          if [ -z "$CERTIFICATE" ]; then
+            echo "::notice::No Mac secrets: the release carries Linux alone."
+            echo "present=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=yes" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v5
+        if: steps.secrets.outputs.present == 'yes'
+        with:
+          fetch-depth: 0
+      - name: The newest Xcode, and the tools
+        if: steps.secrets.outputs.present == 'yes'
+        run: |
+          newest=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          echo "DEVELOPER_DIR=$newest/Contents/Developer" >> "$GITHUB_ENV"
+          brew install xcodegen openssl@3
+          echo "$(brew --prefix openssl@3)/bin" >> "$GITHUB_PATH"
+      - uses: dtolnay/rust-toolchain@stable
+        if: steps.secrets.outputs.present == 'yes'
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+      - name: The signing keychain, the profiles and the keys
+        if: steps.secrets.outputs.present == 'yes'
+        env:
+          CERTIFICATE: ${{ secrets.MAC_CERTIFICATE_P12 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+          APP_PROFILE_DATA: ${{ secrets.MAC_APP_PROFILE }}
+          DRIVE_PROFILE_DATA: ${{ secrets.MAC_DRIVE_PROFILE }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          SPARKLE_KEY_PEM: ${{ secrets.SPARKLE_KEY_PEM }}
+        run: |
+          keys="$RUNNER_TEMP/keys"
+          mkdir -p "$keys"
+          keychain="$RUNNER_TEMP/release.keychain-db"
+          password=$(uuidgen)
+          security create-keychain -p "$password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$password" "$keychain"
+          echo "$CERTIFICATE" | base64 --decode > "$keys/certificate.p12"
+          security import "$keys/certificate.p12" -P "$CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$keychain"
+          security set-key-partition-list -S apple-tool:,apple: -k "$password" "$keychain" >/dev/null
+          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+          for profile in "$APP_PROFILE_DATA" "$DRIVE_PROFILE_DATA"; do
+            echo "$profile" | base64 --decode > "$keys/profile.provisionprofile"
+            uuid=$(security cms -D -i "$keys/profile.provisionprofile" | plutil -extract UUID raw -)
+            for folder in "$HOME/Library/MobileDevice/Provisioning Profiles" "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"; do
+              mkdir -p "$folder"
+              cp "$keys/profile.provisionprofile" "$folder/$uuid.provisionprofile"
+            done
+          done
+          echo "$ASC_KEY_P8" | base64 --decode > "$keys/notary.p8"
+          printf '%s\n' "$SPARKLE_KEY_PEM" > "$keys/sparkle.pem"
+          echo "KEYCHAIN=$keychain" >> "$GITHUB_ENV"
+      - name: The disk image, signed and notarized
+        if: steps.secrets.outputs.present == 'yes'
+        env:
+          TEAM_ID: ${{ secrets.MAC_TEAM_ID }}
+          NOTARY_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          NOTARY_ISSUER: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          APP_PROFILE="Verso Provisioning Profile" EXTENSION_PROFILE="Verso Drive Provisioning Profile" \
+            NOTARY_KEY="$RUNNER_TEMP/keys/notary.p8" mac/release.sh
+      - name: Signed for Sparkle, and on the draft
+        if: steps.secrets.outputs.present == 'yes'
+        run: |
+          version=${TAG#v}
+          dmg="mac/build/release/verso-$version.dmg"
+          build=$(sed -n 's/^CURRENT_PROJECT_VERSION = //p' mac/build/Version.xcconfig)
+          ci/sign-mac-update.sh "$dmg" "$RUNNER_TEMP/keys/sparkle.pem" "$build"
+          gh release upload "$TAG" "$dmg" "$dmg.update" --clobber
+          # The macOS section covers everything since the previous Mac release, whose users skip the Linux-only ones;
+          # Sparkle's update window shows it (site/build.py).
+          previous=$(gh release list --limit 50 --json tagName,isDraft --jq '.[] | select(.isDraft | not) | .tagName' |
+            while read -r tag; do
+              if gh release view "$tag" --json assets --jq '.assets[].name' | grep -q '\.dmg$'; then echo "$tag"; break; fi
+            done)
+          notes=$(ci/release-notes.sh ${previous:+"$previous"} "$TAG")
+          body=$(gh release view "$TAG" --json body --jq .body)
+          title=$(gh release view "$TAG" --json name --jq .name | sed 's/ (Linux)$/ (Linux and macOS)/')
+          printf '## macOS\n\n`verso-%s.dmg`, for macOS 15 or later, signed and notarized; Verso offers it in Check for Updates…, or `brew upgrade --cask verso`.\n\n%s\n\n## Linux\n\n%s\n' \
+            "$version" "$notes" "$body" > "$RUNNER_TEMP/notes.md"
+          gh release edit "$TAG" --title "$title" --notes-file "$RUNNER_TEMP/notes.md"
+      - name: The keychain and the keys removed
+        if: always() && steps.secrets.outputs.present == 'yes'
+        run: |
+          [ -n "${KEYCHAIN:-}" ] && security delete-keychain "$KEYCHAIN" || true
+          rm -rf "$RUNNER_TEMP/keys"

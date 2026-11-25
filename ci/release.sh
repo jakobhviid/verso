@@ -354,6 +354,8 @@ publish() {
   mac_digest=$(gh release view "$tag" --repo "${repositories[-1]}" --json assets \
     --jq ".assets[] | select(.name == \"verso-$version.dmg\") | .digest")
   bump_cask "$version" "${first_digest#sha256:}" "${mac_digest#sha256:}"
+  # Verso's page, its latest.json and Sparkle's feed follow the release.
+  change gh workflow run pages.yml --repo "$repository" --ref main
 }
 
 case "${1:-}" in
