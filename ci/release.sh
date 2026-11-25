@@ -128,7 +128,7 @@ release_text() {
   printf 'libraries it needs inside it, the C library included, so it runs on systems as old as Ubuntu 24.04. Make it '
   printf 'executable and run it (`chmod +x %s && ./%s`); it needs FUSE 3 (`fusermount3`, which Ubuntu 24.04 has), or run ' \
     "$appimage" "$appimage"
-  printf 'it with `--appimage-extract-and-run`. Videos play without H.264, which no patent-free decoder reads. '
+  printf 'it with `--appimage-extract-and-run`. Videos that need an H.264 or H.265 decoder do not play in it. '
   printf 'AppImage updaters (AppImageUpdate) take its zsync file, `%s.zsync`.\n' "$appimage"
 }
 

@@ -317,11 +317,12 @@ fn run_login(paths: &Paths, password: bool, api_key: bool, server: Option<String
         // A logout turns the user service off; say how to turn it on, unless it already is, and where there is a drive
         // to mount.
         let unit = verso_linux::service::user_service();
-        let enabled = std::process::Command::new("systemctl")
-            .args(["--user", "is-enabled", "--quiet", &unit])
-            .status()
-            .is_ok_and(|status| status.success());
-        if !enabled && verso_core::product::current().drive {
+        let enabled = !verso_core::product::current().drive
+            || std::process::Command::new("systemctl")
+                .args(["--user", "is-enabled", "--quiet", &unit])
+                .status()
+                .is_ok_and(|status| status.success());
+        if !enabled {
             println!("next: `{}` mounts it now and at every login", verso_core::product::command("mount"));
         }
     }
