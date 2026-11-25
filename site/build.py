@@ -258,6 +258,63 @@ def photo_credits():
 """
 
 
+def privacy_page():
+    """Verso's privacy policy, for the App Store, TestFlight and everyone: what Verso keeps, where it connects, and
+    that it collects nothing. SECURITY.md has the details it stands on."""
+    return """<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script>try { const chosen = localStorage.getItem("appearance"); if (chosen) document.documentElement.dataset.theme = chosen; } catch {}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy: Verso for Immich</title>
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="bar wrap" aria-label="Verso">
+    <a class="brand" href="./"><img src="icon.svg" alt="" width="34" height="34"><span>Verso</span><span class="for">for Immich</span></a>
+  </nav>
+  <main class="wrap credits-page">
+    <h1>Privacy</h1>
+    <p class="intro">Verso for Immich is an app for your own Immich server. It collects nothing about you: no
+      analytics, no tracking, no advertising, and no account with us. Your photos and your sign-in stay between your
+      devices and your server.</p>
+    <div class="print">
+      <h2>What Verso connects to</h2>
+      <ul>
+        <li><strong>Your Immich server,</strong> the one you sign in to, and nothing else for your library.</li>
+        <li><strong>Maps:</strong> on the iPhone, the iPad and the Mac, Apple's maps; on Linux, the map your Immich
+          server's settings name (Immich's own unless its admin chose another), which learns the areas you look at.</li>
+        <li><strong>Place names with Apple Maps,</strong> on the iPhone and the iPad, only if you switch it on: the
+          location of a photo you open is sent to Apple to name the place. Off by default; never for the Locked
+          Folder.</li>
+        <li><strong>Updates:</strong> Verso on the Mac, and Verso's rpm and deb on Linux, check this page for a newer
+          version, sending nothing but the request and Verso's version.</li>
+      </ul>
+      <h2>What Verso keeps on your device</h2>
+      <ul>
+        <li><strong>Your sign-in,</strong> a session or an API key (never your password), in the Keychain on Apple's
+          devices and the keyring on Linux.</li>
+        <li><strong>Copies of your photos</strong> it has shown, in the cache, which signing out removes.</li>
+        <li><strong>Backing up the iPhone:</strong> each photo's identifiers and fingerprints, to know what is already
+          on your server; a photo's bytes only while it is being sent.</li>
+      </ul>
+      <h2>What Verso changes on your server</h2>
+      <p>Only what you ask it to: a favourite, an album, a share link, an upload, the trash, and the like.</p>
+      <h2>Questions</h2>
+      <p>Ask on <a href="https://github.com/jakobhviid/verso/issues">Verso's issues</a>, or write to
+        <a href="mailto:jakob@hviid.phd">jakob@hviid.phd</a>. The full account of what Verso holds, sends and changes is
+        in <a href="https://github.com/jakobhviid/verso/blob/main/SECURITY.md">SECURITY.md</a>. Verso is an
+        independent, unofficial project, not affiliated with the Immich project or FUTO.</p>
+    </div>
+  </main>
+</body>
+</html>
+"""
+
+
 def main(releases_file, output, app_store=None, testflight=TESTFLIGHT):
     releases = published(json.loads(Path(releases_file).read_text()))
     linux, tarball = newest_with(releases, re.escape(TARBALL))
@@ -331,6 +388,7 @@ def main(releases_file, output, app_store=None, testflight=TESTFLIGHT):
     (output / "screenshots").mkdir(parents=True)
     (output / "index.html").write_text(page)
     (output / "photos.html").write_text(photo_credits())
+    (output / "privacy.html").write_text(privacy_page())
     # What a Linux package from this page looks at to tell of a newer release (ARCHITECTURE.md, "Updates on Linux").
     (output / "latest.json").write_text(json.dumps({"version": version, "page": PAGE}) + "\n")
     feed = appcast(mac, disk_image, mac_notes(releases)) if disk_image else None

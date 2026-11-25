@@ -190,6 +190,8 @@ Verso's page, at `jakob.hviid.phd/verso` and for the top of `jakob.hviid.phd/sof
 - **Verso's app icon is the brand** in the bar and the footer: its design, Mist on Day paper, which people know
   from their system. The lens (`site/mark.svg`, the small icons' lens) marks the tight places: the tab, and the
   drive's folders. Each platform's own icon stands beside that platform alone, on Day paper in both appearances.
+- **A privacy page** (`privacy.html`, from `site/build.py`) in the photos' page's form, linked from the footer: what
+  Verso connects to and keeps, for the App Store, TestFlight and everyone, standing on SECURITY.md.
 - **Light or dark** as the system says, until the switch in the bar chooses; the choice is kept for the next visit,
   and the pictures with a dark version follow it.
 - **The ring's colours** mark each section's heading together and in order, and one at a time as a small dot (a
