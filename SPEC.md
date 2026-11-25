@@ -70,7 +70,9 @@ Use these words in code, docs and issues.
   menu and `verso-service unmount` leave the switch on, and the service goes on without the drive, its bookmark and
   folder kept. **Mount** (on the Status page, in the top bar menu, or `verso-service mount`) restarts the service,
   which mounts, and so does the next login.
-- **Verso as a Flatpak has no drive:** its sandbox reaches neither FUSE nor Files.
+- **Verso as a Flatpak has no drive:** its sandbox reaches neither FUSE nor Files. **Verso as an AppImage has none
+  either:** the drive hangs on files of the install that name its programs (the user unit, Files' menu, the sidebar's
+  entry), which a file that may move cannot hold.
 
 ### Layout
 
@@ -434,7 +436,8 @@ in Files, selected.
   (`crosslink.gallery`; `crosslink.drive`, and the drive on), removes it otherwise and at sign-out, and brings the
   folder's MIME cache up to date. The app grid's entry announces nothing. Verso Gallery's entry runs `verso %u`;
   Verso Drive's runs `verso-service app %u`, which hands the link to the service (`ShowLink`) without opening the
-  window. Verso as a Flatpak takes part as Verso Gallery alone, through the entry it exports.
+  window. Verso as a Flatpak takes part as Verso Gallery alone, through the entry it exports. Verso as an AppImage
+  takes part in neither: its service writes no entries, and the entry in the file announces nothing.
 - **Reading:** a link is *invalid* (another scheme, a host, no `server` or one that is not an `http` or `https`
   address, an id that is not a UUID, a malformed search), *cannot show* (a path or a search the protocol does not
   define), or names an item. The server must be the signed-in one (scheme, host without case, port, a default port
@@ -498,7 +501,7 @@ part in Immich Crosslink, which shows it there: from Verso Drive's menu in Files
   menu reads the apps again.
 - **Off:** with `crosslink.enabled` off, no Show in items; Open in Immich and Copy Immich Link stay.
 - **In the Flatpak,** whose sandbox cannot list the other apps, the window offers one **Show in Another App…**, which
-  has the system ask which app (the OpenURI portal).
+  has the system ask which app (the OpenURI portal). The AppImage lists the apps as an install does.
 - **The settings** (Preferences, Crosslink): the **Immich Crosslink** switch, with **Learn More**, a link to the
   protocol whose address is not shown. Then **Verso Takes Part As**, with a switch each for Verso Gallery and Verso
   Drive. Then **Apps That Take Part**, each by its name and icon with a switch, described as "Apps that take part are
@@ -598,7 +601,9 @@ part in Immich Crosslink, which shows it there: from Verso Drive's menu in Files
   declares it, and Verso makes itself the scheme's default handler (in `~/.config/mimeapps.list`) as it starts a
   browser sign-in. The window is single instance and receives the address in its open window; a redirect for an
   earlier attempt is refused with a message. The Flatpak's exported entry declares the scheme, and the sandbox cannot
-  choose the default.
+  choose the default. The AppImage's entry declares it too, and Verso does not write an entry that names a file that
+  may move: the redirect reaches Verso once a tool that adds AppImages to the desktop (Gear Lever, AppImageLauncher)
+  has made the entry the system's; signing in with an email and password or an API key needs no entry.
 - Immich's password login has no two-factor step. Two-factor comes through the server's OIDC option, and the
   password form says so.
 - **On the Mac,** Verso signs in to one account with the same three methods and keeps it in the Keychain; Verso Drive
@@ -615,10 +620,11 @@ part in Immich Crosslink, which shows it there: from Verso Drive's menu in Files
   package's forced past its dependencies), does not start the window (ARCHITECTURE.md, "Packaging"): it writes to
   stderr `error: Verso needs
   GNOME 49 or newer (libadwaita 1.8 and GTK 4.18), and this system's libraries are older.` (`this system has no
-  libadwaita.` where there is none), the systems new enough, that Verso's Flatpak runs there without Verso Drive, the
-  requirements' address and the library it found; started on a desktop without a terminal, it shows the same in
-  zenity's dialog, or else in a notification that stays until dismissed; and it exits with 1. The Flatpak brings
-  GNOME's own libraries and runs there.
+  libadwaita.` where there is none), the systems new enough, that Verso's Flatpak and AppImage run there without Verso
+  Drive, the requirements' address and the library it found; started on a desktop without a terminal, it shows the
+  same in zenity's dialog, or else in a notification that stays until dismissed; and it exits with 1. The Flatpak
+  brings GNOME's own libraries and runs there; the AppImage brings the libraries it needs, the C library among them,
+  and keeps the system's graphics drivers; Ubuntu 24.04 is the oldest system it is checked on.
 - **Linux:** a kernel with FUSE protocol 7.31 or later, a setuid `fusermount3`, and access to `/dev/fuse`, for Verso
   Drive.
 - **macOS:** 15 or later.
@@ -640,8 +646,8 @@ settings window"). Verso's Preferences show them on these pages:
   `thumbnails.safety_net`: those are for `config.toml` and `verso-service configure`.
 
 A change to the drive's settings restarts the service when its page is left or Preferences closes. Verso as a Flatpak
-hides the drive's switch, place, name, bookmark, cache size and sharp thumbnails, and the app icon's two looks, and
-reads none of them.
+and Verso as an AppImage hide the drive's switch, place, name, bookmark, cache size and sharp thumbnails, the check for
+a newer release and the app icon's two looks, and read none of them.
 
 | Key | Values | Default | Meaning |
 |---|---|---|---|
@@ -734,7 +740,7 @@ The window's application ID is `dev.hviid.Verso`. The service owns the bus name 
 | `ClearCache()` | method | Empty the content cache, except Assets being read |
 | `CheckNow()` | method | Ask the server how it is at once, rather than at the next poll (the window's Try Now) |
 | `RefreshIcon()` | method | Draw the top bar icon again, after `tray.colour` changed |
-| `Quit()` | method | Stop the service, as the top bar menu's Quit does; the Flatpak's window asks this, having no systemd to stop it |
+| `Quit()` | method | Stop the service, as the top bar menu's Quit does; the Flatpak's and the AppImage's window ask this, having no systemd to stop it |
 | `Unmount()` | method | Unmount; the service goes on without the drive |
 | `Links(path s) → (web s, crosslink s, kind s, hidden s)` | method | The links of the item at `path` for the menus: its web address, its crosslink (empty while `crosslink.enabled` is off), its kind (`asset`, `album`, `person`, `place`, `page`) and the apps left out (`crosslink.hidden`); all empty where `WebLink` is |
 | `ShowLink(link s, select b, notify b) → (result s, detail s)` | method | The item a crosslink or a web address names (Links to Immich): `show` with its path, or `invalid`, `cannot-show`, `other-server` with its host, `other-user`, `not-found`, `off` (Immich Crosslink switched off), `no-drive` (Verso Drive off or unmounted) or `unreachable`. With `select` the file manager shows it selected (`org.freedesktop.FileManager1.ShowItems`); with `notify` a notification says why not. Without the drive, `no-drive` |
@@ -822,7 +828,12 @@ listings show the first account's folders until each is refreshed (offline, unti
 Signing out removes every cache, which is the way to switch accounts. Directories are 0700 and files 0600.
 
 Verso as a Flatpak keeps its settings, caches and state in the sandbox's own folders, under
-`~/.var/app/dev.hviid.Verso/`.
+`~/.var/app/dev.hviid.Verso/`. Verso as an AppImage keeps them where an install does, in Verso's own folders, so a
+Verso of another channel on the same account reads the same settings and sign-in; it is no sandbox. It writes one file
+outside them, while it is signed in and has the service start at login: `~/.config/autostart/dev.hviid.Verso.Service.desktop`,
+which runs `"<the AppImage file>" verso-service daemon` (the file where it is: the window writes it again where the
+file moved, and sign-out removes it). The service itself is the AppImage file run with `verso-service daemon` as its
+first argument, as an instance of its own.
 
 ## Verso's window on Linux
 
@@ -1026,8 +1037,8 @@ first.
   `verso-crosslink-symbolic`) and Features (a puzzle piece); under Verso Drive, Status (Verso's mark,
   `dev.hviid.Verso-symbolic`, as Files and the top bar show the drive), and while the drive is on Drive (a disk) and
   Folders (a folder); under Server, for an admin, Administration (a server, `verso-server-symbolic`). General, Crosslink
-  and the drive's pages show the settings ("Configuration"). In a Flatpak, one Verso Drive page says the drive is not
-  part of it, and where to get it.
+  and the drive's pages show the settings ("Configuration"). In a Flatpak or an AppImage, one Verso Drive page says the
+  drive is not part of it, and where to get it; the AppImage's Crosslink page lists the apps and takes no part.
   - **Account:** the server, whom it is signed in as and with what (a session or an API key), and the certificate
     trusted for the server, with Forget… ("A certificate of the server's own"); the profile: its picture
     (Choose Picture…, Remove), its name and the storage used; for a session, Change Password… (where the account has a

@@ -23,8 +23,8 @@ permissions:
 
 jobs:
   linux:
-    # The tarball links Fedora 44's GTK and libadwaita, as the cask expects; privileged for flatpak-builder's sandbox,
-    # and for podman, which runs the rpm's and the deb's containers inside this one (linux/packaging/verso-packages.sh).
+    # The tarball and the AppImage link Fedora 44's GTK and libadwaita, as the cask expects; privileged for
+    # flatpak-builder's sandbox, and for podman, which runs the rpm's and the deb's containers inside this one (linux/packaging/verso-packages.sh).
     runs-on: ubuntu-latest
     container:
       image: fedora:44
@@ -33,7 +33,7 @@ jobs:
       - name: Build dependencies
         run: |
           dnf install -y -q git gcc cargo rust gtk4-devel libadwaita-devel libshumate-devel blueprint-compiler \
-            python3 binutils gh flatpak flatpak-builder podman
+            python3 binutils gh flatpak flatpak-builder podman zsync
       - uses: actions/checkout@v5
         with:
           # The whole history and the tags: ci/version.sh numbers the tree from them.

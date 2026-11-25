@@ -5,6 +5,7 @@
 //! interface (ARCHITECTURE.md, "Crates").
 
 pub mod app_icon;
+pub mod autostart;
 pub mod caller;
 pub mod clipboard;
 pub mod crosslink_apps;

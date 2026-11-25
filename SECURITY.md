@@ -68,7 +68,7 @@ Problems in the Immich server itself belong to the Immich project:
   from your Immich server alone, and photos in the Locked Folder are never looked up. Verso's rpm and deb look for a
   newer release once a day (`updates.check`, Check for Updates in Preferences, on until you switch it off): the
   service reads `https://jakob.hviid.phd/verso/latest.json`, sending nothing but the request and Verso's name and
-  version as its User-Agent. An install by Homebrew, the tarball or the Flatpak never looks.
+  version as its User-Agent. An install by Homebrew, the tarball, the Flatpak or the AppImage never looks.
 - **What it changes on the server:** the gallery changes your library only when you ask it to (a favorite, a rating, an
   album, a tag, a comment or a like, a date or a place, a crop or a turn, a stack, the archive, the trash, sharing, an
   import).

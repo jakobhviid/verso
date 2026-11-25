@@ -63,12 +63,12 @@ fn for_style((light, dark): (&'static str, &'static str), dark_style: bool) -> &
 }
 
 /// Name the look chosen for the desktop's style in Verso's launcher entry: `app.icon`'s in the light style,
-/// `app.icon_dark`'s in the dark, read from `config.toml` now, with a copy of each kept. Nothing in a Flatpak, which
-/// offers no choice and cannot reach its entry.
+/// `app.icon_dark`'s in the dark, read from `config.toml` now, with a copy of each kept. Nothing in a Flatpak or an
+/// AppImage, which offer no choice and have no entry of Verso's to name it in.
 pub fn apply(paths: &Paths, dark_style: bool) {
     set_dark_style(dark_style);
     let product = product::current();
-    if product.sandboxed {
+    if !product.installed() {
         return;
     }
     // The user's folder of entries beside Verso's data (`$XDG_DATA_HOME`), then the system's (`$XDG_DATA_DIRS`).

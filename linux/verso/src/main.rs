@@ -70,9 +70,9 @@ fn main() -> glib::ExitCode {
         return glib::ExitCode::SUCCESS;
     }
     // Verso's folders, keyring items and service, apart from Immich Mount's (`verso_core::product`); built for a
-    // Flatpak (`--features flatpak`), without what its sandbox cannot reach, and for the rpm and the deb
-    // (`--features package`), with the look for a newer release in Preferences.
-    verso_core::product::set(verso_core::product::built_for(cfg!(feature = "flatpak"), cfg!(feature = "package")));
+    // Flatpak (`--features flatpak`), without what its sandbox cannot reach, as an AppImage (`--features appimage`),
+    // and for the rpm and the deb (`--features package`), with the look for a newer release in Preferences.
+    verso_core::product::set(verso_core::product::built_for(cfg!(feature = "flatpak"), cfg!(feature = "appimage"), cfg!(feature = "package")));
     let application = adw::Application::builder().application_id(APP_ID).flags(gio::ApplicationFlags::HANDLES_OPEN).build();
     application.connect_startup(|_| load_style());
     application.connect_activate(|application| window_of(application).present());

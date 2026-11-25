@@ -1,16 +1,19 @@
-//! Verso's background service as a Flatpak (`verso_core::product::VERSO_FLATPAK`): a sandbox has no systemd
-//! unit to start it, so it starts as an instance of the app's sandbox of its own, through the Flatpak portal
-//! (`flatpak-spawn`), which outlives the window that started it; at login through the Background portal, which the
-//! user may refuse in their settings; and it stops when asked over D-Bus (`Quit`). ARCHITECTURE.md, "Verso as a
-//! Flatpak".
+//! Verso's background service where no systemd unit can run it: as a Flatpak (`verso_core::product::VERSO_FLATPAK`) and
+//! as an AppImage (`VERSO_APPIMAGE`). It starts as an instance of the app of its own that outlives the window that
+//! started it: the Flatpak's through the Flatpak portal (`flatpak-spawn`), the AppImage's by running the AppImage file
+//! again (`$APPIMAGE verso-service daemon`), whose mount is then the service's own and does not go with the window's.
+//! At login the Flatpak asks the Background portal, which the user may refuse in their settings, and the AppImage
+//! writes an autostart entry naming its file as it is now. The service stops when asked over D-Bus (`Quit`).
+//! ARCHITECTURE.md, "Verso as a Flatpak" and "Verso as an AppImage".
 
 use std::collections::HashMap;
 use std::process::{Command, Stdio};
 use std::time::Duration;
 
 use verso_linux::dbus;
+use verso_linux::paths::Paths;
 
-/// The service, as the Flatpak names its command.
+/// The service, as the Flatpak names its command and as the AppImage is given it.
 const SERVICE: [&str; 2] = ["verso-service", "daemon"];
 
 /// Run `work` on a runtime and a thread of its own: callers may be on the app's runtime already.
@@ -29,14 +32,25 @@ async fn running(connection: &zbus::Connection) -> bool {
 }
 
 fn spawn() -> Result<(), String> {
-    Command::new("flatpak-spawn")
-        .args(SERVICE)
+    use std::os::unix::process::CommandExt;
+    let mut command = if verso_core::product::current().appimage {
+        let mut command = Command::new(verso_linux::autostart::image()?);
+        // A process group of its own, so a terminal closing with the window does not take the service with it.
+        command.process_group(0);
+        command.args(SERVICE);
+        command
+    } else {
+        let mut command = Command::new("flatpak-spawn");
+        command.args(SERVICE);
+        command
+    };
+    command
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .spawn()
         .map(drop)
-        .map_err(|error| format!("flatpak-spawn: {error}"))
+        .map_err(|error| format!("the service did not start: {error}"))
 }
 
 /// Start the service, unless it runs.
@@ -71,9 +85,16 @@ pub fn restart() -> Result<(), String> {
     spawn()
 }
 
-/// Ask that the service start at every login (the Background portal), giving `reason`; the desktop asks the user the
-/// first time.
+/// Ask that the service start at every login, giving `reason`: the Background portal for the Flatpak, where the desktop
+/// asks the user the first time, and an autostart entry for the AppImage.
 pub fn run_at_login(reason: &str) {
+    if verso_core::product::current().appimage {
+        match verso_linux::autostart::write(&Paths::from_environment()) {
+            Ok(()) => {}
+            Err(error) => log::warn!("could not ask to start at login: {error}"),
+        }
+        return;
+    }
     let reason = reason.to_owned();
     run(async move {
         let Ok(connection) = zbus::Connection::session().await else { return };
@@ -89,4 +110,14 @@ pub fn run_at_login(reason: &str) {
             log::warn!("could not ask to start at login: {error}");
         }
     });
+}
+
+/// Name the AppImage file's place as it is now in the autostart entry, where there is one.
+pub fn refresh_login() {
+    verso_linux::autostart::refresh(&Paths::from_environment());
+}
+
+/// Take the AppImage's autostart entry away (signing out), so the service no longer starts at login.
+pub fn stop_at_login() {
+    verso_linux::autostart::remove(&Paths::from_environment());
 }

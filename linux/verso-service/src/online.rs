@@ -494,9 +494,9 @@ fn daemon_without_drive(
 ) -> Result<Option<StopReason>> {
     use verso_linux::dbus::State;
     use verso_linux::mounts::canonical_mount_point;
-    // Not in a Flatpak, which never had a drive and cannot reach the host's sidebar or home.
-    let sandboxed = verso_core::product::current().sandboxed;
-    if without == Without::Off && !sandboxed && mount_state(&canonical_mount_point(mount_point)) == MountState::NotMounted {
+    // Not in a build that never had a drive (the Flatpak's, the AppImage's), whose Files has no entry of Verso's to keep.
+    let had_drive = verso_core::product::current().drive;
+    if without == Without::Off && had_drive && mount_state(&canonical_mount_point(mount_point)) == MountState::NotMounted {
         let _ = verso_linux::gnome::set_sidebar_entry(paths, mount_point, config.mount_name, verso_linux::gnome::SidebarEntry::Drive);
         let _ = std::fs::remove_dir(mount_point);
     }
@@ -566,9 +566,9 @@ pub fn daemon(paths: &Paths) -> Result<Option<StopReason>> {
     let mount_point = paths.expand(&config.mount_path);
     // Verso's participants in Immich Crosslink, as the settings want them; and the app icon chosen for the desktop's
     // style, in the launcher's entry, which an upgrade replaces with the install's own, named again at each change of
-    // colour scheme while the service runs. A Flatpak cannot reach its entry.
+    // colour scheme while the service runs. A Flatpak or an AppImage has no entry of Verso's to name it in.
     verso_linux::participants::sync(paths, &config);
-    if !verso_core::product::current().sandboxed {
+    if verso_core::product::current().installed() {
         runtime.spawn(verso_linux::app_icon::follow_style(paths.clone()));
     }
     if !config.mount_enabled {

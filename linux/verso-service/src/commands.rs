@@ -88,7 +88,7 @@ fn app_icon(paths: &Paths, key: &str) {
 /// Mounting at login is the user service being enabled, as the apps' switch does. systemctl's own messages are kept
 /// off stdout, which `--json` reserves for one document.
 fn mount_at_login(paths: &Paths, key: &str, value: &str) {
-    if key == "mount.at_login" {
+    if key == "mount.at_login" && verso_core::product::current().installed() {
         let (verb, unit) = match value {
             "false" => ("disable", service::user_service()),
             _ => ("enable", service::ensure_user_service(paths).unwrap_or_else(|_| service::user_service())),
@@ -359,6 +359,8 @@ pub fn logout(paths: &Paths, session_ended: bool) -> Result<LogoutReport> {
     for unit in service::user_services() {
         let _ = std::process::Command::new("systemctl").args(["--user", "disable", &unit]).output();
     }
+    // An AppImage's service starts at login through an autostart entry, which goes the same way.
+    verso_linux::autostart::remove(paths);
     Ok(LogoutReport { session_ended, unmounted: state != mounts::MountState::NotMounted, seeded_thumbnails_removed, keyring_item_removed, removed })
 }
 

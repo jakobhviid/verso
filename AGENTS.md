@@ -96,9 +96,9 @@ has no version: `ci/version.sh` stops and asks for them.
 on any step shows what it would do and changes nothing outside the checkout:
 1. `ci/release.sh` suggests the next version and prints its notes.
 2. `ci/release.sh tag [VERSION]` tags a clean HEAD that is on `origin/main`, signed, and pushes the tag.
-3. `ci/release.sh build TAG` builds Linux's files from the tag in a worktree of its own (the tarball in the toolbox,
-   the rpm and the deb each in a container of its distribution, with podman, the Flatpak's source, and the Flatpak
-   where `flatpak-builder` is) into `target/dist/TAG`, and makes a draft release
+3. `ci/release.sh build TAG` builds Linux's files from the tag in a worktree of its own (the tarball and the AppImage
+   in the toolbox, the rpm and the deb each in a container of its distribution, with podman, the Flatpak's source,
+   and the Flatpak where `flatpak-builder` is) into `target/dist/TAG`, and makes a draft release
    of them, "Verso 0.72.0 (Linux)", here, which Homebrew's `verso` cask and Verso's page download from. The release
    workflow
    (`.github/workflows/release.yml`) runs this step on every pushed tag, the Flatpak included, and adds the Mac's disk
@@ -185,7 +185,8 @@ Build on Fedora 44, or in a Fedora 44 toolbox (the easy way on an immutable host
   `libadwaita-devel`, `libshumate-devel` (the map) and `blueprint-compiler`, and the Files extension
   `nautilus-devel` (in a toolbox it installs only with `dnf install --allowerasing`, which swaps
   `systemd-standalone-tmpfiles` for systemd). The icons' pictures need `librsvg2-tools`
-  (`linux/packaging/icons/linux-app-icon.py`).
+  (`linux/packaging/icons/linux-app-icon.py`). The AppImage (`linux/packaging/verso-appimage.sh`) needs `curl` and
+  `binutils` for what it packs with, which it downloads itself, and `zsync` for the update file beside it.
 - **Mounting** Verso Drive needs `/dev/fuse` and a setuid `fusermount3` (package `fuse3`). The service can mount it
   and be tested on the development host directly.
 - **A global cargo linker the toolbox lacks** (zig through `cargo-zigbuild`, say, on a host without a C toolchain)

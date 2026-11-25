@@ -1,0 +1,15 @@
+[Desktop Entry]
+Name=Verso
+Comment=Browse, search and organise your Immich photos and videos
+Keywords=Immich;photos;videos;gallery;albums;people;
+Exec=verso %u
+Icon=dev.hviid.Verso
+Terminal=false
+Type=Application
+Categories=Graphics;Photography;Viewer;
+StartupNotify=true
+# The AppImage's one entry (ARCHITECTURE.md, "Verso as an AppImage"): app.immich is the browser sign-in's redirect, which
+# reaches Verso once a tool that adds AppImages to the desktop (Gear Lever, AppImageLauncher) has made this the entry the
+# system knows. It announces nothing to Immich Crosslink (https://jakob.hviid.phd/immich-crosslink/): a participant is
+# an entry that names a program, and an AppImage's file may move.
+MimeType=x-scheme-handler/app.immich;

@@ -398,7 +398,7 @@ pub fn apply_app_icon(dark: bool) {
 /// Have the service draw its top bar icon again (`RefreshIcon`), off the caller's thread.
 fn refresh_tray_icon() {
     std::thread::spawn(|| {
-        crate::sandbox::run(async {
+        crate::instance::run(async {
             let Ok(connection) = zbus::Connection::session().await else { return };
             let name = verso_linux::dbus::bus_name();
             let path = verso_linux::dbus::OBJECT_PATH;
@@ -409,8 +409,8 @@ fn refresh_tray_icon() {
 
 /// The daemon reads its settings at start: restart it, if it is running, off the caller's thread.
 pub fn restart_daemon() {
-    if verso_core::product::current().sandboxed {
-        std::thread::spawn(crate::sandbox::restart);
+    if !verso_core::product::current().installed() {
+        std::thread::spawn(crate::instance::restart);
         return;
     }
     std::thread::spawn(|| {

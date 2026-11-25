@@ -1,0 +1,50 @@
+#!/bin/sh
+# Verso's AppImage starts here (ARCHITECTURE.md, "Verso as an AppImage"). The libraries are the ones the AppImage was
+# built with, the C library and its loader among them, so it runs on a system older than the build's: the programs
+# are not run by the system's loader but by the bundled one, handed the bundled libraries as its library path, which
+# only that process takes, so nothing it starts on the system sees them. The graphics drivers (Mesa, NVIDIA, Vulkan),
+# and with them the GL libraries, stay the system's.
+#
+# One file, three names: the AppImage's runtime runs it as AppRun, and `usr/bin/verso` and `usr/bin/verso-service`
+# are links to it, which is how the programs run one another from inside the AppImage (`verso_linux::programs`). Run
+# as AppRun, it starts the window; its first argument `verso-service` starts the service and the command line instead
+# (`$APPIMAGE verso-service daemon`), which is how an instance of the service of its own starts.
+
+self=$(readlink -f "$0")
+here=${self%/*}
+program=verso
+case "${0##*/}" in
+    verso-service) program=verso-service ;;
+    *)
+        if [ "${1-}" = verso-service ]; then
+            program=verso-service
+            shift
+        fi
+        ;;
+esac
+
+export APPDIR=$here
+# What the bundled libraries read: the schemas, the icons, glycin's loaders, ahead of the system's.
+export XDG_DATA_DIRS="$here/usr/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+# The settings backend and the TLS backend of GIO; the system's modules are built for the system's own GLib, which this
+# one is not, so GIO's own folders are not looked in.
+export GIO_EXTRA_MODULES="$here/usr/lib/gio/modules"
+# GStreamer: only the bundled plugins, found without the scanner (a program the system's loader would have to start),
+# and a registry of Verso's own, so the system's applications never read one that names a folder that is gone.
+export GST_PLUGIN_SYSTEM_PATH_1_0="$here/usr/lib/gstreamer-1.0"
+export GST_PLUGIN_PATH_1_0="$here/usr/lib/gstreamer-1.0"
+export GST_REGISTRY_FORK=no
+export GST_REGISTRY_1_0="${XDG_CACHE_HOME:-$HOME/.cache}/verso/gstreamer-registry.bin"
+# The system's own file chooser and opener: through the desktop's portals, not GTK's copies.
+export GTK_USE_PORTAL=1
+# The bundled GnuTLS (the map's tiles) finds the system's certificates where the system keeps them.
+if [ -z "${SSL_CERT_FILE-}" ]; then
+    for bundle in /etc/ssl/certs/ca-certificates.crt /etc/pki/tls/certs/ca-bundle.crt /etc/ssl/ca-bundle.pem /etc/ssl/cert.pem; do
+        if [ -r "$bundle" ]; then
+            export SSL_CERT_FILE=$bundle
+            break
+        fi
+    done
+fi
+
+exec "$here/usr/lib/ld-linux-x86-64.so.2" --library-path "$here/usr/lib" --argv0 "$program" "$here/usr/libexec/$program" "$@"

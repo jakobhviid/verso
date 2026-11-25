@@ -10,7 +10,7 @@ and its service (`verso-service`), which runs the top bar icon and Verso Drive f
 Verso is made for the current GNOME, and runs on x86_64 Linux with GNOME 49's libraries or newer, libadwaita 1.8 and
 GTK 4.18: Fedora 43 and newer, Ubuntu 25.10 and 26.04 LTS, Debian 14, Arch and other rolling distributions. On an
 older system (Ubuntu 24.04 LTS and what is built on it, Debian 13, Fedora 42), `verso` says so as it starts, and the
-Flatpak below runs instead, without Verso Drive.
+AppImage or the Flatpak below runs instead, without Verso Drive.
 
 **With Homebrew** (any Linux that has it, such as Bazzite; nothing is layered onto an atomic system):
 
@@ -56,6 +56,26 @@ Verso Drive (Preferences points to the Homebrew version, which has it), one **Sh
 item per app, no taking over Immich Mount's account, and your desktop asks the first time you sign in whether Verso
 may start at login.
 
+**As an AppImage** (a test build, for older systems such as Ubuntu 24.04): download `verso-x86_64.AppImage` from the
+release, make it executable and run it:
+
+```sh
+chmod +x verso-x86_64.AppImage
+./verso-x86_64.AppImage
+```
+
+It carries its libraries, the C library among them, and uses your system's graphics drivers; it needs FUSE 3
+(`fusermount3`, which Ubuntu 24.04 has), or `./verso-x86_64.AppImage --appimage-extract-and-run`. Its command line is
+the AppImage with the program as its first argument: `./verso-x86_64.AppImage verso-service status`. It is Verso
+without Verso Drive and its menu in Files, and with the rest: the sign-in is kept in your keyring as the other
+installs keep it, Immich Mount's account is offered, and the top bar icon's service starts as you sign in and at every
+login (an entry `~/.config/autostart/dev.hviid.Verso.Service.desktop` naming the file where it is; after moving the
+file, open it once from its new place). Single sign-on in the browser comes back to
+Verso once a tool that adds AppImages to your desktop (Gear Lever, AppImageLauncher) has added it; signing in with an
+email and password or an API key needs none. Videos that need an H.264 or H.265 decoder do not play in it. Update it
+with an AppImage updater (AppImageUpdate reads `verso-x86_64.AppImage.zsync`) or by downloading the next release over
+the file; the top bar icon's service then restarts into it at the next sign-in or login.
+
 **From source**, on Fedora 44 or in a Fedora 44 toolbox, with `gcc`, `cargo`, `rust`, `gtk4-devel`,
 `libadwaita-devel`, `libshumate-devel`, `blueprint-compiler` and `fuse3`:
 
@@ -100,7 +120,7 @@ top bar icon, and has it start at every login. Verso Drive stays off until you s
 **Where Immich Mount is signed in** on this computer, the first page offers **Use Immich Mount's Account**: Verso
 signs in to the same server with a sign-in of its own, takes Immich Mount's settings but the drive's place and name,
 and switches Verso Drive on at `~/Verso`. Immich Mount is left as it is; signing out of one leaves the other signed
-in. The Flatpak does not offer it.
+in. The Flatpak does not offer it; the AppImage does.
 
 **Headless, or from a terminal:**
 
@@ -311,7 +331,8 @@ admins, **Administration**. A change to the drive's settings reaches it when you
 The keys are listed in SPEC.md; `thumbnails.safety_net` is set here only. On the Mac, Settings has a Verso Drive pane
 with the drive's switch, its sections and its names.
 
-**Updates.** Homebrew updates Verso with `brew upgrade verso`, and Flatpak updates the Flatpak. Verso's rpm and deb,
+**Updates.** Homebrew updates Verso with `brew upgrade verso`, Flatpak updates the Flatpak, and the AppImage is
+replaced by a newer file. Verso's rpm and deb,
 which nothing else updates, look for a new version once a day and tell you in a notification and on the top bar menu
 (**Get Verso *version*…**, which opens Verso's page); **Check for Updates** in Preferences, General, switches that
 off (`updates.check`). The other installs do not look.
@@ -360,7 +381,7 @@ in another language once: `LANGUAGE=da verso`. The folders in the drive keep the
 
 | Symptom | What to do |
 |---|---|
-| Verso does not open from the app grid, or says it needs GNOME 49 or newer | The system's GNOME libraries are older than Verso's (section 1); `verso` in a terminal says which it found. Install the Flatpak instead, which runs without Verso Drive |
+| Verso does not open from the app grid, or says it needs GNOME 49 or newer | The system's GNOME libraries are older than Verso's (section 1); `verso` in a terminal says which it found. Install the AppImage or the Flatpak instead, which run without Verso Drive |
 | The keyring prompt appeared at login | Unlock it. If it was dismissed, Verso's service did not start (a notification says so): open Verso, or run `systemctl --user start verso` |
 | "Signed out of Immich" notification | Open Verso (the top bar menu's **Sign In…**) and sign in again. Caches are kept |
 | "Immich's certificate is not trusted" notification, or **Check Certificate…** in Verso | The server presents another certificate than the one trusted for it. If it was renewed or replaced, compare the new fingerprint with the server's (section 2) and trust it in Verso, or with `verso-service login --trust-certificate`; if not, do not: someone may be pretending to be the server |

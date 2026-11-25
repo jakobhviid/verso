@@ -19,7 +19,7 @@ that places the grid's dates, so they behave alike.
 
 | Platform | Where it stands |
 |---|---|
-| Linux, x86_64 (GNOME) | Released as 0.x builds: Homebrew, rpm and deb packages, and a Flatpak test build (below) |
+| Linux, x86_64 (GNOME) | Released as 0.x builds: Homebrew, rpm and deb packages, and a Flatpak and an AppImage test build (below) |
 | Mac (macOS 15 or later) | Released as 0.x builds: a signed and notarized disk image from [Verso's page](https://jakob.hviid.phd/verso/), or `brew install --cask jakobhviid/tap/verso`; it updates itself |
 | iPhone and iPad | In beta through [TestFlight](https://testflight.apple.com/join/7z1ppMM8); the App Store after it |
 
@@ -80,8 +80,8 @@ x86_64 Linux:
 
 - **New enough:** Fedora 43 and newer, Ubuntu 25.10 and 26.04 LTS, Debian 14, Arch and other rolling distributions.
 - **Too old:** Ubuntu 24.04 LTS and what is built on it (Linux Mint 22, Pop!_OS 24.04, Zorin OS 18), Debian 13,
-  Fedora 42 and anything older. There Verso says so when it starts, and the [Flatpak](#as-a-flatpak-test-build),
-  which brings GNOME's own libraries, runs instead, without Verso Drive.
+  Fedora 42 and anything older. There Verso says so when it starts, and the [AppImage](#as-an-appimage-test-build) or the
+  [Flatpak](#as-a-flatpak-test-build), which bring their own libraries, run instead, without Verso Drive.
 
 Verso Drive needs FUSE 3, Verso's menu in Files needs nautilus-python where Homebrew installed Verso, and the top bar
 icon needs a tray: on GNOME, the AppIndicator extension.
@@ -129,6 +129,30 @@ sandbox:
 - **No taking over Immich Mount's account:** you sign in as usual.
 - **Starting at login** is asked by your desktop the first time you sign in.
 
+### As an AppImage (test build)
+
+For the systems the Flatpak is for, as one file: download `verso-x86_64.AppImage` from the
+[latest release](../../releases/latest), then:
+
+```sh
+chmod +x verso-x86_64.AppImage
+./verso-x86_64.AppImage
+```
+
+It carries the libraries it needs, the C library among them, so it runs on Ubuntu 24.04 (the oldest it is checked on)
+and newer systems, with your system's graphics drivers; it needs FUSE 3 (`fusermount3`), or `--appimage-extract-and-run`. It is Verso without the
+parts that need an install:
+
+- **No Verso Drive,** so no Show in Files and no Verso menu in Files.
+- **No part in Immich Crosslink as Verso Gallery:** Verso shows items in the other apps, and they do not show items
+  in it.
+- **Browser sign-in** comes back to Verso once a tool that adds AppImages to the desktop (Gear Lever, AppImageLauncher)
+  has added it; email and password and an API key work without.
+- **Videos that need an H.264 or H.265 decoder do not play.**
+
+The sign-in is kept in your keyring, and the top bar icon starts as you sign in and at every login. Update it with an
+AppImage updater, or by downloading the next release over the file.
+
 ## Building from source
 
 **Linux,** on Fedora 44, or in a Fedora 44 toolbox (`toolbox create -r 44 verso`):
@@ -144,7 +168,7 @@ desktop entry. The two programs alone are `cargo build --release -p verso
 -p verso-service`. `linux/packaging/verso-packages.sh out`, run with podman or docker on the host, builds the rpm
 and the deb, each in a container of its distribution.
 [`linux/packaging/flatpak/dev.hviid.Verso.yml`](linux/packaging/flatpak/dev.hviid.Verso.yml) builds the Flatpak, as
-its first lines say.
+its first lines say, and `linux/packaging/verso-appimage.sh out`, in the same toolbox, the AppImage.
 
 **The Mac, the iPhone and the iPad,** on a Mac with Xcode, Rust (through rustup) and XcodeGen: `mac/build-rust.sh`
 builds the core for the Mac (with `--ios`, for the iPhone and the iPad too), and `xcodegen` makes the Xcode projects,

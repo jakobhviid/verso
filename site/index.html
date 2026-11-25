@@ -263,8 +263,10 @@
           <ul class="downloads">
             {{packages}}<li>{{tarball}}<span>Verso with Verso Drive, the top bar icon and its menu in Files</span></li>
             <li>{{flatpak}}<span>A test build without Verso Drive, which needs access outside the sandbox</span></li>
+            <li>{{appimage}}<span>The same, as one file with its libraries inside, for older systems such as Ubuntu 24.04</span></li>
           </ul>
           <pre class="command"><code>flatpak install --user verso-x86_64.flatpak</code></pre>
+          <pre class="command"><code>chmod +x verso-x86_64.AppImage &amp;&amp; ./verso-x86_64.AppImage</code></pre>
         </article>
         <article class="print get" id="get-mac">
           <h3><picture><img src="icon-mac.png" alt="" width="48" height="48"></picture>
@@ -286,8 +288,8 @@
             LTS, Debian 14, Arch and other rolling distributions.</dd>
           <dt>Too old</dt>
           <dd>Ubuntu 24.04 LTS and what is built on it (Linux Mint 22, Pop!_OS 24.04, Zorin OS 18), Debian 13, Fedora 42
-            and anything older. There Verso says so when it starts, and the Flatpak, which brings GNOME's own
-            libraries, runs instead, without Verso Drive.</dd>
+            and anything older. There Verso says so when it starts, and the Flatpak or the AppImage, which bring
+            their own libraries, run instead, without Verso Drive.</dd>
           <dt>Verso Drive</dt>
           <dd>FUSE 3. Verso's menu in Files needs nautilus-python, and the top bar icon a tray: on GNOME, the
             AppIndicator extension.</dd>

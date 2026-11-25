@@ -92,8 +92,9 @@ fn applications(paths: &Paths) -> PathBuf {
 /// Write the entries these settings want and remove the others. The system reads the folder
 /// again by itself; the MIME cache is brought up to date for tools that read only it.
 pub fn sync(paths: &Paths, config: &Config) {
-    // A Flatpak announces with the entry it exports, and cannot write to the user's applications folder.
-    if verso_core::product::current().sandboxed {
+    // A Flatpak announces with the entry it exports, and cannot write to the user's applications folder; an AppImage's
+    // entries would name programs in a mount that goes.
+    if !verso_core::product::current().installed() {
         return;
     }
     let folder = applications(paths);
@@ -130,7 +131,7 @@ pub fn sync(paths: &Paths, config: &Config) {
 
 /// Take both entries away (signing out, an uninstall).
 pub fn remove_all(paths: &Paths) {
-    if product::current().sandboxed {
+    if !product::current().installed() {
         return;
     }
     let folder = applications(paths);

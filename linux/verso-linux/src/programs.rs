@@ -1,6 +1,7 @@
 //! Finding Verso's own programs wherever its channel put them: in the install's folder (the tarball keeps the window in
 //! `libexec/`, behind its launcher, and the rest beside it; the rpm and deb packages put the window in `/usr/libexec`
-//! and the rest in `/usr/bin`), on PATH, or in the Homebrew prefix, which a desktop session's PATH may not include.
+//! and the rest in `/usr/bin`; an AppImage's `usr/bin`, which its runtime names `APPDIR`), on PATH, or in the Homebrew
+//! prefix, which a desktop session's PATH may not include.
 
 use std::path::{Path, PathBuf};
 
@@ -14,7 +15,7 @@ const HOMEBREW_DEFAULT: &str = "/home/linuxbrew/.linuxbrew";
 pub fn find(name: &str) -> Option<PathBuf> {
     let running = std::env::current_exe().ok();
     let own_prefix = running.as_deref().and_then(homebrew_prefix_of);
-    let beside = running.as_deref().and_then(install_folder_of).map(|folder| [folder.join(name), folder.join("bin").join(name)]);
+    let beside = install_folder().map(|folder| [folder.join(name), folder.join("bin").join(name)]);
     let on_path: Vec<PathBuf> =
         std::env::var_os("PATH").map(|path| std::env::split_paths(&path).map(|directory| directory.join(name)).collect()).unwrap_or_default();
     let other_prefixes = [std::env::var_os("HOMEBREW_PREFIX").map(PathBuf::from), Some(PathBuf::from(HOMEBREW_DEFAULT))];
@@ -32,7 +33,17 @@ pub fn find(name: &str) -> Option<PathBuf> {
 /// launcher that checks the system's libraries first), the folder above it: the tarball's, where the launcher, the
 /// service, the app's own icons and the catalogs are, or the packages' `/usr`.
 pub fn install_folder() -> Option<PathBuf> {
-    install_folder_of(&std::env::current_exe().ok()?)
+    appimage_folder().or_else(|| install_folder_of(&std::env::current_exe().ok()?))
+}
+
+/// An AppImage's `usr/bin`, from `APPDIR`, which its runtime and its `AppRun` set to where it is mounted. The running
+/// program's own path is the C library's loader, which starts it (`AppRun`), so it names no folder of Verso's. Its
+/// programs there (`verso`, `verso-service`) are links to `AppRun`, which run as the AppImage runs them.
+fn appimage_folder() -> Option<PathBuf> {
+    if !verso_core::product::current().appimage {
+        return None;
+    }
+    Some(PathBuf::from(std::env::var_os("APPDIR")?).join("usr/bin"))
 }
 
 /// The launcher in front of the running program, when it runs from a `libexec` folder: the program of its own name, as

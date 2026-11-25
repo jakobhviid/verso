@@ -12,9 +12,10 @@ pub fn packaged() -> String {
     product::current().service()
 }
 
-/// The units that may run the daemon: the packages' alone.
+/// The units that may run the daemon: the packages' alone, and none for a Flatpak or an AppImage, whose service no
+/// unit runs: a unit of that name is another install's, which they leave alone.
 pub fn user_services() -> Vec<String> {
-    vec![packaged()]
+    if verso_core::product::current().installed() { vec![packaged()] } else { Vec::new() }
 }
 
 /// The installed unit, if any.

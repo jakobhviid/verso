@@ -1002,7 +1002,7 @@ sees.
 
 - **Its names come from one place** (`verso_core::product`), first thing in each program: its folders, keyring items,
   D-Bus name, user service, program, tray, notifications, translation domain and the drive's defaults (SPEC.md,
-  "Files on disk" and "The daemon's D-Bus interface"). The switch knows Verso, Verso as a Flatpak (`VERSO_FLATPAK`),
+  "Files on disk" and "The daemon's D-Bus interface"). The switch knows Verso, Verso as a Flatpak (`VERSO_FLATPAK`), as an AppImage (`VERSO_APPIMAGE`),
   Verso from its rpm or deb (`VERSO_PACKAGE`, the same names, which tells of a newer release: "Updates on Linux"),
   and Immich Mount (`IMMICH_MOUNT`), described only so Verso can read its settings and keyring to take its account
   over ("Taking Immich Mount's account over"); nothing runs as it. No name is shared, so Immich Mount and Verso can be
@@ -1745,10 +1745,10 @@ notification (the version told of is kept in `~/.local/state/verso/update-told`)
 *version*…", which opens the page) for as long as it runs. It sends nothing but the request and its User-Agent.
 - **On for the rpm and the deb alone:** they are built with the `package` feature (`linux/packaging/verso-packages.sh`),
   which makes the product `VERSO_PACKAGE`: Verso's, with `updates.check` on by default and shown in Preferences
-  (General, Updates), so it can be switched off. Every other build is `VERSO` or `VERSO_FLATPAK`, which hide the
+  (General, Updates), so it can be switched off. Every other build is `VERSO`, `VERSO_FLATPAK` or `VERSO_APPIMAGE`, which hide the
   setting and read it as off, whatever `config.toml` says (`Product::hidden_settings`).
 - **Who looks, besides:** never Homebrew's installs (in its Cellar or a cask's folder, which `brew upgrade` keeps
-  current) nor a Flatpak (its remote updates it), whatever the setting, and not a development build (version 0.0.0),
+  current) nor a Flatpak (its remote updates it) or an AppImage (its updater replaces the file), whatever the setting, and not a development build (version 0.0.0),
   which has no release to compare (`linux/verso-service/src/updates.rs`, `verso_linux::updates`). A pre-release is
   never told of: the page names the latest release.
 - **Not chosen: deciding at run time** by where the program is (`/usr/bin`): a build of one's own installed there would
@@ -1885,6 +1885,8 @@ Verso installs as one package with both programs, from three channels:
   the tarball.
 - **The Flatpak** (`linux/packaging/flatpak/`), for our own builds and testing, without the drive ("Verso as a
   Flatpak").
+- **The AppImage** (`linux/packaging/verso-appimage.sh`), the same without the sandbox, for older systems ("Verso as
+  an AppImage").
 
 What an install carries:
 - **One launcher entry,** `dev.hviid.Verso.desktop` (`linux/packaging/desktop/dev.hviid.Verso.desktop.in`), named Verso,
@@ -1905,8 +1907,8 @@ What an install carries:
 **The window links the system's GNOME libraries, GNOME 49's or newer:** libadwaita 1.8 and GTK 4.18 at least (SPEC.md,
 "Supported versions"). Verso is built for the current GNOME: the window uses libadwaita's widgets up to 1.8
 (AdwShortcutsDialog from 1.8, AdwToggleGroup from 1.7, AdwSpinner and AdwButtonRow from 1.6) and GTK 4.16's CSS
-variables. The tarball needs them on the desktop, the rpm and the deb ask for them as dependencies, and the Flatpak
-brings them in the GNOME runtime.
+variables. The tarball needs them on the desktop, the rpm and the deb ask for them as dependencies, the Flatpak
+brings them in the GNOME runtime, and the AppImage carries them.
 
 **The launcher: a script in front of the window,** so that a system whose libraries are too old says why. A Rust
 program binds every symbol as it loads (full RELRO, no PLT), so on Ubuntu 24.04 (libadwaita 1.5, GTK 4.14) the loader
@@ -1940,11 +1942,11 @@ who opened it from the app grid or a launcher sees nothing. So the tarball's `ve
 - **Not chosen: the check inside the window.** It cannot run there: the loader binds every symbol before `main`.
   Lazy binding, or loading libadwaita by hand (`dlopen`), would change how every widget is linked for one message.
 - **Flatpak impact:** none. The Flatpak runs on GNOME's runtime, always new enough, and installs the window as
-  `/app/bin/verso`, without the launcher. On a system too old for the tarball it is the way to run Verso, without
-  Verso Drive.
+  `/app/bin/verso`, without the launcher; the AppImage runs the window through its own loader, with libraries of its own,
+  and has none either. On a system too old for the tarball they are the ways to run Verso, without Verso Drive.
 
-**Not chosen: AppImage.** No service or autostart integration, the sign-in scheme handler needs extra desktop
-integration, and bundling GTK 4 and libadwaita drifts from the host look.
+**An AppImage,** beside the Flatpak for older systems: "Verso as an AppImage". It carries GTK 4 and libadwaita, so it
+looks as the build's libadwaita does, not as the host's, which is why it is for the systems the tarball is not for.
 
 #### The rpm and the deb
 
@@ -2048,6 +2050,116 @@ dropped in), the account's and server's settings, and the top bar icon.
 under the app ID, which a Flatpak may own. No filesystem access is needed: imports come through the file chooser and
 drag and drop (the document portal), and downloads through the save dialog. Flathub's rules (2026-11): the manifest and
 the submission are written by the maintainer, without AI tools, and the AI-written code is disclosed with its extent.
+
+#### Verso as an AppImage
+
+The Flatpak's Verso for the people who prefer a file to a runtime, and for the same systems: older ones, Ubuntu 24.04
+among them, whose GNOME libraries are too old for the tarball and the packages. Built by `ci/release.sh build` beside
+the tarball, from the same build in the Fedora 44 toolbox (`linux/packaging/verso-appimage.sh`), into
+`verso-x86_64.AppImage`, with its zsync file where `zsyncmake` is installed. It is the Flatpak's feature set without
+its sandbox: the gallery, the top bar icon and its service, and no Verso Drive, no menu in Files. The drive hangs on
+files of an install that name its programs (the user unit, Files' menu, the sidebar's entry and the volume monitor's
+fstab line), which a file that may move, run from a mount that goes with its process, cannot hold.
+
+**One build feature, `appimage` on both programs,** makes the product `VERSO_APPIMAGE`: Verso's names, folders and app
+ID, with the Flatpak's hidden settings (`WITHOUT_DRIVE`), `drive` off and `appimage` on, and `sandboxed` off. The
+Flatpak's flag, `sandboxed`, was asked in two kinds of place, and the AppImage is the case that told them apart:
+- **`Product::drive`** (false in both): there is no drive to mount, to show, to unmount from the top bar's menu, to list
+  in Files' sidebar, or to say goodbye to when signing out, and Preferences says the drive is not there.
+- **`Product::installed()`** (true for the tarball, the rpm and the deb alone: neither `sandboxed` nor `appimage`):
+  the programs stay where they were put. Only then does a systemd user unit run the service
+  (`verso_linux::service::user_services` lists none for the others, so `login` and `logout` never touch another
+  install's unit), does the service write entries for Verso Gallery and Verso Drive, and is the launcher's entry Verso's
+  to give the app icon's look; only then does a window or a service watch its own program for an upgrade.
+- **`Product::sandboxed`** (the Flatpak alone) keeps what the sandbox is: the Secret portal's keyring, `flatpak-spawn`
+  and the Background portal, no reading Immich Mount's account, the OpenURI portal's Show in Another App…
+- **Not split further:** a field for each thing would say the same three facts again. The AppImage is a case of the
+  first two and not the third, which is the whole difference.
+
+**The bundle** is the libraries the two programs and their modules link, copied from the Fedora 44 toolbox with the
+C library and its loader, so it runs on systems older than the build's (Ubuntu 24.04 has glibc 2.39, GTK 4.14 and
+libadwaita 1.5; the AppImage brings Fedora 44's glibc 2.43, GTK 4.22 and libadwaita 1.9). `AppRun` does not leave the loading to the system: it
+runs each program through the bundled `ld-linux-x86-64.so.2` with `--library-path` the bundled libraries, so only that
+process takes them, and nothing it starts (the system's `systemd-run`, a browser, a file chooser) loads a library built
+for another C library. Alongside the programs:
+- **The system's:** the graphics libraries (GL, EGL, GBM, DRM, Vulkan), so Mesa's and NVIDIA's drivers, which the
+  window finds through them, stay the host's; fonts, cursor themes and the MIME database, which GTK reads from the
+  system's folders; the file chooser and `xdg-open`, which the portals do (`GTK_USE_PORTAL=1`).
+- **Carried, because GLib and GStreamer load them by path:** GIO's settings backend (`libdconfsettings`, so the
+  desktop's dark style reaches the window) and TLS backend (`libgiognutls`, for the map's tile requests, which
+  libshumate makes through libsoup; `SSL_CERT_FILE` names the system's certificates), GStreamer's plugins for video (a short list of the open codecs and containers, in
+  a folder of their own, found with no plugin scanner and a registry under `~/.cache/verso` that no other program
+  reads), GTK's and GLib's compiled schemas, Adwaita's icons, Verso's icons and its catalogs.
+- **Left out:** glycin's and gdk-pixbuf's image loaders (the window decodes thumbnails and previews itself, with the
+  `image` crate, and GTK reads PNG and JPEG without them), GVfs and the proxy modules, iconv's converters, and every
+  H.264 and H.265 decoder: Fedora carries none, and Cisco's OpenH264 is licensed to be fetched from Cisco, which a
+  Flatpak does through its extension and a file cannot. A video that needs one does not play.
+- **Each library's license** is copied from the package it came from, with `THIRD-PARTY-LICENSES.md`, into
+  `usr/share/licenses`; the libraries are Fedora 44's, unchanged.
+
+**The running program is the loader, not Verso's file.** `/proc/self/exe` of a program started through the bundled
+loader is the loader, so `verso_linux::programs` takes the install's folder from `APPDIR`, which the runtime and
+`AppRun` set to the mount (`usr/bin`). `usr/bin/verso` and `usr/bin/verso-service` there are links to `AppRun`, which
+runs the program of the name it was called by; a program that runs another from inside (the window's `verso-service
+logout`) finds one it can run, and a process outside runs `$APPIMAGE verso-service ...`, the AppImage file with the
+program as its first argument.
+
+**The service runs as an AppImage of its own.** A systemd unit would name a path inside a mount that goes with the
+process that made it; copying the file somewhere to name it would leave a second copy. So the window starts the service
+by running `$APPIMAGE verso-service daemon` (`APPIMAGE` is the file where it is, which the runtime sets), in a process
+group of its own: that mount belongs to the service, and lives as long as it. It is the Flatpak's design in
+`verso_desktop::instance`, with the AppImage file in place of `flatpak-spawn`:
+- **One instance:** a second one whose D-Bus name is taken leaves at once, so there is one tray.
+- **At login,** an autostart entry in `~/.config/autostart` (`dev.hviid.Verso.Service.desktop`) runs
+  `"<the file>" verso-service daemon`, quoted as the Desktop Entry Specification wants. The window writes it as it signs
+  in, and writes it again at every start if it exists, so a file that moved is named where it is; a person who took
+  the entry away asked for no service at login, which stays so. Signing out removes it, in the window and with
+  `verso-service logout` (`verso_linux::autostart`).
+- **The tray opens the window** by running `$APPIMAGE` again, so the window does not close with the service, and the
+  service's mount does not go with the window.
+- **An upgrade** is the file replaced (AppImageUpdate from the zsync file, or by hand): a running service stays the old
+  version until it restarts, at the next sign-in or login.
+- **Not chosen: a systemd unit that runs `$APPIMAGE`,** written by the window as the packages' unit is: the unit would
+  hold a path that goes stale when the file moves, and a unit under `~/.config/systemd/user` is a file of Verso's left
+  behind when the AppImage is deleted. An autostart entry is what AppImage tools already manage and the desktop shows.
+
+**Signing in** keeps the credential in the session's keyring as the tarball does (the Secret Service, through `oo7`;
+`keyring.rs` asks for the Secret portal only inside a Flatpak, by `/.flatpak-info`), and takes over Immich Mount's
+account where that is signed in. **Single sign-on in the browser** comes back through the `app.immich` scheme, which
+the AppImage's desktop entry declares: it reaches Verso once a tool that adds AppImages to the desktop (Gear Lever,
+AppImageLauncher) has made that entry the system's, as it does for every AppImage; Verso does not write a desktop entry
+that names a file that may move. Email and password and an API key need none of it.
+
+**Crosslink:** Verso shows in other apps as the others do (it lists them), and takes no part as Verso Gallery: a
+participant is an entry that names a program, and an entry written by the service would name a mount that goes, while
+the AppImage's own entry announces nothing, so that an added AppImage does not list itself in its own Show in.
+Preferences says so on Crosslink's page.
+
+**Tools, pinned:** appimagetool 1.9.1 and the type 2 runtime (20251108), each by URL and SHA-256 in
+`verso-appimage.sh`, downloaded into `~/.cache/verso-appimage` (`VERSO_TOOLS`) once; a changed file fails the build.
+The runtime mounts the image through FUSE 3 (`fusermount3`, on Ubuntu 24.04 by default); without FUSE, `--appimage-extract-and-run`
+runs it unpacked, which is how the matrix runs it. The update information, `gh-releases-zsync|jakobhviid|verso|latest|
+verso-x86_64.AppImage.zsync`, names the latest release's zsync file.
+
+**Not chosen:**
+- **go-appimage's `deploy` mode** (the brief's first thought: it bundles the C library too). On Fedora 44 it stops for
+  want of a gdk-pixbuf `loaders.cache`, which glycin made redundant, and its `AppRun` changes into the bundle, sets
+  `GTK_THEME` and a dozen more variables for every process, and runs `find` over the bundle at each start. What it
+  would have done is what `verso-appimage.sh` does by itself, in one script that says what it carries.
+- **linuxdeploy with its GTK plugin:** it leaves the C library out on purpose, so the file would run only on systems
+  as new as Fedora 44, which is none of the ones it is for.
+- **Bundling Mesa:** the host's drivers match the host's GPU and kernel; a bundled Mesa is the usual reason an AppImage
+  shows a black window.
+- **Bundling the system's GStreamer plugins from the host:** they are built for the host's GStreamer, which is not the
+  bundled one.
+
+**Checked** by the packaging matrix (`lab/packaging/`, the `lab-packaging-matrix` skill): its `appimage:ubuntu/24.04`
+row runs the file on Ubuntu 24.04 (glibc 2.39, GNOME 46's libraries), where the window keeps running under a headless
+compositor, `doctor --json` answers, and, against a lab server, the sign-in lands in GNOME Keyring, the window starts
+the service as an AppImage of its own, and signing out removes the sign-in.
+
+**Flatpak impact:** none. The `flatpak` and `appimage` features are two builds of the same programs, and a Flatpak
+asks `sandboxed` and `drive` as before.
 
 #### The drive in a Flatpak: kept possible
 
@@ -3371,7 +3483,7 @@ the disk image.
   a branch a lower one than main's.
 - **Majors stay in step by themselves:** there is one line of tags.
 - **Flatpak impact:** none. The Flatpak is a Linux build and goes out with every release, its version in its source
-  archive's `VERSION`.
+  archive's `VERSION`; the AppImage goes out with it, built by `ci/release.sh build` from the same tag.
 - **Not chosen:**
   - **A release for every push to main, numbered by its commits** (the house guidelines' way): the history would
     decide when a release happens, not the maintainer, the number would say little about what changed, and no release

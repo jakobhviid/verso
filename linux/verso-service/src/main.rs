@@ -129,8 +129,9 @@ pub(crate) fn cli_command() -> clap::Command {
 
 fn main() -> ExitCode {
     let arguments: Vec<String> = std::env::args().collect();
-    // The Flatpak's build (`--features flatpak`) and the packages' (`--features package`), as the window's.
-    verso_core::product::set(verso_core::product::built_for(cfg!(feature = "flatpak"), cfg!(feature = "package")));
+    // The Flatpak's build (`--features flatpak`), the AppImage's (`--features appimage`) and the packages' (`--features
+    // package`), as the window's.
+    verso_core::product::set(verso_core::product::built_for(cfg!(feature = "flatpak"), cfg!(feature = "appimage"), cfg!(feature = "package")));
     if is_leading_flag(&arguments, "--man") {
         return finish(completions::print_man());
     }
@@ -290,11 +291,14 @@ fn run_login(paths: &Paths, password: bool, api_key: bool, server: Option<String
         .map(|runtime| runtime.block_on(verso_linux::dbus::uploads_in_flight()))
         .unwrap_or_default();
     if uploading.is_empty() {
-        let _ = std::process::Command::new("systemctl")
-            .args(["--user", "try-restart", &verso_linux::service::user_service()])
-            .stdout(std::process::Stdio::null())
-            .stderr(std::process::Stdio::null())
-            .status();
+        // Only an install a unit runs; a Flatpak's and an AppImage's service is started by their window.
+        if verso_core::product::current().installed() {
+            let _ = std::process::Command::new("systemctl")
+                .args(["--user", "try-restart", &verso_linux::service::user_service()])
+                .stdout(std::process::Stdio::null())
+                .stderr(std::process::Stdio::null())
+                .status();
+        }
     } else if !json {
         eprintln!(
             "the mount keeps its earlier sign-in until its uploads finish; then run `{}` and `{}`",
@@ -310,13 +314,14 @@ fn run_login(paths: &Paths, password: bool, api_key: bool, server: Option<String
         if let Some(certificate) = &report.certificate {
             println!("  trusting its own certificate, SHA-256 {certificate}");
         }
-        // A logout turns the user service off; say how to turn it on, unless it already is.
+        // A logout turns the user service off; say how to turn it on, unless it already is, and where there is a drive
+        // to mount.
         let unit = verso_linux::service::user_service();
         let enabled = std::process::Command::new("systemctl")
             .args(["--user", "is-enabled", "--quiet", &unit])
             .status()
             .is_ok_and(|status| status.success());
-        if !enabled {
+        if !enabled && verso_core::product::current().drive {
             println!("next: `{}` mounts it now and at every login", verso_core::product::command("mount"));
         }
     }

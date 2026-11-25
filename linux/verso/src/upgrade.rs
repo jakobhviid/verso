@@ -17,9 +17,10 @@ const LOOK: Duration = Duration::from_secs(5);
 /// What the new version is opened with to show the page the old one showed (`verso:show:<page>`).
 pub const SHOW: &str = "show:";
 
-/// Watch the program this window was started from. A Flatpak is updated by Flatpak, and runs on until closed.
+/// Watch the program this window was started from. A Flatpak is updated by Flatpak, and an AppImage by its file's
+/// replacement (a mount of the old file stays as it was); each runs on until closed.
 pub fn follow(application: &adw::Application) {
-    if verso_core::product::current().sandboxed {
+    if !verso_core::product::current().installed() {
         return;
     }
     let Some(mut watch) = ProgramWatch::new() else { return };

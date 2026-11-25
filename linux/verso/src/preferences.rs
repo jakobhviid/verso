@@ -86,9 +86,31 @@ const CROSSLINK_SANDBOXED: Page = Page {
     }],
 };
 
+/// Crosslink in Verso's AppImage: the switch, and the other apps that take part. Verso takes no part itself: an entry
+/// announcing it would name a program in a mount that goes.
+const CROSSLINK_APPIMAGE: Page = Page {
+    pane: Pane::OtherApps,
+    id: "crosslink",
+    title: "Crosslink",
+    icon: "verso-crosslink-symbolic",
+    groups: &[Group {
+        title: None,
+        description: Some("Show in offers the apps that take part. This version of Verso takes no part itself: it runs from a file that may move, so it cannot announce itself to them."),
+        rows: &[Row { key: "crosslink.enabled", title: "Immich Crosslink", subtitle: None, inner: None }],
+        apps: true,
+    }],
+};
+
 /// Crosslink's page, as this build of Verso has it.
 fn crosslink_page() -> &'static Page {
-    if verso_core::product::current().sandboxed { &CROSSLINK_SANDBOXED } else { &CROSSLINK }
+    let product = verso_core::product::current();
+    if product.sandboxed {
+        &CROSSLINK_SANDBOXED
+    } else if product.appimage {
+        &CROSSLINK_APPIMAGE
+    } else {
+        &CROSSLINK
+    }
 }
 
 /// The drive's own pages, under Verso Drive: its General is Drive here, beside Verso's General; Other Apps is Verso's
@@ -109,8 +131,8 @@ fn entries(admin: bool) -> Vec<Entry> {
         Entry { id: GENERAL.id, title: tr(GENERAL.title), icon: GENERAL.icon, heading: None },
         Entry { id: CROSSLINK.id, title: tr(CROSSLINK.title), icon: CROSSLINK.icon, heading: None },
         Entry { id: "features", title: tr("Features"), icon: "application-x-addon-symbolic", heading: None },
-        // In a Flatpak, one page saying the drive is not there, under its own name.
-        if verso_core::product::current().sandboxed {
+        // Without a drive, one page saying it is not there, under its own name.
+        if !verso_core::product::current().drive {
             Entry { id: "drive", title: tr("Verso Drive"), icon: DRIVE_MARK, heading: None }
         } else {
             Entry { id: "drive", title: tr("Status"), icon: DRIVE_MARK, heading: Some(tr("Verso Drive")) }
@@ -194,7 +216,7 @@ pub fn show(window: &Window, page: Option<&str>) {
         let drawn: gtk::Widget = match id.as_str() {
             "account" => account_page(&window).upcast(),
             "features" => crate::account_settings::features_page(&window).upcast(),
-            "drive" if verso_core::product::current().sandboxed => drive_unavailable_page().upcast(),
+            "drive" if !verso_core::product::current().drive => drive_unavailable_page().upcast(),
             "drive" => drive_page(&window).upcast(),
             "admin" => crate::admin::admin_preferences(&window).upcast(),
             other => match drive_pages().chain([&GENERAL, crosslink_page()]).find(|page| page.id == other) {
@@ -260,13 +282,14 @@ fn show_drive_pages(preferences: &gtk::Widget, on: bool) {
 
 /// Verso Drive: its switch, then, while it is on, where it is, whether it is mounted, and the buttons to mount,
 /// unmount and open it.
-/// Verso Drive in Verso's Flatpak: not there, why, and where to have it.
+/// Verso Drive in Verso's Flatpak and AppImage: not there, why, and where to have it.
 fn drive_unavailable_page() -> adw::PreferencesPage {
-    let status = adw::StatusPage::builder()
-        .icon_name("drive-harddisk-symbolic")
-        .title(tr("Verso Drive"))
-        .description(tr("Your library as a drive in Files needs access outside the Flatpak's sandbox, so it is not part of this version of Verso. Verso installed with Homebrew has it."))
-        .build();
+    let why = if verso_core::product::current().appimage {
+        "Your library as a drive in Files needs Verso installed on the system, not run from an AppImage, so it is not part of this version of Verso. Verso installed with Homebrew has it."
+    } else {
+        "Your library as a drive in Files needs access outside the Flatpak's sandbox, so it is not part of this version of Verso. Verso installed with Homebrew has it."
+    };
+    let status = adw::StatusPage::builder().icon_name("drive-harddisk-symbolic").title(tr("Verso Drive")).description(tr(why)).build();
     status.set_child(Some(&gtk::LinkButton::builder().label(tr("Installing Verso with Homebrew")).uri("https://github.com/jakobhviid/verso#with-homebrew").halign(gtk::Align::Center).build()));
     let group = adw::PreferencesGroup::new();
     group.add(&status);
@@ -465,8 +488,8 @@ fn account_page(window: &Window) -> adw::PreferencesPage {
         page.add(&keys_group(window));
     }
     let sign_out_group = adw::PreferencesGroup::new();
-    // A Flatpak has no drive to take away.
-    if !verso_core::product::current().sandboxed {
+    // Without a drive there is none to take away.
+    if verso_core::product::current().drive {
         sign_out_group.set_description(Some(tr("Signing out also takes Verso Drive out of Files.")));
     }
     let sign_out = adw::ButtonRow::builder().title(tr("Sign Out…")).css_classes(["destructive-action"]).build();

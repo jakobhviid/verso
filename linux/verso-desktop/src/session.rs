@@ -358,9 +358,9 @@ fn remember_server(paths: &Paths, url: &str, trusted: Option<CertificatePin>) ->
 /// Enable Verso's service and restart it, so the tray (and the drive, when it is on) comes now and at every login,
 /// with the new credential and settings.
 pub fn start_service() -> Result<(), String> {
-    if verso_core::product::current().sandboxed {
-        crate::sandbox::run_at_login(tr("Verso shows its icon in the top bar while you are signed in."));
-        return crate::sandbox::restart().map_err(|error| tr("Signed in, but the background service did not start: {error}").replace("{error}", &error));
+    if !verso_core::product::current().installed() {
+        crate::instance::run_at_login(tr("Verso shows its icon in the top bar while you are signed in."));
+        return crate::instance::restart().map_err(|error| tr("Signed in, but the background service did not start: {error}").replace("{error}", &error));
     }
     let unit = verso_linux::service::ensure_user_service(&Paths::from_environment())
         .map_err(|error| tr("Signed in, but the background service cannot start: {error}.").replace("{error}", &error.to_string()))?;
@@ -370,8 +370,9 @@ pub fn start_service() -> Result<(), String> {
 /// Start the service if it is installed and not running (Verso's tray, quit from its menu, comes back with the window),
 /// and have it start at every login, with the drive while it is on.
 pub fn wake_service() {
-    if verso_core::product::current().sandboxed {
-        let _ = crate::sandbox::start();
+    if !verso_core::product::current().installed() {
+        crate::instance::refresh_login();
+        let _ = crate::instance::start();
         return;
     }
     if let Some(unit) = verso_linux::service::installed_user_service() {
@@ -381,8 +382,8 @@ pub fn wake_service() {
 
 /// Whether the drive is on (`mount.enabled`): Verso's is off until switched on in its preferences.
 pub fn drive_enabled() -> bool {
-    // A Flatpak has no drive (`Product::sandboxed`).
-    if verso_core::product::current().sandboxed {
+    // The Flatpak and the AppImage have no drive (`Product::drive`).
+    if !verso_core::product::current().drive {
         return false;
     }
     let paths = Paths::from_environment();
@@ -392,7 +393,7 @@ pub fn drive_enabled() -> bool {
 /// Switch the drive on or off (`mount.enabled`), and restart the service, which then mounts it, or takes it away and
 /// keeps the tray.
 pub fn set_drive(enabled: bool) -> Result<(), String> {
-    if verso_core::product::current().sandboxed {
+    if !verso_core::product::current().drive {
         return Err(tr("Verso Drive is not part of this version of Verso.").to_owned());
     }
     let paths = Paths::from_environment();
@@ -660,9 +661,10 @@ pub fn disconnect() -> Result<(), String> {
     if !outcome.status.success() {
         return Err(String::from_utf8_lossy(&outcome.stderr).trim().to_owned());
     }
-    // A Flatpak's service has no systemd to turn it off: it is asked to stop.
-    if verso_core::product::current().sandboxed {
-        crate::sandbox::stop();
+    // Without systemd to turn the service off, it is asked to stop, and no longer asked to start at login.
+    if !verso_core::product::current().installed() {
+        crate::instance::stop();
+        crate::instance::stop_at_login();
     }
     Ok(())
 }

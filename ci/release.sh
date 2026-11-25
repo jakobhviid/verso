@@ -5,9 +5,9 @@
 #   ci/release.sh                  the version the next release would take (ci/version.sh) and its notes
 #   ci/release.sh tag [VERSION]    tag HEAD, clean and on origin/main, as vVERSION (the suggested one when not given),
 #                                  signed, and push the tag
-#   ci/release.sh build TAG        build Linux's files from the tag, in a worktree of its own (the tarball, the rpm
-#                                  and the deb, the Flatpak's source and, where flatpak-builder is, the Flatpak), into
-#                                  target/dist/TAG, and make a draft release of them here
+#   ci/release.sh build TAG        build Linux's files from the tag, in a worktree of its own (the tarball, the AppImage,
+#                                  the rpm and the deb, the Flatpak's source and, where flatpak-builder is, the
+#                                  Flatpak), into target/dist/TAG, and make a draft release of them here
 #   ci/release.sh publish TAG      publish the draft, then bump the tap's `verso` cask (not for a pre-release)
 #
 # --dry-run, anywhere on the line, changes nothing outside this checkout: every tag, push, release and cask change is
@@ -22,6 +22,7 @@ tap=jakobhviid/homebrew-tap
 cask=Casks/verso.rb
 tarball=verso-x86_64.tar.gz
 flatpak=verso-x86_64.flatpak
+appimage=verso-x86_64.AppImage
 # The packages, named by the release's version (linux/packaging/verso-packages.sh).
 rpm_of() { echo "verso-$1.x86_64.rpm"; }
 deb_of() { echo "verso_$1_amd64.deb"; }
@@ -96,7 +97,7 @@ previous_tag() {
 }
 
 # The release's text: what it holds and needs, what changed for users since the previous release, and the Flatpak
-# (whose runtime the tree's manifest names).
+# (whose runtime the tree's manifest names) and the AppImage.
 release_text() {
   local version=$1 previous=$2 end=$3 tree=$4 notes runtime upgrade
   notes=$(ci/release-notes.sh "$previous" "$end")
@@ -105,7 +106,7 @@ release_text() {
   is_prerelease "$version" && upgrade="A pre-release: Homebrew's cask stays at the last release."
   printf "Evaluation build for x86_64 Linux. Needs GNOME 49's libraries or newer, libadwaita 1.8 and GTK 4.18 "
   printf '(Fedora 43 and newer, Ubuntu 25.10 and 26.04 LTS, Debian 14, Arch); on an older system Verso says so as it '
-  printf 'starts, and the Flatpak below runs there, without Verso Drive. From the tarball, which Homebrew installs, '
+  printf 'starts, and the AppImage and the Flatpak below run there, without Verso Drive. From the tarball, which Homebrew installs, '
   printf 'Verso Drive needs FUSE 3, and its menu in Files nautilus-python. %s\n\n' "$upgrade"
   printf '**Packages:** `%s` for Fedora 43 and newer (`sudo dnf install ./%s`), and `%s` for Ubuntu 26.04 and ' \
     "$(rpm_of "$version")" "$(rpm_of "$version")" "$(deb_of "$version")"
@@ -122,7 +123,13 @@ release_text() {
   printf '**Flatpak (test build):** `%s` is this release as a Flatpak, without Verso Drive. Install it with ' "$flatpak"
   printf '`flatpak install --user %s` (it fetches the GNOME %s runtime from Flathub) and run it with ' \
     "$flatpak" "$runtime"
-  printf '`flatpak run dev.hviid.Verso`. With no keyring in the session, it keeps the sign-in in its own file.\n'
+  printf '`flatpak run dev.hviid.Verso`. With no keyring in the session, it keeps the sign-in in its own file.\n\n'
+  printf '**AppImage:** `%s` is the same Verso, without Verso Drive, for the systems the Flatpak is for, with the ' "$appimage"
+  printf 'libraries it needs inside it, the C library included, so it runs on systems as old as Ubuntu 24.04. Make it '
+  printf 'executable and run it (`chmod +x %s && ./%s`); it needs FUSE 3 (`fusermount3`, which Ubuntu 24.04 has), or run ' \
+    "$appimage" "$appimage"
+  printf 'it with `--appimage-extract-and-run`. Videos play without H.264, which no patent-free decoder reads. '
+  printf 'AppImage updaters (AppImageUpdate) take its zsync file, `%s.zsync`.\n' "$appimage"
 }
 
 # The GitHub repositories a release goes to: this one, which Homebrew's cask and Verso's page download from.
@@ -224,10 +231,14 @@ build() {
   rm -rf "$out"
   mkdir -p "$out"
   (cd "$work/verso" && in_build_environment linux/packaging/verso-tarball.sh "$out")
+  # The AppImage, from the same toolbox: its libraries are Fedora 44's, and it carries them.
+  (cd "$work/verso" && in_build_environment linux/packaging/verso-appimage.sh "$out")
   # The rpm and the deb, each in a container of its distribution, with podman or docker here.
   (cd "$work/verso" && linux/packaging/verso-packages.sh "$out")
   (cd "$work/verso" && linux/packaging/flatpak/source-archive.sh "$out")
-  files=("$out/$tarball" "$out/$(rpm_of "$version")" "$out/$(deb_of "$version")")
+  files=("$out/$tarball" "$out/$appimage" "$out/$(rpm_of "$version")" "$out/$(deb_of "$version")")
+  # Where zsyncmake was here, AppImage updaters have their file to read.
+  [ ! -e "$out/$appimage.zsync" ] || files+=("$out/$appimage.zsync")
   if command -v flatpak-builder >/dev/null; then
     mkdir "$out/flatpak"
     cp "$work/verso/linux/packaging/flatpak/dev.hviid.Verso.yml" "$out/verso-source.tar.gz" "$out/flatpak/"
@@ -319,11 +330,11 @@ bump_cask() {
 
 publish() {
   [ $# -eq 1 ] || usage
-  local tag=$1 version repositories release draft digest flatpaks packages first_digest="" mac_digest latest=(--latest)
+  local tag=$1 version repositories release draft digest flatpaks appimages packages first_digest="" mac_digest latest=(--latest)
   version=$(version_of "$tag")
   signed_in_to_github
   mapfile -t repositories < <(release_repositories)
-  # Every release goes out whole: the same tarball everywhere, the packages and the Flatpak beside it.
+  # Every release goes out whole: the same tarball everywhere, the packages, the AppImage and the Flatpak beside it.
   for release in "${repositories[@]}"; do
     draft=$(gh release view "$tag" --repo "$release" --json isDraft --jq .isDraft 2>/dev/null) ||
       die "$release has no release $tag; build it first (ci/release.sh build $tag)"
@@ -331,10 +342,13 @@ publish() {
       --jq ".assets[] | select(.name == \"$tarball\") | .digest")
     flatpaks=$(gh release view "$tag" --repo "$release" --json assets \
       --jq "[.assets[] | select(.name == \"$flatpak\")] | length")
+    appimages=$(gh release view "$tag" --repo "$release" --json assets \
+      --jq "[.assets[] | select(.name == \"$appimage\")] | length")
     packages=$(gh release view "$tag" --repo "$release" --json assets --jq "[.assets[] | select(.name ==
       \"$(rpm_of "$version")\" or .name == \"$(deb_of "$version")\")] | length")
     [ -n "$digest" ] || die "$release's $tag has no $tarball"
     [ "$packages" -eq 2 ] || die "$release's $tag lacks $(rpm_of "$version") or $(deb_of "$version")"
+    [ "$appimages" -gt 0 ] || die "$release's $tag has no $appimage; build it first (ci/release.sh build $tag)"
     [ "$flatpaks" -gt 0 ] || die "$release's $tag has no $flatpak; attach it first (ci/release.sh build says how)"
     [ -z "$first_digest" ] || [ "$digest" = "$first_digest" ] ||
       die "$release's $tarball is not the one in $repository ($digest, $first_digest)"

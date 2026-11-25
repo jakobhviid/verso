@@ -749,17 +749,17 @@ the daemon's own look can stop for them.
 
 ## An AppImage beside the Flatpak
 
-For the people who prefer an AppImage to a Flatpak: the same Verso as the Flatpak's (the gallery, no Verso Drive, no
-service, no Files menu), for the same systems, older ones like Ubuntu 24.04 among them.
-1. **Built beside the tarball** by `ci/release.sh build`, in the Fedora 44 toolbox, from the same build: go-appimage's
-   deploy mode bundles every library the window needs, the C library with its loader included, so it runs on systems
-   older than the build's; the graphics drivers stay the host's. No GNOME VM, unlike the Flatpak.
-2. **A product of its own** (`verso_core::product`): the Flatpak's feature set without its sandbox, so the sign-in is
-   kept in the keyring as the tarball keeps it, not through the Flatpak's portal.
-3. **Checked in the packaging matrix** (`lab/packaging/`): on Ubuntu 24.04, the window starts under its headless
-   display and signs in to a lab server.
-4. **On the release** as `verso-x86_64.AppImage`, offered on Verso's page and in the notes beside the Flatpak, with
-   a zsync file for AppImage updaters.
+Done: `verso-x86_64.AppImage` with its zsync file, built beside the tarball by `ci/release.sh build`, the Flatpak's
+Verso for older systems without its sandbox, checked on Ubuntu 24.04 in the packaging matrix and offered in the notes
+and on Verso's page (ARCHITECTURE, "Verso as an AppImage"; SPEC, "Files on disk"; WORKFLOWS, section 1). Left:
+- **Video:** H.264 and H.265 do not play, as Fedora carries no decoder and Cisco's OpenH264 may only be fetched from
+  Cisco. Options: fetch OpenH264 at first use, as a Flatpak's extension does, or open such a video in the system's
+  player.
+- **Browser sign-in without an AppImage tool:** the `app.immich` redirect needs the AppImage added to the desktop. An
+  entry written by Verso itself, naming the file and written again where it moved, would do; it was left out, as the
+  entry is a file of Verso's that outlives a deleted AppImage.
+- **To see by hand, in a GNOME session:** the top bar icon and its menu from an AppImage, the autostart entry at a
+  real login, and the AppImage added by Gear Lever (the matrix runs it unpacked, under a headless compositor).
 
 ## Watch upstream
 

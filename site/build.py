@@ -36,6 +36,8 @@ REPOSITORY = "https://github.com/jakobhviid/verso"
 RELEASES = REPOSITORY
 TARBALL = "verso-x86_64.tar.gz"
 FLATPAK = "verso-x86_64.flatpak"
+# The same Verso as one file with its libraries inside, for the systems the Flatpak is for (linux/packaging/verso-appimage.sh).
+APPIMAGE = "verso-x86_64.AppImage"
 # The rpm and the deb of a release (linux/packaging/verso-packages.sh), named by its version.
 RPM = "verso-{version}.x86_64.rpm"
 DEB = "verso_{version}_amd64.deb"
@@ -364,6 +366,7 @@ def main(releases_file, output, app_store=None, testflight=TESTFLIGHT):
         "packages": packages(linux, version),
         "tarball": link(tarball, f"The tarball, {TARBALL}"),
         "flatpak": link(asset_url(linux, FLATPAK), f"The Flatpak, {FLATPAK}"),
+        "appimage": link(asset_url(linux, APPIMAGE), f"The AppImage, {APPIMAGE}"),
         "macos": macos,
         "ios_status": ('<span class="status out">App Store</span>' if app_store
                        else '<span class="status out">TestFlight</span>' if testflight

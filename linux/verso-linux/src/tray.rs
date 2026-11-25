@@ -81,8 +81,15 @@ pub struct View {
     pub unmounted: bool,
 }
 
-/// The program the tray opens as the app: Verso's window, where it is found.
+/// The program the tray opens as the app: Verso's window, where it is found. An AppImage's is the AppImage file run
+/// again, an instance of its own (the service's mount goes with the service, and the window it opened should not).
 pub fn gallery_program() -> Option<std::path::PathBuf> {
+    if product::current().appimage {
+        let image = std::env::var_os("APPIMAGE").map(std::path::PathBuf::from).filter(|file| file.is_absolute());
+        if image.is_some() {
+            return image;
+        }
+    }
     crate::programs::find(product::WINDOW)
 }
 
@@ -156,7 +163,7 @@ impl View {
         }
         // Verso's drive from the menu, as from Preferences: Unmount while it is mounted, Mount while it is on and not,
         // so nobody has to look for it in Preferences to have it back.
-        if !self.product.sandboxed {
+        if self.product.drive {
             if !self.mount_point.is_empty() {
                 lines.push(Line::Action(tr("Unmount Verso Drive").to_owned(), Action::Unmount));
             } else if self.unmounted {

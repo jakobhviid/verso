@@ -275,8 +275,8 @@ fn default_value_for(setting: &Setting, product: &crate::product::Product) -> &'
 pub fn choices(setting: &Setting) -> &'static [&'static str] {
     match setting.kind {
         Kind::Choice(_) if setting.key == "mount.name" => crate::product::current().drive_names,
-        // A Flatpak has no drive to open.
-        Kind::Choice(_) if setting.key == "tray.double_click" && crate::product::current().sandboxed => &["gallery", "preferences"],
+        // A build without a drive has none to open.
+        Kind::Choice(_) if setting.key == "tray.double_click" && !crate::product::current().drive => &["gallery", "preferences"],
         Kind::Choice(words) => words,
         _ => &[],
     }

@@ -136,6 +136,10 @@ impl ProgramWatch {
     /// was when the watch began: the launcher is what was started and what an upgrade replaces, while the program's own
     /// path is one version's folder under Homebrew, gone after an upgrade.
     pub fn new() -> Option<ProgramWatch> {
+        // A Flatpak and an AppImage are replaced as a whole, never program by program under a running one.
+        if !verso_core::product::current().installed() {
+            return None;
+        }
         if let Some(launcher) = crate::programs::launcher() {
             let file = std::fs::metadata(&launcher).ok()?;
             return Some(ProgramWatch { path: launcher, running: (file.dev(), file.ino()), missing_since: None });
@@ -411,9 +415,9 @@ where
     let account = server.account.clone().unwrap_or_default();
     let actions = crate::dbus::Actions::without_drive();
     let connection = runtime.block_on(crate::dbus::serve(state.clone(), "", &server.url, &version, &account, actions));
-    // In a Flatpak, each start is a new instance of the sandbox, and nothing keeps a second one from starting: one
+    // In a Flatpak or an AppImage, each start is a new instance, and nothing keeps a second one from starting: one
     // whose name is taken leaves, so there is one service and one tray.
-    if connection.is_none() && verso_core::product::current().sandboxed {
+    if connection.is_none() && !verso_core::product::current().installed() {
         log::info!("another Verso service runs; this one leaves");
         return StopReason::Signal;
     }

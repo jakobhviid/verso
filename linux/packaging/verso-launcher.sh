@@ -56,7 +56,7 @@ else
     reason="$needs, and this system has no libadwaita."
 fi
 systems="New enough: Fedora 43 and newer, Ubuntu 25.10 and 26.04 LTS, Debian 14, Arch and other rolling distributions."
-flatpak="Verso's Flatpak, verso-x86_64.flatpak on its releases page, runs on this system, without Verso Drive."
+flatpak="Verso's Flatpak (verso-x86_64.flatpak) and its AppImage (verso-x86_64.AppImage), on its releases page, run on this system, without Verso Drive."
 printf 'error: %s\n%s\n%s\nSee %s\n' "$reason" "$systems" "$flatpak" "$address" >&2
 if [ -n "$library" ]; then
     printf 'The libadwaita it would load: %s\n' "$library" >&2
