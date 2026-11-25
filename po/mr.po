@@ -10,13 +10,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: linux/verso-service/src/commands.rs:471
-#: linux/verso-linux/src/daemon.rs:518
+#: linux/verso-service/src/commands.rs:473
+#: linux/verso-linux/src/daemon.rs:522
 msgid "Verso Drive is not mounted"
 msgstr "Verso Drive माउंट केलेले नाही"
 
-#: linux/verso-service/src/commands.rs:471
-#: linux/verso-linux/src/daemon.rs:518
+#: linux/verso-service/src/commands.rs:473
+#: linux/verso-linux/src/daemon.rs:522
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "Verso च्या प्राधान्यांमध्ये ड्राइव्ह चालू करा, नंतर दुवा पुन्हा उघडा."
 
@@ -28,78 +28,78 @@ msgstr "कीरिंग लॉक राहिली. पुन्हा प�
 msgid "Immich is not mounted"
 msgstr "Immich माउंट केलेले नाही"
 
-#: linux/verso-linux/src/daemon.rs:517
+#: linux/verso-linux/src/daemon.rs:521
 msgid "Links from other apps are off"
 msgstr "इतर ॲप्सकडील दुवे बंद आहेत"
 
-#: linux/verso-linux/src/daemon.rs:517
+#: linux/verso-linux/src/daemon.rs:521
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "इतर ॲप्स ज्याकडे दुवा देतात ते दाखवण्यासाठी Verso च्या सेटिंग्जमध्ये Immich Crosslink सुरू करा."
 
-#: linux/verso-linux/src/daemon.rs:519
+#: linux/verso-linux/src/daemon.rs:523
 msgid "A link from another app cannot be opened"
 msgstr "दुसऱ्या ॲपकडील दुवा उघडता येत नाही"
 
-#: linux/verso-linux/src/daemon.rs:519
+#: linux/verso-linux/src/daemon.rs:523
 msgid "It is not a valid Immich link."
 msgstr "हा वैध Immich दुवा नाही."
 
-#: linux/verso-linux/src/daemon.rs:520
 #: linux/verso-linux/src/daemon.rs:524
+#: linux/verso-linux/src/daemon.rs:528
 msgid "Nothing to show"
 msgstr "दाखवण्यासारखे काही नाही"
 
-#: linux/verso-linux/src/daemon.rs:520
+#: linux/verso-linux/src/daemon.rs:524
 msgid "Verso Drive has no place for what this link points to."
 msgstr "हा दुवा ज्याकडे निर्देश करतो, त्यासाठी Verso Drive मध्ये जागा नाही."
 
-#: linux/verso-linux/src/daemon.rs:521
+#: linux/verso-linux/src/daemon.rs:525
 msgid "Not signed in to {host}"
 msgstr "{host} वर साइन इन केलेले नाही"
 
-#: linux/verso-linux/src/daemon.rs:521
+#: linux/verso-linux/src/daemon.rs:525
 msgid "Verso is signed in to another Immich server."
 msgstr "Verso दुसऱ्या Immich सर्व्हरवर साइन इन केलेले आहे."
 
-#: linux/verso-linux/src/daemon.rs:522
+#: linux/verso-linux/src/daemon.rs:526
 msgid "Another Immich account"
 msgstr "दुसरे Immich खाते"
 
-#: linux/verso-linux/src/daemon.rs:522
+#: linux/verso-linux/src/daemon.rs:526
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "हा दुवा दुसऱ्या खात्यासाठी आहे, Verso ज्या खात्याने साइन इन केलेले आहे त्यासाठी नाही."
 
-#: linux/verso-linux/src/daemon.rs:525
+#: linux/verso-linux/src/daemon.rs:529
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "ड्राइव्ह हे दाखवत नाही. ते लपवलेले असू शकते, बंद केलेल्या विभागात असू शकते, किंवा तुमच्याशी शेअर केलेले नसू शकते."
 
-#: linux/verso-linux/src/daemon.rs:527
-#: linux/verso-linux/src/daemon.rs:613
+#: linux/verso-linux/src/daemon.rs:531
+#: linux/verso-linux/src/daemon.rs:617
 msgid "Immich is unreachable"
 msgstr "Immich पर्यंत पोहोचता येत नाही"
 
-#: linux/verso-linux/src/daemon.rs:527
+#: linux/verso-linux/src/daemon.rs:531
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "Immich सर्व्हरपर्यंत पोहोचता येत नाही. नंतर दुवा पुन्हा उघडून पहा."
 
-#: linux/verso-linux/src/daemon.rs:609
+#: linux/verso-linux/src/daemon.rs:613
 msgid "Immich's certificate is not trusted"
 msgstr "Immich चे प्रमाणपत्र विश्वसनीय नाही"
 
-#: linux/verso-linux/src/daemon.rs:610
+#: linux/verso-linux/src/daemon.rs:614
 msgid "The Immich server presented a certificate {app} does not trust, so nothing is sent to it. Open {app} to check the certificate. Files you opened before stay available."
 msgstr "Immich सर्व्हरने असे प्रमाणपत्र दाखवले ज्यावर {app} विश्वास ठेवत नाही, म्हणून त्याला काहीही पाठवले जात नाही. प्रमाणपत्र तपासण्यासाठी {app} उघडा. आधी उघडलेल्या फायली उपलब्ध राहतात."
 
-#: linux/verso-linux/src/daemon.rs:614
+#: linux/verso-linux/src/daemon.rs:618
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "Immich सर्व्हरपर्यंत पोहोचता येत नाही. आधी उघडलेल्या फाइल उपलब्ध राहतील."
 
-#: linux/verso-linux/src/daemon.rs:617
-#: linux/verso-linux/src/tray.rs:128
+#: linux/verso-linux/src/daemon.rs:621
+#: linux/verso-linux/src/tray.rs:135
 msgid "Signed out of Immich"
 msgstr "Immich मधून साइन आउट झाले"
 
-#: linux/verso-linux/src/daemon.rs:618
+#: linux/verso-linux/src/daemon.rs:622
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "Immich आता हे साइन-इन स्वीकारत नाही. पुन्हा साइन इन करण्यासाठी {app} उघडा."
 
@@ -210,67 +210,67 @@ msgstr "{drive} “{name}” उघडू शकत नाही"
 msgid "Verso Drive"
 msgstr "Verso Drive"
 
-#: linux/verso-linux/src/tray.rs:126
+#: linux/verso-linux/src/tray.rs:133
 msgid "Connected to {server}"
 msgstr "{server} शी कनेक्ट केले"
 
-#: linux/verso-linux/src/tray.rs:127
+#: linux/verso-linux/src/tray.rs:134
 msgid "{server} is not reachable"
 msgstr "{server} पर्यंत पोहोचता येत नाही"
 
-#: linux/verso-linux/src/tray.rs:129
+#: linux/verso-linux/src/tray.rs:136
 msgid "Signed in to {server}"
 msgstr "{server} वर साइन इन केले"
 
-#: linux/verso-linux/src/tray.rs:138
+#: linux/verso-linux/src/tray.rs:145
 msgid "Verso Drive is unmounted"
 msgstr "Verso Drive अनमाउंट केले आहे"
 
-#: linux/verso-linux/src/tray.rs:141
+#: linux/verso-linux/src/tray.rs:148
 msgid "Server version: Immich {version}"
 msgstr "सर्व्हर आवृत्ती: Immich {version}"
 
-#: linux/verso-linux/src/tray.rs:144
+#: linux/verso-linux/src/tray.rs:151
 msgid "Signed in as: {account}"
 msgstr "साइन इन केलेले खाते: {account}"
 
-#: linux/verso-linux/src/tray.rs:148
+#: linux/verso-linux/src/tray.rs:155
 msgid "Try Again Now"
 msgstr "आत्ता पुन्हा प्रयत्न करा"
 
-#: linux/verso-linux/src/tray.rs:152
+#: linux/verso-linux/src/tray.rs:159
 msgid "Open {app}"
 msgstr "{app} उघडा"
 
-#: linux/verso-linux/src/tray.rs:155
+#: linux/verso-linux/src/tray.rs:162
 msgid "Open in Files"
 msgstr "फाइल्स् मध्ये उघडा"
 
-#: linux/verso-linux/src/tray.rs:161
+#: linux/verso-linux/src/tray.rs:168
 msgid "Unmount Verso Drive"
 msgstr "Verso Drive अनमाउंट करा"
 
-#: linux/verso-linux/src/tray.rs:163
+#: linux/verso-linux/src/tray.rs:170
 msgid "Mount Verso Drive"
 msgstr "Verso Drive माउंट करा"
 
-#: linux/verso-linux/src/tray.rs:166
+#: linux/verso-linux/src/tray.rs:173
 msgid "Preferences…"
 msgstr "प्राधान्ये…"
 
-#: linux/verso-linux/src/tray.rs:169
+#: linux/verso-linux/src/tray.rs:176
 msgid "Get {app} {version}…"
 msgstr "{app} {version} डाउनलोड करा…"
 
-#: linux/verso-linux/src/tray.rs:175
+#: linux/verso-linux/src/tray.rs:182
 msgid "Sign In…"
 msgstr "साइन इन करा…"
 
-#: linux/verso-linux/src/tray.rs:177
+#: linux/verso-linux/src/tray.rs:184
 msgid "Sign Out…"
 msgstr "साइन आउट करा…"
 
-#: linux/verso-linux/src/tray.rs:179
+#: linux/verso-linux/src/tray.rs:186
 msgid "Quit {app}"
 msgstr "{app} मधून बाहेर पडा"
 
@@ -520,13 +520,13 @@ msgstr "या प्रमाणपत्रावर विश्वास ठ
 
 #: linux/verso-desktop/src/session.rs:268
 #: linux/verso-desktop/src/session.rs:278
-#: linux/verso-desktop/src/session.rs:617
-#: linux/verso-desktop/src/session.rs:620
+#: linux/verso-desktop/src/session.rs:618
+#: linux/verso-desktop/src/session.rs:621
 msgid "Kept in {file}"
 msgstr "{file} मध्ये ठेवले आहे"
 
 #: linux/verso-desktop/src/session.rs:273
-#: linux/verso-desktop/src/session.rs:622
+#: linux/verso-desktop/src/session.rs:623
 msgid "Kept in the keyring"
 msgstr "कीरिंगमध्ये ठेवले आहे"
 
@@ -547,27 +547,27 @@ msgstr "साइन इन झाले, पण पार्श्वभूम�
 msgid "Signed in, but the background service cannot start: {error}."
 msgstr "साइन इन झाले, पण पार्श्वभूमी सेवा सुरू होऊ शकत नाही: {error}."
 
-#: linux/verso-desktop/src/session.rs:396
+#: linux/verso-desktop/src/session.rs:397
 msgid "Verso Drive is not part of this version of Verso."
 msgstr "Verso Drive, Verso च्या या आवृत्तीचा भाग नाही."
 
-#: linux/verso-desktop/src/session.rs:402
+#: linux/verso-desktop/src/session.rs:403
 msgid "The background service did not restart: {error}"
 msgstr "पार्श्वभूमी सेवा पुन्हा सुरू झाली नाही: {error}"
 
-#: linux/verso-desktop/src/session.rs:443
+#: linux/verso-desktop/src/session.rs:444
 msgid "Immich Mount is no longer signed in."
 msgstr "Immich Mount आता साइन इन केलेले नाही."
 
-#: linux/verso-desktop/src/session.rs:449
+#: linux/verso-desktop/src/session.rs:450
 msgid "Immich no longer accepts Immich Mount's sign-in; sign in instead."
 msgstr "Immich आता Immich Mount चे साइन-इन स्वीकारत नाही; त्याऐवजी साइन इन करा."
 
-#: linux/verso-desktop/src/session.rs:498
+#: linux/verso-desktop/src/session.rs:499
 msgid "Signed in, but the mount cannot start: {error}."
 msgstr "साइन इन झाले, पण माउंट सुरू होऊ शकत नाही: {error}."
 
-#: linux/verso-desktop/src/session.rs:502
+#: linux/verso-desktop/src/session.rs:503
 msgid "Signed in, but the mount did not start: {error}"
 msgstr "साइन इन झाले, पण माउंट सुरू झाले नाही: {error}"
 

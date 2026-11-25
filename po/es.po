@@ -10,13 +10,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: linux/verso-service/src/commands.rs:471
-#: linux/verso-linux/src/daemon.rs:518
+#: linux/verso-service/src/commands.rs:473
+#: linux/verso-linux/src/daemon.rs:522
 msgid "Verso Drive is not mounted"
 msgstr "Verso Drive no está montado"
 
-#: linux/verso-service/src/commands.rs:471
-#: linux/verso-linux/src/daemon.rs:518
+#: linux/verso-service/src/commands.rs:473
+#: linux/verso-linux/src/daemon.rs:522
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "Activa la unidad en las Preferencias de Verso y vuelve a abrir el enlace."
 
@@ -28,78 +28,78 @@ msgstr "El depósito de claves siguió bloqueado. Abre {app} o ejecuta «{comman
 msgid "Immich is not mounted"
 msgstr "Immich no está montado"
 
-#: linux/verso-linux/src/daemon.rs:517
+#: linux/verso-linux/src/daemon.rs:521
 msgid "Links from other apps are off"
 msgstr "Los enlaces de otras apps están desactivados"
 
-#: linux/verso-linux/src/daemon.rs:517
+#: linux/verso-linux/src/daemon.rs:521
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "Activa Immich Crosslink en los ajustes de Verso para mostrar lo que enlazan otras apps."
 
-#: linux/verso-linux/src/daemon.rs:519
+#: linux/verso-linux/src/daemon.rs:523
 msgid "A link from another app cannot be opened"
 msgstr "No se puede abrir un enlace de otra app"
 
-#: linux/verso-linux/src/daemon.rs:519
+#: linux/verso-linux/src/daemon.rs:523
 msgid "It is not a valid Immich link."
 msgstr "No es un enlace de Immich válido."
 
-#: linux/verso-linux/src/daemon.rs:520
 #: linux/verso-linux/src/daemon.rs:524
+#: linux/verso-linux/src/daemon.rs:528
 msgid "Nothing to show"
 msgstr "No hay nada que mostrar"
 
-#: linux/verso-linux/src/daemon.rs:520
+#: linux/verso-linux/src/daemon.rs:524
 msgid "Verso Drive has no place for what this link points to."
 msgstr "Verso Drive no tiene dónde mostrar aquello a lo que apunta este enlace."
 
-#: linux/verso-linux/src/daemon.rs:521
+#: linux/verso-linux/src/daemon.rs:525
 msgid "Not signed in to {host}"
 msgstr "No has iniciado sesión en {host}"
 
-#: linux/verso-linux/src/daemon.rs:521
+#: linux/verso-linux/src/daemon.rs:525
 msgid "Verso is signed in to another Immich server."
 msgstr "Verso tiene la sesión iniciada en otro servidor de Immich."
 
-#: linux/verso-linux/src/daemon.rs:522
+#: linux/verso-linux/src/daemon.rs:526
 msgid "Another Immich account"
 msgstr "Otra cuenta de Immich"
 
-#: linux/verso-linux/src/daemon.rs:522
+#: linux/verso-linux/src/daemon.rs:526
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "El enlace es de una cuenta distinta de aquella con la que Verso ha iniciado sesión."
 
-#: linux/verso-linux/src/daemon.rs:525
+#: linux/verso-linux/src/daemon.rs:529
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "La unidad no muestra esto. Puede estar oculto, en una sección desactivada o no compartido contigo."
 
-#: linux/verso-linux/src/daemon.rs:527
-#: linux/verso-linux/src/daemon.rs:613
+#: linux/verso-linux/src/daemon.rs:531
+#: linux/verso-linux/src/daemon.rs:617
 msgid "Immich is unreachable"
 msgstr "No se puede acceder a Immich"
 
-#: linux/verso-linux/src/daemon.rs:527
+#: linux/verso-linux/src/daemon.rs:531
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "No se puede acceder al servidor de Immich. Vuelve a probar el enlace más tarde."
 
-#: linux/verso-linux/src/daemon.rs:609
+#: linux/verso-linux/src/daemon.rs:613
 msgid "Immich's certificate is not trusted"
 msgstr "El certificado de Immich no es de confianza"
 
-#: linux/verso-linux/src/daemon.rs:610
+#: linux/verso-linux/src/daemon.rs:614
 msgid "The Immich server presented a certificate {app} does not trust, so nothing is sent to it. Open {app} to check the certificate. Files you opened before stay available."
 msgstr "El servidor de Immich presentó un certificado en el que {app} no confía, así que no se le envía nada. Abre {app} para revisar el certificado. Los archivos que abriste antes siguen disponibles."
 
-#: linux/verso-linux/src/daemon.rs:614
+#: linux/verso-linux/src/daemon.rs:618
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "No se puede acceder al servidor de Immich. Los archivos que abriste antes siguen disponibles."
 
-#: linux/verso-linux/src/daemon.rs:617
-#: linux/verso-linux/src/tray.rs:128
+#: linux/verso-linux/src/daemon.rs:621
+#: linux/verso-linux/src/tray.rs:135
 msgid "Signed out of Immich"
 msgstr "Sesión de Immich cerrada"
 
-#: linux/verso-linux/src/daemon.rs:618
+#: linux/verso-linux/src/daemon.rs:622
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "Immich ya no acepta este inicio de sesión. Abre {app} para volver a iniciar sesión."
 
@@ -210,67 +210,67 @@ msgstr "{drive} no puede abrir «{name}»"
 msgid "Verso Drive"
 msgstr "Verso Drive"
 
-#: linux/verso-linux/src/tray.rs:126
+#: linux/verso-linux/src/tray.rs:133
 msgid "Connected to {server}"
 msgstr "Conectado a {server}"
 
-#: linux/verso-linux/src/tray.rs:127
+#: linux/verso-linux/src/tray.rs:134
 msgid "{server} is not reachable"
 msgstr "No se puede acceder a {server}"
 
-#: linux/verso-linux/src/tray.rs:129
+#: linux/verso-linux/src/tray.rs:136
 msgid "Signed in to {server}"
 msgstr "Sesión iniciada en {server}"
 
-#: linux/verso-linux/src/tray.rs:138
+#: linux/verso-linux/src/tray.rs:145
 msgid "Verso Drive is unmounted"
 msgstr "Verso Drive está desmontado"
 
-#: linux/verso-linux/src/tray.rs:141
+#: linux/verso-linux/src/tray.rs:148
 msgid "Server version: Immich {version}"
 msgstr "Versión del servidor: Immich {version}"
 
-#: linux/verso-linux/src/tray.rs:144
+#: linux/verso-linux/src/tray.rs:151
 msgid "Signed in as: {account}"
 msgstr "Sesión iniciada como: {account}"
 
-#: linux/verso-linux/src/tray.rs:148
+#: linux/verso-linux/src/tray.rs:155
 msgid "Try Again Now"
 msgstr "Volver a intentarlo ahora"
 
-#: linux/verso-linux/src/tray.rs:152
+#: linux/verso-linux/src/tray.rs:159
 msgid "Open {app}"
 msgstr "Abrir {app}"
 
-#: linux/verso-linux/src/tray.rs:155
+#: linux/verso-linux/src/tray.rs:162
 msgid "Open in Files"
 msgstr "Abrir en Archivos"
 
-#: linux/verso-linux/src/tray.rs:161
+#: linux/verso-linux/src/tray.rs:168
 msgid "Unmount Verso Drive"
 msgstr "Desmontar Verso Drive"
 
-#: linux/verso-linux/src/tray.rs:163
+#: linux/verso-linux/src/tray.rs:170
 msgid "Mount Verso Drive"
 msgstr "Montar Verso Drive"
 
-#: linux/verso-linux/src/tray.rs:166
+#: linux/verso-linux/src/tray.rs:173
 msgid "Preferences…"
 msgstr "Preferencias…"
 
-#: linux/verso-linux/src/tray.rs:169
+#: linux/verso-linux/src/tray.rs:176
 msgid "Get {app} {version}…"
 msgstr "Descargar {app} {version}…"
 
-#: linux/verso-linux/src/tray.rs:175
+#: linux/verso-linux/src/tray.rs:182
 msgid "Sign In…"
 msgstr "Iniciar sesión…"
 
-#: linux/verso-linux/src/tray.rs:177
+#: linux/verso-linux/src/tray.rs:184
 msgid "Sign Out…"
 msgstr "Cerrar sesión…"
 
-#: linux/verso-linux/src/tray.rs:179
+#: linux/verso-linux/src/tray.rs:186
 msgid "Quit {app}"
 msgstr "Salir de {app}"
 
@@ -520,13 +520,13 @@ msgstr "Confiar en este certificado"
 
 #: linux/verso-desktop/src/session.rs:268
 #: linux/verso-desktop/src/session.rs:278
-#: linux/verso-desktop/src/session.rs:617
-#: linux/verso-desktop/src/session.rs:620
+#: linux/verso-desktop/src/session.rs:618
+#: linux/verso-desktop/src/session.rs:621
 msgid "Kept in {file}"
 msgstr "Guardada en {file}"
 
 #: linux/verso-desktop/src/session.rs:273
-#: linux/verso-desktop/src/session.rs:622
+#: linux/verso-desktop/src/session.rs:623
 msgid "Kept in the keyring"
 msgstr "Guardada en el depósito de claves"
 
@@ -547,27 +547,27 @@ msgstr "Sesión iniciada, pero el servicio en segundo plano no se inició: {erro
 msgid "Signed in, but the background service cannot start: {error}."
 msgstr "Sesión iniciada, pero el servicio en segundo plano no puede iniciarse: {error}."
 
-#: linux/verso-desktop/src/session.rs:396
+#: linux/verso-desktop/src/session.rs:397
 msgid "Verso Drive is not part of this version of Verso."
 msgstr "Verso Drive no forma parte de esta versión de Verso."
 
-#: linux/verso-desktop/src/session.rs:402
+#: linux/verso-desktop/src/session.rs:403
 msgid "The background service did not restart: {error}"
 msgstr "El servicio en segundo plano no se reinició: {error}"
 
-#: linux/verso-desktop/src/session.rs:443
+#: linux/verso-desktop/src/session.rs:444
 msgid "Immich Mount is no longer signed in."
 msgstr "Immich Mount ya no tiene la sesión iniciada."
 
-#: linux/verso-desktop/src/session.rs:449
+#: linux/verso-desktop/src/session.rs:450
 msgid "Immich no longer accepts Immich Mount's sign-in; sign in instead."
 msgstr "Immich ya no acepta el inicio de sesión de Immich Mount; inicia sesión en su lugar."
 
-#: linux/verso-desktop/src/session.rs:498
+#: linux/verso-desktop/src/session.rs:499
 msgid "Signed in, but the mount cannot start: {error}."
 msgstr "Sesión iniciada, pero el montaje no puede empezar: {error}."
 
-#: linux/verso-desktop/src/session.rs:502
+#: linux/verso-desktop/src/session.rs:503
 msgid "Signed in, but the mount did not start: {error}"
 msgstr "Sesión iniciada, pero el montaje no se inició: {error}"
 

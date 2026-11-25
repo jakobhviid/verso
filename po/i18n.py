@@ -44,7 +44,7 @@ SOURCES = [
     ("linux/verso-service/src/*.rs", [TR]),
     ("linux/verso-linux/src/*.rs", [TR]),
     # The drive's and the sign-in's texts; the gallery's (the rest of the crate) are not translated yet.
-    *[(f"linux/verso-desktop/src/{name}.rs", [TR, TITLE_ROW]) for name in ("lib", "preferences", "sandbox", "session")],
+    *[(f"linux/verso-desktop/src/{name}.rs", [TR, TITLE_ROW]) for name in ("lib", "preferences", "instance", "session")],
     # The settings pages' layout: each page's and group's title, and the lines under rows.
     ("linux/verso-desktop/src/preferences.rs", [r"\btitle: " + LITERAL, r"\bSome\(\s*" + LITERAL, r'\b(?:row|section)\(\s*"[a-z._]+",\s*' + LITERAL, r'\("[a-z._]+", ' + LITERAL]),
     ("linux/verso/src/drive_preferences.rs", [TR, TITLE_ROW]),
