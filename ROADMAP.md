@@ -687,6 +687,18 @@ platform. SPEC.md, "Links to Immich", has the map; the protocol's test links
 - **Mac (step 3):** how soon Finder offers or drops an action after an app is installed or removed: the menu bar app
   re-reads the items when it sees an app launch, which an install alone does not do.
 
+## Linux, to match the Mac
+
+Changes made on the Mac in 0.74.0 and 0.75.0, each to be reviewed against Verso on Linux and discussed with the
+maintainer before it is built there:
+- **The right-click's Show In submenu** (Verso Drive, Immich and the other apps gathered; Copy Immich Link beside it;
+  Info out of the right-click), where Linux's menus may list them flat.
+- **The account row** showing the storage used under the name, with the server's address and Immich version in its
+  menu, where Linux's sidebar may show the address.
+- **`CACHEDIR.TAG` out of sight in Files:** a `.hidden` file in the drive's root naming it, which Files honours.
+- **Check for Updates in the tray's menu,** for the rpm's and the deb's installs, which look for releases.
+- **What quitting from the tray does to Verso Drive,** beside the Mac's disconnecting it until Verso runs again.
+
 ## Package repositories
 
 The real fix for updates on Linux (ARCHITECTURE.md, "Updates on Linux"): with a repository behind the rpm and the deb
