@@ -142,6 +142,8 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(VERSO_IDENTITY)
+        # The App Store profile ios/release.sh names; empty in a development build, signed automatically.
+        PROVISIONING_PROFILE_SPECIFIER: $(APP_PROFILE)
         PRODUCT_NAME: $(IMMICH_APP_NAME)
         PRODUCT_MODULE_NAME: Verso
         INFOPLIST_FILE: Config/Info.plist
@@ -181,6 +183,8 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(VERSO_IDENTITY).Drive
+        # The App Store profile ios/release.sh names; empty in a development build, signed automatically.
+        PROVISIONING_PROFILE_SPECIFIER: $(DRIVE_PROFILE)
         # The same in both configurations, as on the Mac: the app embeds the extension by this name.
         PRODUCT_NAME: VersoDrive
         INFOPLIST_FILE: Config/VersoDrive-Info.plist
@@ -212,6 +216,8 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(VERSO_IDENTITY).Messages
+        # The App Store profile ios/release.sh names; empty in a development build, signed automatically.
+        PROVISIONING_PROFILE_SPECIFIER: $(MESSAGES_PROFILE)
         # The same in both configurations, as the drive's: the app embeds the extension by this name.
         PRODUCT_NAME: VersoMessages
         INFOPLIST_FILE: Config/VersoMessages-Info.plist
@@ -230,6 +236,8 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(VERSO_IDENTITY).Widgets
+        # The App Store profile ios/release.sh names; empty in a development build, signed automatically.
+        PROVISIONING_PROFILE_SPECIFIER: $(WIDGETS_PROFILE)
         # The same in both configurations, as the other extensions: the app embeds it by this name.
         PRODUCT_NAME: VersoWidgets
         INFOPLIST_FILE: Config/VersoWidgets-Info.plist

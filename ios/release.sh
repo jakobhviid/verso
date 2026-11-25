@@ -5,9 +5,8 @@
 #
 #   ios/release.sh [--no-upload]
 #
-# The archive is signed for development by Xcode (the team's account in Xcode's settings); the export signs it again
-# for the App Store with the four App Store profiles, made in the developer portal and installed, and uploads it with
-# an App Store Connect API key. It reads from the environment:
+# The archive is signed for the App Store with the four App Store profiles, made in the developer portal and installed,
+# and the export uploads it with an App Store Connect API key. It reads from the environment:
 #   TEAM_ID                     the Apple Developer Program team
 #   ASC_KEY_ID, ASC_ISSUER_ID   the API key (App Manager), whose AuthKey_<ASC_KEY_ID>.p8 is in
 #                               ~/.appstoreconnect/private_keys/
@@ -36,8 +35,13 @@ mkdir -p "$out"
 
 ../mac/build-rust.sh release --ios
 xcodegen -q
+# Signed with the App Store profiles from the start: Xcode makes no profiles for an individual membership's Admin
+# role ("No Accounts"), so nothing is signed automatically.
 xcodebuild archive -quiet -project Verso.xcodeproj -scheme Verso -configuration Release \
-  -destination 'generic/platform=iOS' -archivePath "$archive" -allowProvisioningUpdates DEVELOPMENT_TEAM="$TEAM_ID"
+  -destination 'generic/platform=iOS' -archivePath "$archive" DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Manual \
+  CODE_SIGN_IDENTITY="Apple Distribution" APP_PROFILE="Verso App Store Provisioning Profile" \
+  DRIVE_PROFILE="Verso Drive App Store Provisioning Profile" MESSAGES_PROFILE="Verso Messages App Store Provisioning Profile" \
+  WIDGETS_PROFILE="Verso Widgets App Store Provisioning Profile"
 
 # Each part with its App Store profile: the App Group and the Keychain group they share are entitlements only a
 # profile grants.
