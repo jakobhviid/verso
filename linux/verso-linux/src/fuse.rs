@@ -279,9 +279,13 @@ fn is_probe_name(name: &str) -> bool {
     PROBED.contains(&name) || ROM_PROPERTIES.contains(&name) || name.starts_with(".Trash-") || name.starts_with("._")
 }
 
-/// Files the mount answers itself, at its root; all but the volume information, the folder's icon and the cache tag
-/// are empty.
-const VIRTUAL_FILES: &[&str] = &[VOLUME_INFO, DIRECTORY, ".nomedia", ".trackerignore", verso_core::layout::CACHE_TAG_NAME];
+/// Files the mount answers itself, at its root; all but the volume information, the folder's icon, the cache tag and
+/// the list of hidden names are empty.
+const VIRTUAL_FILES: &[&str] = &[VOLUME_INFO, DIRECTORY, ".nomedia", ".trackerignore", verso_core::layout::CACHE_TAG_NAME, HIDDEN];
+/// The names Files leaves out of a folder it lists (`.hidden`, one per line): the cache tag, which backup tools find
+/// and people need not see, as Finder hides it on the Mac.
+const HIDDEN: &str = ".hidden";
+const HIDDEN_NAMES: &str = "CACHEDIR.TAG\n";
 /// GVfs's volume information: Files and Dolphin show the mount under its `Name`, the drive's name (`mount.name`), and
 /// GVfs gives its full-colour icon the `Icon` (ARCHITECTURE.md, "The drive's icon").
 const VOLUME_INFO: &str = ".xdg-volume-info";
@@ -894,6 +898,7 @@ where
                     VOLUME_INFO => self.volume_info.as_bytes(),
                     DIRECTORY => directory_text().as_bytes(),
                     verso_core::layout::CACHE_TAG_NAME => verso_core::layout::CACHE_TAG.as_bytes(),
+                    HIDDEN => HIDDEN_NAMES.as_bytes(),
                     _ => &[],
                 };
                 let start = (offset as usize).min(bytes.len());
@@ -1543,6 +1548,7 @@ impl AttributeMaker {
                     VOLUME_INFO => self.volume_info_size,
                     DIRECTORY => directory_text().len() as u64,
                     verso_core::layout::CACHE_TAG_NAME => verso_core::layout::CACHE_TAG.len() as u64,
+                    HIDDEN => HIDDEN_NAMES.len() as u64,
                     _ => 0,
                 };
                 (FileType::RegularFile, 0o644, size, self.mounted_at)

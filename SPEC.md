@@ -208,6 +208,8 @@ cameras. Clashes are detected case-insensitively, after Unicode NFC normalisatio
 - `/CACHEDIR.TAG`: a cache directory tag (<https://bford.info/cachedir/>, its signature line and a comment), so backup
   tools that honour it (restic, borg, tar with `--exclude-caches`) skip the drive rather than download the whole
   library; Immich is where it is backed up.
+- `/.hidden` (`CACHEDIR.TAG`): the names Files leaves out of the root, so the tag is out of sight; on the Mac the tag
+  carries Finder's hidden flag instead.
 - Anything else that tools probe for (`.hidden`, `.directory` below the root, `.Trash-<uid>`, `autorun.inf`, `.DS_Store`, and
   rom-properties' `code`, `title.tik`, `default.xex` and `default.xbe` in their spellings): a fast `ENOENT`, which
   the kernel remembers for a minute (a negative entry), so a folder's next probes never reach the service. Such a
