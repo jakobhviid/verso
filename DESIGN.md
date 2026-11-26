@@ -264,13 +264,16 @@ texts, into the version being prepared (ARCHITECTURE.md, "Verso's releases"). Ea
   (`ios/AppStore/what_to_test.txt`): what changed, said as what to try.
 
 **Screenshots,** in the Simulators against the showcase server, as DESIGN's other screenshots ("Screenshots" above),
-whole and without frames or captions, so each is the app as it is: the iPhone 17 Pro Max's 1320 × 2868 (the 6.9-inch
-size, from which App Store Connect makes the smaller ones), the iPad Pro 13-inch's 2752 × 2064, and the Apple TV's
+whole and without frames or captions, so each is the app as it is: the iPhone 17 Pro Max's 1320 × 2868 for
+App Store Connect's "iPhone with Dynamic Island, large display", and the same scaled to 1206 × 2622 for its "medium
+display", which it asks for and shows in the listing's header and search results (`ios/appstore.py medium`; the two
+screens' shapes differ by a tenth of a percent), the iPad Pro 13-inch's 2752 × 2064, and the Apple TV's
 3840 × 2160, light on the iPhone and the iPad and dark on the TV, as each is mostly seen. In the order a person meets
 Verso, the first three being what a search result shows: the Library, a photo, its details, Memories, Albums, Places,
 Search, the Backup page, Free Up Space on the iPhone; the Library, a photo, Albums, Places and People on the iPad; and
-the Library by year, Memories, Places, a photo and an album on the TV. They are kept in the git-ignored
-`ios/AppStore/screenshots/<iphone|ipad|tv>/`, named `NN-place.png` in their order.
+the Library by year, Memories, Places, a photo and an album on the TV; and Verso in Messages, its grid and a photo in
+the message field, for the iMessage App section, on the iPhone and the iPad. They are kept in the git-ignored
+`ios/AppStore/screenshots/<iphone|ipad|tv|imessage-iphone|imessage-ipad>/`, named `NN-place.png` in their order.
 
 **App previews,** once the app is near done, from the walkthrough video's recording (ROADMAP.md, "The walkthrough
 video"): up to 30 seconds each, the iPhone's showing a photo opening out of its tile, a memory as a story and backing

@@ -71,10 +71,12 @@ struct BackupPage: View {
                 }
             }
             #if DEBUG
+            if !Self.forPictures {
             Section {
                 Button("Reset Backup", role: .destructive) { confirmingReset = true }
             } footer: {
                 Text("Verso Dev only: forgets everything backing up knows on this \(DeviceWords.model) and switches it off, to walk the first run again from the Library's card. Nothing in Immich changes.")
+            }
             }
             #endif
         }
@@ -126,6 +128,12 @@ struct BackupPage: View {
         #endif
     }
 
+    #if DEBUG
+    /// Verso Dev taking the App Store's and the website's pictures (`-screenshots YES`): its own rows stay out, so the
+    /// page is the release's.
+    private static let forPictures = UserDefaults.standard.bool(forKey: "screenshots")
+    #endif
+
     /// The phases with options to set: all but those with no account to back up to.
     private static func offersOptions(_ phase: BackupSnapshot.Phase) -> Bool {
         phase != .signedOut && phase != .publicDemo
@@ -159,7 +167,9 @@ struct BackupPage: View {
             LabeledContent("Sent by Verso", value: BackupStatus.itemCount(snapshot.sentByVerso))
             #if DEBUG
             // Verso Dev: iCloud originals known through Immich's own app's metadata, rather than downloaded.
-            LabeledContent("Known by iCloud Identifier", value: snapshot.borrowedFingerprints.formatted())
+            if !Self.forPictures {
+                LabeledContent("Known by iCloud Identifier", value: snapshot.borrowedFingerprints.formatted())
+            }
             #endif
             HStack {
                 VStack(alignment: .leading, spacing: 2) {

@@ -6,6 +6,7 @@ fills in what App Store Connect's API reaches; App Privacy, pricing and the subm
 Store Connect. Python's standard library and openssl only, so it runs on the Mac and on a CI runner as it is.
 
     ios/appstore.py check                                         the texts' lengths and the screenshots, offline
+    ios/appstore.py medium                                        the medium iPhone's pictures, from the large one's
     ios/appstore.py push [--version X.Y.Z] [--platform ios|tvos|all] [--no-screenshots]
 
 push reads the API key as ios/release.sh does: ASC_KEY_ID, ASC_ISSUER_ID, and the key file (ASC_KEY_FILE, else
@@ -45,13 +46,24 @@ DEMO = ("demo@immich.app", "demo")
 # Each platform's version, and its screenshots: the folder in ios/AppStore/screenshots and App Store Connect's display
 # type, with the sizes it takes (either way round).
 PLATFORMS = {
-    "ios": {"api": "IOS", "shots": {"iphone": "APP_IPHONE_67", "ipad": "APP_IPAD_PRO_3GEN_129"}},
+    # App Store Connect names the iPhone's by display: "iPhone with Dynamic Island, medium display" (APP_IPHONE_61,
+    # 1206 x 2622), which it asks for and shows in search results, and the large display (APP_IPHONE_67, 1320 x 2868).
+    "ios": {"api": "IOS", "shots": {"iphone-medium": "APP_IPHONE_61", "iphone": "APP_IPHONE_67",
+                                    "ipad": "APP_IPAD_PRO_3GEN_129",
+                                    # Verso in Messages, which the listing's iMessage App section shows.
+                                    "imessage-iphone-medium": "IMESSAGE_APP_IPHONE_61",
+                                    "imessage-iphone": "IMESSAGE_APP_IPHONE_67",
+                                    "imessage-ipad": "IMESSAGE_APP_IPAD_PRO_3GEN_129"}},
     "tvos": {"api": "TV_OS", "shots": {"tv": "APP_APPLE_TV"}},
 }
 SIZES = {
+    "APP_IPHONE_61": {(1179, 2556), (1206, 2622)},
+    "IMESSAGE_APP_IPHONE_61": {(1179, 2556), (1206, 2622)},
     "APP_IPHONE_67": {(1290, 2796), (1320, 2868)},
     "APP_IPAD_PRO_3GEN_129": {(2048, 2732), (2064, 2752)},
     "APP_APPLE_TV": {(1920, 1080), (3840, 2160)},
+    "IMESSAGE_APP_IPHONE_67": {(1290, 2796), (1320, 2868)},
+    "IMESSAGE_APP_IPAD_PRO_3GEN_129": {(2048, 2732), (2064, 2752)},
 }
 # The texts, by file, with App Store Connect's limits (keywords count bytes).
 LIMITS = {"name": 30, "subtitle": 30, "promotional_text": 170, "keywords": 100, "description": 4000,
@@ -85,6 +97,26 @@ def screenshots(platform):
         if files:
             found[display] = files
     return found
+
+
+def medium():
+    """The medium display's pictures (1206 x 2622) from the large one's (1320 x 2868), whose shape they share to a
+    tenth of a percent, as App Store Connect would scale them: with sips on the Mac, Pillow elsewhere."""
+    for large, small in (("iphone", "iphone-medium"), ("imessage-iphone", "imessage-iphone-medium")):
+        target = LISTING / "screenshots" / small
+        if target.exists():
+            for old in target.glob("*.png"):
+                old.unlink()
+        for path in sorted((LISTING / "screenshots" / large).glob("*.png")):
+            target.mkdir(parents=True, exist_ok=True)
+            out = target / path.name
+            if sys.platform == "darwin":
+                subprocess.run(["sips", "-z", "2622", "1206", str(path), "--out", str(out)], check=True,
+                               capture_output=True)
+            else:
+                from PIL import Image
+                Image.open(path).convert("RGB").resize((1206, 2622), Image.LANCZOS).save(out)
+            print(f"{out.relative_to(ROOT)}")
 
 
 def check():
@@ -383,6 +415,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("check")
+    commands.add_parser("medium")
     pushing = commands.add_parser("push")
     pushing.add_argument("--version")
     pushing.add_argument("--platform", choices=["ios", "tvos", "all"], default="all")
@@ -390,6 +423,9 @@ def main():
     arguments = parser.parse_args()
     if arguments.command == "check":
         sys.exit(0 if check() else 1)
+    if arguments.command == "medium":
+        medium()
+        return
     if not check():
         sys.exit("the listing has problems: nothing was sent")
     version = arguments.version or subprocess.run([str(ROOT / "ci/version.sh")], capture_output=True, text=True,

@@ -224,7 +224,7 @@ the run's environment as `ios/tools/live/record.sh` passes them, on screens that
   `ios/AppStore/screenshots/<iphone|ipad|tv>/`, and `ios/appstore.py push` sends them:
   - **Without alpha:** `simctl io` writes RGBA PNGs, which App Store Connect turns down; save them as RGB.
   - **Only what a release shows:** a Debug build's own rows (the Backup page's "Known by iCloud Identifier", Reset
-    Backup) must not be in them; leave those pages out, or take them from a Release build.
+    Backup) must not be in them: start Verso Dev with `-screenshots YES`, which leaves them out.
   - **Today's memories end at local midnight:** the app asks for them by the Mac's date, so take the memory pictures
     before midnight there.
 - **Overlays are missing from the UI test's tree** (seen on iOS 27.2): with the viewer or a sheet open,
