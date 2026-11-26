@@ -15,6 +15,8 @@ struct VersoTVApp: App {
         WindowGroup {
             TVRootView()
                 .environment(model)
+                // A Top Shelf item: a memory or a photo (TVShelfData).
+                .onOpenURL { model.open($0) }
         }
     }
 }
@@ -24,6 +26,8 @@ struct VersoTVApp: App {
 final class TVModel {
     private(set) var client: ImmichClient?
     private(set) var images: ImagePipeline?
+    /// What a Top Shelf item asked to open, until the place it opens in has opened it.
+    var opening: TVOpening?
 
     init() {
         #if DEBUG
@@ -45,10 +49,29 @@ final class TVModel {
         use(account)
     }
 
+    /// Signs out of this Apple TV. The key stays in Immich until the iPhone forgets the TV or it is deleted there: a
+    /// read-only key may not delete itself.
     func signOut() {
         TVAccount.remove()
         client = nil
         images = nil
+        TVTopShelf.clear()
+    }
+
+    /// The Top Shelf's memories and newest photos, written again (TVTopShelf).
+    func refreshTopShelf() async {
+        guard let client, let images else { return }
+        await TVTopShelf.refresh(client: client, images: images)
+    }
+
+    /// A link from the Top Shelf: `memory/<id>` or `photo/<id>`, after the app's scheme.
+    func open(_ url: URL) {
+        let id = url.lastPathComponent
+        switch url.host() {
+        case "memory": opening = .memory(id)
+        case "photo": opening = .photo(id)
+        default: break
+        }
     }
 
     #if DEBUG
@@ -67,4 +90,10 @@ final class TVModel {
         }
     }
     #endif
+}
+
+/// Where a Top Shelf item opens the app: a memory's story, or a photo in the viewer.
+enum TVOpening: Equatable {
+    case memory(String)
+    case photo(String)
 }

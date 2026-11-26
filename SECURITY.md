@@ -20,12 +20,17 @@ Problems in the Immich server itself belong to the Immich project:
   in logs. On the Mac, the iPhone and the iPad it is kept in the Keychain, on that device only: readable after its
   first unlock, and never carried to another device by a backup, Quick Start or Migration Assistant, so a new device
   signs in once. With Verso Drive on, its extension reads it from a Keychain group only Verso and its extension
-  share.
+  share. The Apple TV keeps a key of its own in its Keychain, the same way: one the iPhone's Set Up Apple TV made for
+  it, allowed only to read, which the person never sees. Sign Out on the TV forgets it; the key itself stays in Immich
+  until Forget This Apple TV on the iPhone, or deleting it in Immich, ends it, as a read-only key may not delete
+  itself.
 - **Copies of your photos:** server thumbnails, the gallery's pictures and the parts of originals that were read, in
   your cache directory (`~/.cache/verso`), and thumbnails in the desktop's thumbnail cache. Signing out (**Sign Out…**
   in Verso, or `verso-service logout`) removes them. On the Mac, the iPhone and the iPad the viewer keeps the original
   movies of the last 40 Live Photos it played or fetched ahead, in the app's caches folder, and signing out removes
-  them. Files that could not be uploaded are kept in
+  them. The Apple TV keeps, for its Top Shelf, the previews of today's memories' first photos and of the newest
+  photos (none from the Locked Folder), in a caches folder of the App Group it shares with its Top Shelf extension,
+  written again each time it starts and removed by Sign Out. Files that could not be uploaded are kept in
   `~/.local/share/verso/not-uploaded/`; they are yours, and signing out leaves them. On the iPhone and the iPad,
   originals opened through Verso Drive stay in iOS's copy of its location until iOS removes them, or until turning the
   drive off or signing out removes the location whole, files in its Upload folder not yet uploaded included (Verso asks

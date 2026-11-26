@@ -189,7 +189,8 @@ jobs:
     # Verso for the iPhone and the iPad, and for the Apple TV (ios/release.sh, --tvos), uploaded to App Store Connect
     # for TestFlight: never on GitHub (AGENTS.md, "Versioning"). Its secrets: IOS_CERTIFICATE_P12 and
     # IOS_CERTIFICATE_PASSWORD (the Apple Distribution certificate with its key, base64), MAC_TEAM_ID, the App Store
-    # profiles IOS_APP_PROFILE, IOS_DRIVE_PROFILE, IOS_MESSAGES_PROFILE, IOS_WIDGETS_PROFILE and TV_APP_PROFILE (base64),
+    # profiles IOS_APP_PROFILE, IOS_DRIVE_PROFILE, IOS_MESSAGES_PROFILE, IOS_WIDGETS_PROFILE, TV_APP_PROFILE and
+    # TV_TOP_SHELF_PROFILE (base64),
     # and the API key the Mac job notarizes with (ASC_KEY_P8, ASC_KEY_ID, ASC_ISSUER_ID). Without them the job says so
     # and stops. A rehearsal by hand builds both and uploads nothing.
     runs-on: macos-26
@@ -240,6 +241,7 @@ jobs:
           MESSAGES_PROFILE_DATA: ${{ secrets.IOS_MESSAGES_PROFILE }}
           WIDGETS_PROFILE_DATA: ${{ secrets.IOS_WIDGETS_PROFILE }}
           TV_PROFILE_DATA: ${{ secrets.TV_APP_PROFILE }}
+          TV_TOP_SHELF_PROFILE_DATA: ${{ secrets.TV_TOP_SHELF_PROFILE }}
           ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
         run: |
@@ -254,7 +256,8 @@ jobs:
           security import "$keys/certificate.p12" -P "$CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$keychain"
           security set-key-partition-list -S apple-tool:,apple: -k "$password" "$keychain" >/dev/null
           security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
-          for profile in "$APP_PROFILE_DATA" "$DRIVE_PROFILE_DATA" "$MESSAGES_PROFILE_DATA" "$WIDGETS_PROFILE_DATA" "$TV_PROFILE_DATA"; do
+          for profile in "$APP_PROFILE_DATA" "$DRIVE_PROFILE_DATA" "$MESSAGES_PROFILE_DATA" "$WIDGETS_PROFILE_DATA" "$TV_PROFILE_DATA" \
+              "$TV_TOP_SHELF_PROFILE_DATA"; do
             echo "$profile" | base64 --decode > "$keys/profile.mobileprovision"
             uuid=$(security cms -D -i "$keys/profile.mobileprovision" | plutil -extract UUID raw -)
             for folder in "$HOME/Library/MobileDevice/Provisioning Profiles" "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"; do

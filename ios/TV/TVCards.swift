@@ -406,7 +406,17 @@ struct TVMemories: View {
         }
         .scrollClipDisabled()
         .task { await load() }
+        .onChange(of: tv.opening) { playAsked() }
         .fullScreenCover(item: $playing) { play in TVMemoryStory(memories: play.memories, start: play.start, duration: duration) }
+    }
+
+    /// A memory a Top Shelf item asked for, played once the memories are read; one no longer there is let go.
+    private func playAsked() {
+        guard case .memory(let id) = tv.opening, phase == .loaded else { return }
+        tv.opening = nil
+        if let index = memories.firstIndex(where: { $0.id == id }) {
+            playing = TVMemoryPlay(memories: memories, start: index)
+        }
     }
 
     private var cards: some View {
@@ -457,6 +467,7 @@ struct TVMemories: View {
             }
             .filter { !$0.assets.isEmpty }
             phase = .loaded
+            playAsked()
         } catch {
             phase = .failed(error.localizedDescription)
         }

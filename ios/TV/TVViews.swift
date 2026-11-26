@@ -1,13 +1,15 @@
 import SwiftUI
 
 // The TV's places, by priority (ROADMAP.md, "Verso on the Apple TV"): Library, Albums, Search, People, Places, Memories,
-// Favorites and Archive, in tvOS's sidebar-style tab view, each drawn as the iPhone draws its own (DESIGN.md, "The
+// Favorites and Archive, and Settings at the foot, in tvOS's sidebar-style tab view, each drawn as the iPhone draws its own (DESIGN.md, "The
 // apps' interfaces"); one grid size for the sofa, and the photo fills the screen. Nothing here changes the library: the
 // TV's key may only read.
 
 struct TVRootView: View {
     @Environment(TVModel.self) private var model
     @State private var place = TVPlace.library
+    /// A photo a Top Shelf item opened.
+    @State private var viewing: TVViewing?
 
     init() {
         #if DEBUG
@@ -36,13 +38,36 @@ struct TVRootView: View {
                         NavigationStack { TVTimeline(query: TimelineQuery(visibility: "archive"), title: String(localized: "Archive")) }
                     }
                 }
+                // In a section of its own, as tvOS puts loose tabs above the sections: at the sidebar's foot.
+                TabSection {
+                    Tab("Settings", systemImage: "gear", value: TVPlace.settings) { NavigationStack { TVSettings() } }
+                } header: {
+                    EmptyView()
+                }
             }
             .tabViewStyle(.sidebarAdaptable)
+            .task { await model.refreshTopShelf() }
+            .task(id: model.opening) { await follow(model.opening) }
+            .fullScreenCover(item: $viewing) { viewing in TVViewer(viewing: viewing) }
+        }
+    }
+
+    /// A Top Shelf item: a memory opens in Memories, which plays it; a photo opens in the viewer here.
+    private func follow(_ opening: TVOpening?) async {
+        switch opening {
+        case .memory:
+            place = .memories
+        case .photo(let id):
+            model.opening = nil
+            guard let client = model.client, let asset = try? await client.asset(id), asset.visibility != "locked" else { return }
+            viewing = TVViewing(items: [TVItem(asset)], index: 0)
+        case nil:
+            break
         }
     }
 }
 
 /// The TV's places, the tab view's selection. A development build opens at one named by `-tvPlace`.
 enum TVPlace: String, Hashable {
-    case library, albums, memories, search, favorites, people, places, archive
+    case library, albums, memories, search, favorites, people, places, archive, settings
 }

@@ -10,6 +10,22 @@
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Verso connects to your Immich server, which may be on your local network.</string>
+	<!-- The App Group it writes the Top Shelf into (TVShelfData), and its scheme, which the shelf's items open. -->
+	<key>VersoAppGroup</key>
+	<string>$(VERSO_APP_GROUP)</string>
+	<key>VersoURLScheme</key>
+	<string>$(IMMICH_URL_SCHEME)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>$(VERSO_IDENTITY)</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>$(IMMICH_URL_SCHEME)</string>
+			</array>
+		</dict>
+	</array>
 	<key>NSHumanReadableCopyright</key>
 	<string>Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO.</string>
 	<!-- Set Up with iPhone: the iPhones nearby with Verso's Set Up Apple TV open (DeviceDiscoveryUI). -->

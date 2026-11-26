@@ -312,6 +312,8 @@ targets:
     sources:
       - path: TV
         excludes: [make-tv-icons.py]
+      # What the Top Shelf shows, which the app writes for its extension.
+      - TVTopShelf/TVShelfData.swift
       - ../mac/Verso/Verso/API
       - ../mac/Verso/Verso/Core
       - ../mac/Verso/Verso/Support/Formatters.swift
@@ -342,8 +344,11 @@ targets:
         TARGETED_DEVICE_FAMILY: "3"
         # The App Store profile ios/release.sh --tvos names; empty in a development build, signed automatically.
         PROVISIONING_PROFILE_SPECIFIER: $(TV_PROFILE)
-        # tvOS's layered icon and Top Shelf images, drawn by TV/make-tv-icons.py.
+        # tvOS's layered icon and Top Shelf images, and the Night icon Settings offers, drawn by TV/make-tv-icons.py.
         ASSETCATALOG_COMPILER_APPICON_NAME: App Icon & Top Shelf Image
+        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: AppIconNight
+        # The App Group it shares with the Top Shelf extension, which its App Store profile grants.
+        CODE_SIGN_ENTITLEMENTS: Config/VersoTV.entitlements
         # The iPhone's accent, the system blue, which tvOS does not take as its own.
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         INFOPLIST_FILE: Config/TV-Info.plist
@@ -351,9 +356,34 @@ targets:
         "EXCLUDED_ARCHS[sdk=appletvsimulator*]": x86_64
     dependencies:
       - target: VersoCoreTV
+      - target: VersoTVTopShelf
+        embed: true
       - framework: ../mac/build/VersoBridge.xcframework
         embed: false
       - sdk: Security.framework
+
+  # The Apple TV's Top Shelf (TVTopShelf): today's memories and the newest photos, as the app last wrote them into the
+  # App Group they share, so it needs no key and no network.
+  VersoTVTopShelf:
+    type: app-extension
+    platform: tvOS
+    sources:
+      - TVTopShelf
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(VERSO_IDENTITY).TopShelf
+        # The App Store profile ios/release.sh --tvos names; empty in a development build, signed automatically.
+        PROVISIONING_PROFILE_SPECIFIER: $(TV_TOP_SHELF_PROFILE)
+        # The same in both configurations: the app embeds the extension by this name.
+        PRODUCT_NAME: VersoTopShelf
+        TARGETED_DEVICE_FAMILY: "3"
+        INFOPLIST_FILE: Config/VersoTVTopShelf-Info.plist
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_ENTITLEMENTS: Config/VersoTV.entitlements
+        SKIP_INSTALL: YES
+        "EXCLUDED_ARCHS[sdk=appletvsimulator*]": x86_64
+    dependencies:
+      - sdk: TVServices.framework
 
 schemes:
   VersoTV:

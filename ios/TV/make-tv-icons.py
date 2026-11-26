@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """Verso on the Apple TV's icons (DESIGN.md, the icon family): tvOS's layered app icon, whose layers the remote's
-focus tilts apart as Apple's own icons do, and the Top Shelf images, the same picture flat and wider. Drawn from the
+focus tilts apart as Apple's own icons do, its Night icon, which Settings on the TV offers as the app's alternate icon
+(tvOS keeps one icon in light and dark alike), flat pictures of both for Settings, and the Top Shelf images, the Day
+picture flat and wider. Drawn from the
 lens, the print and its back in linux/packaging/icons/dev.hviid.Verso.svg, the master every platform's icon comes
 from. Writes the brand assets into ios/TV/Assets.xcassets. Needs rsvg-convert (librsvg2-tools; in the toolbox).
 
-The designs, by name (the first is the app's):
+The designs, by name (the first is the app's, the second its Night icon):
   E2  Front and back: a print's back, Verso written on it by hand, behind the print's front with its lens, on Mist
   E3  E2 on a night sky
   B2  The print edge to edge, Verso on its strip, its corner turned over to Mist
   B3  B2 in the print's night colours
 
-    ios/TV/make-tv-icons.py [--design NAME]
+    ios/TV/make-tv-icons.py [--design NAME] [--night NAME]
 """
 import argparse
 import json
@@ -139,9 +141,9 @@ def write(folder, contents):
     (folder / "Contents.json").write_text(json.dumps(contents, indent=2) + "\n")
 
 
-def imagestack(name, sizes, idiom, design, work):
+def imagestack(name, sizes, idiom, design, work, brand=BRAND):
     """A layered icon, front first, at each (scale, width, height)."""
-    stack = BRAND / f"{name}.imagestack"
+    stack = brand / f"{name}.imagestack"
     layers = list(reversed(design))
     write(stack, {"info": INFO, "layers": [{"filename": f"{layer}.imagestacklayer"} for layer in layers]})
     for layer in layers:
@@ -151,7 +153,7 @@ def imagestack(name, sizes, idiom, design, work):
         for scale, width, height in sizes:
             file = f"{layer.lower()}-{scale}.png"
             folder.mkdir(parents=True, exist_ok=True)
-            shutil.copy(render(svg(400, [design[layer]]), width, height, work, f"{name}-{layer}-{scale}"),
+            shutil.copy(render(svg(400, [design[layer]]), width, height, work, f"{brand.stem}-{name}-{layer}-{scale}"),
                         folder / file)
             images.append({"idiom": idiom, "scale": scale, "filename": file})
         write(folder, {"images": images, "info": INFO})
@@ -170,12 +172,24 @@ def top_shelf(name, sizes, design, work):
     write(folder, {"images": images, "info": INFO})
 
 
+def preview(name, design, work):
+    """The icon flat, as the Home Screen shows it unfocused, for Settings' choice."""
+    folder = CATALOG / f"{name}.imageset"
+    folder.mkdir(parents=True, exist_ok=True)
+    shutil.copy(render(svg(400, list(design.values())), 800, 480, work, name), folder / "icon.png")
+    write(folder, {"images": [{"idiom": "tv", "filename": "icon.png"}], "info": INFO})
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--design", choices=DESIGNS, default=next(iter(DESIGNS)))
-    design = DESIGNS[parser.parse_args().design]
-    if BRAND.exists():
-        shutil.rmtree(BRAND)
+    names = list(DESIGNS)
+    parser.add_argument("--design", choices=DESIGNS, default=names[0])
+    parser.add_argument("--night", choices=DESIGNS, default=names[1])
+    arguments = parser.parse_args()
+    design, night = DESIGNS[arguments.design], DESIGNS[arguments.night]
+    for old in (BRAND, CATALOG / "AppIconNight.imagestack", CATALOG / "TV Icon Day.imageset", CATALOG / "TV Icon Night.imageset"):
+        if old.exists():
+            shutil.rmtree(old)
     write(CATALOG, {"info": INFO})
     with tempfile.TemporaryDirectory() as temporary:
         work = Path(temporary)
@@ -183,6 +197,10 @@ def main():
         imagestack("App Icon - App Store", [("1x", 1280, 768)], "tv-marketing", design, work)
         top_shelf("Top Shelf Image", [("1x", 1920, 720), ("2x", 3840, 1440)], design, work)
         top_shelf("Top Shelf Image Wide", [("1x", 2320, 720), ("2x", 4640, 1440)], design, work)
+        # The Night icon, an alternate icon: an image stack of its own beside the brand assets, as tvOS has them.
+        imagestack("AppIconNight", [("1x", 400, 240), ("2x", 800, 480)], "tv", night, work, CATALOG)
+        preview("TV Icon Day", design, work)
+        preview("TV Icon Night", night, work)
     write(BRAND, {"info": INFO, "assets": [
         {"filename": "App Icon - App Store.imagestack", "idiom": "tv", "role": "primary-app-icon", "size": "1280x768"},
         {"filename": "App Icon.imagestack", "idiom": "tv", "role": "primary-app-icon", "size": "400x240"},

@@ -5,8 +5,9 @@
 #
 #   ios/release.sh [--tvos] [--no-upload]
 #
-# --tvos builds Verso on the Apple TV instead (the VersoTV target), signed with its App Store profile, "Verso TV App
-# Store Provisioning Profile" (tvOS, for dev.hviid.Verso), into the same App Store record.
+# --tvos builds Verso on the Apple TV instead (the VersoTV target), signed with its two App Store profiles, "Verso TV App
+# Store Provisioning Profile" (tvOS, for dev.hviid.Verso) and "Verso TV Top Shelf App Store Provisioning Profile" (tvOS,
+# for dev.hviid.Verso.TopShelf, with the App Group group.dev.hviid.Verso), into the same App Store record.
 #
 # The archive is signed for the App Store with the four App Store profiles, made in the developer portal and installed,
 # and the export uploads it with an App Store Connect API key. It reads from the environment:
@@ -47,8 +48,10 @@ xcodegen -q
 if [ "$tvos" = yes ]; then
   xcodebuild archive -quiet -project Verso.xcodeproj -scheme VersoTV -configuration Release \
     -destination 'generic/platform=tvOS' -archivePath "$archive" DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Manual \
-    CODE_SIGN_IDENTITY="Apple Distribution" TV_PROFILE="Verso TV App Store Provisioning Profile"
-  profiles="<key>dev.hviid.Verso</key><string>Verso TV App Store Provisioning Profile</string>"
+    CODE_SIGN_IDENTITY="Apple Distribution" TV_PROFILE="Verso TV App Store Provisioning Profile" \
+    TV_TOP_SHELF_PROFILE="Verso TV Top Shelf App Store Provisioning Profile"
+  profiles="<key>dev.hviid.Verso</key><string>Verso TV App Store Provisioning Profile</string>
+    <key>dev.hviid.Verso.TopShelf</key><string>Verso TV Top Shelf App Store Provisioning Profile</string>"
 else
   xcodebuild archive -quiet -project Verso.xcodeproj -scheme Verso -configuration Release \
     -destination 'generic/platform=iOS' -archivePath "$archive" DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Manual \
