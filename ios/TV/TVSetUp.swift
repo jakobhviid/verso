@@ -24,7 +24,11 @@ struct TVSetUpView: View {
             } parameters: {
                 .applicationService
             }
-            if let failure { Text(failure).foregroundStyle(.orange) }
+            if let failure {
+                Text(failure).foregroundStyle(.orange)
+            } else if let reason = model.signedOutReason {
+                Text(reason).foregroundStyle(.secondary)
+            }
         }
     }
 

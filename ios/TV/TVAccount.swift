@@ -2,7 +2,7 @@ import Foundation
 import Security
 
 /// The server and the read-only key the iPhone made for this TV, kept in the TV's Keychain. The person never sees the key:
-/// the iPhone makes it and hands it over, and Forget This Apple TV, there or in Immich, ends it.
+/// the iPhone makes it and hands it over, and Forget on the iPhone's Apple TV page, or deleting it in Immich, ends it.
 struct TVAccount: Codable, Sendable {
     let server: String
     let key: String

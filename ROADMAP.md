@@ -711,8 +711,10 @@ sees an API key:
 - it travels to the TV over the local network with Apple's DeviceDiscoveryUI (tvOS 16 and later): the TV offers
   "Set Up with iPhone", the iPhone running Verso shows up, the TV says its name, and Verso on the iPhone asks
   "Set Up “name”?" before it makes the key, named after the TV ("Verso on Apple TV (Living Room)").
-- the TV keeps it in its Keychain; **Forget This Apple TV** on the phone, or deleting the key in Immich, ends it
-  without touching the phone.
+- the TV keeps it in its Keychain. The iPhone's Apple TV page lists the TVs set up, by name and the day each was set
+  up, each with **Forget** (and **Forget All** where there are several), which asks first and deletes its key. A key
+  forgotten there, or deleted in Immich, signs the TV out the next time it comes back to Verso, and Set Up with iPhone
+  says why; the phone is not touched.
 
 **Built** (`ios/TV/`, the `VersoTV` target of the iOS project, with the core's bindings as `VersoCoreTV`): the core for
 tvOS (`mac/build-rust.sh --tvos`), the eight places in tvOS's sidebar-style tab view drawn as the iPhone's pages (DESIGN.md,

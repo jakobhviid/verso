@@ -6,6 +6,7 @@ import SwiftUI
 @main
 struct VersoTVApp: App {
     @State private var model = TVModel()
+    @Environment(\.scenePhase) private var phase
 
     init() {
         CoreTransport.install()
@@ -17,6 +18,8 @@ struct VersoTVApp: App {
                 .environment(model)
                 // A Top Shelf item: a memory or a photo (TVShelfData).
                 .onOpenURL { model.open($0) }
+                // Each time the TV comes back to Verso: a key forgotten on the iPhone, or deleted in Immich, signs it out.
+                .task(id: phase) { if phase == .active { await model.checkKey() } }
         }
     }
 }
@@ -28,6 +31,8 @@ final class TVModel {
     private(set) var images: ImagePipeline?
     /// What a Top Shelf item asked to open, until the place it opens in has opened it.
     var opening: TVOpening?
+    /// Why the TV signed itself out, said on Set Up with iPhone.
+    var signedOutReason: String?
 
     init() {
         #if DEBUG
@@ -47,6 +52,7 @@ final class TVModel {
     func signIn(_ account: TVAccount) {
         account.save()
         use(account)
+        signedOutReason = nil
     }
 
     /// Signs out of this Apple TV. The key stays in Immich until the iPhone forgets the TV or it is deleted there: a
@@ -56,6 +62,18 @@ final class TVModel {
         client = nil
         images = nil
         TVTopShelf.clear()
+    }
+
+    /// Immich turning the key down means the TV was forgotten: it signs out and says so. Any other failure (the server
+    /// out of reach) leaves it signed in.
+    func checkKey() async {
+        guard let client else { return }
+        do {
+            _ = try await client.currentUser()
+        } catch ImmichError.unauthorized {
+            signOut()
+            signedOutReason = String(localized: "This Apple TV was forgotten on your iPhone, or its key was deleted in Immich. Set it up again to come back.")
+        } catch {}
     }
 
     /// The Top Shelf's memories and newest photos, written again (TVTopShelf).
