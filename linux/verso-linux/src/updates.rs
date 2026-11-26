@@ -21,6 +21,18 @@ pub struct Release {
 pub type Check = Box<dyn Fn() -> Pin<Box<dyn Future<Output = Option<Release>> + Send>> + Send + Sync>;
 
 const EVERY: Duration = Duration::from_secs(24 * 60 * 60);
+
+/// A look asked for from the tray's Check for Updates, which wakes `follow` at once.
+fn requested() -> &'static tokio::sync::Notify {
+    static REQUESTED: std::sync::OnceLock<tokio::sync::Notify> = std::sync::OnceLock::new();
+    REQUESTED.get_or_init(tokio::sync::Notify::new)
+}
+
+/// Look now, as the tray's Check for Updates asks: what is found is told as a daily look tells it, and when nothing
+/// newer is out the person who asked is told so.
+pub fn check_now() {
+    requested().notify_one();
+}
 /// The first look waits until the session has settled, so it never slows the login.
 const FIRST: Duration = Duration::from_secs(5 * 60);
 
@@ -40,9 +52,19 @@ pub fn is_newer(latest: &str, running: &str) -> bool {
 /// Look now and then once a day, for as long as the daemon runs. `told` keeps the last version told of, so each is
 /// told once, across restarts.
 pub async fn follow(check: Check, running: &'static str, connection: Option<zbus::Connection>, told: PathBuf) {
-    tokio::time::sleep(FIRST).await;
+    let mut asked = tokio::select! {
+        _ = tokio::time::sleep(FIRST) => false,
+        _ = requested().notified() => true,
+    };
     loop {
-        if let Some(release) = check().await.filter(|release| is_newer(&release.version, running)) {
+        let newer = check().await.filter(|release| is_newer(&release.version, running));
+        if newer.is_none() && asked {
+            crate::notify::notify_in_background(
+                tr("{app} is up to date").replace("{app}", verso_core::product::current().name),
+                tr("{version} is the newest version.").replace("{version}", running),
+            );
+        }
+        if let Some(release) = newer {
             log::info!("{} {} is out ({running} runs here)", verso_core::product::current().name, release.version);
             if let Some(connection) = &connection {
                 crate::tray::offer_update(connection, &release).await;
@@ -59,7 +81,10 @@ pub async fn follow(check: Check, running: &'static str, connection: Option<zbus
                 let _ = std::fs::write(&told, &release.version);
             }
         }
-        tokio::time::sleep(EVERY).await;
+        asked = tokio::select! {
+            _ = tokio::time::sleep(EVERY) => false,
+            _ = requested().notified() => true,
+        };
     }
 }
 

@@ -772,6 +772,8 @@ first, then the server out of reach, then the drive on and unmounted (`dev.hviid
 | "Unmount Verso Drive" | while the drive is mounted: `verso-service unmount`; refused while a file is uploading, with a notification saying which |
 | "Mount Verso Drive" | while the drive is on and unmounted: `verso-service mount` |
 | "Preferences…" | the window on Preferences (`verso verso:settings`) |
+| "Check for Updates" | where the install looks for releases (the rpm and the deb, `updates.check`) and none newer is known: looks now, and says so in a notification when Verso is up to date |
+| "Get Verso *version*…" | after a separator, once a newer release is known: its page |
 | "Sign Out…" | after a separator: the window on its Account page, asking whether to sign out (`verso verso:sign-out`); nothing is signed out without the answer. While signed out, "Sign In…" instead, which opens Verso |
 | "Quit Verso" | closes Verso's window, where it is open, and stops the service, which unmounts the drive; the service comes back at the next login, or when Verso is opened |
 

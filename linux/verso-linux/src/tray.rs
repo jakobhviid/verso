@@ -73,6 +73,9 @@ pub struct View {
     pub mount_point: String,
     /// A newer release, once the daemon has seen one (`crate::updates`).
     pub update: Option<crate::updates::Release>,
+    /// Whether this install looks for releases (the rpm's and the deb's, `updates.check`): the menu has Check for
+    /// Updates.
+    pub checks_updates: bool,
     /// Verso's window, where it is found: the menu offers to open it, and its preferences and signing out go to it.
     pub gallery: Option<std::path::PathBuf>,
     /// Which product the daemon is, for the menu's names.
@@ -113,6 +116,8 @@ pub enum Action {
     Quit,
     /// Ask the server now, while it cannot be reached, rather than at the next poll.
     TryAgain,
+    /// Look for a newer release now (`updates::check_now`).
+    CheckForUpdates,
 }
 
 /// What Verso's window is given to open on its Preferences: an address no other program claims, which it receives as
@@ -171,6 +176,10 @@ impl View {
             }
         }
         lines.push(Line::Action(tr("Preferences…").to_owned(), Action::OpenSettings));
+        // As the Mac's menu bar icon has it, for the installs that look for releases themselves.
+        if self.checks_updates && self.update.is_none() {
+            lines.push(Line::Action(tr("Check for Updates").to_owned(), Action::CheckForUpdates));
+        }
         if let Some(release) = &self.update {
             lines.push(Line::Separator);
             let get = tr("Get {app} {version}…").replace("{app}", self.product.name).replace("{version}", &release.version);
@@ -455,6 +464,7 @@ fn run(action: Action, view: &View) {
         }
         Action::Unmount => return unmount(),
         Action::TryAgain => return crate::daemon::check_now(),
+        Action::CheckForUpdates => return crate::updates::check_now(),
         // The command restarts the service, which mounts; launched in a scope of its own, it outlives this one.
         Action::Mount => match std::env::current_exe() {
             Ok(program) => (program, vec!["mount".to_owned()]),
@@ -624,6 +634,7 @@ mod tests {
             account: "admin@example.com".to_owned(),
             mount_point: "/home/tester/Verso".to_owned(),
             update: None,
+            checks_updates: false,
             gallery: Some("/usr/local/bin/verso".into()),
             product: &verso_core::product::VERSO,
             unmounted: false,
