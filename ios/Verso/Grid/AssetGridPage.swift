@@ -75,6 +75,7 @@ struct AssetGridPage: View {
         let modelOldestFirst = model.arrangement?.order == .oldestFirst
         let reversed = opensAtNewest && (newestAtTop ? modelOldestFirst : !modelOldestFirst)
         let phone = phoneTiles(model)
+        lifecycle(dialogs(
         TimelineGrid(model: model, pipeline: session.pipeline, actions: actions, header: header, reversed: reversed,
                      opensAtBottom: opensAtBottom,
                      landingRequests: landingTab.map { chrome?.landings[$0] ?? 0 } ?? 0,
@@ -95,66 +96,80 @@ struct AssetGridPage: View {
                                         readsBackwards: reversed, pushRoute: pushRoute))
             // The phone's own tiles open their viewer with SwiftUI's zoom.
             .phoneViewer(session: session, state: state, photos: phone.map(\.photo), readsUp: opensAtBottom,
-                         zoomNamespace: phoneZoom)
-            .shareSheet(item: $state.sharing) { request in
-                actions.rules.shareContent(request.ids)
-            } onClose: {
-                actions.endSelecting()
+                         zoomNamespace: phoneZoom),
+            actions: actions), actions: actions, opensAtBottom: opensAtBottom)
+    }
+
+    // The body's modifiers in three parts, each type-checked on its own: Xcode 26 could not type-check them as one
+    // chain.
+
+    /// The sheets and the questions of the grid's actions.
+    private func dialogs(_ content: some View, actions: GridActions) -> some View {
+        content
+        .shareSheet(item: $state.sharing) { request in
+            actions.rules.shareContent(request.ids)
+        } onClose: {
+            actions.endSelecting()
+        }
+        .confirmationDialog(actions.deleteTitle(state.pendingDelete?.ids.count ?? 0), isPresented: deleteAsked,
+                            titleVisibility: .visible, presenting: state.pendingDelete) { request in
+            Button(actions.deletesPermanently ? "Delete Permanently" : "Delete", role: .destructive) {
+                actions.delete(request.ids)
             }
-            .confirmationDialog(actions.deleteTitle(state.pendingDelete?.ids.count ?? 0), isPresented: deleteAsked,
-                                titleVisibility: .visible, presenting: state.pendingDelete) { request in
-                Button(actions.deletesPermanently ? "Delete Permanently" : "Delete", role: .destructive) {
-                    actions.delete(request.ids)
-                }
-            } message: { request in
-                Text(actions.deleteMessage(request.ids))
-            }
-            .confirmationDialog(actions.removalTitle ?? "", isPresented: removalAsked, titleVisibility: .hidden,
-                                presenting: state.pendingRemoval) { request in
-                Button(actions.removalTitle ?? "Remove", role: .destructive) { actions.remove(request.ids) }
-            } message: { _ in
-                Text("The photos remain in your library.")
-            }
-            .alert("Something Went Wrong", isPresented: errorShown(model)) {
-                Button("OK") { model.lastError = nil }
-            } message: {
-                Text(model.lastError ?? "")
-            }
-            .onChange(of: state.isSelecting) { _, selecting in
-                chrome?.setSelecting(pageID, selecting)
-            }
-            .onChange(of: state.atOpeningEnd) { _, atEnd in onOpeningEnd?(atEnd) }
-            .onChange(of: state.awayScrolls) { onScrolledAway?() }
-            .onChange(of: opensAtBottom) { _, atBottom in chrome?.setOpensAtBottom(pageID, atBottom) }
-            // A page pushed over this one, or another tab, has the bottom of the window while this one is away.
-            .onAppear {
-                chrome?.setSelecting(pageID, state.isSelecting)
-                chrome?.setOpensAtBottom(pageID, opensAtBottom)
-                onOpeningEnd?(state.atOpeningEnd)
-            }
-            .onDisappear {
-                chrome?.setSelecting(pageID, false)
-                chrome?.setOpensAtBottom(pageID, false)
-            }
-            // An album sheet of the window's took the selection (Add to Album).
-            .onChange(of: chrome?.finishedSelection) { _, finished in
-                if finished?.grid == ObjectIdentifier(model) { actions.endSelecting() }
-            }
-            // As on the Mac: the grid reads itself again once something marked it stale or its view options changed,
-            // and shows what an import brought, reading again only the months that changed.
-            .modifier(GridOptionsReloader(model: model))
-            .task(id: session.macGridRevision) { await model.loadIfNeeded() }
-            .onChange(of: session.upload.revision) { Task { await model.reload(keepingUnchanged: true) } }
-            // A photo on its way arrived: the grid reads again, as an import makes it, and Immich's photo takes its
-            // tile's place.
-            .onChange(of: BackupCenter.shared.arrivals) {
-                if showsPhoneTiles { Task { await model.reload(keepingUnchanged: true) } }
-            }
-            .overlay(alignment: .bottom) { noticeView }
-            // A function of its own: Xcode 26 could not type-check this chain with the closure written in it.
-            .task(id: state.notice) { await clearNoticeLater() }
-            // The sheets of the menu's actions (Add To, the editors), and the preferences the menu reads.
-            .modifier(PhotoActionsPresentation(session: session, actions: actions))
+        } message: { request in
+            Text(actions.deleteMessage(request.ids))
+        }
+        .confirmationDialog(actions.removalTitle ?? "", isPresented: removalAsked, titleVisibility: .hidden,
+                            presenting: state.pendingRemoval) { request in
+            Button(actions.removalTitle ?? "Remove", role: .destructive) { actions.remove(request.ids) }
+        } message: { _ in
+            Text("The photos remain in your library.")
+        }
+        .alert("Something Went Wrong", isPresented: errorShown(model)) {
+            Button("OK") { model.lastError = nil }
+        } message: {
+            Text(model.lastError ?? "")
+        }
+    }
+
+    /// What the grid follows while it is shown: the selection, its ends, the window's chrome, reading again.
+    private func lifecycle(_ content: some View, actions: GridActions, opensAtBottom: Bool) -> some View {
+        content
+        .onChange(of: state.isSelecting) { _, selecting in
+            chrome?.setSelecting(pageID, selecting)
+        }
+        .onChange(of: state.atOpeningEnd) { _, atEnd in onOpeningEnd?(atEnd) }
+        .onChange(of: state.awayScrolls) { onScrolledAway?() }
+        .onChange(of: opensAtBottom) { _, atBottom in chrome?.setOpensAtBottom(pageID, atBottom) }
+        // A page pushed over this one, or another tab, has the bottom of the window while this one is away.
+        .onAppear {
+            chrome?.setSelecting(pageID, state.isSelecting)
+            chrome?.setOpensAtBottom(pageID, opensAtBottom)
+            onOpeningEnd?(state.atOpeningEnd)
+        }
+        .onDisappear {
+            chrome?.setSelecting(pageID, false)
+            chrome?.setOpensAtBottom(pageID, false)
+        }
+        // An album sheet of the window's took the selection (Add to Album).
+        .onChange(of: chrome?.finishedSelection) { _, finished in
+            if finished?.grid == ObjectIdentifier(model) { actions.endSelecting() }
+        }
+        // As on the Mac: the grid reads itself again once something marked it stale or its view options changed,
+        // and shows what an import brought, reading again only the months that changed.
+        .modifier(GridOptionsReloader(model: model))
+        .task(id: session.macGridRevision) { await model.loadIfNeeded() }
+        .onChange(of: session.upload.revision) { Task { await model.reload(keepingUnchanged: true) } }
+        // A photo on its way arrived: the grid reads again, as an import makes it, and Immich's photo takes its
+        // tile's place.
+        .onChange(of: BackupCenter.shared.arrivals) {
+            if showsPhoneTiles { Task { await model.reload(keepingUnchanged: true) } }
+        }
+        .overlay(alignment: .bottom) { noticeView }
+        // A function of its own: Xcode 26 could not type-check this chain with the closure written in it.
+        .task(id: state.notice) { await clearNoticeLater() }
+        // The sheets of the menu's actions (Add To, the editors), and the preferences the menu reads.
+        .modifier(PhotoActionsPresentation(session: session, actions: actions))
     }
 
     /// A notice that does not hold goes after three seconds.
