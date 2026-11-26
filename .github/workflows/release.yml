@@ -2,7 +2,8 @@ name: release
 
 # A pushed tag (ci/release.sh tag) builds Linux's files and makes the draft release, as `ci/release.sh build` does on
 # the workstation, the Flatpak included; then the Mac's disk image, signed, notarized and signed for Sparkle, joins the
-# draft when the Mac's secrets are set. The maintainer checks the draft and publishes it with `ci/release.sh publish`
+# draft when the Mac's secrets are set; and the iPhone's, the iPad's and the Apple TV's builds go to TestFlight when
+# theirs are. The maintainer checks the draft and publishes it with `ci/release.sh publish`
 # (AGENTS.md, "Versioning").
 on:
   push:
@@ -155,3 +156,96 @@ jobs:
         run: |
           [ -n "${KEYCHAIN:-}" ] && security delete-keychain "$KEYCHAIN" || true
           rm -rf "$RUNNER_TEMP/keys"
+
+  ios:
+    # Verso for the iPhone and the iPad, and for the Apple TV (ios/release.sh, --tvos), uploaded to App Store Connect
+    # for TestFlight: never on GitHub (AGENTS.md, "Versioning"). Its secrets: IOS_CERTIFICATE_P12 and
+    # IOS_CERTIFICATE_PASSWORD (the Apple Distribution certificate with its key, base64), MAC_TEAM_ID, the App Store
+    # profiles IOS_APP_PROFILE, IOS_DRIVE_PROFILE, IOS_MESSAGES_PROFILE, IOS_WIDGETS_PROFILE and TV_APP_PROFILE (base64),
+    # and the API key the Mac job notarizes with (ASC_KEY_P8, ASC_KEY_ID, ASC_ISSUER_ID). Without them the job says so
+    # and stops. A rehearsal by hand builds both and uploads nothing.
+    runs-on: macos-26
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+      DRY_RUN: ${{ inputs.dry_run && 'yes' || '' }}
+    steps:
+      - name: The iPhone's secrets
+        id: secrets
+        env:
+          CERTIFICATE: ${{ secrets.IOS_CERTIFICATE_P12 }}
+        run: |
+          if [ -z "$CERTIFICATE" ]; then
+            echo "::notice::No iOS secrets: nothing goes to TestFlight."
+            echo "present=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=yes" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v5
+        if: steps.secrets.outputs.present == 'yes'
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.tag || github.ref }}
+      - name: The newest Xcode, and the tools
+        if: steps.secrets.outputs.present == 'yes'
+        run: |
+          newest=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          echo "DEVELOPER_DIR=$newest/Contents/Developer" >> "$GITHUB_ENV"
+          brew install xcodegen
+      - uses: dtolnay/rust-toolchain@stable
+        if: steps.secrets.outputs.present == 'yes'
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin,aarch64-apple-ios,aarch64-apple-ios-sim
+      - name: The nightly toolchain, for the Apple TV's core (mac/build-rust.sh --tvos)
+        if: steps.secrets.outputs.present == 'yes'
+        run: rustup toolchain install nightly --profile minimal --component rust-src
+      - name: The signing keychain, the profiles and the key
+        if: steps.secrets.outputs.present == 'yes'
+        env:
+          CERTIFICATE: ${{ secrets.IOS_CERTIFICATE_P12 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          APP_PROFILE_DATA: ${{ secrets.IOS_APP_PROFILE }}
+          DRIVE_PROFILE_DATA: ${{ secrets.IOS_DRIVE_PROFILE }}
+          MESSAGES_PROFILE_DATA: ${{ secrets.IOS_MESSAGES_PROFILE }}
+          WIDGETS_PROFILE_DATA: ${{ secrets.IOS_WIDGETS_PROFILE }}
+          TV_PROFILE_DATA: ${{ secrets.TV_APP_PROFILE }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+        run: |
+          keys="$RUNNER_TEMP/keys"
+          mkdir -p "$keys"
+          keychain="$RUNNER_TEMP/release.keychain-db"
+          password=$(uuidgen)
+          security create-keychain -p "$password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$password" "$keychain"
+          echo "$CERTIFICATE" | base64 --decode > "$keys/certificate.p12"
+          security import "$keys/certificate.p12" -P "$CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$keychain"
+          security set-key-partition-list -S apple-tool:,apple: -k "$password" "$keychain" >/dev/null
+          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+          for profile in "$APP_PROFILE_DATA" "$DRIVE_PROFILE_DATA" "$MESSAGES_PROFILE_DATA" "$WIDGETS_PROFILE_DATA" "$TV_PROFILE_DATA"; do
+            echo "$profile" | base64 --decode > "$keys/profile.mobileprovision"
+            uuid=$(security cms -D -i "$keys/profile.mobileprovision" | plutil -extract UUID raw -)
+            for folder in "$HOME/Library/MobileDevice/Provisioning Profiles" "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"; do
+              mkdir -p "$folder"
+              cp "$keys/profile.mobileprovision" "$folder/$uuid.mobileprovision"
+            done
+          done
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          echo "$ASC_KEY_P8" | base64 --decode > "$HOME/.appstoreconnect/private_keys/AuthKey_$ASC_KEY_ID.p8"
+          echo "KEYCHAIN=$keychain" >> "$GITHUB_ENV"
+      - name: The iPhone and the iPad, and the Apple TV, to TestFlight
+        if: steps.secrets.outputs.present == 'yes'
+        env:
+          TEAM_ID: ${{ secrets.MAC_TEAM_ID }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          upload=$([ "$DRY_RUN" = yes ] && echo --no-upload || true)
+          ios/release.sh $upload
+          ios/release.sh --tvos $upload
+      - name: The keychain and the keys removed
+        if: always() && steps.secrets.outputs.present == 'yes'
+        run: |
+          [ -n "${KEYCHAIN:-}" ] && security delete-keychain "$KEYCHAIN" || true
+          rm -rf "$RUNNER_TEMP/keys" "$HOME/.appstoreconnect/private_keys"
