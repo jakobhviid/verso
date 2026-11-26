@@ -2,9 +2,9 @@ import Network
 import SwiftUI
 
 /// Set Up Apple TV (ROADMAP.md, "Verso on the Apple TV"): while this page is open, the iPhone can be found by Verso on an
-/// Apple TV nearby, through Apple's DeviceDiscoveryUI. When the TV connects (the person approves it in the system's
-/// own prompt), the iPhone makes the TV a key of its own, allowed to read only, and sends it with the server's
-/// address. The person never sees the key; Forget Apple TVs deletes them all.
+/// Apple TV nearby, through Apple's DeviceDiscoveryUI. The TV that connects says its name, and Verso asks here whether
+/// to set it up: only on Allow does the iPhone make the TV a key of its own, allowed to read only, named after the TV,
+/// and send it with the server's address. The person never sees the key; Forget Apple TVs deletes them all.
 struct AccountAppleTVPage: View {
     let services: AccountServices
     @State private var setup = AppleTVSetup()
@@ -32,6 +32,13 @@ struct AccountAppleTVPage: View {
             }
         }
         .navigationTitle("Apple TV")
+        .alert(setup.asking.map { String(localized: "Set Up \u{201C}\($0)\u{201D}?") } ?? "", isPresented: Binding(
+            get: { setup.asking != nil }, set: { if !$0 { setup.answer(false) } })) {
+            Button("Allow") { setup.answer(true) }
+            Button("Don't Allow", role: .cancel) { setup.answer(false) }
+        } message: {
+            Text("This Apple TV gets a key of its own that may only view your library.")
+        }
         .onAppear { setup.start(client: services.client) }
         .onDisappear { setup.stop() }
     }
@@ -52,7 +59,10 @@ final class AppleTVSetup {
                                           "user.read", "server.about"]
 
     private(set) var state = State.waiting
+    /// The TV waiting for the person's answer, by the name it gave.
+    private(set) var asking: String?
     private var listener: NWListener?
+    private var waiting: (connection: NWConnection, name: String, client: ImmichClient)?
 
     func start(client: ImmichClient) {
         guard listener == nil else { return }
@@ -73,14 +83,35 @@ final class AppleTVSetup {
         listener = nil
     }
 
+    /// A TV connected: it says its name first, and the person is asked about it by that name. A second TV while one
+    /// waits is turned away.
     private func serve(_ connection: NWConnection, client: ImmichClient) {
+        guard waiting == nil else { return connection.cancel() }
         connection.start(queue: .main)
+        connection.receive(minimumIncompleteLength: 1, maximumLength: 4096) { [weak self] data, _, _, _ in
+            Task { @MainActor in
+                guard let self else { return connection.cancel() }
+                let fields = data.flatMap { try? JSONDecoder().decode([String: String].self, from: $0) } ?? [:]
+                let name = fields["name"].flatMap { $0.isEmpty ? nil : $0 } ?? String(localized: "Apple TV")
+                self.waiting = (connection, name, client)
+                self.asking = name
+            }
+        }
+    }
+
+    /// The person's answer: Allow makes the key and sends it; Don't Allow tells the TV and closes.
+    func answer(_ allowed: Bool) {
+        guard let (connection, name, client) = waiting else { return }
+        waiting = nil
+        asking = nil
+        guard allowed else {
+            send(["refused": "true"], over: connection)
+            return
+        }
         Task {
             do {
-                let key = try await client.createAccountKey(name: Self.keyName, permissions: Self.permissions)
-                let payload = try JSONEncoder().encode(["server": client.serverURL.absoluteString, "key": key.secret])
-                connection.send(content: payload, contentContext: .finalMessage, isComplete: true,
-                                completion: .contentProcessed { _ in connection.cancel() })
+                let key = try await client.createAccountKey(name: "\(Self.keyName) (\(name))", permissions: Self.permissions)
+                send(["server": client.serverURL.absoluteString, "key": key.secret], over: connection)
                 state = .done
             } catch {
                 connection.cancel()
@@ -89,9 +120,15 @@ final class AppleTVSetup {
         }
     }
 
+    private func send(_ fields: [String: String], over connection: NWConnection) {
+        guard let payload = try? JSONEncoder().encode(fields) else { return connection.cancel() }
+        connection.send(content: payload, contentContext: .finalMessage, isComplete: true,
+                        completion: .contentProcessed { _ in connection.cancel() })
+    }
+
     func forget(client: ImmichClient) async {
         guard let keys = try? await client.accountKeys() else { return }
-        for key in keys where key.name == Self.keyName {
+        for key in keys where key.name == Self.keyName || key.name.hasPrefix(Self.keyName + " (") {
             try? await client.deleteAccountKey(key.id)
         }
         state = .waiting
