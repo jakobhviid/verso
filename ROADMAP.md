@@ -728,11 +728,9 @@ Thumbnails live in the cache, which tvOS may empty when space runs low; they are
 
 ## Linux, to match the Mac
 
-Built: the Show In submenu, the account row's storage, `.hidden` for `CACHEDIR.TAG`, and Check for Updates in the
-tray; quitting from the tray already stops the service and unmounts the drive, as the Mac's Quit Verso disconnects it.
-Left:
-- **The menus' icons:** Linux's menus do not show the icons the Mac's do beside their items; which items carry one,
-  and Adwaita's symbolic icon for each, matched to the Mac's.
+Built: the Show In submenu, the account row's storage, `.hidden` for `CACHEDIR.TAG`, Check for Updates in the tray,
+and the lens as the top bar icon and Files' sidebar symbol; quitting from the tray already stops the service and
+unmounts the drive, as the Mac's Quit Verso disconnects it.
 
 ## Package repositories
 
