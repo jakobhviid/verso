@@ -323,6 +323,24 @@ sections, the pages, the viewer's info), drawn with each platform's own toolkit:
   Info with a close button, in the background colour with rounded corners and a soft shadow, the cards the iPhone's.
   Under the pointer, cards lift and Collections' rows and headers light up. A window narrower than a regular width is
   laid out as an iPhone.
+- **On the Apple TV,** the iPhone's pages at a sofa's distance (ROADMAP.md, "Verso on the Apple TV"): the same type, colours
+  and cards, each shared from the iPhone's files where tvOS compiles them and drawn after them where it does not; a
+  page's title large and bold at the leading edge with its line under it, scrolling away with the page. Focus takes the
+  place of a finger as a quiet lift: the focused tile or card grows a little, with a soft shadow beneath and its corners
+  rounding, never tvOS's platter with its wide spacing; cards that lie edge to edge in a card (a month's mosaic) are
+  ringed in white instead. The Library has Years, Months and All Photos in the system's segmented control beside its title,
+  opening on All Photos: Years are a card for each year, Months each month's name over a mosaic of photos from different
+  days with the day on each, and All Photos the grid, square tiles six to a row with eight points between them, each
+  month under its name, the newest first (the iPhone's Newest at the Top, as the remote's focus starts at the top). Albums
+  are the iPhone's album cards, four to a row, in sections by year with the most recent photo first; People the rounded
+  squares with their names on them, in the server's order and without the hidden and the unnamed; Places the city cards
+  with their country, the most recently visited first, opening a city's photos; Memories the memory cards, three to a
+  row, playing as a story; Favorites and the Archive the grid under their names. Search is tvOS's own search screen with
+  the iPhone's start page under it: quick filters, people with their faces, places and recent searches as glass chips
+  and rows, what matches while typing, and the results as the grid. The viewer fills the screen; a click shows or hides
+  the iPhone's title capsule, the place over the day and time, left and right step through, a Live Photo wears the LIVE
+  badge on yellow glass and play/pause plays its movie, and a video plays in tvOS's own player. The accent is the system
+  blue, as the iPhone's, set in the TV's asset catalog because tvOS's own is white.
 - **The Backup page** is backing up's one page on the iPhone and the iPad: a list of iOS's own whose top is the page's
   status, centred, as Settings' feature pages have theirs: a cloud symbol (the accent while it works, and only then
   pulsing with the system's variable colour; green with a tick when backed up; grey while it waits; orange when the

@@ -714,16 +714,26 @@ sees an API key:
   without touching the phone.
 
 **Built** (`ios/TV/`, the `VersoTV` target of the iOS project, with the core's bindings as `VersoCoreTV`): the core for
-tvOS (`mac/build-rust.sh --tvos`), the eight places in tvOS's sidebar-style tab view, the viewer (the preview, then the
-full-size image; videos; memories as slideshows), the TV's key in its Keychain, the iPhone's **Set Up Apple TV**
-(Account) and the TV's **Set Up with iPhone** (DeviceDiscoveryUI's picker); it runs in the tvOS Simulator against a
-server. **Left:**
+tvOS (`mac/build-rust.sh --tvos`), the eight places in tvOS's sidebar-style tab view drawn as the iPhone's pages (DESIGN.md,
+"The apps' interfaces", "On the Apple TV"), sharing the iPhone's files where tvOS compiles them (`ios/project.yml`, the
+`VersoTV` sources: the cards of people, places and memories, the search chips, the Library modes, the albums', places' and
+people's arrangement by the shared core), the viewer (the preview, then the full-size image; title capsule on a click;
+the LIVE badge and a Live Photo's movie; videos), memories as stories, the TV's key in its Keychain, the iPhone's
+**Set Up Apple TV** (Account) and the TV's **Set Up with iPhone** (DeviceDiscoveryUI's picker); it runs in the tvOS
+Simulator against a server. A development build takes launch arguments to open at a place (`-tvPlace`, `-tvLibraryMode`,
+`-tvSearch`, `-tvOpenPhoto`), for looking. Not as the iPhone has them, because a remote has no pinch, no long press and no
+drag: the grid's zoom and the date scroller, a card's menu and Select, the filters sheet in Search, tags, and a
+memory's New mark going away once played, which needs a key that may write; the Library opens at its newest photos at
+the top rather than at the bottom. **Left:**
 1. **Set Up Apple TV on a real Apple TV and iPhone** (DeviceDiscoveryUI does not run in the Simulator), and the
    Developer ID team's App ID capability it may ask for.
 2. A **Top Shelf** extension with memories or recent photos (the static Top Shelf image is there), and a **TestFlight**
    build: `ios/release.sh --tvos` builds and uploads it once the TV's App Store profile exists (the maintainer's, in
    the developer portal: App Store Connect, tvOS, for `dev.hviid.Verso`, named "Verso TV App Store Provisioning
    Profile").
+3. **A walk of the remote's focus**: left and right in the viewer, the story, Years to Months to All Photos at a photo,
+   the lift of a tile under focus. The Simulator has no remote's keys under `simctl`, and the TV has no UI test target
+   yet, so these are for a real Apple TV or for such a target.
 
 Thumbnails live in the cache, which tvOS may empty when space runs low; they are fetched again.
 
