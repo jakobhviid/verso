@@ -37,7 +37,9 @@ outside() {
     version=$(ci/version.sh)
     epoch=$(git log -1 --format=%ct HEAD)
     cargo_home=${CARGO_HOME:-$HOME/.cargo}
-    mkdir -p "$out" "$cargo_home/registry" "$cargo_home/git"
+    # The builds' place: the tree's, or a fixed one where it is given (VERSO_TARGET_ROOT, the release workflow's cache).
+    target_root=${VERSO_TARGET_ROOT:-$PWD/target}
+    mkdir -p "$out" "$cargo_home/registry" "$cargo_home/git" "$target_root"
     out=$(cd "$out" && pwd)
     for format in "${formats[@]}"; do
         image=$fedora_image
@@ -46,6 +48,7 @@ outside() {
         # The tree at a fixed path, so the build is the same wherever the checkout is; not relabelled for SELinux.
         "$engine" run --rm --pull=newer --security-opt label=disable \
             -v "$PWD:/src" -v "$out:/out" -v "$cargo_home/registry:/cargo/registry" -v "$cargo_home/git:/cargo/git" \
+            -v "$target_root:/target" \
             -w /src \
             -e VERSO_VERSION="$version" -e SOURCE_DATE_EPOCH="$epoch" -e CARGO_HOME=/cargo \
             "$image" linux/packaging/verso-packages.sh --inside "$format" /out
@@ -70,7 +73,7 @@ inside() {
         *) die "no package format $format" ;;
     esac
     export VERSO_VERSION
-    target=/src/target/package-$format
+    target=/target/package-$format
     # Built as the packages' Verso, which tells of a newer release (ARCHITECTURE.md, "Updates on Linux").
     CARGO_TARGET_DIR=$target cargo build --release --locked --features package -p verso -p verso-service
 

@@ -35,7 +35,8 @@ jobs:
         run: |
           dnf install -y -q git gcc cargo rust gtk4-devel libadwaita-devel libshumate-devel blueprint-compiler \
             python3 binutils gh flatpak flatpak-builder podman \
-            gstreamer1-plugins-base gstreamer1-plugins-good glib-networking dconf adwaita-icon-theme zsync curl file
+            gstreamer1-plugins-base gstreamer1-plugins-good glib-networking dconf adwaita-icon-theme zsync curl file \
+            zstd
       - name: Podman inside this container
         # The rpm's and the deb's containers run inside this one, where podman has no cgroups to manage.
         run: |
@@ -46,11 +47,22 @@ jobs:
         with:
           # The whole history and the tags: ci/version.sh numbers the tree from them.
           fetch-depth: 0
+      # The builds and the Flatpak's state between releases: only what changed since the last one is built.
+      - uses: actions/cache@v4
+        with:
+          path: |
+            /github/home/.cargo/registry
+            /github/home/verso-target
+            /github/home/verso-flatpak
+          key: verso-linux-${{ hashFiles('Cargo.lock', 'linux/packaging/flatpak/dev.hviid.Verso.yml') }}-${{ github.run_id }}
+          restore-keys: verso-linux-
       - name: Build, and make the draft release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag || github.ref_name }}
           DRY_RUN: ${{ inputs.dry_run && '--dry-run' || '' }}
+          VERSO_TARGET_ROOT: /github/home/verso-target
+          VERSO_FLATPAK_STATE: /github/home/verso-flatpak
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           ci/release.sh build "$TAG" $DRY_RUN
@@ -62,7 +74,7 @@ jobs:
     # Developer ID profiles "Verso Provisioning Profile" and "Verso Drive Provisioning Profile", base64), ASC_KEY_P8,
     # ASC_KEY_ID and ASC_ISSUER_ID (an App Store Connect API key, for the notary service; the .p8 base64), and
     # SPARKLE_KEY_PEM (Verso's Ed25519 key for Sparkle's updates). Without them the job says so and stops.
-    needs: linux
+    # Built while the linux job builds; it waits for that job's draft only to attach its files.
     runs-on: macos-26
     env:
       GH_TOKEN: ${{ github.token }}
@@ -96,6 +108,10 @@ jobs:
         if: steps.secrets.outputs.present == 'yes'
         with:
           targets: aarch64-apple-darwin,x86_64-apple-darwin
+      - uses: Swatinem/rust-cache@v2
+        if: steps.secrets.outputs.present == 'yes'
+        with:
+          key: mac-release
       - name: The signing keychain, the profiles and the keys
         if: steps.secrets.outputs.present == 'yes'
         env:
@@ -143,6 +159,11 @@ jobs:
         run: |
           version=${TAG#v}
           dmg="mac/build/release/verso-$version.dmg"
+          # The linux job's draft, which this job was built beside: waited for, for up to an hour and a half.
+          for _ in $(seq 1 180); do
+            gh release view "$TAG" >/dev/null 2>&1 && break
+            sleep 30
+          done
           build=$(sed -n 's/^CURRENT_PROJECT_VERSION = //p' mac/build/Version.xcconfig)
           ci/sign-mac-update.sh "$dmg" "$RUNNER_TEMP/keys/sparkle.pem" "$build"
           gh release upload "$TAG" "$dmg" "$dmg.update" --clobber
@@ -202,6 +223,10 @@ jobs:
         if: steps.secrets.outputs.present == 'yes'
         with:
           targets: aarch64-apple-darwin,x86_64-apple-darwin,aarch64-apple-ios,aarch64-apple-ios-sim
+      - uses: Swatinem/rust-cache@v2
+        if: steps.secrets.outputs.present == 'yes'
+        with:
+          key: ios-release
       - name: The nightly toolchain, for the Apple TV's core (mac/build-rust.sh --tvos)
         if: steps.secrets.outputs.present == 'yes'
         run: rustup toolchain install nightly --profile minimal --component rust-src
@@ -250,7 +275,7 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           upload=$([ "$DRY_RUN" = yes ] && echo --no-upload || true)
           ios/release.sh $upload
-          ios/release.sh --tvos $upload
+          VERSO_BRIDGE_BUILT=1 ios/release.sh --tvos $upload
       - name: The keychain and the keys removed
         if: always() && steps.secrets.outputs.present == 'yes'
         run: |

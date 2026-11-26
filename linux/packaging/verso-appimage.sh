@@ -60,7 +60,7 @@ fetch "https://github.com/AppImage/type2-runtime/releases/download/$runtime_vers
 # The version it is released as, built in (`verso_core::product::VERSION`).
 VERSO_VERSION=$(ci/version.sh)
 export VERSO_VERSION
-target=$PWD/target/appimage
+target=${VERSO_TARGET_ROOT:-$PWD/target}/appimage
 CARGO_TARGET_DIR=$target cargo build --release --locked --features appimage -p verso -p verso-service
 
 mkdir -p "$out"

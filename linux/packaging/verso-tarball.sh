@@ -10,7 +10,8 @@ out=${1:?usage: linux/packaging/verso-tarball.sh OUT_DIR}
 # The version it is released as, built in (`verso_core::product::VERSION`).
 VERSO_VERSION=$(ci/version.sh)
 export VERSO_VERSION
-target=$PWD/target/package
+# A fixed place for the build where one is given (VERSO_TARGET_ROOT, the release workflow's cache), else the tree's.
+target=${VERSO_TARGET_ROOT:-$PWD/target}/package
 CARGO_TARGET_DIR=$target RUSTFLAGS='-C link-arg=-Wl,--disable-new-dtags,-rpath,$ORIGIN/lib' \
     cargo build --release -p verso -p verso-service
 stage=$out/verso

@@ -245,7 +245,14 @@ build() {
     (
       cd "$out/flatpak"
       flatpak remote-add --user --if-not-exists flathub "$flathub"
-      flatpak-builder --user --install-deps-from=flathub --force-clean --disable-cache --repo=repo build \
+      # A state directory kept between builds (VERSO_FLATPAK_STATE, the release workflow's cache) builds only what
+      # changed; without one, everything is built afresh.
+      if [ -n "${VERSO_FLATPAK_STATE:-}" ]; then
+        cache=(--state-dir="$VERSO_FLATPAK_STATE")
+      else
+        cache=(--disable-cache)
+      fi
+      flatpak-builder --user --install-deps-from=flathub --force-clean "${cache[@]}" --repo=repo build \
         dev.hviid.Verso.yml
       flatpak build-bundle repo "$out/$flatpak" dev.hviid.Verso --runtime-repo="$flathub"
     )

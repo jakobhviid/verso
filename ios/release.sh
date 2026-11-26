@@ -39,7 +39,8 @@ archive="$out/Verso.xcarchive"
 rm -rf "$out"
 mkdir -p "$out"
 
-../mac/build-rust.sh release --ios --tvos
+# The core once for both builds of a release (VERSO_BRIDGE_BUILT, set for the second): it has every platform's slices.
+[ -n "${VERSO_BRIDGE_BUILT:-}" ] || ../mac/build-rust.sh release --ios --tvos
 xcodegen -q
 # Signed with the App Store profiles from the start: Xcode makes no profiles for an individual membership's Admin
 # role ("No Accounts"), so nothing is signed automatically.
