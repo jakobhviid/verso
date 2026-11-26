@@ -123,7 +123,9 @@ at once (ARCHITECTURE.md, "Verso's releases"):
   beside Linux ("Verso 3.9.0 (Linux and macOS)"), with a macOS section in its notes since the previous Mac release.
   `mac/release.sh` builds its disk image, signed with Developer ID and notarized, in a Terminal window on the Mac;
   `ci/sign-mac-update.sh` signs it for Sparkle on the workstation, and both are attached to the tag's drafts.
-- iOS ships through TestFlight and the App Store, never on GitHub.
+- iOS ships through TestFlight and the App Store, never on GitHub: the release workflow's `ios` job uploads the
+  iPhone's and the iPad's build and the Apple TV's (`ios/release.sh`, `--tvos`) once their secrets are set, as
+  `ios/release.sh` does on the Mac.
 - There is no rolling "latest" release: each platform's newest is found on its own; the cask follows GitHub's Latest
   here.
 
