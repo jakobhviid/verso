@@ -1202,20 +1202,23 @@ impl Window {
         let name = if account.name.trim().is_empty() { account.email.clone() } else { account.name.clone() };
         let avatar = adw::Avatar::new(28, Some(&name), true);
         let host = host_of(&session.connection.server);
+        let used = account.quota_usage_in_bytes.map(|used| match account.quota_size_in_bytes.filter(|quota| *quota > 0) {
+            Some(quota) => tr("{used} of {quota} used").replace("{used}", &text::size(used)).replace("{quota}", &text::size(quota)),
+            None => tr("{used} used").replace("{used}", &text::size(used)),
+        });
+        // Under the name, the storage used, as on the Mac: it says more at a glance than the server's address, which
+        // the menu has (the address where the storage is not known).
         let labels = gtk::Box::builder().orientation(gtk::Orientation::Vertical).valign(gtk::Align::Center).build();
         labels.append(&gtk::Label::builder().label(&name).xalign(0.0).ellipsize(gtk::pango::EllipsizeMode::End).build());
-        labels.append(&gtk::Label::builder().label(&host).xalign(0.0).ellipsize(gtk::pango::EllipsizeMode::End).css_classes(["caption", "dim-label"]).build());
+        labels.append(&gtk::Label::builder().label(used.as_deref().unwrap_or(&host)).xalign(0.0).ellipsize(gtk::pango::EllipsizeMode::End).css_classes(["caption", "dim-label"]).build());
         let content = gtk::Box::builder().spacing(8).build();
         content.append(&avatar);
         labels.set_hexpand(true);
         content.append(&labels);
         // The menu opens upward: the arrow says the row is a menu.
         content.append(&gtk::Image::builder().icon_name("pan-up-symbolic").css_classes(["dim-label"]).valign(gtk::Align::Center).build());
-        let used = account.quota_usage_in_bytes.map(|used| match account.quota_size_in_bytes.filter(|quota| *quota > 0) {
-            Some(quota) => tr("{used} of {quota} used").replace("{used}", &text::size(used)).replace("{quota}", &text::size(quota)),
-            None => tr("{used} used").replace("{used}", &text::size(used)),
-        });
-        // Who is signed in, at the menu's top: the name, then the email and the storage used, as information.
+        // Who is signed in, at the menu's top: the name, then the email, the storage used, the server's address and its
+        // Immich version, as information.
         let menu = gio::Menu::new();
         let who = gio::Menu::new();
         let card = gio::MenuItem::new(None, None);
@@ -1236,9 +1239,17 @@ impl Window {
         if let Some(popover) = button.popover().and_downcast::<gtk::PopoverMenu>() {
             let details = gtk::Box::builder().orientation(gtk::Orientation::Vertical).spacing(2).margin_start(12).margin_end(12).margin_top(6).margin_bottom(6).build();
             details.append(&gtk::Label::builder().label(&name).xalign(0.0).css_classes(["heading"]).build());
-            for line in std::iter::once(account.email.clone()).chain(used) {
+            for line in std::iter::once(account.email.clone()).chain(used).chain(std::iter::once(session.connection.server.clone())) {
                 details.append(&gtk::Label::builder().label(&line).xalign(0.0).css_classes(["caption", "dim-label"]).build());
             }
+            let client = session.connection.client.clone();
+            let weak_details = details.downgrade();
+            crate::tasks::run(async move { client.server_about().await.ok() }, move |about| {
+                if let (Some(details), Some(about)) = (weak_details.upgrade(), about) {
+                    let version = tr("Immich {version}").replace("{version}", &about.version);
+                    details.append(&gtk::Label::builder().label(&version).xalign(0.0).css_classes(["caption", "dim-label"]).build());
+                }
+            });
             popover.add_child(&details, "account");
         }
         footer.append(&button);
