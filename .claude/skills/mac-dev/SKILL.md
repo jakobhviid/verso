@@ -235,6 +235,12 @@ the run's environment as `ios/tools/live/record.sh` passes them, on screens that
   scheme's tests, which presses the remote's buttons with `XCUIRemote` and reads focus with `hasFocus == true`. The
   TV signs in only from `-signInServer` with `-signInAPIKey`. tvOS's Simulator takes no appearance from `simctl ui`:
   its pictures are dark.
+- **Verso in Messages' pictures:** start Messages with `xcrun simctl launch <udid> com.apple.MobileSMS` and attach to
+  it in the test; launched from the test, it keeps a "◀ Verso" back link in the status bar. The Simulator's sample
+  contacts (Kate Bell, John Appleseed) have fictional numbers. On the iPhone, dragging the expanded picker's grabber
+  all the way down closes it (half way brings it back to compact); on the iPad it opens as a floating panel, which a
+  tap outside closes, leaving the photo in the field. Backing up's Live Activity draws a black Dynamic Island in some
+  frames: keep the frames without it.
 - **Simulators can run side by side:** separate `-derivedDataPath`s keep an iOS and a tvOS build apart, and one iOS
   `build-for-testing` with `IMMICH_APP_NAME=Verso` serves the iPhone and the iPad.
 
