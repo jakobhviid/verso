@@ -151,14 +151,18 @@ struct AssetGridPage: View {
                 if showsPhoneTiles { Task { await model.reload(keepingUnchanged: true) } }
             }
             .overlay(alignment: .bottom) { noticeView }
-            .task(id: state.notice) {
-                guard state.notice != nil, !state.noticeHolds else { return }
-                try? await Task.sleep(for: .seconds(3))
-                guard !Task.isCancelled else { return }
-                state.clearNotice()
-            }
+            // A function of its own: Xcode 26 could not type-check this chain with the closure written in it.
+            .task(id: state.notice) { await clearNoticeLater() }
             // The sheets of the menu's actions (Add To, the editors), and the preferences the menu reads.
             .modifier(PhotoActionsPresentation(session: session, actions: actions))
+    }
+
+    /// A notice that does not hold goes after three seconds.
+    private func clearNoticeLater() async {
+        guard state.notice != nil, !state.noticeHolds else { return }
+        try? await Task.sleep(for: .seconds(3))
+        guard !Task.isCancelled else { return }
+        state.clearNotice()
     }
 
     /// A word at the grid's foot, such as the photos on their way an action left out, for a few seconds.
