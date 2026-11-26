@@ -168,13 +168,17 @@ fn context_menu(kind: &Kind) -> gio::Menu {
         }
         gio::MenuItem::new_submenu(Some(label), &part)
     };
-    let mut looking = vec![(tr("Open"), "open"), (tr("Info"), "info")];
+    // No Info here, as on the Mac: the viewer's Info button and Ctrl+I open it.
+    let mut looking = vec![(tr("Open"), "open")];
     if !matches!(kind, Kind::Library | Kind::Partner) {
         looking.push((tr("Show in All Photos"), "show-in-library"));
     }
     section(&looking);
     if *kind == Kind::Partner {
-        section(&[(tr("Open in Immich"), "open-in-immich"), (tr("Copy Immich Link"), "copy-link")]);
+        let links = gio::Menu::new();
+        links.append_item(&submenu(tr("Show In"), &[(tr("Immich"), "open-in-immich")]));
+        links.append(Some(tr("Copy Immich Link")), Some("selection.copy-link"));
+        menu.append_section(None, &links);
         section(&[(tr("Download Originals…"), "download"), (tr("Download as ZIP…"), "zip")]);
         return menu;
     }

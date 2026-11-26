@@ -164,8 +164,11 @@ fn attach_menu(card: &gtk::Box, person: &Person) {
     item(&changing, if person.is_hidden { tr("Show in People") } else { tr("Hide from People") }, if person.is_hidden { "unhide" } else { "hide" });
     item(&changing, tr("Merge With Another Person…"), "merge");
     menu.append_section(None, &changing);
+    // As every right-click (crosslink::append): Show In, with Immich, and Copy Immich Link beside it.
     let links = gio::Menu::new();
-    item(&links, tr("Open in Immich"), "open-in-immich");
+    let show_in = gio::Menu::new();
+    item(&show_in, tr("Immich"), "open-in-immich");
+    links.append_submenu(Some(tr("Show In")), &show_in);
     item(&links, tr("Copy Immich Link"), "copy-link");
     menu.append_section(None, &links);
     let popover = gtk::PopoverMenu::from_model(Some(&menu));

@@ -481,10 +481,11 @@ in Files, selected.
 
 Beside Open in Immich and Copy Immich Link, **Show in _app_** sends the item's crosslink to another app that takes
 part in Immich Crosslink, which shows it there: from Verso Drive's menu in Files, and from Verso's window.
-- **On the Mac,** a right-click in Verso's window gathers them in a **Show In** submenu: **Verso Drive** (while it is
-  on: the item selected in Finder, in the drive's location, through the drive's own lookup of the link), **Widget**
-  for photos (checked while they are in the widget's Chosen Photos), **Immich** (the web app) and each other app
-  found; Copy Immich Link stays beside the submenu.
+- **In the window's right-click,** on Linux as on the Mac, they are gathered in a **Show In** submenu, each app by its
+  name, with **Immich** (the web app) first and **Copy Immich Link** beside the submenu; Linux's grid leaves Info
+  out of its right-click, as the Mac's does. On the Mac the submenu also holds **Verso Drive** (while it is on: the
+  item selected in Finder, in the drive's location, through the drive's own lookup of the link) and **Widget** for
+  photos (checked while they are in the widget's Chosen Photos); on Linux, Verso Drive is one of the apps.
 - **The way back, in Finder:** on an item of Verso Drive with a web address, **Show in Verso** beside Open in Immich
   hands the item to Verso itself (its crosslink, in the app's own scheme), which shows it as a received link. One
   app, so this is no link between apps; other apps are reached through Immich Crosslink alone.
@@ -500,7 +501,7 @@ part in Immich Crosslink, which shows it there: from Verso Drive's menu in Files
   desktop entry gone since the menu was made) or "Verso could not open *app*: *the system's reason*", and the next
   menu reads the apps again.
 - **Off:** with `crosslink.enabled` off, no Show in items; Open in Immich and Copy Immich Link stay.
-- **In the Flatpak,** whose sandbox cannot list the other apps, the window offers one **Show in Another App…**, which
+- **In the Flatpak,** whose sandbox cannot list the other apps, the window's Show In offers one **Another App…**, which
   has the system ask which app (the OpenURI portal). The AppImage lists the apps as an install does.
 - **The settings** (Preferences, Crosslink): the **Immich Crosslink** switch, with **Learn More**, a link to the
   protocol whose address is not shown. Then **Verso Takes Part As**, with a switch each for Verso Gallery and Verso

@@ -41,25 +41,33 @@ pub fn offered(kind: &str) -> Vec<CrosslinkApp> {
         .collect()
 }
 
-/// Add Open in Immich and Copy Immich Link (`{prefix}.open-in-immich`, `{prefix}.copy-link`) where their switch is on,
-/// then Show in *app* for each participant offered for `kind`, as `{prefix}.show-in` with the app's id.
+/// The right-click's Show In submenu, as the Mac's: Immich (`{prefix}.open-in-immich`, where web links are on), then
+/// each participant offered for `kind` (Verso Drive among them) by its name, as `{prefix}.show-in` with the app's id,
+/// or Another App… in the Flatpak; and Copy Immich Link (`{prefix}.copy-link`) beside the submenu, as it shows
+/// nothing.
 pub fn append(menu: &gio::Menu, kind: &str, prefix: &str) {
+    let show_in = gio::Menu::new();
     if web_links() {
-        menu.append(Some(tr("Open in Immich")), Some(&format!("{prefix}.open-in-immich")));
-        menu.append(Some(tr("Copy Immich Link")), Some(&format!("{prefix}.copy-link")));
+        show_in.append(Some(tr("Immich")), Some(&format!("{prefix}.open-in-immich")));
     }
     if verso_core::product::current().sandboxed {
         if config().is_some_and(|config| config.crosslink_enabled) {
-            let item = gio::MenuItem::new(Some(tr("Show in Another App…")), None);
+            let item = gio::MenuItem::new(Some(tr("Another App…")), None);
             item.set_action_and_target_value(Some(&format!("{prefix}.show-in")), Some(&ANOTHER_APP.to_variant()));
-            menu.append_item(&item);
+            show_in.append_item(&item);
         }
-        return;
+    } else {
+        for app in offered(kind) {
+            let item = gio::MenuItem::new(Some(&app.name), None);
+            item.set_action_and_target_value(Some(&format!("{prefix}.show-in")), Some(&app.id.to_variant()));
+            show_in.append_item(&item);
+        }
     }
-    for app in offered(kind) {
-        let item = gio::MenuItem::new(Some(&tr("Show in {app}").replace("{app}", &app.name)), None);
-        item.set_action_and_target_value(Some(&format!("{prefix}.show-in")), Some(&app.id.to_variant()));
-        menu.append_item(&item);
+    if show_in.n_items() > 0 {
+        menu.append_submenu(Some(tr("Show In")), &show_in);
+    }
+    if web_links() {
+        menu.append(Some(tr("Copy Immich Link")), Some(&format!("{prefix}.copy-link")));
     }
 }
 
