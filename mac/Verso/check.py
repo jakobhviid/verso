@@ -6,6 +6,7 @@ to arrange what it shows or what to keep (a page's view options, Verso's own not
 from what `mac/build-rust.sh` built.
 """
 from pathlib import Path
+import os
 import subprocess
 import concurrent.futures
 
@@ -100,6 +101,11 @@ def check(item):
     print(f'{"FAIL" if result else "PASS"} {name}', flush=True)
     return name, result, log
 
+# Vision's feature prints need the Neural Engine or a GPU, which GitHub's virtual Macs lack: there that check waits for
+# ever, so it runs on a real Mac alone.
+if os.environ.get('GITHUB_ACTIONS') == 'true':
+    cases.pop('similar-photos', None)
+    print('SKIP similar-photos: no Neural Engine or GPU on this runner', flush=True)
 if with_core & cases.keys():
     build_core()
 with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:

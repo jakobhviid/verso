@@ -36,6 +36,14 @@ private func close(_ first: CGRect, _ second: CGRect) -> Bool {
     close(first.minX, second.minX) && close(first.minY, second.minY) && close(first.width, second.width) && close(first.height, second.height)
 }
 
+/// A view's frame against the arithmetic's, within one of the screen's pixels: AppKit may put a view on whole points
+/// where the screen has no Retina (GitHub's Mac runners), half a point from where a Retina screen keeps it.
+private func onScreen(_ view: CGRect, _ arithmetic: CGRect, scale: CGFloat) -> Bool {
+    let pixel = 1 / max(scale, 1) + 0.01
+    return abs(view.minX - arithmetic.minX) < pixel && abs(view.minY - arithmetic.minY) < pixel
+        && close(view.width, arithmetic.width) && close(view.height, arithmetic.height)
+}
+
 @main private struct PhotoGridLayoutChecks {
     typealias Place = PhotoGridGeometry.Place
 
@@ -144,7 +152,8 @@ private func close(_ first: CGRect, _ second: CGRect) -> Bool {
         guard let item = collection.item(at: IndexPath(item: deep.item, section: deep.section)) else {
             preconditionFailure("The tile scrolled to is laid out")
         }
-        precondition(close(item.view.frame, frame), "The tile is where the arithmetic puts it: \(item.view.frame) \(frame)")
+        let scale = collection.window?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 1
+        precondition(onScreen(item.view.frame, frame, scale: scale), "The tile is where the arithmetic puts it: \(item.view.frame) \(frame)")
         let visibleTop = scroll.contentView.bounds.minY + 52
         precondition(close(visibleTop, frame.minY - 50), "Scrolled to the point")
         // Its month's header stays at the top of the view over its photos.
