@@ -723,7 +723,7 @@ tvOS (`mac/build-rust.sh --tvos`), the eight places in tvOS's sidebar-style tab 
 people's arrangement by the shared core), the viewer (the preview, then the full-size image; title capsule on a click;
 the LIVE badge and a Live Photo's movie; videos), memories as stories, the TV's key in its Keychain, the iPhone's
 **Set Up Apple TV** (Account) and the TV's **Set Up with iPhone** (DeviceDiscoveryUI's picker); **Settings** at the
-sidebar's foot (the app's icon, Day or Night; the account, with Sign Out; About, with the non-affiliation notice); the
+sidebar's foot (the account, with Sign Out; About, with the non-affiliation notice); the
 **Top Shelf** (`ios/TVTopShelf`, the `VersoTVTopShelf` extension): today's memories and the newest photos, which the app
 writes into the App Group it shares with the extension each time it starts signed in, so the extension needs no key and
 no network, each opening the app at that memory or photo (`verso://memory/<id>`, `verso://photo/<id>`); it runs in the tvOS
@@ -732,7 +732,12 @@ Simulator against a server, and on a real Apple TV from TestFlight. A developmen
 drag: the grid's zoom and the date scroller, a card's menu and Select, the filters sheet in Search, tags, and a
 memory's New mark going away once played, which needs a key that may write; the Library opens at its newest photos at
 the top rather than at the bottom. **Left:**
-1. **A walk of the remote's focus**: left and right in the viewer, the story, Years to Months to All Photos at a photo,
+1. **The Night icon as the app's alternate,** which Settings offers as App Icon, Day or Night, once the app carries it
+   (`TVAppIcon.offered`): the asset catalog registers a tvOS alternate only as an image stack beside the brand assets
+   (`AppIconNight`, which `make-tv-icons.py` writes), and App Store validation then turns the build down, "Missing the
+   Alternate Icon asset", as it carries no App Store size (1280 × 768); in brand assets of its own, with that size,
+   the asset catalog does not find it at all. Open: how a tvOS alternate carries its App Store size.
+2. **A walk of the remote's focus**: left and right in the viewer, the story, Years to Months to All Photos at a photo,
    the lift of a tile under focus. The Simulator has no remote's keys under `simctl`, and the TV has no UI test target
    yet, so these are for a real Apple TV or for such a target.
 

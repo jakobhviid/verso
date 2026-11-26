@@ -344,9 +344,10 @@ targets:
         TARGETED_DEVICE_FAMILY: "3"
         # The App Store profile ios/release.sh --tvos names; empty in a development build, signed automatically.
         PROVISIONING_PROFILE_SPECIFIER: $(TV_PROFILE)
-        # tvOS's layered icon and Top Shelf images, and the Night icon Settings offers, drawn by TV/make-tv-icons.py.
+        # tvOS's layered icon and Top Shelf images, drawn by TV/make-tv-icons.py. Its Night icon is not an alternate yet
+        # (ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: AppIconNight): the App Store asks of it a size the asset
+        # catalog leaves out (ROADMAP.md, "Verso on the Apple TV").
         ASSETCATALOG_COMPILER_APPICON_NAME: App Icon & Top Shelf Image
-        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: AppIconNight
         # The App Group it shares with the Top Shelf extension, which its App Store profile grants.
         CODE_SIGN_ENTITLEMENTS: Config/VersoTV.entitlements
         # The iPhone's accent, the system blue, which tvOS does not take as its own.

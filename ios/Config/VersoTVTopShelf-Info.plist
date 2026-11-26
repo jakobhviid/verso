@@ -12,6 +12,11 @@
 		<key>NSExtensionPrincipalClass</key>
 		<string>$(PRODUCT_MODULE_NAME).ContentProvider</string>
 	</dict>
+	<!-- A 64-bit Apple TV, as the App Store asks of a 64-bit extension. -->
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
 	<!-- The App Group the app writes the shelf into, and the app's scheme its items open. -->
 	<key>VersoAppGroup</key>
 	<string>$(VERSO_APP_GROUP)</string>

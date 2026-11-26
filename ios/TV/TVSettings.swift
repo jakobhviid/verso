@@ -14,6 +14,7 @@ struct TVSettings: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 48) {
                 TVPageTitle("Settings")
+                if TVAppIcon.offered {
                 VStack(alignment: .leading, spacing: 24) {
                     TVSectionHeader(title: String(localized: "App Icon"))
                     HStack(spacing: TVMetrics.cardSpacing) {
@@ -25,6 +26,7 @@ struct TVSettings: View {
                             .tvLifts()
                         }
                     }
+                }
                 }
                 VStack(alignment: .leading, spacing: 24) {
                     TVSectionHeader(title: String(localized: "Account"))
@@ -87,6 +89,13 @@ enum TVAppIcon: String, CaseIterable, Identifiable {
     case day, night
 
     var id: Self { self }
+
+    /// Whether the app carries its Night icon as an alternate (Info.plist's CFBundleAlternateIcons, which the asset
+    /// catalog writes for the project's alternate icons).
+    static var offered: Bool {
+        let icons = Bundle.main.object(forInfoDictionaryKey: "CFBundleIcons") as? [String: Any]
+        return (icons?["CFBundleAlternateIcons"] as? [String: Any])?["AppIconNight"] != nil
+    }
 
     @MainActor static var current: TVAppIcon { UIApplication.shared.alternateIconName == nil ? .day : .night }
 

@@ -142,7 +142,8 @@ def write(folder, contents):
 
 
 def imagestack(name, sizes, idiom, design, work, brand=BRAND):
-    """A layered icon, front first, at each (scale, width, height)."""
+    """A layered icon, front first, at each (scale, width, height), or (scale, width, height, idiom) where a size has
+    an idiom of its own."""
     stack = brand / f"{name}.imagestack"
     layers = list(reversed(design))
     write(stack, {"info": INFO, "layers": [{"filename": f"{layer}.imagestacklayer"} for layer in layers]})
@@ -150,12 +151,12 @@ def imagestack(name, sizes, idiom, design, work, brand=BRAND):
         folder = stack / f"{layer}.imagestacklayer" / "Content.imageset"
         write(folder.parent, {"info": INFO})
         images = []
-        for scale, width, height in sizes:
-            file = f"{layer.lower()}-{scale}.png"
+        for scale, width, height, *own in sizes:
+            file = f"{layer.lower()}-{scale}.png" if not own else f"{layer.lower()}-{width}-{scale}.png"
             folder.mkdir(parents=True, exist_ok=True)
             shutil.copy(render(svg(400, [design[layer]]), width, height, work, f"{brand.stem}-{name}-{layer}-{scale}"),
                         folder / file)
-            images.append({"idiom": idiom, "scale": scale, "filename": file})
+            images.append({"idiom": own[0] if own else idiom, "scale": scale, "filename": file})
         write(folder, {"images": images, "info": INFO})
 
 
@@ -187,7 +188,7 @@ def main():
     parser.add_argument("--night", choices=DESIGNS, default=names[1])
     arguments = parser.parse_args()
     design, night = DESIGNS[arguments.design], DESIGNS[arguments.night]
-    for old in (BRAND, CATALOG / "AppIconNight.imagestack", CATALOG / "TV Icon Day.imageset", CATALOG / "TV Icon Night.imageset"):
+    for old in (BRAND, CATALOG / "AppIconNight.imagestack", CATALOG / "AppIconNight.brandassets", CATALOG / "TV Icon Day.imageset", CATALOG / "TV Icon Night.imageset"):
         if old.exists():
             shutil.rmtree(old)
     write(CATALOG, {"info": INFO})
@@ -197,7 +198,9 @@ def main():
         imagestack("App Icon - App Store", [("1x", 1280, 768)], "tv-marketing", design, work)
         top_shelf("Top Shelf Image", [("1x", 1920, 720), ("2x", 3840, 1440)], design, work)
         top_shelf("Top Shelf Image Wide", [("1x", 2320, 720), ("2x", 4640, 1440)], design, work)
-        # The Night icon, an alternate icon: an image stack of its own beside the brand assets, as tvOS has them.
+        # The Night icon, an image stack of its own beside the brand assets, which is where the asset catalog finds a
+        # tvOS alternate. The App Store turns an alternate down without its App Store size ("Missing the Alternate Icon
+        # asset"), which this stack does not carry yet, so the project does not name it as an alternate (ROADMAP.md).
         imagestack("AppIconNight", [("1x", 400, 240), ("2x", 800, 480)], "tv", night, work, CATALOG)
         preview("TV Icon Day", design, work)
         preview("TV Icon Night", night, work)
