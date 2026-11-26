@@ -708,7 +708,8 @@ sees an API key:
   Locked Folder once the phone's PIN was given. A key never reaches the Locked Folder, which needs a PIN-elevated
   session.
 - it travels to the TV over the local network with Apple's DeviceDiscoveryUI (tvOS 16 and later): the TV offers
-  "Set up with your iPhone", the iPhone running Verso shows up, and the person accepts on the phone.
+  "Set Up with iPhone", the iPhone running Verso shows up, the TV says its name, and Verso on the iPhone asks
+  "Set Up “name”?" before it makes the key, named after the TV ("Verso on Apple TV (Living Room)").
 - the TV keeps it in its Keychain; **Forget This Apple TV** on the phone, or deleting the key in Immich, ends it
   without touching the phone.
 
