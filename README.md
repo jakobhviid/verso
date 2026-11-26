@@ -2,20 +2,28 @@
 
 # Verso for Immich
 
-**Your [Immich](https://immich.app) library in a native app on the iPhone, the iPad, the Apple TV, the Mac and the Linux desktop:
-browse, search, organise and share it, back your phone up to it, and, when you want it, keep the whole library as a
-drive in Files or Finder.**
+**Your [Immich](https://immich.app) library in a native app on the iPhone, the iPad, the Apple TV, the Mac and the
+Linux desktop: browse, search, organise and share it, back your phone up to it, and, when you want it, keep the whole
+library as a drive in Files or Finder.**
 
 > Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich
 > project or FUTO. "Immich" is used only to describe the server this software works with, and remains the mark of
 > its owner.
 
-![Verso's Library by year, with the date scroller along its edge](docs/screenshots/verso-library.png)
+<p align="center">
+  <picture><source media="(prefers-color-scheme: dark)" srcset="site/screenshots/iphone-library-dark.webp"><img src="site/screenshots/iphone-library.webp" alt="Verso on the iPhone: the Library, edge to edge under Liquid Glass" width="150"></picture>
+  <picture><source media="(prefers-color-scheme: dark)" srcset="site/screenshots/ipad-library-dark.webp"><img src="site/screenshots/ipad-library.webp" alt="Verso on the iPad: the Library, with the tabs in the floating bar at the top" width="430"></picture>
+</p>
+<p align="center">
+  <img src="site/screenshots/tv-places.webp" alt="Verso on the Apple TV: Places, a card for each country with its cities" width="290">
+  <picture><source media="(prefers-color-scheme: dark)" srcset="site/screenshots/mac-library-dark.webp"><img src="site/screenshots/mac-library.webp" alt="Verso on the Mac: the Library beside its sidebar" width="290"></picture>
+  <picture><source media="(prefers-color-scheme: dark)" srcset="site/screenshots/linux-albums-dark.webp"><img src="site/screenshots/linux-albums.webp" alt="Verso on Linux: Albums, each with its cover" width="290"></picture>
+</p>
 
 Verso is one app, made natively for each platform it runs on: with SwiftUI and UIKit on the iPhone and the iPad, where
-it looks and moves as Photos does; with SwiftUI on the Apple TV; with SwiftUI and AppKit on the Mac; and with GTK 4 and libadwaita on Linux, made
-for GNOME. Underneath, the platforms share one core in Rust: the Immich client, the drive's layout and the arithmetic
-that places the grid's dates, so they behave alike.
+it looks and moves as Photos does; with SwiftUI on the Apple TV; with SwiftUI and AppKit on the Mac; and with GTK 4
+and libadwaita on Linux, made for GNOME. Underneath, the platforms share one core in Rust: the Immich client, the
+drive's layout and the arithmetic that places the grid's dates, so they behave alike.
 
 | Platform | Where it stands |
 |---|---|
@@ -173,9 +181,10 @@ and the deb, each in a container of its distribution.
 [`linux/packaging/flatpak/dev.hviid.Verso.yml`](linux/packaging/flatpak/dev.hviid.Verso.yml) builds the Flatpak, as
 its first lines say, and `linux/packaging/verso-appimage.sh out`, in the same toolbox, the AppImage.
 
-**The Mac, the iPhone and the iPad,** on a Mac with Xcode, Rust (through rustup) and XcodeGen: `mac/build-rust.sh`
-builds the core for the Mac (with `--ios`, for the iPhone and the iPad too), and `xcodegen` makes the Xcode projects,
-in `mac/Verso` and in `ios`.
+**The Mac, the iPhone, the iPad and the Apple TV,** on a Mac with Xcode, Rust (through rustup) and XcodeGen:
+`mac/build-rust.sh` builds the core for the Mac (with `--ios`, for the iPhone and the iPad too, and `--tvos`, with
+Rust's nightly toolchain and its `rust-src`, for the Apple TV), and `xcodegen` makes the Xcode projects, in
+`mac/Verso` and in `ios`.
 
 [AGENTS.md](AGENTS.md), "Development environment" and "The green gate", has the rest: the checks every change passes,
 signing a development build, and testing in virtual machines.
@@ -187,7 +196,8 @@ The repository is sorted by where the code runs:
   through.
 - `linux/`: the window, the service behind the top bar icon and the drive, the Files extension and the packaging.
 - `mac/`: the Mac app, its widgets and Verso Drive's Finder extension, with the Swift that the iPhone shares.
-- `ios/`: the iPhone and iPad app, its backup, and its extensions for Files and Messages.
+- `ios/`: the iPhone and iPad app, its backup, and its extensions for Files and Messages; the Apple TV app
+  (`ios/TV`) and its Top Shelf (`ios/TVTopShelf`); and the App Store listing (`ios/AppStore`).
 
 Read on:
 - [ARCHITECTURE.md](ARCHITECTURE.md): how the parts fit, and each design decision with its reason.
@@ -211,8 +221,9 @@ welcome in this repository's [issues](../../issues).
   (MIT).
 - **[Immich](https://github.com/immich-app/immich)**, the server all of this talks to.
 - The photos in the screenshots are the lab servers', Creative Commons and public domain photos from Wikimedia
-  Commons, each credited in [lab/immich-server/fixtures/ATTRIBUTION.md](lab/immich-server/fixtures/ATTRIBUTION.md),
-  and the map's in [lab/immich-server/fixtures/showcase/ATTRIBUTION.md](lab/immich-server/fixtures/showcase/ATTRIBUTION.md).
+  Commons: the showcase library's, on the website, the App Store and at the top of this page, credited in
+  [lab/immich-server/fixtures/showcase/ATTRIBUTION.md](lab/immich-server/fixtures/showcase/ATTRIBUTION.md), and the
+  others' in [lab/immich-server/fixtures/ATTRIBUTION.md](lab/immich-server/fixtures/ATTRIBUTION.md).
   Map data and imagery are OpenStreetMap's, as credited on the map.
 
 More: [CREDITS.md](CREDITS.md).
