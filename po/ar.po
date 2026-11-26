@@ -11,12 +11,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: linux/verso-service/src/commands.rs:473
-#: linux/verso-linux/src/daemon.rs:522
+#: linux/verso-linux/src/daemon.rs:524
 msgid "Verso Drive is not mounted"
 msgstr "Verso Drive غير مركّب"
 
 #: linux/verso-service/src/commands.rs:473
-#: linux/verso-linux/src/daemon.rs:522
+#: linux/verso-linux/src/daemon.rs:524
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "فعّل القرص في تفضيلات Verso، ثم افتح الرابط مجددًا."
 
@@ -28,78 +28,78 @@ msgstr "بقيت حلقة المفاتيح مقفلة. افتح {app}، أو ش�
 msgid "Immich is not mounted"
 msgstr "Immich غير مركّب"
 
-#: linux/verso-linux/src/daemon.rs:521
+#: linux/verso-linux/src/daemon.rs:523
 msgid "Links from other apps are off"
 msgstr "الروابط من التطبيقات الأخرى متوقفة"
 
-#: linux/verso-linux/src/daemon.rs:521
+#: linux/verso-linux/src/daemon.rs:523
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "فعّل Immich Crosslink في إعدادات Verso لعرض ما تشير إليه التطبيقات الأخرى."
 
-#: linux/verso-linux/src/daemon.rs:523
+#: linux/verso-linux/src/daemon.rs:525
 msgid "A link from another app cannot be opened"
 msgstr "تعذّر فتح رابط من تطبيق آخر"
 
-#: linux/verso-linux/src/daemon.rs:523
+#: linux/verso-linux/src/daemon.rs:525
 msgid "It is not a valid Immich link."
 msgstr "ليس رابط Immich صالحًا."
 
-#: linux/verso-linux/src/daemon.rs:524
-#: linux/verso-linux/src/daemon.rs:528
+#: linux/verso-linux/src/daemon.rs:526
+#: linux/verso-linux/src/daemon.rs:530
 msgid "Nothing to show"
 msgstr "لا شيء لعرضه"
 
-#: linux/verso-linux/src/daemon.rs:524
+#: linux/verso-linux/src/daemon.rs:526
 msgid "Verso Drive has no place for what this link points to."
 msgstr "ليس لدى Verso Drive مكان لما يشير إليه هذا الرابط."
 
-#: linux/verso-linux/src/daemon.rs:525
+#: linux/verso-linux/src/daemon.rs:527
 msgid "Not signed in to {host}"
 msgstr "لم يتم تسجيل الدخول إلى {host}"
 
-#: linux/verso-linux/src/daemon.rs:525
+#: linux/verso-linux/src/daemon.rs:527
 msgid "Verso is signed in to another Immich server."
 msgstr "Verso مسجّل الدخول إلى خادم Immich آخر."
 
-#: linux/verso-linux/src/daemon.rs:526
+#: linux/verso-linux/src/daemon.rs:528
 msgid "Another Immich account"
 msgstr "حساب Immich آخر"
 
-#: linux/verso-linux/src/daemon.rs:526
+#: linux/verso-linux/src/daemon.rs:528
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "الرابط لحساب غير الحساب الذي سجّل Verso الدخول به."
 
-#: linux/verso-linux/src/daemon.rs:529
+#: linux/verso-linux/src/daemon.rs:531
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "لا يعرض القرص هذا العنصر. قد يكون مخفيًا، أو في قسم معطّل، أو غير مشارَك معك."
 
-#: linux/verso-linux/src/daemon.rs:531
-#: linux/verso-linux/src/daemon.rs:617
+#: linux/verso-linux/src/daemon.rs:533
+#: linux/verso-linux/src/daemon.rs:619
 msgid "Immich is unreachable"
 msgstr "تعذّر الوصول إلى Immich"
 
-#: linux/verso-linux/src/daemon.rs:531
+#: linux/verso-linux/src/daemon.rs:533
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "تعذّر الوصول إلى خادم Immich. أعد محاولة فتح الرابط لاحقًا."
 
-#: linux/verso-linux/src/daemon.rs:613
+#: linux/verso-linux/src/daemon.rs:615
 msgid "Immich's certificate is not trusted"
 msgstr "شهادة Immich غير موثوق بها"
 
-#: linux/verso-linux/src/daemon.rs:614
+#: linux/verso-linux/src/daemon.rs:616
 msgid "The Immich server presented a certificate {app} does not trust, so nothing is sent to it. Open {app} to check the certificate. Files you opened before stay available."
 msgstr "قدّم خادم Immich شهادة لا يثق بها {app}، لذلك لا يُرسَل إليه شيء. افتح {app} للتحقق من الشهادة. تبقى الملفات التي فتحتها سابقًا متاحة."
 
-#: linux/verso-linux/src/daemon.rs:618
+#: linux/verso-linux/src/daemon.rs:620
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "تعذّر الوصول إلى خادم Immich. تبقى الملفات التي فتحتها سابقًا متاحة."
 
-#: linux/verso-linux/src/daemon.rs:621
-#: linux/verso-linux/src/tray.rs:135
+#: linux/verso-linux/src/daemon.rs:623
+#: linux/verso-linux/src/tray.rs:140
 msgid "Signed out of Immich"
 msgstr "تم تسجيل الخروج من Immich"
 
-#: linux/verso-linux/src/daemon.rs:622
+#: linux/verso-linux/src/daemon.rs:624
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "لم يعد Immich يقبل تسجيل الدخول هذا. افتح {app} لتسجيل الدخول مجددًا."
 
@@ -145,55 +145,55 @@ msgstr "لا يسمح Immich لهذا الحساب بإنشاء ألبومات (
 msgid "Signed out of Immich. The photos and videos are in the timeline."
 msgstr "تم تسجيل الخروج من Immich. الصور ومقاطع الفيديو في الخط الزمني."
 
-#: linux/verso-linux/src/fuse.rs:647
-#: linux/verso-linux/src/fuse.rs:695
-#: linux/verso-linux/src/fuse.rs:701
-#: linux/verso-linux/src/fuse.rs:711
-#: linux/verso-linux/src/fuse.rs:1185
+#: linux/verso-linux/src/fuse.rs:651
+#: linux/verso-linux/src/fuse.rs:699
+#: linux/verso-linux/src/fuse.rs:705
+#: linux/verso-linux/src/fuse.rs:715
+#: linux/verso-linux/src/fuse.rs:1190
 msgid "Not uploaded: {name}"
 msgstr "لم يُرفع: {name}"
 
-#: linux/verso-linux/src/fuse.rs:647
+#: linux/verso-linux/src/fuse.rs:651
 msgid "The file is incomplete, as if its copy was cancelled."
 msgstr "الملف غير مكتمل، كأن نسخه قد أُلغي."
 
-#: linux/verso-linux/src/fuse.rs:663
+#: linux/verso-linux/src/fuse.rs:667
 msgid "Uploading {name} to Immich"
 msgstr "جارٍ رفع {name} إلى Immich"
 
-#: linux/verso-linux/src/fuse.rs:664
+#: linux/verso-linux/src/fuse.rs:668
 msgid "The copy finishes once Immich has the file."
 msgstr "ينتهي النسخ حالما يستلم Immich الملف."
 
-#: linux/verso-linux/src/fuse.rs:677
+#: linux/verso-linux/src/fuse.rs:681
 msgid "Restored from the trash: {name}"
 msgstr "استُعيد من سلة المهملات: {name}"
 
-#: linux/verso-linux/src/fuse.rs:678
+#: linux/verso-linux/src/fuse.rs:682
 msgid "Immich had this photo in its trash, and copying it in brought it back."
 msgstr "كانت هذه الصورة في سلة مهملات Immich، ونسخها أعادها."
 
-#: linux/verso-linux/src/fuse.rs:682
+#: linux/verso-linux/src/fuse.rs:686
 msgid "Immich has this photo already, so nothing was added."
 msgstr "هذه الصورة موجودة في Immich مسبقًا، لذا لم يُضَف شيء."
 
-#: linux/verso-linux/src/fuse.rs:683
+#: linux/verso-linux/src/fuse.rs:687
 msgid "Already in Immich: {name}"
 msgstr "موجود في Immich مسبقًا: {name}"
 
-#: linux/verso-linux/src/fuse.rs:692
+#: linux/verso-linux/src/fuse.rs:696
 msgid "{error}. The file is kept in {folder}."
 msgstr "{error}. الملف محفوظ في {folder}."
 
-#: linux/verso-linux/src/fuse.rs:702
+#: linux/verso-linux/src/fuse.rs:706
 msgid "This computer lets a file operation take at most {seconds} seconds (fs.fuse.default_request_timeout). Set it to 0 for longer uploads. The file is kept in {folder}."
 msgstr "يسمح هذا الحاسوب بأن تستغرق عملية الملف {seconds} ثانية كحدٍّ أقصى (fs.fuse.default_request_timeout). اضبطه على 0 لعمليات رفع أطول. الملف محفوظ في {folder}."
 
-#: linux/verso-linux/src/fuse.rs:712
+#: linux/verso-linux/src/fuse.rs:716
 msgid "The upload took too long. The file is kept in {folder}."
 msgstr "استغرق الرفع وقتًا أطول من اللازم. الملف محفوظ في {folder}."
 
-#: linux/verso-linux/src/fuse.rs:1185
+#: linux/verso-linux/src/fuse.rs:1190
 msgid "Immich takes photos and videos only."
 msgstr "لا يقبل Immich سوى الصور ومقاطع الفيديو."
 
@@ -210,75 +210,90 @@ msgstr "يتعذّر على {drive} فتح «{name}»"
 msgid "Verso Drive"
 msgstr "Verso Drive"
 
-#: linux/verso-linux/src/tray.rs:133
+#: linux/verso-linux/src/tray.rs:138
 msgid "Connected to {server}"
 msgstr "متصل بـ {server}"
 
-#: linux/verso-linux/src/tray.rs:134
+#: linux/verso-linux/src/tray.rs:139
 msgid "{server} is not reachable"
 msgstr "تعذّر الوصول إلى {server}"
 
-#: linux/verso-linux/src/tray.rs:136
+#: linux/verso-linux/src/tray.rs:141
 msgid "Signed in to {server}"
 msgstr "تم تسجيل الدخول إلى {server}"
 
-#: linux/verso-linux/src/tray.rs:145
+#: linux/verso-linux/src/tray.rs:150
 msgid "Verso Drive is unmounted"
 msgstr "تم إلغاء تركيب Verso Drive"
 
-#: linux/verso-linux/src/tray.rs:148
+#: linux/verso-linux/src/tray.rs:153
 msgid "Server version: Immich {version}"
 msgstr "إصدار الخادم: Immich {version}"
 
-#: linux/verso-linux/src/tray.rs:151
+#: linux/verso-linux/src/tray.rs:156
 msgid "Signed in as: {account}"
 msgstr "تم تسجيل الدخول باسم: {account}"
 
-#: linux/verso-linux/src/tray.rs:155
+#: linux/verso-linux/src/tray.rs:160
 msgid "Try Again Now"
 msgstr "إعادة المحاولة الآن"
 
-#: linux/verso-linux/src/tray.rs:159
+#: linux/verso-linux/src/tray.rs:164
 msgid "Open {app}"
 msgstr "فتح {app}"
 
-#: linux/verso-linux/src/tray.rs:162
+#: linux/verso-linux/src/tray.rs:167
 msgid "Open in Files"
 msgstr "فتح في «الملفات»"
 
-#: linux/verso-linux/src/tray.rs:168
+#: linux/verso-linux/src/tray.rs:173
 msgid "Unmount Verso Drive"
 msgstr "إلغاء تركيب Verso Drive"
 
-#: linux/verso-linux/src/tray.rs:170
+#: linux/verso-linux/src/tray.rs:175
 msgid "Mount Verso Drive"
 msgstr "تركيب Verso Drive"
 
-#: linux/verso-linux/src/tray.rs:173
+#: linux/verso-linux/src/tray.rs:178
 msgid "Preferences…"
 msgstr "التفضيلات…"
 
-#: linux/verso-linux/src/tray.rs:176
+#: linux/verso-linux/src/tray.rs:181
+#: linux/verso-desktop/src/preferences.rs:85
+#: linux/verso-desktop/src/preferences.rs:85
+#: linux/verso-desktop/src/preferences.rs:85
+msgid "Check for Updates"
+msgstr "التحقق من التحديثات"
+
+#: linux/verso-linux/src/tray.rs:185
 msgid "Get {app} {version}…"
 msgstr "تنزيل {app} {version}…"
 
-#: linux/verso-linux/src/tray.rs:182
+#: linux/verso-linux/src/tray.rs:191
 msgid "Sign In…"
 msgstr "تسجيل الدخول…"
 
-#: linux/verso-linux/src/tray.rs:184
+#: linux/verso-linux/src/tray.rs:193
 msgid "Sign Out…"
 msgstr "تسجيل الخروج…"
 
-#: linux/verso-linux/src/tray.rs:186
+#: linux/verso-linux/src/tray.rs:195
 msgid "Quit {app}"
 msgstr "إنهاء {app}"
 
-#: linux/verso-linux/src/updates.rs:53
+#: linux/verso-linux/src/updates.rs:63
+msgid "{app} is up to date"
+msgstr ""
+
+#: linux/verso-linux/src/updates.rs:64
+msgid "{version} is the newest version."
+msgstr ""
+
+#: linux/verso-linux/src/updates.rs:75
 msgid "{app} {version} is available"
 msgstr "يتوفر {app} {version}"
 
-#: linux/verso-linux/src/updates.rs:54
+#: linux/verso-linux/src/updates.rs:76
 msgid "Get it from jakob.hviid.phd/verso."
 msgstr "نزّله من jakob.hviid.phd/verso."
 
@@ -356,12 +371,6 @@ msgstr "حجم ذاكرة التخزين المؤقت"
 #: linux/verso-desktop/src/preferences.rs:78
 msgid "Sharp Thumbnails"
 msgstr "مصغّرات واضحة"
-
-#: linux/verso-desktop/src/preferences.rs:85
-#: linux/verso-desktop/src/preferences.rs:85
-#: linux/verso-desktop/src/preferences.rs:85
-msgid "Check for Updates"
-msgstr "التحقق من التحديثات"
 
 #: linux/verso-desktop/src/preferences.rs:100
 #: linux/verso-desktop/src/preferences.rs:100

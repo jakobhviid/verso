@@ -11,12 +11,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: linux/verso-service/src/commands.rs:473
-#: linux/verso-linux/src/daemon.rs:522
+#: linux/verso-linux/src/daemon.rs:524
 msgid "Verso Drive is not mounted"
 msgstr "Verso Driveはマウントされていません"
 
 #: linux/verso-service/src/commands.rs:473
-#: linux/verso-linux/src/daemon.rs:522
+#: linux/verso-linux/src/daemon.rs:524
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "Versoの「設定」でドライブをオンにしてから、もう一度リンクを開いてください。"
 
@@ -28,78 +28,78 @@ msgstr "キーリングがロックされたままです。もう一度試すに
 msgid "Immich is not mounted"
 msgstr "Immichはマウントされていません"
 
-#: linux/verso-linux/src/daemon.rs:521
+#: linux/verso-linux/src/daemon.rs:523
 msgid "Links from other apps are off"
 msgstr "ほかのアプリからのリンクはオフです"
 
-#: linux/verso-linux/src/daemon.rs:521
+#: linux/verso-linux/src/daemon.rs:523
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "ほかのアプリがリンクする項目を表示するには、Verso の設定で Immich Crosslink をオンにしてください。"
 
-#: linux/verso-linux/src/daemon.rs:523
+#: linux/verso-linux/src/daemon.rs:525
 msgid "A link from another app cannot be opened"
 msgstr "ほかのアプリからのリンクを開けません"
 
-#: linux/verso-linux/src/daemon.rs:523
+#: linux/verso-linux/src/daemon.rs:525
 msgid "It is not a valid Immich link."
 msgstr "有効なImmichのリンクではありません。"
 
-#: linux/verso-linux/src/daemon.rs:524
-#: linux/verso-linux/src/daemon.rs:528
+#: linux/verso-linux/src/daemon.rs:526
+#: linux/verso-linux/src/daemon.rs:530
 msgid "Nothing to show"
 msgstr "表示するものがありません"
 
-#: linux/verso-linux/src/daemon.rs:524
+#: linux/verso-linux/src/daemon.rs:526
 msgid "Verso Drive has no place for what this link points to."
 msgstr "このリンクが指す先を表示する場所がVerso Driveにありません。"
 
-#: linux/verso-linux/src/daemon.rs:525
+#: linux/verso-linux/src/daemon.rs:527
 msgid "Not signed in to {host}"
 msgstr "{host}にサインインしていません"
 
-#: linux/verso-linux/src/daemon.rs:525
+#: linux/verso-linux/src/daemon.rs:527
 msgid "Verso is signed in to another Immich server."
 msgstr "Versoは別のImmichサーバーにサインインしています。"
 
-#: linux/verso-linux/src/daemon.rs:526
+#: linux/verso-linux/src/daemon.rs:528
 msgid "Another Immich account"
 msgstr "別のImmichアカウント"
 
-#: linux/verso-linux/src/daemon.rs:526
+#: linux/verso-linux/src/daemon.rs:528
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "このリンクは、Versoがサインインしているアカウントとは別のアカウントのものです。"
 
-#: linux/verso-linux/src/daemon.rs:529
+#: linux/verso-linux/src/daemon.rs:531
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "ドライブにはこれが表示されません。非表示になっているか、オフになっているセクションにあるか、あなたと共有されていない可能性があります。"
 
-#: linux/verso-linux/src/daemon.rs:531
-#: linux/verso-linux/src/daemon.rs:617
+#: linux/verso-linux/src/daemon.rs:533
+#: linux/verso-linux/src/daemon.rs:619
 msgid "Immich is unreachable"
 msgstr "Immichに接続できません"
 
-#: linux/verso-linux/src/daemon.rs:531
+#: linux/verso-linux/src/daemon.rs:533
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "Immichサーバーに接続できません。しばらくしてからもう一度リンクを開いてください。"
 
-#: linux/verso-linux/src/daemon.rs:613
+#: linux/verso-linux/src/daemon.rs:615
 msgid "Immich's certificate is not trusted"
 msgstr "Immichの証明書は信頼されていません"
 
-#: linux/verso-linux/src/daemon.rs:614
+#: linux/verso-linux/src/daemon.rs:616
 msgid "The Immich server presented a certificate {app} does not trust, so nothing is sent to it. Open {app} to check the certificate. Files you opened before stay available."
 msgstr "Immichサーバーが{app}の信頼していない証明書を提示したため、何も送信しません。証明書を確認するには{app}を開いてください。以前に開いたファイルは引き続き利用できます。"
 
-#: linux/verso-linux/src/daemon.rs:618
+#: linux/verso-linux/src/daemon.rs:620
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "Immichサーバーに接続できません。以前に開いたファイルは引き続き利用できます。"
 
-#: linux/verso-linux/src/daemon.rs:621
-#: linux/verso-linux/src/tray.rs:135
+#: linux/verso-linux/src/daemon.rs:623
+#: linux/verso-linux/src/tray.rs:140
 msgid "Signed out of Immich"
 msgstr "Immichからサインアウトしました"
 
-#: linux/verso-linux/src/daemon.rs:622
+#: linux/verso-linux/src/daemon.rs:624
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "Immichはこのサインインを受け付けなくなりました。もう一度サインインするには、{app}を開いてください。"
 
@@ -145,55 +145,55 @@ msgstr "Immichはこのアカウントにアルバムの作成を許可してい
 msgid "Signed out of Immich. The photos and videos are in the timeline."
 msgstr "Immichからサインアウトしました。写真とビデオはタイムラインにあります。"
 
-#: linux/verso-linux/src/fuse.rs:647
-#: linux/verso-linux/src/fuse.rs:695
-#: linux/verso-linux/src/fuse.rs:701
-#: linux/verso-linux/src/fuse.rs:711
-#: linux/verso-linux/src/fuse.rs:1185
+#: linux/verso-linux/src/fuse.rs:651
+#: linux/verso-linux/src/fuse.rs:699
+#: linux/verso-linux/src/fuse.rs:705
+#: linux/verso-linux/src/fuse.rs:715
+#: linux/verso-linux/src/fuse.rs:1190
 msgid "Not uploaded: {name}"
 msgstr "アップロードされませんでした：{name}"
 
-#: linux/verso-linux/src/fuse.rs:647
+#: linux/verso-linux/src/fuse.rs:651
 msgid "The file is incomplete, as if its copy was cancelled."
 msgstr "ファイルが不完全です。コピーがキャンセルされたようです。"
 
-#: linux/verso-linux/src/fuse.rs:663
+#: linux/verso-linux/src/fuse.rs:667
 msgid "Uploading {name} to Immich"
 msgstr "{name}をImmichにアップロードしています"
 
-#: linux/verso-linux/src/fuse.rs:664
+#: linux/verso-linux/src/fuse.rs:668
 msgid "The copy finishes once Immich has the file."
 msgstr "Immichがファイルを受け取るとコピーが完了します。"
 
-#: linux/verso-linux/src/fuse.rs:677
+#: linux/verso-linux/src/fuse.rs:681
 msgid "Restored from the trash: {name}"
 msgstr "ゴミ箱から復元しました：{name}"
 
-#: linux/verso-linux/src/fuse.rs:678
+#: linux/verso-linux/src/fuse.rs:682
 msgid "Immich had this photo in its trash, and copying it in brought it back."
 msgstr "この写真はImmichのゴミ箱にありました。コピーしたことで元に戻りました。"
 
-#: linux/verso-linux/src/fuse.rs:682
+#: linux/verso-linux/src/fuse.rs:686
 msgid "Immich has this photo already, so nothing was added."
 msgstr "この写真はすでにImmichにあるため、何も追加されませんでした。"
 
-#: linux/verso-linux/src/fuse.rs:683
+#: linux/verso-linux/src/fuse.rs:687
 msgid "Already in Immich: {name}"
 msgstr "すでにImmichにあります：{name}"
 
-#: linux/verso-linux/src/fuse.rs:692
+#: linux/verso-linux/src/fuse.rs:696
 msgid "{error}. The file is kept in {folder}."
 msgstr "{error}。ファイルは{folder}に保管されています。"
 
-#: linux/verso-linux/src/fuse.rs:702
+#: linux/verso-linux/src/fuse.rs:706
 msgid "This computer lets a file operation take at most {seconds} seconds (fs.fuse.default_request_timeout). Set it to 0 for longer uploads. The file is kept in {folder}."
 msgstr "このコンピューターでは、1回のファイル操作にかけられる時間は最大{seconds}秒です（fs.fuse.default_request_timeout）。時間のかかるアップロードを行うには0に設定してください。ファイルは{folder}に保管されています。"
 
-#: linux/verso-linux/src/fuse.rs:712
+#: linux/verso-linux/src/fuse.rs:716
 msgid "The upload took too long. The file is kept in {folder}."
 msgstr "アップロードに時間がかかりすぎました。ファイルは{folder}に保管されています。"
 
-#: linux/verso-linux/src/fuse.rs:1185
+#: linux/verso-linux/src/fuse.rs:1190
 msgid "Immich takes photos and videos only."
 msgstr "Immichが受け付けるのは写真とビデオのみです。"
 
@@ -210,75 +210,90 @@ msgstr "{drive}の「{name}」を開けません"
 msgid "Verso Drive"
 msgstr "Verso Drive"
 
-#: linux/verso-linux/src/tray.rs:133
+#: linux/verso-linux/src/tray.rs:138
 msgid "Connected to {server}"
 msgstr "{server}に接続済み"
 
-#: linux/verso-linux/src/tray.rs:134
+#: linux/verso-linux/src/tray.rs:139
 msgid "{server} is not reachable"
 msgstr "{server}に接続できません"
 
-#: linux/verso-linux/src/tray.rs:136
+#: linux/verso-linux/src/tray.rs:141
 msgid "Signed in to {server}"
 msgstr "{server}にサインイン済み"
 
-#: linux/verso-linux/src/tray.rs:145
+#: linux/verso-linux/src/tray.rs:150
 msgid "Verso Drive is unmounted"
 msgstr "Verso Driveはマウント解除されています"
 
-#: linux/verso-linux/src/tray.rs:148
+#: linux/verso-linux/src/tray.rs:153
 msgid "Server version: Immich {version}"
 msgstr "サーバーのバージョン：Immich {version}"
 
-#: linux/verso-linux/src/tray.rs:151
+#: linux/verso-linux/src/tray.rs:156
 msgid "Signed in as: {account}"
 msgstr "サインイン中のアカウント：{account}"
 
-#: linux/verso-linux/src/tray.rs:155
+#: linux/verso-linux/src/tray.rs:160
 msgid "Try Again Now"
 msgstr "今すぐ再試行"
 
-#: linux/verso-linux/src/tray.rs:159
+#: linux/verso-linux/src/tray.rs:164
 msgid "Open {app}"
 msgstr "{app}を開く"
 
-#: linux/verso-linux/src/tray.rs:162
+#: linux/verso-linux/src/tray.rs:167
 msgid "Open in Files"
 msgstr "「ファイル」で開く"
 
-#: linux/verso-linux/src/tray.rs:168
+#: linux/verso-linux/src/tray.rs:173
 msgid "Unmount Verso Drive"
 msgstr "Verso Driveをマウント解除"
 
-#: linux/verso-linux/src/tray.rs:170
+#: linux/verso-linux/src/tray.rs:175
 msgid "Mount Verso Drive"
 msgstr "Verso Driveをマウント"
 
-#: linux/verso-linux/src/tray.rs:173
+#: linux/verso-linux/src/tray.rs:178
 msgid "Preferences…"
 msgstr "設定…"
 
-#: linux/verso-linux/src/tray.rs:176
+#: linux/verso-linux/src/tray.rs:181
+#: linux/verso-desktop/src/preferences.rs:85
+#: linux/verso-desktop/src/preferences.rs:85
+#: linux/verso-desktop/src/preferences.rs:85
+msgid "Check for Updates"
+msgstr "アップデートを確認"
+
+#: linux/verso-linux/src/tray.rs:185
 msgid "Get {app} {version}…"
 msgstr "{app} {version}を入手…"
 
-#: linux/verso-linux/src/tray.rs:182
+#: linux/verso-linux/src/tray.rs:191
 msgid "Sign In…"
 msgstr "サインイン…"
 
-#: linux/verso-linux/src/tray.rs:184
+#: linux/verso-linux/src/tray.rs:193
 msgid "Sign Out…"
 msgstr "サインアウト…"
 
-#: linux/verso-linux/src/tray.rs:186
+#: linux/verso-linux/src/tray.rs:195
 msgid "Quit {app}"
 msgstr "{app}を終了"
 
-#: linux/verso-linux/src/updates.rs:53
+#: linux/verso-linux/src/updates.rs:63
+msgid "{app} is up to date"
+msgstr ""
+
+#: linux/verso-linux/src/updates.rs:64
+msgid "{version} is the newest version."
+msgstr ""
+
+#: linux/verso-linux/src/updates.rs:75
 msgid "{app} {version} is available"
 msgstr "{app} {version}が利用可能です"
 
-#: linux/verso-linux/src/updates.rs:54
+#: linux/verso-linux/src/updates.rs:76
 msgid "Get it from jakob.hviid.phd/verso."
 msgstr "jakob.hviid.phd/verso からダウンロードしてください。"
 
@@ -356,12 +371,6 @@ msgstr "キャッシュのサイズ"
 #: linux/verso-desktop/src/preferences.rs:78
 msgid "Sharp Thumbnails"
 msgstr "鮮明なサムネイル"
-
-#: linux/verso-desktop/src/preferences.rs:85
-#: linux/verso-desktop/src/preferences.rs:85
-#: linux/verso-desktop/src/preferences.rs:85
-msgid "Check for Updates"
-msgstr "アップデートを確認"
 
 #: linux/verso-desktop/src/preferences.rs:100
 #: linux/verso-desktop/src/preferences.rs:100

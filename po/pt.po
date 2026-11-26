@@ -11,12 +11,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: linux/verso-service/src/commands.rs:473
-#: linux/verso-linux/src/daemon.rs:522
+#: linux/verso-linux/src/daemon.rs:524
 msgid "Verso Drive is not mounted"
 msgstr "O Verso Drive não está montado"
 
 #: linux/verso-service/src/commands.rs:473
-#: linux/verso-linux/src/daemon.rs:522
+#: linux/verso-linux/src/daemon.rs:524
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "Ative-o nas Preferências do Verso e abra o link novamente."
 
@@ -28,78 +28,78 @@ msgstr "O chaveiro continuou bloqueado. Abra o {app} ou execute “{command}” 
 msgid "Immich is not mounted"
 msgstr "O Immich não está montado"
 
-#: linux/verso-linux/src/daemon.rs:521
+#: linux/verso-linux/src/daemon.rs:523
 msgid "Links from other apps are off"
 msgstr "Os links de outros apps estão desligados"
 
-#: linux/verso-linux/src/daemon.rs:521
+#: linux/verso-linux/src/daemon.rs:523
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "Ative o Immich Crosslink nos ajustes do Verso para mostrar o que outros apps indicam."
 
-#: linux/verso-linux/src/daemon.rs:523
+#: linux/verso-linux/src/daemon.rs:525
 msgid "A link from another app cannot be opened"
 msgstr "Não é possível abrir um link de outro app"
 
-#: linux/verso-linux/src/daemon.rs:523
+#: linux/verso-linux/src/daemon.rs:525
 msgid "It is not a valid Immich link."
 msgstr "Não é um link válido do Immich."
 
-#: linux/verso-linux/src/daemon.rs:524
-#: linux/verso-linux/src/daemon.rs:528
+#: linux/verso-linux/src/daemon.rs:526
+#: linux/verso-linux/src/daemon.rs:530
 msgid "Nothing to show"
 msgstr "Nada para mostrar"
 
-#: linux/verso-linux/src/daemon.rs:524
+#: linux/verso-linux/src/daemon.rs:526
 msgid "Verso Drive has no place for what this link points to."
 msgstr "O Verso Drive não tem lugar para aquilo para onde este link aponta."
 
-#: linux/verso-linux/src/daemon.rs:525
+#: linux/verso-linux/src/daemon.rs:527
 msgid "Not signed in to {host}"
 msgstr "Sessão não iniciada em {host}"
 
-#: linux/verso-linux/src/daemon.rs:525
+#: linux/verso-linux/src/daemon.rs:527
 msgid "Verso is signed in to another Immich server."
 msgstr "O Verso está com a sessão iniciada em outro servidor Immich."
 
-#: linux/verso-linux/src/daemon.rs:526
+#: linux/verso-linux/src/daemon.rs:528
 msgid "Another Immich account"
 msgstr "Outra conta do Immich"
 
-#: linux/verso-linux/src/daemon.rs:526
+#: linux/verso-linux/src/daemon.rs:528
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "O link é de uma conta diferente daquela com que o Verso iniciou a sessão."
 
-#: linux/verso-linux/src/daemon.rs:529
+#: linux/verso-linux/src/daemon.rs:531
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "A unidade não mostra isto. Pode estar oculto, em uma seção desativada ou não compartilhado com você."
 
-#: linux/verso-linux/src/daemon.rs:531
-#: linux/verso-linux/src/daemon.rs:617
+#: linux/verso-linux/src/daemon.rs:533
+#: linux/verso-linux/src/daemon.rs:619
 msgid "Immich is unreachable"
 msgstr "O Immich está inacessível"
 
-#: linux/verso-linux/src/daemon.rs:531
+#: linux/verso-linux/src/daemon.rs:533
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "O servidor Immich está inacessível. Tente o link novamente mais tarde."
 
-#: linux/verso-linux/src/daemon.rs:613
+#: linux/verso-linux/src/daemon.rs:615
 msgid "Immich's certificate is not trusted"
 msgstr "O certificado do Immich não é confiável"
 
-#: linux/verso-linux/src/daemon.rs:614
+#: linux/verso-linux/src/daemon.rs:616
 msgid "The Immich server presented a certificate {app} does not trust, so nothing is sent to it. Open {app} to check the certificate. Files you opened before stay available."
 msgstr "O servidor do Immich apresentou um certificado em que o {app} não confia, então nada é enviado a ele. Abra o {app} para verificar o certificado. Os arquivos que você abriu antes continuam disponíveis."
 
-#: linux/verso-linux/src/daemon.rs:618
+#: linux/verso-linux/src/daemon.rs:620
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "O servidor Immich está inacessível. Os arquivos que você abriu antes continuam disponíveis."
 
-#: linux/verso-linux/src/daemon.rs:621
-#: linux/verso-linux/src/tray.rs:135
+#: linux/verso-linux/src/daemon.rs:623
+#: linux/verso-linux/src/tray.rs:140
 msgid "Signed out of Immich"
 msgstr "Sessão do Immich encerrada"
 
-#: linux/verso-linux/src/daemon.rs:622
+#: linux/verso-linux/src/daemon.rs:624
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "O Immich não aceita mais este início de sessão. Abra o {app} para iniciar a sessão novamente."
 
@@ -145,55 +145,55 @@ msgstr "O Immich não permite que esta conta crie álbuns ({permission}). As fot
 msgid "Signed out of Immich. The photos and videos are in the timeline."
 msgstr "Sessão do Immich encerrada. As fotos e os vídeos estão na linha do tempo."
 
-#: linux/verso-linux/src/fuse.rs:647
-#: linux/verso-linux/src/fuse.rs:695
-#: linux/verso-linux/src/fuse.rs:701
-#: linux/verso-linux/src/fuse.rs:711
-#: linux/verso-linux/src/fuse.rs:1185
+#: linux/verso-linux/src/fuse.rs:651
+#: linux/verso-linux/src/fuse.rs:699
+#: linux/verso-linux/src/fuse.rs:705
+#: linux/verso-linux/src/fuse.rs:715
+#: linux/verso-linux/src/fuse.rs:1190
 msgid "Not uploaded: {name}"
 msgstr "Não enviado: {name}"
 
-#: linux/verso-linux/src/fuse.rs:647
+#: linux/verso-linux/src/fuse.rs:651
 msgid "The file is incomplete, as if its copy was cancelled."
 msgstr "O arquivo está incompleto, como se a cópia tivesse sido cancelada."
 
-#: linux/verso-linux/src/fuse.rs:663
+#: linux/verso-linux/src/fuse.rs:667
 msgid "Uploading {name} to Immich"
 msgstr "Enviando {name} para o Immich"
 
-#: linux/verso-linux/src/fuse.rs:664
+#: linux/verso-linux/src/fuse.rs:668
 msgid "The copy finishes once Immich has the file."
 msgstr "A cópia termina assim que o Immich recebe o arquivo."
 
-#: linux/verso-linux/src/fuse.rs:677
+#: linux/verso-linux/src/fuse.rs:681
 msgid "Restored from the trash: {name}"
 msgstr "Restaurado da lixeira: {name}"
 
-#: linux/verso-linux/src/fuse.rs:678
+#: linux/verso-linux/src/fuse.rs:682
 msgid "Immich had this photo in its trash, and copying it in brought it back."
 msgstr "O Immich tinha esta foto na lixeira, e copiá-la a trouxe de volta."
 
-#: linux/verso-linux/src/fuse.rs:682
+#: linux/verso-linux/src/fuse.rs:686
 msgid "Immich has this photo already, so nothing was added."
 msgstr "O Immich já tem esta foto, então nada foi adicionado."
 
-#: linux/verso-linux/src/fuse.rs:683
+#: linux/verso-linux/src/fuse.rs:687
 msgid "Already in Immich: {name}"
 msgstr "Já está no Immich: {name}"
 
-#: linux/verso-linux/src/fuse.rs:692
+#: linux/verso-linux/src/fuse.rs:696
 msgid "{error}. The file is kept in {folder}."
 msgstr "{error}. O arquivo é mantido em {folder}."
 
-#: linux/verso-linux/src/fuse.rs:702
+#: linux/verso-linux/src/fuse.rs:706
 msgid "This computer lets a file operation take at most {seconds} seconds (fs.fuse.default_request_timeout). Set it to 0 for longer uploads. The file is kept in {folder}."
 msgstr "Este computador permite que uma operação de arquivo dure no máximo {seconds} segundos (fs.fuse.default_request_timeout). Defina o valor como 0 para envios mais longos. O arquivo é mantido em {folder}."
 
-#: linux/verso-linux/src/fuse.rs:712
+#: linux/verso-linux/src/fuse.rs:716
 msgid "The upload took too long. The file is kept in {folder}."
 msgstr "O envio demorou demais. O arquivo é mantido em {folder}."
 
-#: linux/verso-linux/src/fuse.rs:1185
+#: linux/verso-linux/src/fuse.rs:1190
 msgid "Immich takes photos and videos only."
 msgstr "O Immich aceita apenas fotos e vídeos."
 
@@ -210,75 +210,90 @@ msgstr "{drive} não consegue abrir “{name}”"
 msgid "Verso Drive"
 msgstr "Verso Drive"
 
-#: linux/verso-linux/src/tray.rs:133
+#: linux/verso-linux/src/tray.rs:138
 msgid "Connected to {server}"
 msgstr "Conectado a {server}"
 
-#: linux/verso-linux/src/tray.rs:134
+#: linux/verso-linux/src/tray.rs:139
 msgid "{server} is not reachable"
 msgstr "{server} está inacessível"
 
-#: linux/verso-linux/src/tray.rs:136
+#: linux/verso-linux/src/tray.rs:141
 msgid "Signed in to {server}"
 msgstr "Sessão iniciada em {server}"
 
-#: linux/verso-linux/src/tray.rs:145
+#: linux/verso-linux/src/tray.rs:150
 msgid "Verso Drive is unmounted"
 msgstr "O Verso Drive está desmontado"
 
-#: linux/verso-linux/src/tray.rs:148
+#: linux/verso-linux/src/tray.rs:153
 msgid "Server version: Immich {version}"
 msgstr "Versão do servidor: Immich {version}"
 
-#: linux/verso-linux/src/tray.rs:151
+#: linux/verso-linux/src/tray.rs:156
 msgid "Signed in as: {account}"
 msgstr "Sessão iniciada como: {account}"
 
-#: linux/verso-linux/src/tray.rs:155
+#: linux/verso-linux/src/tray.rs:160
 msgid "Try Again Now"
 msgstr "Tentar novamente agora"
 
-#: linux/verso-linux/src/tray.rs:159
+#: linux/verso-linux/src/tray.rs:164
 msgid "Open {app}"
 msgstr "Abrir o {app}"
 
-#: linux/verso-linux/src/tray.rs:162
+#: linux/verso-linux/src/tray.rs:167
 msgid "Open in Files"
 msgstr "Abrir no Arquivos"
 
-#: linux/verso-linux/src/tray.rs:168
+#: linux/verso-linux/src/tray.rs:173
 msgid "Unmount Verso Drive"
 msgstr "Desmontar o Verso Drive"
 
-#: linux/verso-linux/src/tray.rs:170
+#: linux/verso-linux/src/tray.rs:175
 msgid "Mount Verso Drive"
 msgstr "Montar o Verso Drive"
 
-#: linux/verso-linux/src/tray.rs:173
+#: linux/verso-linux/src/tray.rs:178
 msgid "Preferences…"
 msgstr "Preferências…"
 
-#: linux/verso-linux/src/tray.rs:176
+#: linux/verso-linux/src/tray.rs:181
+#: linux/verso-desktop/src/preferences.rs:85
+#: linux/verso-desktop/src/preferences.rs:85
+#: linux/verso-desktop/src/preferences.rs:85
+msgid "Check for Updates"
+msgstr "Procurar atualizações"
+
+#: linux/verso-linux/src/tray.rs:185
 msgid "Get {app} {version}…"
 msgstr "Obter o {app} {version}…"
 
-#: linux/verso-linux/src/tray.rs:182
+#: linux/verso-linux/src/tray.rs:191
 msgid "Sign In…"
 msgstr "Iniciar sessão…"
 
-#: linux/verso-linux/src/tray.rs:184
+#: linux/verso-linux/src/tray.rs:193
 msgid "Sign Out…"
 msgstr "Encerrar sessão…"
 
-#: linux/verso-linux/src/tray.rs:186
+#: linux/verso-linux/src/tray.rs:195
 msgid "Quit {app}"
 msgstr "Encerrar o {app}"
 
-#: linux/verso-linux/src/updates.rs:53
+#: linux/verso-linux/src/updates.rs:63
+msgid "{app} is up to date"
+msgstr ""
+
+#: linux/verso-linux/src/updates.rs:64
+msgid "{version} is the newest version."
+msgstr ""
+
+#: linux/verso-linux/src/updates.rs:75
 msgid "{app} {version} is available"
 msgstr "O {app} {version} está disponível"
 
-#: linux/verso-linux/src/updates.rs:54
+#: linux/verso-linux/src/updates.rs:76
 msgid "Get it from jakob.hviid.phd/verso."
 msgstr "Obtenha-o em jakob.hviid.phd/verso."
 
@@ -356,12 +371,6 @@ msgstr "Tamanho do cache"
 #: linux/verso-desktop/src/preferences.rs:78
 msgid "Sharp Thumbnails"
 msgstr "Miniaturas nítidas"
-
-#: linux/verso-desktop/src/preferences.rs:85
-#: linux/verso-desktop/src/preferences.rs:85
-#: linux/verso-desktop/src/preferences.rs:85
-msgid "Check for Updates"
-msgstr "Procurar atualizações"
 
 #: linux/verso-desktop/src/preferences.rs:100
 #: linux/verso-desktop/src/preferences.rs:100

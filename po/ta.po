@@ -11,12 +11,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: linux/verso-service/src/commands.rs:473
-#: linux/verso-linux/src/daemon.rs:522
+#: linux/verso-linux/src/daemon.rs:524
 msgid "Verso Drive is not mounted"
 msgstr "Verso Drive மவுண்ட் செய்யப்படவில்லை"
 
 #: linux/verso-service/src/commands.rs:473
-#: linux/verso-linux/src/daemon.rs:522
+#: linux/verso-linux/src/daemon.rs:524
 msgid "Switch it on in Verso's Preferences, then open the link again."
 msgstr "Verso-இன் விருப்பங்களில் டிரைவை இயக்கி, பிறகு இணைப்பை மீண்டும் திறக்கவும்."
 
@@ -28,78 +28,78 @@ msgstr "கீரிங் பூட்டியே இருந்தது. �
 msgid "Immich is not mounted"
 msgstr "Immich மவுண்ட் செய்யப்படவில்லை"
 
-#: linux/verso-linux/src/daemon.rs:521
+#: linux/verso-linux/src/daemon.rs:523
 msgid "Links from other apps are off"
 msgstr "பிற பயன்பாடுகளிலிருந்து வரும் இணைப்புகள் முடக்கப்பட்டுள்ளன"
 
-#: linux/verso-linux/src/daemon.rs:521
+#: linux/verso-linux/src/daemon.rs:523
 msgid "Turn on Immich Crosslink in Verso's settings to show what other apps link to."
 msgstr "பிற பயன்பாடுகள் இணைப்பதைக் காட்ட Verso அமைப்புகளில் Immich Crosslink-ஐ இயக்கவும்."
 
-#: linux/verso-linux/src/daemon.rs:523
+#: linux/verso-linux/src/daemon.rs:525
 msgid "A link from another app cannot be opened"
 msgstr "பிற பயன்பாட்டிலிருந்து வந்த இணைப்பைத் திறக்க முடியவில்லை"
 
-#: linux/verso-linux/src/daemon.rs:523
+#: linux/verso-linux/src/daemon.rs:525
 msgid "It is not a valid Immich link."
 msgstr "இது சரியான Immich இணைப்பு அல்ல."
 
-#: linux/verso-linux/src/daemon.rs:524
-#: linux/verso-linux/src/daemon.rs:528
+#: linux/verso-linux/src/daemon.rs:526
+#: linux/verso-linux/src/daemon.rs:530
 msgid "Nothing to show"
 msgstr "காட்ட எதுவும் இல்லை"
 
-#: linux/verso-linux/src/daemon.rs:524
+#: linux/verso-linux/src/daemon.rs:526
 msgid "Verso Drive has no place for what this link points to."
 msgstr "இந்த இணைப்பு சுட்டுவதற்கு Verso Drive-இல் இடம் இல்லை."
 
-#: linux/verso-linux/src/daemon.rs:525
+#: linux/verso-linux/src/daemon.rs:527
 msgid "Not signed in to {host}"
 msgstr "{host} இல் உள்நுழையவில்லை"
 
-#: linux/verso-linux/src/daemon.rs:525
+#: linux/verso-linux/src/daemon.rs:527
 msgid "Verso is signed in to another Immich server."
 msgstr "Verso வேறொரு Immich சேவையகத்தில் உள்நுழைந்துள்ளது."
 
-#: linux/verso-linux/src/daemon.rs:526
+#: linux/verso-linux/src/daemon.rs:528
 msgid "Another Immich account"
 msgstr "வேறொரு Immich கணக்கு"
 
-#: linux/verso-linux/src/daemon.rs:526
+#: linux/verso-linux/src/daemon.rs:528
 msgid "The link is for another account than the one Verso is signed in with."
 msgstr "இந்த இணைப்பு Verso உள்நுழைந்துள்ள கணக்கிற்கானது அல்ல, வேறொரு கணக்கிற்கானது."
 
-#: linux/verso-linux/src/daemon.rs:529
+#: linux/verso-linux/src/daemon.rs:531
 msgid "The drive does not show this. It may be hidden, in a section that is switched off, or not shared with you."
 msgstr "டிரைவ் இதைக் காட்டவில்லை. இது மறைக்கப்பட்டிருக்கலாம், முடக்கப்பட்ட பிரிவில் இருக்கலாம், அல்லது உங்களுடன் பகிரப்படாமல் இருக்கலாம்."
 
-#: linux/verso-linux/src/daemon.rs:531
-#: linux/verso-linux/src/daemon.rs:617
+#: linux/verso-linux/src/daemon.rs:533
+#: linux/verso-linux/src/daemon.rs:619
 msgid "Immich is unreachable"
 msgstr "Immich-ஐ அணுக முடியவில்லை"
 
-#: linux/verso-linux/src/daemon.rs:531
+#: linux/verso-linux/src/daemon.rs:533
 msgid "The Immich server cannot be reached. Try the link again later."
 msgstr "Immich சேவையகத்தை அணுக முடியவில்லை. பின்னர் இணைப்பை மீண்டும் முயலவும்."
 
-#: linux/verso-linux/src/daemon.rs:613
+#: linux/verso-linux/src/daemon.rs:615
 msgid "Immich's certificate is not trusted"
 msgstr "Immich-இன் சான்றிதழ் நம்பகமானதல்ல"
 
-#: linux/verso-linux/src/daemon.rs:614
+#: linux/verso-linux/src/daemon.rs:616
 msgid "The Immich server presented a certificate {app} does not trust, so nothing is sent to it. Open {app} to check the certificate. Files you opened before stay available."
 msgstr "{app} நம்பாத சான்றிதழை Immich சேவையகம் காட்டியது, எனவே அதற்கு எதுவும் அனுப்பப்படாது. சான்றிதழைச் சரிபார்க்க {app}-ஐத் திறக்கவும். முன்பு திறந்த கோப்புகள் கிடைக்கும்."
 
-#: linux/verso-linux/src/daemon.rs:618
+#: linux/verso-linux/src/daemon.rs:620
 msgid "The Immich server cannot be reached. Files you opened before stay available."
 msgstr "Immich சேவையகத்தை அணுக முடியவில்லை. முன்பு திறந்த கோப்புகள் தொடர்ந்து கிடைக்கும்."
 
-#: linux/verso-linux/src/daemon.rs:621
-#: linux/verso-linux/src/tray.rs:135
+#: linux/verso-linux/src/daemon.rs:623
+#: linux/verso-linux/src/tray.rs:140
 msgid "Signed out of Immich"
 msgstr "Immich-இலிருந்து வெளியேறிவிட்டீர்கள்"
 
-#: linux/verso-linux/src/daemon.rs:622
+#: linux/verso-linux/src/daemon.rs:624
 msgid "Immich no longer accepts this sign-in. Open {app} to sign in again."
 msgstr "Immich இனி இந்த உள்நுழைவை ஏற்கவில்லை. மீண்டும் உள்நுழைய {app}-ஐத் திறக்கவும்."
 
@@ -145,55 +145,55 @@ msgstr "இந்தக் கணக்கு ஆல்பங்களை உர
 msgid "Signed out of Immich. The photos and videos are in the timeline."
 msgstr "Immich-இலிருந்து வெளியேறிவிட்டீர்கள். படங்களும் வீடியோக்களும் காலவரிசையில் உள்ளன."
 
-#: linux/verso-linux/src/fuse.rs:647
-#: linux/verso-linux/src/fuse.rs:695
-#: linux/verso-linux/src/fuse.rs:701
-#: linux/verso-linux/src/fuse.rs:711
-#: linux/verso-linux/src/fuse.rs:1185
+#: linux/verso-linux/src/fuse.rs:651
+#: linux/verso-linux/src/fuse.rs:699
+#: linux/verso-linux/src/fuse.rs:705
+#: linux/verso-linux/src/fuse.rs:715
+#: linux/verso-linux/src/fuse.rs:1190
 msgid "Not uploaded: {name}"
 msgstr "பதிவேற்றப்படவில்லை: {name}"
 
-#: linux/verso-linux/src/fuse.rs:647
+#: linux/verso-linux/src/fuse.rs:651
 msgid "The file is incomplete, as if its copy was cancelled."
 msgstr "கோப்பு முழுமையடையவில்லை, அதன் நகலெடுப்பு ரத்துசெய்யப்பட்டது போல."
 
-#: linux/verso-linux/src/fuse.rs:663
+#: linux/verso-linux/src/fuse.rs:667
 msgid "Uploading {name} to Immich"
 msgstr "{name} Immich-இல் பதிவேற்றப்படுகிறது"
 
-#: linux/verso-linux/src/fuse.rs:664
+#: linux/verso-linux/src/fuse.rs:668
 msgid "The copy finishes once Immich has the file."
 msgstr "Immich-க்குக் கோப்பு கிடைத்ததும் நகலெடுப்பு முடியும்."
 
-#: linux/verso-linux/src/fuse.rs:677
+#: linux/verso-linux/src/fuse.rs:681
 msgid "Restored from the trash: {name}"
 msgstr "குப்பையிலிருந்து மீட்டெடுக்கப்பட்டது: {name}"
 
-#: linux/verso-linux/src/fuse.rs:678
+#: linux/verso-linux/src/fuse.rs:682
 msgid "Immich had this photo in its trash, and copying it in brought it back."
 msgstr "இந்தப் படம் Immich-இன் குப்பையில் இருந்தது; அதை நகலெடுத்ததால் அது திரும்ப வந்தது."
 
-#: linux/verso-linux/src/fuse.rs:682
+#: linux/verso-linux/src/fuse.rs:686
 msgid "Immich has this photo already, so nothing was added."
 msgstr "இந்தப் படம் ஏற்கெனவே Immich-இல் உள்ளது, எனவே எதுவும் சேர்க்கப்படவில்லை."
 
-#: linux/verso-linux/src/fuse.rs:683
+#: linux/verso-linux/src/fuse.rs:687
 msgid "Already in Immich: {name}"
 msgstr "ஏற்கெனவே Immich-இல் உள்ளது: {name}"
 
-#: linux/verso-linux/src/fuse.rs:692
+#: linux/verso-linux/src/fuse.rs:696
 msgid "{error}. The file is kept in {folder}."
 msgstr "{error}. கோப்பு {folder} இல் வைக்கப்பட்டுள்ளது."
 
-#: linux/verso-linux/src/fuse.rs:702
+#: linux/verso-linux/src/fuse.rs:706
 msgid "This computer lets a file operation take at most {seconds} seconds (fs.fuse.default_request_timeout). Set it to 0 for longer uploads. The file is kept in {folder}."
 msgstr "இந்தக் கணினி ஒரு கோப்புச் செயல்பாட்டுக்கு அதிகபட்சம் {seconds} வினாடிகள் மட்டுமே அனுமதிக்கிறது (fs.fuse.default_request_timeout). நீண்ட பதிவேற்றங்களுக்கு இதை 0 என அமைக்கவும். கோப்பு {folder} இல் வைக்கப்பட்டுள்ளது."
 
-#: linux/verso-linux/src/fuse.rs:712
+#: linux/verso-linux/src/fuse.rs:716
 msgid "The upload took too long. The file is kept in {folder}."
 msgstr "பதிவேற்றம் மிக அதிக நேரம் எடுத்தது. கோப்பு {folder} இல் வைக்கப்பட்டுள்ளது."
 
-#: linux/verso-linux/src/fuse.rs:1185
+#: linux/verso-linux/src/fuse.rs:1190
 msgid "Immich takes photos and videos only."
 msgstr "Immich படங்களையும் வீடியோக்களையும் மட்டுமே ஏற்கும்."
 
@@ -210,75 +210,90 @@ msgstr "{drive} ஆல் “{name}”-ஐத் திறக்க முடி
 msgid "Verso Drive"
 msgstr "Verso Drive"
 
-#: linux/verso-linux/src/tray.rs:133
+#: linux/verso-linux/src/tray.rs:138
 msgid "Connected to {server}"
 msgstr "{server} உடன் இணைக்கப்பட்டுள்ளது"
 
-#: linux/verso-linux/src/tray.rs:134
+#: linux/verso-linux/src/tray.rs:139
 msgid "{server} is not reachable"
 msgstr "{server} ஐ அணுக முடியவில்லை"
 
-#: linux/verso-linux/src/tray.rs:136
+#: linux/verso-linux/src/tray.rs:141
 msgid "Signed in to {server}"
 msgstr "{server} இல் உள்நுழைந்துள்ளீர்கள்"
 
-#: linux/verso-linux/src/tray.rs:145
+#: linux/verso-linux/src/tray.rs:150
 msgid "Verso Drive is unmounted"
 msgstr "Verso Drive அன்மவுண்ட் செய்யப்பட்டுள்ளது"
 
-#: linux/verso-linux/src/tray.rs:148
+#: linux/verso-linux/src/tray.rs:153
 msgid "Server version: Immich {version}"
 msgstr "சேவையகப் பதிப்பு: Immich {version}"
 
-#: linux/verso-linux/src/tray.rs:151
+#: linux/verso-linux/src/tray.rs:156
 msgid "Signed in as: {account}"
 msgstr "உள்நுழைந்துள்ள கணக்கு: {account}"
 
-#: linux/verso-linux/src/tray.rs:155
+#: linux/verso-linux/src/tray.rs:160
 msgid "Try Again Now"
 msgstr "இப்போதே மீண்டும் முயல்"
 
-#: linux/verso-linux/src/tray.rs:159
+#: linux/verso-linux/src/tray.rs:164
 msgid "Open {app}"
 msgstr "{app}-ஐத் திற"
 
-#: linux/verso-linux/src/tray.rs:162
+#: linux/verso-linux/src/tray.rs:167
 msgid "Open in Files"
 msgstr "கோப்புகள் பயன்பாட்டில் திற"
 
-#: linux/verso-linux/src/tray.rs:168
+#: linux/verso-linux/src/tray.rs:173
 msgid "Unmount Verso Drive"
 msgstr "Verso Drive-ஐ அன்மவுண்ட் செய்"
 
-#: linux/verso-linux/src/tray.rs:170
+#: linux/verso-linux/src/tray.rs:175
 msgid "Mount Verso Drive"
 msgstr "Verso Drive-ஐ மவுண்ட் செய்"
 
-#: linux/verso-linux/src/tray.rs:173
+#: linux/verso-linux/src/tray.rs:178
 msgid "Preferences…"
 msgstr "விருப்பங்கள்…"
 
-#: linux/verso-linux/src/tray.rs:176
+#: linux/verso-linux/src/tray.rs:181
+#: linux/verso-desktop/src/preferences.rs:85
+#: linux/verso-desktop/src/preferences.rs:85
+#: linux/verso-desktop/src/preferences.rs:85
+msgid "Check for Updates"
+msgstr "புதுப்பிப்புகளைச் சரிபார்"
+
+#: linux/verso-linux/src/tray.rs:185
 msgid "Get {app} {version}…"
 msgstr "{app} {version}-ஐப் பதிவிறக்கு…"
 
-#: linux/verso-linux/src/tray.rs:182
+#: linux/verso-linux/src/tray.rs:191
 msgid "Sign In…"
 msgstr "உள்நுழைக…"
 
-#: linux/verso-linux/src/tray.rs:184
+#: linux/verso-linux/src/tray.rs:193
 msgid "Sign Out…"
 msgstr "வெளியேறு…"
 
-#: linux/verso-linux/src/tray.rs:186
+#: linux/verso-linux/src/tray.rs:195
 msgid "Quit {app}"
 msgstr "{app}-ஐ மூடு"
 
-#: linux/verso-linux/src/updates.rs:53
+#: linux/verso-linux/src/updates.rs:63
+msgid "{app} is up to date"
+msgstr ""
+
+#: linux/verso-linux/src/updates.rs:64
+msgid "{version} is the newest version."
+msgstr ""
+
+#: linux/verso-linux/src/updates.rs:75
 msgid "{app} {version} is available"
 msgstr "{app} {version} கிடைக்கிறது"
 
-#: linux/verso-linux/src/updates.rs:54
+#: linux/verso-linux/src/updates.rs:76
 msgid "Get it from jakob.hviid.phd/verso."
 msgstr "jakob.hviid.phd/verso இலிருந்து பதிவிறக்கவும்."
 
@@ -356,12 +371,6 @@ msgstr "தற்காலிகச் சேமிப்பின் அளவ�
 #: linux/verso-desktop/src/preferences.rs:78
 msgid "Sharp Thumbnails"
 msgstr "தெளிவான சிறுபடங்கள்"
-
-#: linux/verso-desktop/src/preferences.rs:85
-#: linux/verso-desktop/src/preferences.rs:85
-#: linux/verso-desktop/src/preferences.rs:85
-msgid "Check for Updates"
-msgstr "புதுப்பிப்புகளைச் சரிபார்"
 
 #: linux/verso-desktop/src/preferences.rs:100
 #: linux/verso-desktop/src/preferences.rs:100
