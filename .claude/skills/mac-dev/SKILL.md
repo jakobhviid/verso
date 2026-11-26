@@ -218,6 +218,25 @@ the run's environment as `ios/tools/live/record.sh` passes them, on screens that
   Rome and Venice in 2022), aged by when they were taken (`VERSO_FREE_UP_BY_TAKEN`).
 - **Dark:** `xcrun simctl ui <udid> appearance dark` turns a screen already set up. The Backup page's symbol pulses
   while it works: take a few and keep one where it shows whole.
+- **The pulse is easiest caught in a burst:** about 30 `xcrun simctl io <udid> screenshot` captures in a row on the
+  Mac, keeping the frame where the symbol is most saturated; a single capture mostly lands on a faded one.
+- **The App Store's pictures** (DESIGN.md, "The App Store listing") come the same way, into the git-ignored
+  `ios/AppStore/screenshots/<iphone|ipad|tv>/`, and `ios/appstore.py push` sends them:
+  - **Without alpha:** `simctl io` writes RGBA PNGs, which App Store Connect turns down; save them as RGB.
+  - **Only what a release shows:** a Debug build's own rows (the Backup page's "Known by iCloud Identifier", Reset
+    Backup) must not be in them; leave those pages out, or take them from a Release build.
+  - **Today's memories end at local midnight:** the app asks for them by the Mac's date, so take the memory pictures
+    before midnight there.
+- **Overlays are missing from the UI test's tree** (seen on iOS 27.2): with the viewer or a sheet open,
+  `debugDescription` still lists the page underneath, and a tap by label lands on whatever the overlay has at that
+  spot (a tap meant for Albums favourited a photo). Tap by coordinates and look at a screenshot while one is open.
+- **The Apple TV has no UI test target:** past `-tvPlace`, `-tvLibraryMode` and `-tvOpenPhoto`, moving through it
+  needs a throwaway `bundle.ui-testing` target for tvOS in the copy's `project.yml`, depending on VersoTV and in its
+  scheme's tests, which presses the remote's buttons with `XCUIRemote` and reads focus with `hasFocus == true`. The
+  TV signs in only from `-signInServer` with `-signInAPIKey`. tvOS's Simulator takes no appearance from `simctl ui`:
+  its pictures are dark.
+- **Simulators can run side by side:** separate `-derivedDataPath`s keep an iOS and a tvOS build apart, and one iOS
+  `build-for-testing` with `IMMICH_APP_NAME=Verso` serves the iPhone and the iPad.
 
 ## Look
 
