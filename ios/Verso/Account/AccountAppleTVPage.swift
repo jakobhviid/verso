@@ -56,7 +56,7 @@ final class AppleTVSetup {
     /// What a TV's key may do: view, nothing else (Immich's permissions).
     nonisolated static let permissions = ["asset.read", "asset.view", "asset.download", "album.read", "person.read",
                                           "memory.read", "map.read", "partner.read", "tag.read", "stack.read",
-                                          "user.read", "server.about"]
+                                          "user.read", "userPreference.read", "server.about"]
 
     private(set) var state = State.waiting
     /// The TV waiting for the person's answer, by the name it gave.

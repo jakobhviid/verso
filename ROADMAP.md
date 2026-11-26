@@ -697,13 +697,14 @@ and Archive. Search is tvOS's own search screen, with its keyboard and the Siri 
 Immich's smart search. The Library follows the user's partners as Immich has them set ("show in my timeline"), with no
 setting of its own. Left out on purpose: the Locked Folder and editing, uploads and backup, Verso Drive, sharing,
 the trash and administration. No zoom and no pinch between sizes: one grid size for the sofa, and the photo fills the
-screen. The places sit in tvOS's sidebar-style tab view.
+screen. The places sit in tvOS's sidebar-style tab view. Places opens at the countries, most recently visited first,
+each opening its cities, as the iPhone groups them by country: a wall of cities from around the world says nothing.
 
 **Sign-in, from the iPhone alone.** The TV never asks for a server, a password or an OIDC sign-in, and the user never
 sees an API key:
 - the iPhone's **Set Up Apple TV** makes a key of the TV's own through the phone's sign-in (`POST /api-keys`, which
   every user may do), named for the TV ("Verso on Apple TV (Living room)") and allowed to read only: view, download
-  the full-size image, search, albums, people, memories, the timeline. Not the phone's session passed on: that would
+  the full-size image, search, albums, people, memories and the account's settings for them, the timeline. Not the phone's session passed on: that would
   sign the TV out with the phone, could not be revoked for the TV alone, and could change and delete, and reach the
   Locked Folder once the phone's PIN was given. A key never reaches the Locked Folder, which needs a PIN-elevated
   session.
@@ -720,18 +721,13 @@ tvOS (`mac/build-rust.sh --tvos`), the eight places in tvOS's sidebar-style tab 
 people's arrangement by the shared core), the viewer (the preview, then the full-size image; title capsule on a click;
 the LIVE badge and a Live Photo's movie; videos), memories as stories, the TV's key in its Keychain, the iPhone's
 **Set Up Apple TV** (Account) and the TV's **Set Up with iPhone** (DeviceDiscoveryUI's picker); it runs in the tvOS
-Simulator against a server. A development build takes launch arguments to open at a place (`-tvPlace`, `-tvLibraryMode`,
+Simulator against a server, and on a real Apple TV from TestFlight. A development build takes launch arguments to open at a place (`-tvPlace`, `-tvLibraryMode`,
 `-tvSearch`, `-tvOpenPhoto`), for looking. Not as the iPhone has them, because a remote has no pinch, no long press and no
 drag: the grid's zoom and the date scroller, a card's menu and Select, the filters sheet in Search, tags, and a
 memory's New mark going away once played, which needs a key that may write; the Library opens at its newest photos at
 the top rather than at the bottom. **Left:**
-1. **Set Up Apple TV on a real Apple TV and iPhone** (DeviceDiscoveryUI does not run in the Simulator), and the
-   Developer ID team's App ID capability it may ask for.
-2. A **Top Shelf** extension with memories or recent photos (the static Top Shelf image is there), and a **TestFlight**
-   build: `ios/release.sh --tvos` builds and uploads it once the TV's App Store profile exists (the maintainer's, in
-   the developer portal: App Store Connect, tvOS, for `dev.hviid.Verso`, named "Verso TV App Store Provisioning
-   Profile").
-3. **A walk of the remote's focus**: left and right in the viewer, the story, Years to Months to All Photos at a photo,
+1. A **Top Shelf** extension with memories or recent photos (the static Top Shelf image is there).
+2. **A walk of the remote's focus**: left and right in the viewer, the story, Years to Months to All Photos at a photo,
    the lift of a tile under focus. The Simulator has no remote's keys under `simctl`, and the TV has no UI test target
    yet, so these are for a real Apple TV or for such a target.
 

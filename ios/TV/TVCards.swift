@@ -278,9 +278,10 @@ struct TVPeople: View {
 
 /// The cities Immich knows, each a card of one of its photos with its name and its country on a fade, the most recently
 /// visited first, as the iPhone's Places sorts them; a city opens its photos.
+/// Places by country, as the iPhone groups them: the countries, most recently visited first, each opening its cities.
 struct TVPlaces: View {
     @Environment(TVModel.self) private var tv
-    @State private var cities: [AssetResponse] = []
+    @State private var countries: [PlacesGroup] = []
     @State private var phase = TVPhase.loading
 
     var body: some View {
@@ -293,7 +294,7 @@ struct TVPlaces: View {
                 case .failed(let message):
                     TVNotice(title: "Can't Load Places", systemImage: "globe", message: message) { Task { await load() } }
                 case .loaded:
-                    if cities.isEmpty {
+                    if countries.isEmpty {
                         TVNotice(title: "No Places", systemImage: "globe",
                                  message: String(localized: "Photos with a place they were taken appear here."))
                     } else {
@@ -308,14 +309,19 @@ struct TVPlaces: View {
 
     private var grid: some View {
         LazyVGrid(columns: tvColumns(TVMetrics.cityColumns), alignment: .leading, spacing: TVMetrics.cardSpacing) {
-            ForEach(cities, id: \.id) { place in
-                NavigationLink { TVCityPage(city: place.exifInfo?.city ?? "") } label: {
-                    if let pipeline = tv.images { PlaceCityTile(pipeline: pipeline, place: place, showsCountry: true) }
+            ForEach(countries) { country in
+                NavigationLink { TVCountryPage(title: Self.title(country), cities: country.places) } label: {
+                    if let pipeline = tv.images { PlaceCountryCard(pipeline: pipeline, title: Self.title(country), places: country.places) }
                 }
                 .buttonStyle(TVLiftStyle(cornerRadius: TVMetrics.cardRadius))
                 .tvLifts()
             }
         }
+    }
+
+    static func title(_ country: PlacesGroup) -> String {
+        if case .country(let name)? = country.header { return name }
+        return String(localized: "Unknown Country")
     }
 
     private func load() async {
@@ -329,11 +335,36 @@ struct TVPlaces: View {
                 guard let city = place.exifInfo?.city, let date = ImmichDate.parse(place.localDateTime) else { continue }
                 visits[city] = date
             }
-            cities = PlacesOptions(groupBy: .none, sortBy: .recentVisit).sorted(places, visits: visits)
+            countries = PlacesOptions(groupBy: .country, sortBy: .recentVisit).groups(places, visits: visits)
             phase = .loaded
         } catch {
             phase = .failed(error.localizedDescription)
         }
+    }
+}
+
+/// A country's cities, in the order of the countries' page, each opening its photos.
+struct TVCountryPage: View {
+    let title: String
+    let cities: [AssetResponse]
+    @Environment(TVModel.self) private var tv
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 32) {
+                TVPageTitle(title)
+                LazyVGrid(columns: tvColumns(TVMetrics.cityColumns), alignment: .leading, spacing: TVMetrics.cardSpacing) {
+                    ForEach(cities, id: \.id) { place in
+                        NavigationLink { TVCityPage(city: place.exifInfo?.city ?? "") } label: {
+                            if let pipeline = tv.images { PlaceCityTile(pipeline: pipeline, place: place, showsCountry: false) }
+                        }
+                        .buttonStyle(TVLiftStyle(cornerRadius: TVMetrics.cardRadius))
+                        .tvLifts()
+                    }
+                }
+            }
+        }
+        .scrollClipDisabled()
     }
 }
 
@@ -410,9 +441,11 @@ struct TVMemories: View {
         }
         #endif
         do {
-            let preferences = try await client.explorePreferences()
-            enabled = preferences.memories?.enabled == true
-            duration = max(1, preferences.memories?.duration ?? 5)
+            // A key made before the TV's keys could read preferences (`userPreference.read`) plays memories with the
+            // default duration rather than failing.
+            let preferences = try? await client.explorePreferences()
+            enabled = preferences?.memories?.enabled ?? true
+            duration = max(1, preferences?.memories?.duration ?? 5)
             guard enabled else {
                 phase = .loaded
                 return
