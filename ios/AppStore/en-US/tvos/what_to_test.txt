@@ -1,0 +1,4 @@
+- The Top Shelf: move Verso to the Home Screen's top row, and today's memories and your newest photos show above it; a click opens that memory or photo.
+- Settings, at the foot of the sidebar: the app's icon, Day or Night, Sign Out, and About.
+- Forget this Apple TV on the iPhone (Account, Apple TV): the next time you come back to Verso on the TV, it is signed out and says why.
+- Places opens at the countries, each opening its cities.

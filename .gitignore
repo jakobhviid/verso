@@ -14,3 +14,7 @@ lab/**/evidence/
 /ios/build/
 /ios/*.xcodeproj/
 __pycache__/
+
+# The App Store listing: screenshots taken for it (DESIGN.md, "The App Store listing"), and the review contact.
+/ios/AppStore/screenshots/
+/ios/AppStore/contact.local

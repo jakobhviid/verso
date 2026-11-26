@@ -125,7 +125,8 @@ at once (ARCHITECTURE.md, "Verso's releases"):
   `ci/sign-mac-update.sh` signs it for Sparkle on the workstation, and both are attached to the tag's drafts.
 - iOS ships through TestFlight and the App Store, never on GitHub: the release workflow's `ios` job uploads the
   iPhone's and the iPad's build and the Apple TV's (`ios/release.sh`, `--tvos`) once their secrets are set, as
-  `ios/release.sh` does on the Mac.
+  `ios/release.sh` does on the Mac. `ios/appstore.py push` fills the App Store listing and TestFlight's texts from
+  `ios/AppStore/`; sending a version to review is the maintainer's.
 - There is no rolling "latest" release: each platform's newest is found on its own; the cask follows GitHub's Latest
   here.
 

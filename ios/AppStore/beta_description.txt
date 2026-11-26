@@ -1,0 +1,1 @@
+Verso is a native app for your own Immich server: your photo and video library on the iPhone, the iPad and the Apple TV, made to look and move as Apple's Photos does, with backing up this iPhone, Free Up Space and Verso Drive in Files. It needs an Immich server, version 3.2 or later. Verso is an independent, unofficial project, not affiliated with the Immich project or FUTO.

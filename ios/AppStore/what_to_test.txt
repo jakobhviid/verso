@@ -1,0 +1,2 @@
+- The Backup page: a section for each subject, what needs you first. The bar's parts are rows you can open, Left Out has a page of its own, and Free Up Space is a row opening its page.
+- The Apple TV page (Account, Apple TV): the Apple TVs you set up, each with Forget, which asks first and shows when it is done.

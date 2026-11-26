@@ -3482,6 +3482,15 @@ the disk image.
   20261122.1435`, written by `mac/build-rust.sh`): TestFlight and Sparkle need it to rise with every build, also
   between two builds of one version. A count of the commits would give two builds of one commit the same number, and
   a branch a lower one than main's.
+- **The App Store listing lives in the repository** (`ios/AppStore/`; DESIGN.md, "The App Store listing") and
+  `ios/appstore.py push` sends it through App Store Connect's API with the release's API key: the texts of each
+  platform's version, the app's name, category and age rating, App Review's notes and demo account, the screenshots,
+  and TestFlight's description and each newest build's What to Test. So the listing is reviewed as text, changes
+  with the code it describes, and a new version starts from the last one's words. It uses Python's standard
+  library and `openssl` for the token, so it runs on the Mac and a CI runner without installing anything. What the
+  API does not reach stays the maintainer's, in App Store Connect: App Privacy's answers, the price and
+  availability, and sending a version to review. Not chosen: fastlane's `deliver`, which does the same through a
+  Ruby toolchain and a folder layout of its own, for one command's worth of calls.
 - **Majors stay in step by themselves:** there is one line of tags.
 - **Flatpak impact:** none. The Flatpak is a Linux build and goes out with every release, its version in its source
   archive's `VERSION`; the AppImage goes out with it, built by `ci/release.sh build` from the same tag.

@@ -1,0 +1,11 @@
+Verso is a client for Immich, a photo server people run themselves; it needs the address of an Immich server to sign in. Please use Immich's public demo server:
+
+Server: https://demo.immich.app
+Email: demo@immich.app
+Password: demo
+
+On the first screen, enter the server's address, then choose to sign in with email and password. The demo server is shared by everyone who tries Immich, so its photos change, and Verso does not back up to it: the Backup page says so, as anyone could see what was sent there. Every other part of the app works against it.
+
+Apple TV: Verso on the Apple TV signs in only from Verso on an iPhone or iPad, so it never asks for a password with the remote. With the iPhone signed in to the demo server as above, open Account, Set Up Apple TV on the iPhone; on the Apple TV, open Verso and choose Set Up with iPhone, then the iPhone, and choose Allow on the iPhone.
+
+Verso is an independent, unofficial project, not affiliated with the Immich project or FUTO; "Immich" names the server it works with.

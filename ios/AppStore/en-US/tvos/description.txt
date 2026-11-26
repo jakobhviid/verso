@@ -1,0 +1,17 @@
+Verso brings your own Immich server to the Apple TV: your photo and video library on the big screen, drawn as Verso draws it on the iPhone.
+
+Immich is the photo server you run yourself, at home or on a server of your own. Verso connects to it, so your photos stay where you keep them.
+
+ON THE BIG SCREEN
+• The timeline by year, by month or every photo
+• Memories as stories, and today's memories and your newest photos on the Top Shelf
+• Albums, people, places by country, favorites and the archive
+• Search with the Siri Remote's dictation, answered by Immich's smart search
+• Photos full screen, with Live Photos and videos playing
+
+SET UP FROM YOUR IPHONE
+Open Verso on your iPhone, choose Set Up Apple TV, and pick this TV. The iPhone gives it a key of its own that may only look: the TV never changes, deletes or shares anything, and never opens the Locked Folder. Forget it on the iPhone to sign it out.
+
+Verso is free and open source, under the MIT license. The Apple TV is set up with Verso on an iPhone signed in to an Immich server, version 3.2 or later.
+
+Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO. "Immich" is used only to describe the server this software works with, and remains the mark of its owner.

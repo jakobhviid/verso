@@ -1,0 +1,40 @@
+Verso is a native app for your own Immich server: your whole photo and video library on the iPhone, the iPad and the Apple TV, made to look and move as Apple's Photos does.
+
+Immich is the photo server you run yourself, at home or on a server of your own. Verso connects to it, so your photos stay where you keep them.
+
+YOUR WHOLE LIBRARY
+• The timeline by year, by month or every photo, with a date scroller along its edge
+• Albums, people, places and the map, memories, folders, tags, favorites, the archive, Recently Deleted and the Locked Folder
+• A photo opens out of its tile and pinches back into it; Live Photos and videos play, and the place, the people and the camera are a swipe up
+
+SEARCH
+• Find photos by what they show, by text in them, by file name or description
+• Narrow it down by people, places, dates and cameras
+
+ORGANISE AND SHARE
+• Favorites, albums, stacks, dates and locations
+• Albums shared with people and by link
+• Photos and files imported from the device, and Verso in Messages to send a photo from your library
+
+BACK UP THIS IPHONE
+• Your photos and videos go to Immich in the background, each once, with their Live Photos, edits and favorites; hidden photos go into the Locked Folder
+• Nothing is sent until you have seen what is already in Immich and said Start
+• Free Up Space removes photos from the phone once Immich holds them, only after you review them and iOS asks
+
+VERSO DRIVE
+• When you switch it on, your library is a set of folders in the Files app, so any app can open a photo; originals download only when something opens them
+
+ON THE IPAD
+• Laid out as Photos is on the iPad, with the keyboard's commands, the pointer and drag and drop between apps
+
+ON THE APPLE TV
+• Your library from the sofa, memories as stories, and today's memories on the Top Shelf
+• Set up from your iPhone, with a key of its own that may only look
+
+PRIVATE BY DESIGN
+• Verso talks only to your Immich server: no account with us, no analytics, no trackers
+• Sign in with your server's single sign-on, with email and password, or with an API key, kept in the Keychain on this device
+
+Verso is free and open source, under the MIT license. It needs an Immich server, version 3.2 or later.
+
+Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO. "Immich" is used only to describe the server this software works with, and remains the mark of its owner.

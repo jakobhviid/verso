@@ -229,6 +229,55 @@ Verso's page, at `jakob.hviid.phd/verso` and for the top of `jakob.hviid.phd/sof
   as Immich holds them, so they count as in Immich and fill Free Up Space's review, and four new ones on their way
   (the `mac-dev` skill, "The website's pictures").
 
+## The App Store listing
+
+One App Store record, "Verso for Immich" (`dev.hviid.Verso`), holds the iPhone and the iPad (one version, `IOS`) and
+the Apple TV (its own version, `TV_OS`). Its words are in `ios/AppStore/en-US/` (the TV's own beside them in `tvos/`,
+where they differ), and `ios/appstore.py push` sends them, with the screenshots, the review notes and TestFlight's
+texts, into the version being prepared (ARCHITECTURE.md, "Verso's releases"). Each field, and what goes in it:
+- **Name,** "Verso for Immich": the app's name and what it works with, which is what people search for. Immich is in the
+  name as the server it describes, never as our brand (the non-affiliation notice closes the description).
+- **Subtitle,** "Self-hosted photos & backup": the two reasons to look, in the words people search with; App Store
+  search reads the name, the subtitle and the keywords, so none repeats another.
+- **Promotional text** (170 characters, changed without a review): what is new and worth a look now, the newest
+  platform or feature; the iPhone's names the Apple TV, the TV's what it does.
+- **Description:** one sentence of what Verso is, one of what Immich is (many will meet the word here first), then
+  sections in capitals as App Store descriptions have them, each a few lines that each say one thing a person can do:
+  the whole library, search, organise and share, backing up (with Start and Free Up Space's review, the two promises
+  that make people trust it), Verso Drive, the iPad, the Apple TV, privacy; then free and open source with the server
+  it needs, and the non-affiliation notice whole. Nothing it does not do, and no comparison with other apps or
+  services. The TV's leads with the big screen and says how it is set up.
+- **Keywords** (100 bytes): words a person searching for a self-hosted gallery uses that the name and subtitle leave
+  out (`gallery`, `nas`, `homelab`, `open source`); never another product's name.
+- **What's New:** the release's own notes, from the tag's Conventional Commits (`ci/release-notes.sh`), the Apple
+  editions' parts; the first version has none.
+- **Links:** Verso's page for marketing, its privacy policy (`privacy.html`, which `site/build.py` writes, standing on
+  SECURITY.md), and the issue tracker for support.
+- **Category** Photo & Video; **age rating** 4+: Verso shows a person's own library, from their own server, and what
+  the people they share albums with add (photos, comments, likes); no public content, no strangers, no chat of its
+  own, no advertising, no web browsing.
+- **App Review:** Immich's public demo as the demo account, with notes on entering a server's address (a reviewer
+  meets a sign-in that asks for one), why backing up is not offered there, and how the Apple TV is set up from the
+  iPhone. The contact is the maintainer's, from the git-ignored `ios/AppStore/contact.local`.
+- **TestFlight:** a short beta description, the same review notes, and each build's What to Test
+  (`ios/AppStore/what_to_test.txt`): what changed, said as what to try.
+
+**Screenshots,** in the Simulators against the showcase server, as DESIGN's other screenshots ("Screenshots" above),
+whole and without frames or captions, so each is the app as it is: the iPhone 17 Pro Max's 1320 × 2868 (the 6.9-inch
+size, from which App Store Connect makes the smaller ones), the iPad Pro 13-inch's 2752 × 2064, and the Apple TV's
+3840 × 2160, light on the iPhone and the iPad and dark on the TV, as each is mostly seen. In the order a person meets
+Verso, the first three being what a search result shows: the Library, a photo, its details, Memories, Albums, Places,
+Search, the Backup page, Free Up Space on the iPhone; the Library, a photo, Albums, Places and People on the iPad; and
+the Library by year, Memories, Places, a photo and an album on the TV. They are kept in the git-ignored
+`ios/AppStore/screenshots/<iphone|ipad|tv>/`, named `NN-place.png` in their order.
+
+**App previews,** once the app is near done, from the walkthrough video's recording (ROADMAP.md, "The walkthrough
+video"): up to 30 seconds each, the iPhone's showing a photo opening out of its tile, a memory as a story and backing
+up's first run, the TV's a memory playing on the big screen. Not made yet.
+
+**One language,** English, until the listing is translated with the app's own words (`po/`) by people who speak them;
+a machine's translation of a store page reads as one.
+
 ## The apps' interfaces
 
 Verso is one app on each platform: the gallery's window, Verso Drive, and an icon in the top bar or the menu bar
