@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-"""Verso on the Apple TV's icons (DESIGN.md, the icon family): tvOS's layered app icon in three layers, which the
-remote's focus tilts apart as Apple's own icons do: Mist at the back, Verso's print in the middle (its paper, its
-picture, the word and the turned corner; linux/packaging/icons/dev.hviid.Verso.svg, the master every platform's icon is
-drawn from) and the print's lens alone at the front, in its place on the print; and the Top Shelf images, the print on
-Mist. Writes the brand assets into
-ios/TV/Assets.xcassets. Needs rsvg-convert (librsvg2-tools; in the toolbox) and Pillow.
+"""Verso on the Apple TV's icons (DESIGN.md, the icon family): tvOS's layered app icon, whose layers the remote's
+focus tilts apart as Apple's own icons do, and the Top Shelf images, the same picture flat and wider. Drawn from the
+lens, the print and its back in linux/packaging/icons/dev.hviid.Verso.svg, the master every platform's icon comes
+from. Writes the brand assets into ios/TV/Assets.xcassets. Needs rsvg-convert (librsvg2-tools; in the toolbox).
 
-    ios/TV/make-tv-icons.py
+The designs, by name (the first is the app's):
+  E2  Front and back: a print's back, Verso written on it by hand, behind the print's front with its lens, on Mist
+  E3  E2 on a night sky
+  B2  The print edge to edge, Verso on its strip, its corner turned over to Mist
+  B3  B2 in the print's night colours
+
+    ios/TV/make-tv-icons.py [--design NAME]
 """
+import argparse
 import json
 import re
 import shutil
@@ -15,62 +20,118 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from PIL import Image
-
 ROOT = Path(__file__).resolve().parents[2]
-SVG = ROOT / "linux/packaging/icons/dev.hviid.Verso.svg"
+MASTER = (ROOT / "linux/packaging/icons/dev.hviid.Verso.svg").read_text()
 CATALOG = ROOT / "ios/TV/Assets.xcassets"
 BRAND = CATALOG / "App Icon & Top Shelf Image.brandassets"
-MIST = ((0xE6, 0xED, 0xF5), (0xC4, 0xD0, 0xDE))  # top to bottom
-SHARE = 0.70  # the print's height in the icon's: the TV shows icons small in its rows
+HEIGHT = 240  # every design is drawn 240 high, centred on x = 200 of an icon 400 wide
+
+DEFS = MASTER[MASTER.index("<defs>") + len("<defs>"):MASTER.index("</defs>")]
+PRINT = MASTER[MASTER.index("</defs>") + len("</defs>"):MASTER.rindex("</svg>")]
+LENS = re.search(r'<use xlink:href="#lens"[^>]*/>', PRINT).group(0)
+WORD = re.search(r'<g transform="translate\(22 94.3\) scale\(0.64\)".*?</g>', PRINT, re.S).group(0)
+WORD_PATHS = WORD[WORD.index(">") + 1:WORD.rindex("</g>")]
+# The master's print sits in a group that fills its 128 square; the lens is placed inside it.
+PRINT_FRAME = '<g transform="translate(-9.142857 -9.142857) scale(1.142857)">'
+MORE_DEFS = """
+  <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#e6edf5"/><stop offset="1" stop-color="#c4d0de"/></linearGradient>
+  <radialGradient id="night" cx="0.5" cy="0.45" r="0.75">
+    <stop offset="0" stop-color="#27477a"/><stop offset="0.55" stop-color="#151f38"/><stop offset="1" stop-color="#0b0a12"/>
+  </radialGradient>
+  <filter id="drop" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="5"/><feOffset dy="5"/>
+    <feComponentTransfer><feFuncA type="linear" slope="0.28"/></feComponentTransfer>
+    <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+"""
+DAY = {"paper": ("#ffffff", "#e6e4e0"), "photo": ("#e6edf5", "#c4d0de"), "ink": "#6f7486", "under": "#c9d2de",
+       "back": "url(#back)"}
+NIGHT = {"paper": ("#4a4a4f", "#2f2f33"), "photo": ("#414d5c", "#262d37"), "ink": "#a9adbb", "under": "#1c1f26",
+         "back": "#5d5749"}
 
 
-LENS_USE = re.compile(r'<use xlink:href="#lens"[^>]*/>')
+def lens(cx, cy, diameter):
+    return f'<use xlink:href="#lens" transform="translate({cx} {cy}) scale({diameter / 60:.4f})"/>'
 
 
-def part(which):
-    """The master's SVG as a whole ("print"), without its lens ("paper"), or with the lens alone ("lens"), each in the
-    print's own place, so the layers line up."""
-    source = SVG.read_text()
-    lens = LENS_USE.search(source).group(0)
-    if which == "paper":
-        return source.replace(lens, "")
-    if which == "lens":
-        start = source.index("</defs>") + len("</defs>")
-        outer = re.search(r'<g transform="[^"]*">', source[start:]).group(0)
-        return source[:start] + f"\n{outer}{lens}</g>\n</svg>\n"
-    return source
+def placed(cx, cy, height, rotate, inner, shadow=True):
+    """Something drawn in the master's 128 square, `height` tall, centred at (cx, cy) and turned by `rotate`."""
+    group = (f'<g transform="translate({cx} {cy}) rotate({rotate}) scale({height / 128:.4f}) translate(-64 -64)">'
+             f'{inner}</g>')
+    return f'<g filter="url(#drop)">{group}</g>' if shadow else group
 
 
-def render(size, work, which="print"):
-    """The print, or a part of it, at `size` pixels square, transparent around it."""
-    svg = work / f"{which}.svg"
-    svg.write_text(part(which))
-    out = work / f"{which}-{size}.png"
-    command = ["rsvg-convert", "-w", str(size), "-h", str(size), str(svg), "-o", str(out)]
+def print_back(cx, cy, height, rotate):
+    """A print seen from behind: its cream back, Verso written on it by hand as on an old photo's back."""
+    return placed(cx, cy, height, rotate,
+                  '<path d="M14,0 H114 Q128,0 128,14 V114 Q128,128 114,128 H14 Q0,128 0,114 V14 Q0,0 14,0 Z" '
+                  'fill="url(#back)"/><g transform="translate(8 34) scale(0.95)" fill="none" stroke="#8a7f68" '
+                  f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{WORD_PATHS}</g>')
+
+
+def front_and_back(sky):
+    """E: the back of one print behind the front of another, Verso written once, on the back."""
+    paper = PRINT.replace(LENS, "").replace(WORD, "")
+    return {
+        "Back": f'<rect x="-1000" width="2400" height="{HEIGHT}" fill="url(#{sky})"/>',
+        "Middle": print_back(128, 124, 160, -10),
+        "Print": placed(262, 116, 170, 5, paper),
+        "Front": placed(262, 116, 170, 5, f"{PRINT_FRAME}{LENS}</g>", shadow=False),
+    }
+
+
+def edge_to_edge(theme, corner=68):
+    """B: the print filling the icon, in the back layer (the one tvOS keeps full bleed under a tilt), its corner cut
+    away to what it lies on and turned over in a layer of its own."""
+    (paper_top, paper_bottom), (photo_top, photo_bottom) = theme["paper"], theme["photo"]
+    x, y = 400 - corner, HEIGHT - corner
+    rounding = corner * 0.18
+    return {
+        "Back": (f'<linearGradient id="tpaper" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{paper_top}"/>'
+                 f'<stop offset="1" stop-color="{paper_bottom}"/></linearGradient>'
+                 f'<linearGradient id="tphoto" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{photo_top}"/>'
+                 f'<stop offset="1" stop-color="{photo_bottom}"/></linearGradient>'
+                 f'<rect x="-1000" width="2400" height="{HEIGHT}" fill="{theme["under"]}"/>'
+                 f'<path d="M-1000,0 H1400 V{HEIGHT} H{x + corner} V{y} L{x},{HEIGHT} H-1000 Z" fill="url(#tpaper)"/>'
+                 '<rect x="24" y="22" width="352" height="150" rx="16" fill="url(#tphoto)"/>'
+                 '<rect x="24.5" y="22.5" width="351" height="149" rx="15.5" fill="none" stroke="#000" '
+                 'stroke-opacity="0.08"/>'
+                 f'<g transform="translate(40 175) scale(1.25)" fill="none" stroke="{theme["ink"]}" '
+                 f'stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">{WORD_PATHS}</g>'),
+        "Middle": (f'<path d="M400,{y} L{x},{HEIGHT} L{x},{y + rounding} Q{x},{y} {x + rounding},{y} Z" '
+                   f'fill="{theme["back"]}" filter="url(#flapshadow)"/>'),
+        "Front": lens(200, 97, 124),
+    }
+
+
+DESIGNS = {
+    "E2": front_and_back("mist"),
+    "E3": front_and_back("night"),
+    "B2": edge_to_edge(DAY),
+    "B3": edge_to_edge(NIGHT),
+}
+INFO = {"author": "xcode", "version": 1}
+
+
+def svg(width, layers):
+    """Layers drawn on a canvas `width` wide and HEIGHT high, the design centred in it."""
+    shift = (width - 400) / 2
+    body = "".join(layers)
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{width:g}" '
+            f'height="{HEIGHT}" viewBox="0 0 {width:g} {HEIGHT}"><defs>{DEFS}{MORE_DEFS}</defs>'
+            f'<g transform="translate({shift:g} 0)">{body}</g></svg>')
+
+
+def render(text, pixels_wide, pixels_high, work, name):
+    source = work / f"{name}.svg"
+    source.write_text(text)
+    out = work / f"{name}.png"
+    command = ["rsvg-convert", "-w", str(pixels_wide), "-h", str(pixels_high), str(source), "-o", str(out)]
     if shutil.which("rsvg-convert") is None:
         command = ["toolbox", "run", "-c", "verso", *command]
     subprocess.run(command, check=True)
-    return Image.open(out).convert("RGBA")
-
-
-def mist(width, height):
-    top, bottom = MIST
-    image = Image.new("RGB", (width, height))
-    for y in range(height):
-        t = y / max(1, height - 1)
-        row = tuple(round(top[i] + (bottom[i] - top[i]) * t) for i in range(3))
-        image.paste(row, (0, y, width, y + 1))
-    return image
-
-
-def front(width, height, share, work, which="print"):
-    """The print, or a part of it, centred on a transparent layer, `share` of the layer's height."""
-    layer = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-    size = round(height * share)
-    picture = render(size, work, which)
-    layer.alpha_composite(picture, ((width - size) // 2, (height - size) // 2))
-    return layer
+    return out
 
 
 def write(folder, contents):
@@ -78,53 +139,50 @@ def write(folder, contents):
     (folder / "Contents.json").write_text(json.dumps(contents, indent=2) + "\n")
 
 
-INFO = {"author": "xcode", "version": 1}
-
-
-def imagestack(name, sizes, idiom, work):
-    """A layered icon: the lens over the print's paper over Mist, at each (scale, width, height)."""
+def imagestack(name, sizes, idiom, design, work):
+    """A layered icon, front first, at each (scale, width, height)."""
     stack = BRAND / f"{name}.imagestack"
-    layers = ("Front", "Middle", "Back")
+    layers = list(reversed(design))
     write(stack, {"info": INFO, "layers": [{"filename": f"{layer}.imagestacklayer"} for layer in layers]})
     for layer in layers:
-        layer_folder = stack / f"{layer}.imagestacklayer"
-        write(layer_folder, {"info": INFO})
+        folder = stack / f"{layer}.imagestacklayer" / "Content.imageset"
+        write(folder.parent, {"info": INFO})
         images = []
         for scale, width, height in sizes:
             file = f"{layer.lower()}-{scale}.png"
-            if layer == "Back":
-                picture = mist(width, height)
-            else:
-                picture = front(width, height, SHARE, work, "lens" if layer == "Front" else "paper")
-            (layer_folder / "Content.imageset").mkdir(parents=True, exist_ok=True)
-            picture.save(layer_folder / "Content.imageset" / file)
+            folder.mkdir(parents=True, exist_ok=True)
+            shutil.copy(render(svg(400, [design[layer]]), width, height, work, f"{name}-{layer}-{scale}"),
+                        folder / file)
             images.append({"idiom": idiom, "scale": scale, "filename": file})
-        write(layer_folder / "Content.imageset", {"images": images, "info": INFO})
+        write(folder, {"images": images, "info": INFO})
 
 
-def top_shelf(name, sizes, work):
+def top_shelf(name, sizes, design, work):
+    """The design flat, centred on its background, as wide as the Top Shelf."""
     folder = BRAND / f"{name}.imageset"
     images = []
     for scale, width, height in sizes:
         file = f"top-shelf-{scale}.png"
-        picture = mist(width, height).convert("RGBA")
-        picture.alpha_composite(front(width, height, 0.62, work))
         folder.mkdir(parents=True, exist_ok=True)
-        picture.convert("RGB").save(folder / file)
+        picture = svg(HEIGHT * width / height, list(design.values()))
+        shutil.copy(render(picture, width, height, work, f"{name}-{scale}"), folder / file)
         images.append({"idiom": "tv", "scale": scale, "filename": file})
     write(folder, {"images": images, "info": INFO})
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--design", choices=DESIGNS, default=next(iter(DESIGNS)))
+    design = DESIGNS[parser.parse_args().design]
     if BRAND.exists():
         shutil.rmtree(BRAND)
     write(CATALOG, {"info": INFO})
     with tempfile.TemporaryDirectory() as temporary:
         work = Path(temporary)
-        imagestack("App Icon", [("1x", 400, 240), ("2x", 800, 480)], "tv", work)
-        imagestack("App Icon - App Store", [("1x", 1280, 768)], "tv-marketing", work)
-        top_shelf("Top Shelf Image", [("1x", 1920, 720), ("2x", 3840, 1440)], work)
-        top_shelf("Top Shelf Image Wide", [("1x", 2320, 720), ("2x", 4640, 1440)], work)
+        imagestack("App Icon", [("1x", 400, 240), ("2x", 800, 480)], "tv", design, work)
+        imagestack("App Icon - App Store", [("1x", 1280, 768)], "tv-marketing", design, work)
+        top_shelf("Top Shelf Image", [("1x", 1920, 720), ("2x", 3840, 1440)], design, work)
+        top_shelf("Top Shelf Image Wide", [("1x", 2320, 720), ("2x", 4640, 1440)], design, work)
     write(BRAND, {"info": INFO, "assets": [
         {"filename": "App Icon - App Store.imagestack", "idiom": "tv", "role": "primary-app-icon", "size": "1280x768"},
         {"filename": "App Icon.imagestack", "idiom": "tv", "role": "primary-app-icon", "size": "400x240"},
