@@ -97,14 +97,14 @@ struct AssetGridPage: View {
             // The phone's own tiles open their viewer with SwiftUI's zoom.
             .phoneViewer(session: session, state: state, photos: phone.map(\.photo), readsUp: opensAtBottom,
                          zoomNamespace: phoneZoom),
-            actions: actions), actions: actions, opensAtBottom: opensAtBottom)
+            actions: actions, model: model), actions: actions, model: model, opensAtBottom: opensAtBottom)
     }
 
-    // The body's modifiers in three parts, each type-checked on its own: Xcode 26 could not type-check them as one
+    // The body's modifiers in parts, each type-checked on its own: Xcode 26 could not type-check them as one
     // chain.
 
     /// The sheets and the questions of the grid's actions.
-    private func dialogs(_ content: some View, actions: GridActions) -> some View {
+    private func dialogs(_ content: some View, actions: GridActions, model: AssetGridModel) -> some View {
         content
         .shareSheet(item: $state.sharing) { request in
             actions.rules.shareContent(request.ids)
@@ -133,8 +133,8 @@ struct AssetGridPage: View {
     }
 
     /// What the grid follows while it is shown: the selection, its ends, the window's chrome, reading again.
-    private func lifecycle(_ content: some View, actions: GridActions, opensAtBottom: Bool) -> some View {
-        content
+    private func lifecycle(_ content: some View, actions: GridActions, model: AssetGridModel, opensAtBottom: Bool) -> some View {
+        reloading(content, actions: actions, model: model)
         .onChange(of: state.isSelecting) { _, selecting in
             chrome?.setSelecting(pageID, selecting)
         }
@@ -151,6 +151,11 @@ struct AssetGridPage: View {
             chrome?.setSelecting(pageID, false)
             chrome?.setOpensAtBottom(pageID, false)
         }
+    }
+
+    /// The grid reading itself again, a selection taken by an album sheet, and the actions' sheets and notices.
+    private func reloading(_ content: some View, actions: GridActions, model: AssetGridModel) -> some View {
+        content
         // An album sheet of the window's took the selection (Add to Album).
         .onChange(of: chrome?.finishedSelection) { _, finished in
             if finished?.grid == ObjectIdentifier(model) { actions.endSelecting() }
