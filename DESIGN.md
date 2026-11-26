@@ -344,19 +344,22 @@ sections, the pages, the viewer's info), drawn with each platform's own toolkit:
 - **The Backup page** is backing up's one page on the iPhone and the iPad: a list of iOS's own whose top is the page's
   status, centred, as Settings' feature pages have theirs: a cloud symbol (the accent while it works, and only then
   pulsing with the system's variable colour; green with a tick when backed up; grey while it waits; orange when the
-  person is needed), what goes on in bold, and one line in grey. Under it one bar for the whole library, split as iPhone
-  Storage splits the device, each part's colour in a legend of two columns with its count: In Immich green, To upload
-  the accent (with its size, "69 · 403 MB"), Needs a look orange, Left out grey, To check a lighter grey. The groups
-  under it follow the same split, Needs a Look and Left Out, each row opening its photos. Then the moment's one action,
-  a prominent glass button across the width (Turn On Backup, Start, Back Up Now, Try Now), with a footnote under it
-  where it helps. What backing up waits for is said in that grey line, never as an error; only what the person must act
-  on is orange. Under the top, Space on This iPhone: the period as a menu in its row, Review and Free Up in the accent
+  person is needed), what goes on in bold, and one line in grey, which also explains a stop. Under it one bar for the
+  whole library, split as iPhone Storage splits the device: In Immich green, To upload the accent, Needs a look orange,
+  Left out grey, To check a lighter grey. Then the moment's one action, a prominent glass button across the width (Turn
+  On Backup, Start, Back Up Now, Try Now, or Check Again over Send Them Again and Let Them Go on plain glass), with a
+  footnote under it where it helps. What backing up waits for is said in that grey line, never as an error; only what
+  the person must act on is orange. Each section under the top has one subject. On This iPhone is the bar's legend:
+  its parts as rows in the bar's order, each with a dot of its colour, its count on the right ("69 · 403 MB" for To
+  Upload) and its photos a tap away; Left Out opens a page of its own groups. Then On Its Way, Free Up Space as one
+  row with what is ready in the accent, Checked with Immich, the options in two sections (Uploading, Included; above On
+  This iPhone until the first run's Start) and Turn Off Backup. Free Up Space's page: the period as a menu in its row, Review and Free Up in the accent
   with what it frees under it, Always Keep with what it keeps in grey on the right. The review is a grid of the photos by
   month under pinned month headers, each tile ticked in its corner (unticked dimmed), a small cloud on those only in
   iCloud, and Delete in red across the foot; under its title, what Always Keep keeps beside a heart, with Change in the
   accent, on a quiet rounded ground. Hidden photos are a group on the same quiet ground under a lock, a count and
   size until checked with the PIN, their pictures only after Show; wherever a hidden photo would show its picture
-  before that (the Backup page's lists, the photos that stay), a lock in grey stands in its place. Options sit on the page, and Turn Off Backup in red at its foot. The Library's
+  before that (the Backup page's lists, the photos that stay), a lock in grey stands in its place. Turn Off Backup is in red at the Backup page's foot. The Library's
   number of items at its newest end is followed by "· Backed Up" in grey, or "· 2.3 GB to Free" in the accent. While
   backing up is off, a glass card above the tab bar offers it, with Not Now on glass and Set Up prominent; while it is
   on, the same card says what is ready to free (a drive in the accent, Review prominent), or that the phone is almost

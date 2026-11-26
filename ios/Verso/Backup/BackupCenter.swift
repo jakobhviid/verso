@@ -49,8 +49,8 @@ final class BackupCenter {
     private static let invitationKey = "backup.invitationDismissed"
     /// The Backup page opens on Free Up Space's review (the Library's card and line, the reminder).
     var reviewRequested = false
-    /// The Backup page opens at Space on This iPhone (the Library's card for a phone short of space).
-    var freeUpSectionRequested = false
+    /// The Backup page opens Free Up Space's page (the Library's card for a phone short of space).
+    var freeUpPageRequested = false
     /// When the person last opened the review from the Library's card, or said Not Now, and what was ready then;
     /// and when they put aside the card for a phone short of space (this device's).
     private(set) var freeUpCardPutAside = BackupCenter.readPutAside()

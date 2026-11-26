@@ -1,8 +1,8 @@
 // A walk through Free Up Space against a lab server (never Immich's demo), keeping a screenshot of each place: the
-// Backup page's Space on This iPhone with Always Keep, Keep on This iPhone chosen (and the question on what deleting
+// Backup page's Free Up Space, a page of its own, with Always Keep, Keep on This iPhone chosen (and the question on what deleting
 // means, the first time), the Library's card, its Review opening the review itself, each photo checked with Immich,
 // Delete, and iOS's own question answered Don't Allow, after which nothing has changed; then Forever again, and the
-// Library's card for a phone short of space, leading to Space on This iPhone. Nothing is ever deleted. The server's
+// Library's card for a phone short of space, leading to Free Up Space. Nothing is ever deleted. The server's
 // address and an API key reach it only through the test run's environment, as for BackupWalkTests; the photos are aged
 // by when they were taken (VERSO_FREE_UP_BY_TAKEN), as a Simulator's were all added lately, the cards come for a few
 // megabytes (VERSO_FREE_UP_WORTH) whatever an earlier run said to them (VERSO_FREE_UP_CARDS_AFRESH), and the phone
@@ -34,10 +34,11 @@ final class FreeUpSpaceWalkTests: XCTestCase {
         keep("01 Backup page", application)
 
         // Keep on This iPhone: 1 Month, asking first what deleting means where it was not yet understood.
+        openFreeUp(application)
         let keepPicker = application.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Keep on This iPhone'")).firstMatch
-        scrollTo(keepPicker, in: application)
+        XCTAssertTrue(keepPicker.waitForExistence(timeout: 10))
         XCTAssertTrue(application.buttons["Always Keep"].firstMatch.exists, "what stays, by its name")
-        keep("02 Space on This iPhone", application)
+        keep("02 Free Up Space", application)
         keepPicker.tap()
         settle()
         application.buttons["1 Month"].firstMatch.tap()
@@ -80,14 +81,14 @@ final class FreeUpSpaceWalkTests: XCTestCase {
         // Forever again, as the walk found it.
         application.navigationBars.buttons.element(boundBy: 0).tap()
         settle()
-        scrollTo(keepPicker, in: application)
+        openFreeUp(application)
         keepPicker.tap()
         settle()
         application.buttons["Forever"].firstMatch.tap()
         settle()
         keep("08 Forever again", application)
 
-        // Forever on a phone short of space: the Library's card, leading to Space on This iPhone.
+        // Forever on a phone short of space: the Library's card, leading to Free Up Space.
         closeSheets(application)
         let freeUpOnCard = application.buttons["Free Up Space"].firstMatch
         XCTAssertTrue(freeUpOnCard.waitForExistence(timeout: 30), "the card says the phone is short of space")
@@ -95,11 +96,20 @@ final class FreeUpSpaceWalkTests: XCTestCase {
         freeUpOnCard.tap()
         settle()
         XCTAssertTrue(waitForLabel(application, "This iPhone is short of space", timeout: 10), "said where the period is chosen")
-        keep("10 Space on This iPhone", application)
+        keep("10 Free Up Space", application)
         closeSheets(application)
     }
 
     // MARK: Steps
+
+    /// Free Up Space's page, from its row on the Backup page.
+    @MainActor
+    private func openFreeUp(_ application: XCUIApplication) {
+        let row = application.buttons["Free Up Space"].firstMatch
+        scrollTo(row, in: application)
+        row.tap()
+        settle()
+    }
 
     /// The Backup page from the account's sheet, backing up switched on there if it was off.
     @MainActor

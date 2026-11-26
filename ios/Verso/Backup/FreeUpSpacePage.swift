@@ -1,9 +1,9 @@
 // Free Up Space on the iPhone (ROADMAP.md, M10, "Free Up Space"; ARCHITECTURE.md, "Free Up Space"): photos older
 // than the person keeps on the phone, safe in Immich, removed from the phone only after the person reviews them and
 // iOS asks. Nothing deletes on its own: a reminder may say there is space to gain, never more.
-// - FreeUpSection, on the Backup page under its top: Keep on This iPhone (Forever, the default, until the person
-//   chooses a period, which asks once what deleting means for iCloud Photos and a Shared Library), what can be freed,
-//   Review and Free Up, and Always Keep with what it keeps.
+// - FreeUpRow, the Backup page's row, with what is ready to free, opening FreeUpSpacePage: Keep on This iPhone
+//   (Forever, the default, until the person chooses a period, which asks once what deleting means for iCloud Photos
+//   and a Shared Library), what can be freed, Review and Free Up, and Always Keep with what it keeps.
 // - FreeUpKeepPage, Always Keep: the favourites, as Photos has them, hidden photos where chosen, and the albums on this
 //   iPhone the person picks.
 // - FreeUpReviewPage: the photos, by month, all ticked, each checked with Immich as the page opens (BackupEngine's
@@ -20,9 +20,53 @@ import Photos
 import SwiftUI
 import UIKit
 
-/// The Backup page's Space on This iPhone.
-struct FreeUpSection: View {
-    let services: AccountServices
+/// The Backup page's row for Free Up Space: what is ready to free, that the phone is short of space, or how long photos
+/// stay on it.
+struct FreeUpRow: View {
+    private var center: BackupCenter { BackupCenter.shared }
+
+    var body: some View {
+        NavigationLink {
+            FreeUpSpacePage()
+        } label: {
+            LabeledContent("Free Up Space") {
+                Text(value ?? "")
+                    .foregroundStyle(ready ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary))
+            }
+        }
+        .accessibilityIdentifier("Free Up Space")
+    }
+
+    private var ready: Bool { (center.snapshot.freeable?.count ?? 0) > 0 && center.settings.keepMonths != nil }
+
+    private var value: String? {
+        let settings = center.settings
+        if let months = settings.keepMonths {
+            if ready, let freeable = center.snapshot.freeable {
+                return String(localized: "\(freeable.bytes.formatted(.byteCount(style: .file))) to Free")
+            }
+            return String(localized: "Keep \(FreeUpPeriod.name(months))")
+        }
+        if let offer = center.snapshot.spaceOffer, offer.count > 0 {
+            return String(localized: "Short of Space")
+        }
+        return nil
+    }
+}
+
+/// Free Up Space, from the Backup page's row, or the Library's card for a phone short of space.
+struct FreeUpSpacePage: View {
+    var body: some View {
+        List {
+            FreeUpSection()
+        }
+        .navigationTitle("Free Up Space")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+/// Free Up Space's page: how long photos stay, what is ready to free, and what is always kept.
+private struct FreeUpSection: View {
     /// A period chosen while what deleting means is not yet understood: asked first.
     @State private var asking: Int?
 
@@ -78,8 +122,6 @@ struct FreeUpSection: View {
                 LabeledContent("Always Keep", value: FreeUpKeep.summary(settings))
             }
             .accessibilityIdentifier("Always Keep")
-        } header: {
-            Text("Space on This \(DeviceWords.model)")
         } footer: {
             Text("Verso never deletes on its own: you review what goes, and iOS asks before anything is deleted. Only photos safe in Immich go, to Recently Deleted, where they stay for 30 days.")
         }
@@ -666,7 +708,7 @@ enum FreeUpKeep {
 
 /// The Library's card for Free Up Space, above the tab bar where the invitation to back up shows (BackupInvitationCard):
 /// what is ready to free, with Review, which opens the review itself; or, while Keep on This iPhone is Forever, that
-/// the phone runs short of space, with Free Up Space, which opens Space on This iPhone to choose a period. Either, and
+/// the phone runs short of space, with Free Up Space, which opens its page to choose a period. Either, and
 /// Not Now, puts the card aside (FreeUpRules.cardShown, spaceCardShown).
 struct FreeUpCard: View {
     enum Kind { case ready, shortOfSpace }
@@ -745,7 +787,7 @@ struct FreeUpCard: View {
         switch kind {
         case .ready: center.showFreeUp()
         case .shortOfSpace:
-            center.freeUpSectionRequested = true
+            center.freeUpPageRequested = true
             center.showPage()
         }
     }

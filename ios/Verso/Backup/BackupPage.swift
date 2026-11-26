@@ -1,20 +1,18 @@
 // The Backup page on iOS (SPEC.md, "Backing the iPhone up"; DESIGN.md, "The Backup page"), where everything about
 // backing up happens: every way to it (the Library's card and line, the account's row, a notification, a Live
-// Activity) opens this one page (BackupCenter.showPage). Its top says what goes on, with one bar for the whole library
-// split by what each photo is waiting for, as iPhone Storage splits the device, and the one action the moment needs.
-// - Off: what backing up does, its options, and Turn On Backup, which asks for the photos and notifications and starts
-//   the check here, without leaving the page.
-// - The first run, which uploads nothing before the person says Start: the check, with Start under the bar all along
-//   (photos found in Immich are never sent, and the check goes on during the run); In Immich in Another Form, to send
-//   or skip.
-// - Backing up: On Its Way, Back Up Now, what Verso sent, the last check with Immich and Check Again, and the groups
-//   as the bar's colours sort them: Needs a Look (with the reasons, Retry and Don't Send), In Another Form and Missing
-//   from Immich; Left Out, on purpose: In Immich's Trash, Deleted in Immich, and those the person chose not to send.
-// - What Verso waits for (Wi-Fi, a connection, Immich, free space) is said calmly under the title (BackupStatus); a
-//   stop the person must put right, plainly, with what can be done.
-// Under its top, once backing up has started, Space on This iPhone (FreeUpSection), where the Library's free-up cards
-// and line and the reminder lead. Its options, and Turn Off Backup at its foot. A list of iOS's own; only the title's
-// symbol moves, while work goes on.
+// Activity) opens this one page (BackupCenter.showPage). Each section has one subject, what needs the person first:
+// - The top says what goes on, with one bar for the whole library split by what each photo is waiting for, as iPhone
+//   Storage splits the device, and the one action the moment needs. A stop the person must put right is said there,
+//   with what can be done (the answers to most of the library gone included), and so is an error that has lasted.
+//   What Verso waits for (Wi-Fi, a connection, Immich, free space) is said calmly under the title (BackupStatus).
+// - On This iPhone: the bar's parts as rows, each with its colour, its count, and its photos a tap away: In Immich, To
+//   Upload, Needs a Look, In Another Form, Missing from Immich, Left Out (a page of its own: In Immich's Trash,
+//   Deleted in Immich, those the person chose not to send, and screenshots), To Check.
+// - On Its Way, the newest photos going; Free Up Space, a row opening its page (FreeUpSpacePage), where the Library's
+//   card for a phone short of space leads; Checked with Immich, what Verso sent and when it last checked.
+// - Uploading and Included, the options, which come under the top until the first run's Start, since what is
+//   included changes what goes; Turn Off Backup at the foot.
+// A list of iOS's own; only the title's symbol moves, while work goes on.
 
 import Photos
 import SwiftUI
@@ -22,7 +20,6 @@ import UIKit
 
 struct BackupPage: View {
     let services: AccountServices
-    private static let freeUpSection = "freeUp"
     @State private var confirmingMostGone: BackupMostGoneAnswer?
     @State private var confirmingOff = false
     #if DEBUG
@@ -39,66 +36,57 @@ struct BackupPage: View {
     var body: some View {
         let snapshot = center.snapshot
         let tally = snapshot.tally
-        ScrollViewReader { proxy in
-            List {
-                Section {
-                    BackupHead(snapshot: snapshot, settings: center.settings, personRunActive: center.personRunActive) { action in
-                        act(action)
-                    }
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(EdgeInsets(top: 8, leading: 4, bottom: 8, trailing: 4))
+        List {
+            Section {
+                BackupHead(snapshot: snapshot, settings: center.settings, personRunActive: center.personRunActive) { action in
+                    act(action)
                 }
-                if center.settings.isOn && snapshot.firstRunStarted && Self.followsLibrary(snapshot.phase) {
-                    FreeUpSection(services: services)
-                        .id(Self.freeUpSection)
-                }
-                if !waiting.isEmpty {
-                    BackupOnItsWaySection(photos: waiting, zoomNamespace: zoomNamespace) { photo in
-                        openedWaiting = OpenedAsset(id: photo.localID)
-                    }
-                }
-                if case .stopped(let stop) = snapshot.phase, stop != .unreachable {
-                    stopped(stop, snapshot: snapshot)
-                }
-                if Self.followsLibrary(snapshot.phase) {
-                    lists(tally, snapshot: snapshot)
-                    facts(snapshot)
-                }
-                if snapshot.phase != .signedOut && snapshot.phase != .publicDemo {
-                    options
-                }
-                if let error = snapshot.error {
-                    Section {
-                        Label(error, systemImage: "exclamationmark.triangle")
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                if center.settings.isOn {
-                    Section {
-                        Button("Turn Off Backup", role: .destructive) { confirmingOff = true }
-                    }
-                }
-                #if DEBUG
-                Section {
-                    Button("Reset Backup", role: .destructive) { confirmingReset = true }
-                } footer: {
-                    Text("Verso Dev only: forgets everything backing up knows on this \(DeviceWords.model) and switches it off, to walk the first run again from the Library's card. Nothing in Immich changes.")
-                }
-                #endif
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 8, leading: 4, bottom: 8, trailing: 4))
             }
-            // Asked for by the Library's card for a phone short of space.
-            .onAppear {
-                guard center.freeUpSectionRequested else { return }
-                center.freeUpSectionRequested = false
-                // Once the list has its rows.
-                Task { proxy.scrollTo(Self.freeUpSection, anchor: .top) }
+            // Until Start, what is included is chosen before the photos that go are looked through.
+            if !snapshot.firstRunStarted && Self.offersOptions(snapshot.phase) {
+                options
             }
+            if Self.followsLibrary(snapshot.phase) {
+                photos(tally, snapshot: snapshot)
+            }
+            if !waiting.isEmpty {
+                BackupOnItsWaySection(photos: waiting, zoomNamespace: zoomNamespace) { photo in
+                    openedWaiting = OpenedAsset(id: photo.localID)
+                }
+            }
+            if center.settings.isOn && snapshot.firstRunStarted && Self.followsLibrary(snapshot.phase) {
+                Section {
+                    FreeUpRow()
+                }
+                checked(snapshot)
+            }
+            if snapshot.firstRunStarted && Self.offersOptions(snapshot.phase) {
+                options
+            }
+            if center.settings.isOn {
+                Section {
+                    Button("Turn Off Backup", role: .destructive) { confirmingOff = true }
+                }
+            }
+            #if DEBUG
+            Section {
+                Button("Reset Backup", role: .destructive) { confirmingReset = true }
+            } footer: {
+                Text("Verso Dev only: forgets everything backing up knows on this \(DeviceWords.model) and switches it off, to walk the first run again from the Library's card. Nothing in Immich changes.")
+            }
+            #endif
         }
         .navigationTitle("Backup")
         .navigationBarTitleDisplayMode(.inline)
         // Free Up Space's review, asked for by the Library's card and line, or its reminder.
         .navigationDestination(isPresented: Binding(get: { center.reviewRequested }, set: { center.reviewRequested = $0 })) {
             if let months = center.settings.keepMonths { FreeUpReviewPage(months: months) }
+        }
+        // Free Up Space's page, asked for by the Library's card for a phone short of space.
+        .navigationDestination(isPresented: Binding(get: { center.freeUpPageRequested }, set: { center.freeUpPageRequested = $0 })) {
+            FreeUpSpacePage()
         }
         .task { await center.refresh() }
         .task(id: center.snapshot) {
@@ -138,6 +126,11 @@ struct BackupPage: View {
         #endif
     }
 
+    /// The phases with options to set: all but those with no account to back up to.
+    private static func offersOptions(_ phase: BackupSnapshot.Phase) -> Bool {
+        phase != .signedOut && phase != .publicDemo
+    }
+
     /// The phases with a library to account for, past what is read and checked.
     private static func followsLibrary(_ phase: BackupSnapshot.Phase) -> Bool {
         switch phase {
@@ -152,62 +145,62 @@ struct BackupPage: View {
         case .openSettings: if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
         case .start: center.startFirstRun()
         case .backUpNow: center.backUpNow()
+        case .checkAgain: center.answerMostGone(.checkAgain)
+        case .sendAgain: confirmingMostGone = .sendAgain
+        case .letGo: confirmingMostGone = .deleted
         }
     }
 
-    // MARK: The facts
+    // MARK: Checked with Immich
 
-    /// What the library is and what Verso did, for trust: everything on the phone it covers, what it sent, screenshots
-    /// it leaves out, and the last check with Immich, with Check Again.
-    @ViewBuilder
-    private func facts(_ snapshot: BackupSnapshot) -> some View {
-        let tally = snapshot.tally
+    /// What Verso did, for trust: what it sent, and the last check with Immich, with Check Again.
+    private func checked(_ snapshot: BackupSnapshot) -> some View {
         Section {
-            LabeledContent("On This \(DeviceWords.model)", value: BackupStatus.itemCount(tally.total))
-            if snapshot.firstRunStarted {
-                LabeledContent("Sent by Verso", value: BackupStatus.itemCount(snapshot.sentByVerso))
-            }
-            if snapshot.screenshotsLeftOut > 0 {
-                LabeledContent("Screenshots Left Out", value: snapshot.screenshotsLeftOut.formatted())
-            }
+            LabeledContent("Sent by Verso", value: BackupStatus.itemCount(snapshot.sentByVerso))
             #if DEBUG
             // Verso Dev: iCloud originals known through Immich's own app's metadata, rather than downloaded.
             LabeledContent("Known by iCloud Identifier", value: snapshot.borrowedFingerprints.formatted())
             #endif
-            if snapshot.firstRunStarted {
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Last Checked with Immich")
-                        Text(snapshot.lastChecked.map { $0.formatted(.relative(presentation: .named)) } ?? String(localized: "Not yet"))
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Button("Check Again") { center.checkNow() }
-                        .buttonStyle(.bordered)
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Last Checked with Immich")
+                    Text(snapshot.lastChecked.map { $0.formatted(.relative(presentation: .named)) } ?? String(localized: "Not yet"))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
+                Spacer()
+                Button("Check Again") { center.checkNow() }
+                    .buttonStyle(.bordered)
             }
         } header: {
-            Text("Your Library and Immich")
+            Text("Checked with Immich")
         } footer: {
-            Text("Shared Albums and photos synced from a computer are not backed up. Verso checks each week that what it sent is still in Immich.")
+            Text("Verso checks each week that what it sent is still in Immich.")
         }
     }
 
     // MARK: Options
 
+    /// When photos go, and which go.
+    @ViewBuilder
     private var options: some View {
         let settings = center.settings
-        return Section {
+        Section {
             Toggle("Use Cellular for Photos", isOn: binding(BackupSettings.Key.cellularPhotos, settings.cellularPhotos))
             Toggle("Use Cellular for Videos", isOn: binding(BackupSettings.Key.cellularVideos, settings.cellularVideos))
             Toggle("Only While Charging", isOn: binding(BackupSettings.Key.onlyWhileCharging, settings.onlyWhileCharging))
+        } header: {
+            Text("Uploading")
+        } footer: {
+            Text("Low Data Mode is always respected. Only While Charging is for backing up on its own; Back Up Now goes at once.")
+        }
+        Section {
             Toggle("Screenshots", isOn: binding(BackupSettings.Key.screenshots, settings.screenshots))
             Toggle("Hidden Photos", isOn: binding(BackupSettings.Key.hiddenPhotos, settings.hiddenPhotos))
         } header: {
-            Text("Options")
+            Text("Included")
         } footer: {
-            Text("Low Data Mode is always respected. Only While Charging is for backing up on its own; Back Up Now goes at once. Hidden photos go to Immich's Locked Folder, never your timeline. iOS shows them to Verso only while Use Face ID is off for Photos' hidden album: Settings, Apps, Photos.")
+            Text("Hidden photos go to Immich's Locked Folder, never your timeline. iOS shows them to Verso only while Use Face ID is off for Photos' hidden album: Settings, Apps, Photos. Shared Albums and photos synced from a computer are never backed up.")
         }
     }
 
@@ -215,44 +208,7 @@ struct BackupPage: View {
         Binding(get: { value }, set: { center.set(key, $0) })
     }
 
-    // MARK: Stops
-
-    @ViewBuilder
-    private func stopped(_ stop: BackupStop, snapshot: BackupSnapshot) -> some View {
-        switch stop {
-        case .unauthorized:
-            Section {
-                Label("Sign in again to back up", systemImage: "person.crop.circle.badge.exclamationmark")
-            } footer: {
-                Text("Your Immich server no longer accepts this sign-in. Sign out and in again in your account; backing up goes on from where it stopped.")
-            }
-        case .notAllowed:
-            Section {
-                Label("Immich doesn't let Verso upload", systemImage: "hand.raised")
-            } footer: {
-                Text("Your Immich server refused: \(snapshot.stopReason ?? "no reason given"). An API key needs permission to upload as well as to read your library, and a proxy in front of Immich may refuse too. Sign in again with a key that has it, or try again once it is put right; backing up goes on from where it stopped.")
-            }
-        case .unreachable:
-            EmptyView()
-        case .full:
-            Section {
-                Label("Your Immich server is full", systemImage: "externaldrive.badge.exclamationmark")
-            } footer: {
-                Text("Backing up stopped. Verso tries again each day; free space on the server, or raise your quota.")
-            }
-        case .mostGone:
-            Section {
-                Label("Backing up stopped", systemImage: "exclamationmark.octagon")
-                Button("Check Again") { center.answerMostGone(.checkAgain) }
-                Button("Send Them Again") { confirmingMostGone = .sendAgain }
-                Button("Let Them Go", role: .destructive) { confirmingMostGone = .deleted }
-            } footer: {
-                if let mostGone = snapshot.mostGone {
-                    Text("\(mostGone.gone.formatted()) of the \(mostGone.of.formatted()) photos Verso backed up are gone from Immich at once. That looks like a problem with the server, such as another server or account, or its storage offline, rather than deletions. Nothing changes until you answer.")
-                }
-            }
-        }
-    }
+    // MARK: Most of the library gone
 
     private var mostGoneTitle: String {
         confirmingMostGone == .deleted ? "Let the photos gone from Immich go?" : "Send the photos gone from Immich again?"
@@ -262,75 +218,132 @@ struct BackupPage: View {
         Binding(get: { confirmingMostGone != nil }, set: { if !$0 { confirmingMostGone = nil } })
     }
 
-    // MARK: The lists
+    // MARK: On this iPhone
 
-    /// The groups, as the bar's colours sort them, each opening its photos: what needs the person (Needs a Look, In
-    /// Another Form, Missing from Immich), and what is left out on purpose (In Immich's Trash, Deleted in Immich, those
-    /// the person chose not to send).
-    @ViewBuilder
-    private func lists(_ tally: BackupTally, snapshot: BackupSnapshot) -> some View {
+    /// The bar's parts as rows, in its order and colours, each opening its photos: In Immich, To Upload, what needs the
+    /// person (Needs a Look, In Another Form, Missing from Immich), Left Out, and To Check.
+    private func photos(_ tally: BackupTally, snapshot: BackupSnapshot) -> some View {
         let toCheck = tally.total - tally.checked
-        if tally.toUpload > 0 || toCheck > 0 {
-            Section {
-                if tally.toUpload > 0 {
-                    NavigationLink {
-                        BackupPhotosPage(services: services, kind: .toUpload)
-                    } label: {
-                        LabeledContent("To Upload", value: BackupStatus.toGo(tally.toUpload, bytes: tally.toUploadBytes))
-                    }
-                }
-                link(.toCheck, count: toCheck)
-            } footer: {
-                if !snapshot.firstRunStarted {
-                    Text("Look through what goes before you say Start. Don't Send keeps a photo on this \(DeviceWords.model) alone, as one you deleted in Immich long ago and kept here: once Immich's trash is emptied, nothing tells it from a new photo.")
+        let leftOut = BackupLeftOutPage.count(tally, snapshot: snapshot)
+        return Section {
+            BackupGroupRow(title: String(localized: "In Immich"), value: tally.alreadyInImmich.formatted(), color: BackupBar.inImmich)
+            if tally.toUpload > 0 {
+                NavigationLink {
+                    BackupPhotosPage(services: services, kind: .toUpload)
+                } label: {
+                    BackupGroupRow(title: String(localized: "To Upload"), value: BackupStatus.toGo(tally.toUpload, bytes: tally.toUploadBytes),
+                                  color: BackupBar.toUpload)
                 }
             }
-        }
-        if tally.needsLook + tally.anotherForm + tally.missingFromImmich > 0 {
-            Section {
-                link(.needsLook, count: tally.needsLook)
-                link(.anotherForm, count: tally.anotherForm)
-                link(.missing, count: tally.missingFromImmich)
-            } header: {
-                Text("Needs a Look")
-            } footer: {
-                if tally.anotherForm > 0 {
-                    Text("\(tally.anotherForm.formatted()) look like they are in Immich already, in another form: taken at the same second under the same name, with other bytes, such as an export or an edit sent alone. They go only if you send them.")
-                } else if tally.missingFromImmich > 0 {
-                    Text("Photos Verso backed up that are no longer in Immich. Verso never sends one again without your yes.")
+            BackupGroupLink(services: services, kind: .needsLook, count: tally.needsLook, color: BackupBar.needsYou)
+            BackupGroupLink(services: services, kind: .anotherForm, count: tally.anotherForm, color: BackupBar.needsYou)
+            BackupGroupLink(services: services, kind: .missing, count: tally.missingFromImmich, color: BackupBar.needsYou)
+            if leftOut > 0 {
+                NavigationLink {
+                    BackupLeftOutPage(services: services)
+                } label: {
+                    BackupGroupRow(title: String(localized: "Left Out"), value: leftOut.formatted(), color: BackupBar.leftOut)
                 }
             }
-        }
-        if tally.inImmichTrash + tally.deletedInImmich + tally.skipped > 0 {
-            Section {
-                link(.trash, count: tally.inImmichTrash)
-                link(.deleted, count: tally.deletedInImmich)
-                link(.skipped, count: tally.skipped)
-            } header: {
-                Text("Left Out")
-            } footer: {
-                Text("Verso leaves these out on purpose: deleted in Immich, or kept off it by you. Nothing here is uploaded unless you say so.")
-            }
-        }
-    }
-
-    /// A group's row, opening its photos; none where it has none.
-    @ViewBuilder
-    private func link(_ kind: BackupPhotosPage.Kind, count: Int) -> some View {
-        if count > 0 {
-            NavigationLink {
-                BackupPhotosPage(services: services, kind: kind)
-            } label: {
-                LabeledContent(kind.title, value: count.formatted())
+            BackupGroupLink(services: services, kind: .toCheck, count: toCheck, color: BackupBar.toCheck)
+        } header: {
+            Text("On This \(DeviceWords.model) · \(BackupStatus.itemCount(tally.total))")
+        } footer: {
+            if !snapshot.firstRunStarted {
+                Text("Look through what goes before you say Start. Don't Send keeps a photo on this \(DeviceWords.model) alone, as one you deleted in Immich long ago and kept here: once Immich's trash is emptied, nothing tells it from a new photo.")
+            } else if tally.anotherForm > 0 {
+                Text("\(tally.anotherForm.formatted()) look like they are in Immich already, in another form: taken at the same second under the same name, with other bytes, such as an export or an edit sent alone. They go only if you send them.")
+            } else if tally.missingFromImmich > 0 {
+                Text("Photos Verso backed up that are no longer in Immich. Verso never sends one again without your yes.")
             }
         }
     }
 }
 
-/// The page's top: a symbol, what goes on and one line on it; the bar for the whole library with its legend; and the
-/// one action the moment needs (Turn On Backup, Start, Back Up Now, Try Now), with a word under it where it helps.
+/// A part of the library as a row: the bar's colour, its name and its count.
+private struct BackupGroupRow: View {
+    let title: String
+    let value: String
+    let color: Color
+
+    var body: some View {
+        LabeledContent {
+            Text(value)
+                .monospacedDigit()
+        } label: {
+            Label {
+                Text(title)
+            } icon: {
+                Circle().fill(color).frame(width: 10, height: 10)
+            }
+        }
+    }
+}
+
+/// A group's row, opening its photos; none where it has none.
+private struct BackupGroupLink: View {
+    let services: AccountServices
+    let kind: BackupPhotosPage.Kind
+    let count: Int
+    var color: Color?
+
+    var body: some View {
+        if count > 0 {
+            NavigationLink {
+                BackupPhotosPage(services: services, kind: kind)
+            } label: {
+                if let color {
+                    BackupGroupRow(title: kind.title, value: count.formatted(), color: color)
+                } else {
+                    LabeledContent(kind.title, value: count.formatted())
+                }
+            }
+        }
+    }
+}
+
+/// Left Out: what Verso leaves out on purpose, each group opening its photos, and the screenshots left out while
+/// Screenshots is off.
+private struct BackupLeftOutPage: View {
+    let services: AccountServices
+
+    private var center: BackupCenter { BackupCenter.shared }
+
+    /// How many are left out, the screenshots included.
+    static func count(_ tally: BackupTally, snapshot: BackupSnapshot) -> Int {
+        tally.inImmichTrash + tally.deletedInImmich + tally.skipped + snapshot.screenshotsLeftOut
+    }
+
+    var body: some View {
+        let snapshot = center.snapshot
+        let tally = snapshot.tally
+        List {
+            Section {
+                BackupGroupLink(services: services, kind: .trash, count: tally.inImmichTrash)
+                BackupGroupLink(services: services, kind: .deleted, count: tally.deletedInImmich)
+                BackupGroupLink(services: services, kind: .skipped, count: tally.skipped)
+                if snapshot.screenshotsLeftOut > 0 {
+                    LabeledContent("Screenshots", value: snapshot.screenshotsLeftOut.formatted())
+                }
+            } footer: {
+                Text("Verso leaves these out on purpose: deleted in Immich, or kept off it by you. Nothing here is uploaded unless you say so. Screenshots go once Screenshots is on, under Included.")
+            }
+        }
+        .overlay {
+            if Self.count(tally, snapshot: snapshot) == 0 {
+                ContentUnavailableView("None", systemImage: "checkmark.circle")
+            }
+        }
+        .navigationTitle("Left Out")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+/// The page's top: a symbol, what goes on and one line on it, an error that has lasted; the bar for the whole library;
+/// and the one action the moment needs (Turn On Backup, Start, Back Up Now, Try Now), with a word under it where it
+/// helps, or, with most of the library gone from Immich, the three answers.
 private struct BackupHead: View {
-    enum Action { case turnOn, openSettings, start, backUpNow }
+    enum Action { case turnOn, openSettings, start, backUpNow, checkAgain, sendAgain, letGo }
 
     let snapshot: BackupSnapshot
     let settings: BackupSettings
@@ -352,6 +365,12 @@ private struct BackupHead: View {
                 if let line = words.line {
                     Text(line)
                         .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                if let error = snapshot.error {
+                    Label(error, systemImage: "exclamationmark.triangle")
+                        .font(.footnote)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                 }
@@ -377,6 +396,21 @@ private struct BackupHead: View {
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                 }
+            }
+            if snapshot.phase == .stopped(.mostGone) {
+                Button {
+                    act(.checkAgain)
+                } label: {
+                    Text("Check Again").frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.glassProminent)
+                .controlSize(.large)
+                HStack(spacing: 12) {
+                    Button { act(.sendAgain) } label: { Text("Send Them Again").frame(maxWidth: .infinity) }
+                    Button(role: .destructive) { act(.letGo) } label: { Text("Let Them Go").frame(maxWidth: .infinity) }
+                }
+                .buttonStyle(.glass)
+                .controlSize(.large)
             }
         }
     }
@@ -469,83 +503,72 @@ private struct BackupHead: View {
             return Words(symbol: "icloud", tint: .secondary, headline: String(localized: "Waiting for Immich"),
                          line: String(localized: "Uploads failed several times in a row, so Verso waits rather than reading photo after photo for nothing. It tries again \(again), and when the connection changes."))
         case .stopped(.unauthorized):
-            return Words(symbol: "exclamationmark.icloud", tint: .orange, headline: String(localized: "Sign in again"))
+            return Words(symbol: "exclamationmark.icloud", tint: .orange, headline: String(localized: "Sign in again"),
+                         line: String(localized: "Your Immich server no longer accepts this sign-in. Sign out and in again in your account; backing up goes on from where it stopped."))
         case .stopped(.notAllowed):
-            return Words(symbol: "exclamationmark.icloud", tint: .orange, headline: String(localized: "Immich doesn't let Verso upload"))
+            let reason = snapshot.stopReason ?? String(localized: "no reason given")
+            return Words(symbol: "exclamationmark.icloud", tint: .orange, headline: String(localized: "Immich doesn't let Verso upload"),
+                         line: String(localized: "Your Immich server refused: \(reason). An API key needs permission to upload as well as to read your library, and a proxy in front of Immich may refuse too. Sign in again with a key that has it, or try again once it is put right; backing up goes on from where it stopped."))
         case .stopped(.full):
-            return Words(symbol: "exclamationmark.icloud", tint: .orange, headline: String(localized: "Your server is full"))
+            return Words(symbol: "exclamationmark.icloud", tint: .orange, headline: String(localized: "Your server is full"),
+                         line: String(localized: "Backing up stopped. Verso tries again each day; free space on the server, or raise your quota."))
         case .stopped(.mostGone):
-            return Words(symbol: "exclamationmark.icloud", tint: .orange, headline: String(localized: "Most of your backup is gone from Immich"))
+            let line = snapshot.mostGone.map { mostGone in
+                String(localized: "\(mostGone.gone.formatted()) of the \(mostGone.of.formatted()) photos Verso backed up are gone from Immich at once. That looks like a problem with the server, such as another server or account, or its storage offline, rather than deletions. Nothing changes until you answer.")
+            }
+            return Words(symbol: "exclamationmark.icloud", tint: .orange, headline: String(localized: "Most of your backup is gone from Immich"),
+                         line: line)
         }
     }
 }
 
-/// One bar for the whole library, split by what each photo is waiting for, as iPhone Storage splits the device, with
-/// a legend of each part and its count: In Immich (green), To upload (the accent, with its size), Needs a look (orange:
-/// the person's call, also photos in another form or missing from Immich), Left out (on purpose: in Immich's trash,
-/// deleted in Immich, or kept off it by the person) and To check (grey). A part with none is left out of the legend, but In Immich and To upload.
-private struct BackupBar: View {
+/// One bar for the whole library, split by what each photo is waiting for, as iPhone Storage splits the device: In Immich
+/// (green), To upload (the accent), Needs a look (orange: the person's call, also photos in another form or missing from
+/// Immich), Left out (on purpose: in Immich's trash, deleted in Immich, or kept off it by the person) and To check
+/// (grey). The page's On This iPhone has its parts as rows, in the same colours, so the bar needs no legend.
+struct BackupBar: View {
+    static let inImmich = Color.green
+    static let toUpload = Color.accentColor
+    static let needsYou = Color.orange
+    static let leftOut = Color(.systemGray)
+    static let toCheck = Color(.systemGray4)
+
     let tally: BackupTally
 
     private struct Part: Identifiable {
-        var id: String { label }
-        var label: String
+        var id: Int
         var count: Int
-        var value: String
         var color: Color
     }
 
     private var parts: [Part] {
         let needsYou = tally.needsLook + tally.anotherForm + tally.missingFromImmich
         let leftAsIs = tally.skipped + tally.deletedInImmich + tally.inImmichTrash
-        let toCheck = tally.total - tally.checked
         return [
-            Part(label: String(localized: "In Immich"), count: tally.alreadyInImmich, value: tally.alreadyInImmich.formatted(),
-                 color: .green),
-            Part(label: String(localized: "To upload"), count: tally.toUpload,
-                 value: tally.toUploadBytes > 0 ? "\(tally.toUpload.formatted()) · \(tally.toUploadBytes.formatted(.byteCount(style: .file)))"
-                     : tally.toUpload.formatted(), color: .accentColor),
-            Part(label: String(localized: "Needs a look"), count: needsYou, value: needsYou.formatted(), color: .orange),
-            Part(label: String(localized: "Left out"), count: leftAsIs, value: leftAsIs.formatted(), color: Color(.systemGray)),
-            Part(label: String(localized: "To check"), count: toCheck, value: toCheck.formatted(), color: Color(.systemGray4)),
+            Part(id: 0, count: tally.alreadyInImmich, color: Self.inImmich),
+            Part(id: 1, count: tally.toUpload, color: Self.toUpload),
+            Part(id: 2, count: needsYou, color: Self.needsYou),
+            Part(id: 3, count: leftAsIs, color: Self.leftOut),
+            Part(id: 4, count: tally.total - tally.checked, color: Self.toCheck),
         ]
     }
 
     var body: some View {
-        let parts = parts
-        let shown = parts.enumerated().filter { $0.offset < 2 || $0.element.count > 0 }.map(\.element)
-        VStack(alignment: .leading, spacing: 10) {
-            GeometryReader { geometry in
-                let filled = parts.filter { $0.count > 0 }
-                let gaps = CGFloat(max(0, filled.count - 1)) * 2
-                HStack(spacing: 2) {
-                    ForEach(filled) { part in
-                        Rectangle()
-                            .fill(part.color)
-                            .frame(width: max(3, (geometry.size.width - gaps) * CGFloat(part.count) / CGFloat(max(tally.total, 1))))
-                    }
-                }
-                .frame(width: geometry.size.width, alignment: .leading)
-            }
-            .frame(height: 10)
-            .clipShape(.capsule)
-            .accessibilityHidden(true)
-            LazyVGrid(columns: [GridItem(.flexible(), alignment: .leading), GridItem(.flexible(), alignment: .leading)],
-                      alignment: .leading, spacing: 6) {
-                ForEach(shown) { part in
-                    HStack(spacing: 6) {
-                        Circle().fill(part.color).frame(width: 8, height: 8)
-                        Text(part.label)
-                        Text(part.value)
-                            .foregroundStyle(.secondary)
-                            .monospacedDigit()
-                    }
-                    .font(.footnote)
-                    .accessibilityElement(children: .combine)
-                    .accessibilityIdentifier(part.label)
+        GeometryReader { geometry in
+            let filled = parts.filter { $0.count > 0 }
+            let gaps = CGFloat(max(0, filled.count - 1)) * 2
+            HStack(spacing: 2) {
+                ForEach(filled) { part in
+                    Rectangle()
+                        .fill(part.color)
+                        .frame(width: max(3, (geometry.size.width - gaps) * CGFloat(part.count) / CGFloat(max(tally.total, 1))))
                 }
             }
+            .frame(width: geometry.size.width, alignment: .leading)
         }
+        .frame(height: 10)
+        .clipShape(.capsule)
+        .accessibilityHidden(true)
     }
 }
 

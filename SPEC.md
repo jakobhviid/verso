@@ -1156,9 +1156,9 @@ Its words name the device as Apple's do: "This iPhone" here reads "This iPad" on
   sheet (a Backup row saying how it stands: "Off", "Checking with Immich…", "Up to Date"), a notification, a Live
   Activity. Backing up is switched on there (**Turn On Backup**, which asks for the whole photo library and for
   notifications, then starts the check on the same page) and off there (**Turn Off Backup**, at its foot, which asks
-  first: "Nothing is deleted, on this iPhone or in Immich"). Its **Options:** Use Cellular for Photos and Use Cellular
-  for Videos (off), Only While Charging (off, for backing up on its own), and Screenshots (on). They are this device's
-  own.
+  first: "Nothing is deleted, on this iPhone or in Immich"). Its options: Use Cellular for Photos and Use Cellular
+  for Videos (off), Only While Charging (off, for backing up on its own), Screenshots (on) and Hidden Photos. They are
+  this device's own.
 - **The Library's card,** while backing up is off on the account's own server: "Back Up This iPhone" above the tab bar,
   by the newest photos, with **Set Up** (the Backup page) and **Not Now**, which hides it on this device for good.
 - **What goes:** the photo library's own photos and videos, every burst frame, each with all its parts (the original, a
@@ -1186,31 +1186,35 @@ Its words name the device as Apple's do: "This iPhone" here reads "This iPad" on
   asked whether it holds each asset Verso made under Verso's fingerprint (a part it does not arrived otherwise than it
   was sent, and its photo needs a look), then stacks (an edit with its original, RAW+JPEG, a burst) and, on the assets
   Verso made, the date and place Photos has where the file says otherwise.
-- **The Backup page:**
+- **The Backup page,** each section one subject, what needs the person first:
   - **Its top:** a symbol, what goes on ("Checking with Immich", "Ready to back up", "Backing up", "Backed up") and
     one line on it ("1,205 of 3,523 checked", "69 items · 403 MB to go", "3,454 of 3,523 in Immich", or what it waits
-    for); one bar for the whole library with its legend (In Immich, To upload with its size, Needs a look, Left out,
-    To check, each with its count); and the action of the moment: Turn On Backup, Start, Back Up Now, or Try Now.
+    for); one bar for the whole library, in the colours of the rows under it; and the action of the moment: Turn On
+    Backup, Start, Back Up Now, or Try Now. A stop is said there, with what can be done (below), and so is an error
+    that has lasted an hour.
+  - **Uploading** (Use Cellular for Photos, Use Cellular for Videos, Only While Charging) and **Included**
+    (Screenshots, Hidden Photos, and what is never backed up: Shared Albums, photos synced from a computer): under the
+    top until the first run's Start, as what is included changes what goes, and near the foot after it.
+  - **On This iPhone,** with the number of items backing up covers: the bar's parts as rows, each with its colour and
+    count, opening its photos, with Select for several at once. **In Immich**; **To Upload** (Don't Send), before Start
+    and after; what needs the person: **Needs a Look** (each with its reason, Retry and Don't Send), **In Immich in
+    Another Form** (Send, Skip), **Missing from Immich** (Send Again, Let Go); **Left Out**, on purpose, nothing of it
+    uploaded unless the person says so, a page of its own: **In Immich's Trash** (deleted in Immich and in its trash
+    for up to 30 days; restored there, not uploaded again, which would undo the deletion), **Deleted in Immich** (Send
+    Again), **You Chose Not to Send** (Send), and the screenshots while Screenshots is off; and **To Check** (Don't
+    Send), each photo saying what it waits for and when it is tried again.
   - **On Its Way:** the photos waiting or uploading, newest first, from the phone, each with its mark (a ring filling
     while it uploads, a cloud with an upward arrow while it waits, a clock while the connection holds it back, an
     exclamation mark when it needs a look), a tap opening one from the phone to see or share it, and **Show All** when
     there are more.
-  - **The groups,** as the bar's colours sort them, each opening its photos, with Select for several at once. **To
-    Upload** (Don't Send), before Start and after, and **To Check** (Don't Send), each photo saying what it waits for
-    and when it is tried again. Needs a Look: **Needs a Look** (each with its reason, Retry and Don't Send), **In Immich
-    in Another Form** (Send, Skip), **Missing from Immich** (Send Again, Let Go). Left Out, on purpose, nothing of it
-    uploaded unless the person says so: **In Immich's Trash** (deleted in Immich and in its trash for up to 30 days;
-    restored there, not uploaded again, which would undo the deletion), **Deleted in Immich** (Send Again), **You Chose
-    Not to Send** (Send).
-  - **Your Library and Immich:** On This iPhone (every item backing up covers), Sent by Verso, Screenshots Left Out
-    (while they are), and Last Checked with Immich with **Check Again**; what is not backed up (Shared Albums, photos
-    synced from a computer).
+  - **Free Up Space,** a row with what is ready to free ("2.3 GB to Free"), opening its page (below).
+  - **Checked with Immich:** Sent by Verso, and Last Checked with Immich with **Check Again**.
   - **What it waits for,** said calmly, as Verso goes on by itself: "Waiting for Wi-Fi", "Waiting for a connection",
     "Paused for Low Data Mode", "1 waits, trying again at 11:35" ("3 still to check, …"), "Waiting for Immich" (also
     after five uploads in a row failed, with when it tries again, and Try Now), "Needs 1.2 GB free on this iPhone".
-  - **The stops,** which only the person can put right: sign in again; "Immich doesn't let Verso upload", with
-    Immich's reason and Try Now; "Your Immich server is full", tried daily, and Try Now; most of the library gone, with
-    Check Again, Send Them Again and Let Them Go.
+  - **The stops,** which only the person can put right, said in the top with their actions: sign in again; "Immich
+    doesn't let Verso upload", with Immich's reason and Try Now; "Your Immich server is full", tried daily, and Try
+    Now; most of the library gone, with Check Again, Send Them Again and Let Them Go.
 - **Needs a Look** is for what Verso could not do by itself: a file Immich refused (with its reason), a part that could
   not be read for three days (five tries at least), an upload that arrived otherwise than it was sent. A read that fails
   is tried again quietly until then, the photo still to check.
@@ -1236,7 +1240,7 @@ Its words name the device as Apple's do: "This iPhone" here reads "This iPad" on
   upload as `isFavorite`, or set on Immich's asset afterwards), and is deleted from the phone, which iOS asks about,
   after which it never uploads; Add to Album, Archive and Rating wait, saying "On its way". In a selection it is shared
   and deleted with the rest, and Immich's actions leave it out and say so.
-- **Free Up Space:** on the Backup page, **Space on This iPhone**: **Keep on This iPhone** (Forever, the default; 1
+- **Free Up Space:** a page of its own, from its row on the Backup page: **Keep on This iPhone** (Forever, the default; 1
   Month, 3 Months, 6 Months, 1 Year, 2 Years), which asks the first time what deleting means with iCloud Photos and a
   Shared Library, and says what Always Keep keeps; **Review and Free Up 2.3 GB** ("412 items older than 6 months, safe
   in Immich"); **Always Keep** with what it keeps ("Favorites, 2 Albums"): Favorites (on; the favourites as Photos has
@@ -1258,7 +1262,7 @@ Its words name the device as Apple's do: "This iPhone" here reads "This iPad" on
   once a gigabyte or more is ready; after either, again a month later, or sooner once another gigabyte is ready. While
   Keep on This iPhone is Forever and the phone runs short of space (under 5 GB free, or under a tenth of it): "iPhone
   Storage Almost Full" ("8.3 GB of photos and videos older than a year are safe in Immich.") with Not Now and Free Up
-  Space, which opens Space on This iPhone, where the same is said, to choose a period; after either, again in three
+  Space, which opens Free Up Space's page, where the same is said, to choose a period; after either, again in three
   months. Verso never chooses a period itself.
   - **The Library's line** at its newest end, while backing up is up to date: "3,525 Items · Backed Up", or "· 2.3 GB to
   Free" in the tint with a period chosen and photos to free; a tap opens the Backup page, or the review where there is

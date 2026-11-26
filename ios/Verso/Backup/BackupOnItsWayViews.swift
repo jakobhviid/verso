@@ -1,4 +1,4 @@
-// On Its Way, at the top of the Backup page (ROADMAP.md, M10, "Backing the iPhone up"): the photos waiting or
+// On Its Way, on the Backup page (ROADMAP.md, M10, "Backing the iPhone up"): the photos waiting or
 // uploading, newest first, read from the backup's store and shown from the phone (BackupPhoneTile), each with its
 // state's mark. A tap opens the photo from the phone (PhoneViewer), where it can be shared at once. The page shows the
 // newest few rows; Show All opens every one in a grid of its own, read a page at a time.
@@ -36,8 +36,6 @@ struct BackupOnItsWaySection: View {
         } header: {
             Text("On Its Way")
                 .accessibilityIdentifier("On Its Way")
-        } footer: {
-            Text("Newest first, from this \(DeviceWords.model). Tap one to see or share it now.")
         }
     }
 
