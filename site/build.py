@@ -347,13 +347,14 @@ def main(releases_file, output, app_store=None, testflight=TESTFLIGHT):
             f'<p>Or try the next version first, in <a href="{html.escape(testflight)}">TestFlight</a>.</p>'
             if testflight and app_store else "",
             f'<p><a class="button" href="{html.escape(testflight)}">Join the beta in TestFlight</a></p>'
-            '<p class="small">Install Apple\'s TestFlight app, open the link on the iPhone or the iPad, and accept.</p>'
+            '<p class="small">Install Apple\'s TestFlight app, open the link on the iPhone or the iPad, and accept. On '
+            'an Apple TV signed in to the same Apple Account, Verso is then in its TestFlight app too.</p>'
             if testflight and not app_store else "",
         ])
     else:
         ios = (
             '<p><span class="status soon">Coming</span></p>'
-            '<p>Verso for the iPhone and the iPad will come through TestFlight first, then the App Store.</p>'
+            '<p>Verso for the iPhone, the iPad and the Apple TV will come through TestFlight first, then the App Store.</p>'
         )
 
     values = {

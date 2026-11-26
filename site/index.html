@@ -12,13 +12,13 @@
     try { const chosen = localStorage.getItem("appearance"); if (chosen) document.documentElement.dataset.theme = chosen; } catch {}
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Verso for Immich: your Immich library in a native app on the iPhone, the iPad, the Mac and Linux</title>
-  <meta name="description" content="Verso is a native app for a self-hosted Immich library on the iPhone, the iPad, the Mac and the Linux desktop: browse, search, organise and share it, back your phone up to it, and keep the whole library as a drive in Files or Finder. Free and MIT licensed. Unofficial and independent.">
+  <title>Verso for Immich: your Immich library in a native app on the iPhone, the iPad, the Apple TV, the Mac and Linux</title>
+  <meta name="description" content="Verso is a native app for a self-hosted Immich library on the iPhone, the iPad, the Apple TV, the Mac and the Linux desktop: browse, search, organise and share it, back your phone up to it, and keep the whole library as a drive in Files or Finder. Free and MIT licensed. Unofficial and independent.">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#e8edf3" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#181b21" media="(prefers-color-scheme: dark)">
   <meta property="og:title" content="Verso for Immich">
-  <meta property="og:description" content="Your Immich library in a native app on the iPhone, the iPad, the Mac and the Linux desktop. Unofficial and independent.">
+  <meta property="og:description" content="Your Immich library in a native app on the iPhone, the iPad, the Apple TV, the Mac and the Linux desktop. Unofficial and independent.">
   <meta property="og:image" content="{{page}}social-preview.png">
   <meta property="og:url" content="{{page}}">
   <meta name="twitter:card" content="summary_large_image">
@@ -64,11 +64,12 @@
         <div class="pitch">
           <h1>Your Immich library, at home on every device.</h1>
           <p class="lead">Browse, search, organise and share your photos, back your phone up, and, when you want it, keep
-            the whole library as a drive in Files or Finder. One app, made natively for the iPhone, the iPad, the Mac
-            and the Linux desktop.</p>
+            the whole library as a drive in Files or Finder. One app, made natively for the iPhone, the iPad, the
+            Apple TV, the Mac and the Linux desktop.</p>
           <ul class="chips" aria-label="Platforms">
             <li><picture><img src="icon-ios.png" alt="" width="22" height="22"></picture>iPhone</li>
             <li><picture><img src="icon-ios.png" alt="" width="22" height="22"></picture>iPad</li>
+            <li><picture><img src="icon-ios.png" alt="" width="22" height="22"></picture>Apple TV</li>
             <li><picture><img src="icon-mac.png" alt="" width="22" height="22"></picture>Mac</li>
             <li><picture><img src="icon-linux.svg" alt="" width="22" height="22"></picture>Linux</li>
           </ul>
@@ -92,7 +93,7 @@
   <main>
     <section id="platforms" class="wrap">
       <header class="heading">
-        <p class="eyebrow"><span class="ring" aria-hidden="true"></span>One app, four homes</p>
+        <p class="eyebrow"><span class="ring" aria-hidden="true"></span>One app, five homes</p>
         <h2>Made with each platform's own toolkit</h2>
         <p class="intro">Verso looks and moves as the apps around it do, because it is made with what they are made
           with. Underneath, every platform shares one core in Rust: the Immich client, the drive's layout and the
@@ -113,6 +114,14 @@
             <h3><picture><img src="icon-ios.png" alt="" width="40" height="40"></picture>iPad{{ios_status}}</h3>
             <p>Laid out as Photos is on the iPad, with the keyboard's commands in the menu bar, the pointer's effects,
               and drag and drop between apps.</p>
+          </div>
+        </article>
+        <article class="print platform" id="on-tv">
+          <div class="shot wide">{{shot tv-places|Verso on the Apple TV: Places, a card for each country with its cities}}</div>
+          <div class="about">
+            <h3><picture><img src="icon-ios.png" alt="" width="40" height="40"></picture>Apple TV{{ios_status}}</h3>
+            <p>Your library from the sofa: memories as stories, albums, people and places, and the newest photos on the
+              Top Shelf. Set up from your iPhone, with a key that may only look.</p>
           </div>
         </article>
         <article class="print platform" id="on-mac">
@@ -275,7 +284,7 @@
         </article>
         <article class="print get" id="get-ios">
           <h3><picture><img src="icon-ios.png" alt="" width="48" height="48"></picture>
-            <span>iPhone and iPad<small>iOS and iPadOS 26.1 or later</small></span><span class="yours">Your system</span></h3>
+            <span>iPhone, iPad and Apple TV<small>iOS and iPadOS 26.1, tvOS 26 or later</small></span><span class="yours">Your system</span></h3>
           {{ios}}
         </article>
       </div>

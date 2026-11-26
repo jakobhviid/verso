@@ -2,7 +2,7 @@
 
 # Verso for Immich
 
-**Your [Immich](https://immich.app) library in a native app on the iPhone, the iPad, the Mac and the Linux desktop:
+**Your [Immich](https://immich.app) library in a native app on the iPhone, the iPad, the Apple TV, the Mac and the Linux desktop:
 browse, search, organise and share it, back your phone up to it, and, when you want it, keep the whole library as a
 drive in Files or Finder.**
 
@@ -13,7 +13,7 @@ drive in Files or Finder.**
 ![Verso's Library by year, with the date scroller along its edge](docs/screenshots/verso-library.png)
 
 Verso is one app, made natively for each platform it runs on: with SwiftUI and UIKit on the iPhone and the iPad, where
-it looks and moves as Photos does; with SwiftUI and AppKit on the Mac; and with GTK 4 and libadwaita on Linux, made
+it looks and moves as Photos does; with SwiftUI on the Apple TV; with SwiftUI and AppKit on the Mac; and with GTK 4 and libadwaita on Linux, made
 for GNOME. Underneath, the platforms share one core in Rust: the Immich client, the drive's layout and the arithmetic
 that places the grid's dates, so they behave alike.
 
@@ -21,7 +21,7 @@ that places the grid's dates, so they behave alike.
 |---|---|
 | Linux, x86_64 (GNOME) | Released as 0.x builds: Homebrew, rpm and deb packages, and a Flatpak and an AppImage test build (below) |
 | Mac (macOS 15 or later) | Released as 0.x builds: a signed and notarized disk image from [Verso's page](https://jakob.hviid.phd/verso/), or `brew install --cask jakobhviid/tap/verso`; it updates itself |
-| iPhone and iPad | In beta through [TestFlight](https://testflight.apple.com/join/7z1ppMM8); the App Store after it |
+| iPhone, iPad and Apple TV | In beta through [TestFlight](https://testflight.apple.com/join/7z1ppMM8); the App Store after it |
 
 ## What it does
 
@@ -49,6 +49,9 @@ that places the grid's dates, so they behave alike.
 - **Free Up Space** offers to remove photos from the phone once they are safely in Immich and old enough, never
   without asking, and keeps your favorites, the albums you choose and anything recent.
 - **Verso in Messages:** pick a photo from your library straight into a message.
+
+**On the Apple TV:** your library from the sofa, memories as stories, and today's memories and the newest photos on the
+Top Shelf. It is set up from the iPhone, with a key that may only look, and changes nothing.
 
 **On the Mac:** widgets with your photos, Shortcuts actions, and an icon in the menu bar.
 

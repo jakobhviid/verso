@@ -1,17 +1,18 @@
 # Verso for Immich
 
-> Verso is a native app for a self-hosted Immich photo library on the iPhone, the iPad, the Mac and the Linux desktop (GNOME): browse, search, organise and share the library, back the phone up to it, and keep the whole library as a drive in Files or Finder (Verso Drive). Free, MIT licensed. Unofficial and independent.
+> Verso is a native app for a self-hosted Immich photo library on the iPhone, the iPad, the Apple TV, the Mac and the Linux desktop (GNOME): browse, search, organise and share the library, back the phone up to it, and keep the whole library as a drive in Files or Finder (Verso Drive). Free, MIT licensed. Unofficial and independent.
 
 Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO. "Immich" is used only to describe the server this software works with, and remains the mark of its owner. Verso is one of the software projects by Jakob Hviid, all listed at https://jakob.hviid.phd/software/ (for LLMs: https://jakob.hviid.phd/llms.txt).
 
 ## What it does
 
-- **One app, native on each platform**: SwiftUI and UIKit on the iPhone and the iPad, where it looks and moves as Photos does; SwiftUI and AppKit on the Mac; GTK 4 and libadwaita on Linux, made for GNOME. The platforms share one core in Rust: the Immich client, the drive's layout and the arithmetic that places the grid's dates.
+- **One app, native on each platform**: SwiftUI and UIKit on the iPhone and the iPad, where it looks and moves as Photos does; SwiftUI on the Apple TV; SwiftUI and AppKit on the Mac; GTK 4 and libadwaita on Linux, made for GNOME. The platforms share one core in Rust: the Immich client, the drive's layout and the arithmetic that places the grid's dates.
 - **The whole library**: the timeline by year, by month or every photo, with a date scroller; albums, people, places and the map, memories, tags, folders, shared links, partners, duplicates, the archive, the trash and the Locked Folder.
 - **Search** by what photos show, by text in them, by file name or description, narrowed by people, places, dates and cameras.
 - **Organise and share**: favorites, albums, stacks, dates and locations; albums shared with people and by link; imports from the device.
 - **Verso Drive**, off until switched on: the library as folders (Photos, Albums, People, Places, Upload) in Files on Linux, the iPhone and the iPad, and in Finder on the Mac. Thumbnails come from the server; originals download only when something opens them; files copied into Upload are uploaded.
 - **On the iPhone and the iPad**: backing up to Immich in the background (Live Photos, edits, favorites, hidden photos into the Locked Folder), Free Up Space (removes photos from the phone once Immich holds them whole, only after a review), and Verso in Messages.
+- **On the Apple TV**: the library from the sofa (the timeline, albums, people, places, memories as stories, favorites and the archive), today's memories and the newest photos on the Top Shelf, set up from the iPhone with a read-only key; it changes nothing.
 - **Sign-in** with the server's single sign-on, email and password, or an API key, kept in the system's keyring or Keychain.
 - **Immich Crosslink** on the Mac and Linux: Show in opens the same photo, album, person or place in another Immich app that takes part.
 
@@ -21,7 +22,7 @@ Needs an Immich server, v3.2 or later.
 
 - **Linux** (x86_64, GNOME 49's libraries or newer: Fedora 43+, Ubuntu 25.10 and 26.04 LTS, Debian 14, Arch): `brew install jakobhviid/tap/verso`, or the tarball, and the Flatpak and AppImage test builds (without Verso Drive, for older systems such as Ubuntu 24.04) from the releases: https://github.com/jakobhviid/verso/releases/latest
 - **Mac** (macOS 15 or later): a signed and notarized disk image from this page, or `brew install --cask jakobhviid/tap/verso`; it updates itself with Sparkle.
-- **iPhone and iPad** (iOS and iPadOS 26.1 or later): in beta through TestFlight, https://testflight.apple.com/join/7z1ppMM8; the App Store after it.
+- **iPhone, iPad and Apple TV** (iOS and iPadOS 26.1, tvOS 26 or later): in beta through TestFlight, https://testflight.apple.com/join/7z1ppMM8; the App Store after it.
 
 ## Privacy
 
