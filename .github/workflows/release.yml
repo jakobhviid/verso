@@ -34,7 +34,8 @@ jobs:
       - name: Build dependencies
         run: |
           dnf install -y -q git gcc cargo rust gtk4-devel libadwaita-devel libshumate-devel blueprint-compiler \
-            python3 binutils gh flatpak flatpak-builder podman zsync
+            python3 binutils gh flatpak flatpak-builder podman \
+            gstreamer1-plugins-base gstreamer1-plugins-good glib-networking dconf adwaita-icon-theme zsync curl zsync
       - uses: actions/checkout@v5
         with:
           # The whole history and the tags: ci/version.sh numbers the tree from them.
