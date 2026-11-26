@@ -737,6 +737,8 @@ maintainer before it is built there:
 - **`CACHEDIR.TAG` out of sight in Files:** a `.hidden` file in the drive's root naming it, which Files honours.
 - **Check for Updates in the tray's menu,** for the rpm's and the deb's installs, which look for releases.
 - **What quitting from the tray does to Verso Drive,** beside the Mac's disconnecting it until Verso runs again.
+- **The menus' icons:** Linux's menus do not show the icons the Mac's do beside their items; which items carry one,
+  and Adwaita's symbolic icon for each, matched to the Mac's.
 
 ## Package repositories
 
