@@ -1322,7 +1322,8 @@ packets silently rather than refusing.
   and on the window's Try Now (`CheckNow`) and the menu's **Try Again Now** (`daemon::check_now`). A refused
   connection shows within 10 seconds, dropped packets within the poll's 25-second limit. The server answering again
   turns the state back without a notification. The states: SPEC.md, "The daemon's D-Bus interface".
-- **The top bar's icon** (`tray::icon_for`) speaks the sync apps' shared iconography (Nextcloud, OneDrive, Dropbox):
+- **The top bar's icon** (`tray::icon_for`) is the app icon's lens alone, as the Mac's menu bar icon, and speaks the
+  sync apps' shared iconography (Nextcloud, OneDrive, Dropbox):
   faded and struck through while the server cannot be reached, faded with a key while it refuses the sign-in, a pause
   badge while Verso Drive is on and unmounted; a problem shows before a choice. In colour (`tray.colour`) the lens's
   ring has Immich's five colours, which the faded states lose, so the colour itself says the server is out of reach;
@@ -3358,10 +3359,10 @@ this project as SVG by a script of our own, and is MIT like the rest. DESIGN.md,
   app icon's designs on Linux"), the Mac in Settings for the Dock, both looks free, and the iPhone and the iPad as
   alternate icons, a design and its lens, Day and Night ("The app icon's designs on the Mac, the iPhone and the iPad").
   The looks are drawn by the script, never by hand, so a change to the drawing reaches all 28.
-- **The symbolic icon** is the print as one solid shape with the lens, the line on its strip and the turned corner cut
-  out (`dev.hviid.Verso-symbolic.svg`), for the tray, notifications and Files' sidebar. The tray's states are
-  variants of it, in one colour and in colour ("When the server cannot be reached"). `linux/packaging/icons/sources/`
-  draws both, and the tray's states.
+- **The symbolic icon** is the app icon's lens alone (`dev.hviid.Verso-symbolic.svg`), as the Mac's menu bar icon and
+  Finder's sidebar symbol, for the tray, notifications and Files' sidebar. The tray's states are variants of it, in one
+  colour and in colour ("When the server cannot be reached"), drawn as plain shapes, since GTK recolours a symbolic
+  icon's every fill: `linux/packaging/icons/sources/states.py` draws them all.
 - **Verso Drive has an icon of its own,** the app's with a drive's badge in its corner (`dev.hviid.Verso.Drive`,
   `Product::drive_icon`), on its volume, its folder and its Crosslink entry, so a dock showing mounted drives does not
   show two Verso icons alike. Files shows it by the ways it offers ("The drive's icon").
