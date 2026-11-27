@@ -26,6 +26,15 @@ die() {
     exit 1
 }
 
+# The manifest with the source archive's checksum beside its path, so flatpak-builder's cache, kept between releases,
+# takes a changed source for a new one: by its path alone, it built the previous release's again.
+with_source_checksum() {
+    local manifest=$1 archive=$2 sum
+    sum=$(sha256sum "$archive" | cut -d' ' -f1)
+    sed -i "s|^\( *\)path: verso-source.tar.gz\$|&\n\1sha256: $sum|" "$manifest"
+    grep -q "sha256: $sum" "$manifest" || die "no source archive path in $manifest"
+}
+
 # The source as HEAD has it, with the version it builds as, in the layout flatpak/source-archive.sh gives.
 committed_source() {
     local out=$1 stage
@@ -66,6 +75,7 @@ inside() {
     mkdir -p "$work"
     cp /packaging/flatpak/dev.hviid.Verso.yml "$out/verso-source.tar.gz" "$work/"
     cd "$work"
+    with_source_checksum dev.hviid.Verso.yml verso-source.tar.gz
     flatpak remote-add --user --if-not-exists flathub "$flathub"
     flatpak-builder --user --install-deps-from=flathub --force-clean --state-dir=/home/builder/state \
         --repo=/home/builder/repo build dev.hviid.Verso.yml

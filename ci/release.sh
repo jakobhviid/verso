@@ -199,6 +199,10 @@ build_flatpak() {
     mkdir "$out/flatpak"
     cp linux/packaging/flatpak/dev.hviid.Verso.yml "$out/verso-source.tar.gz" "$out/flatpak/"
     cd "$out/flatpak"
+    # The archive's checksum beside its path, so the kept state takes a changed source for a new one.
+    local sum
+    sum=$(sha256sum verso-source.tar.gz | cut -d' ' -f1)
+    sed -i "s|^\( *\)path: verso-source.tar.gz\$|&\n\1sha256: $sum|" dev.hviid.Verso.yml
     flatpak remote-add --user --if-not-exists flathub "$flathub"
     # A state directory kept between builds (VERSO_FLATPAK_STATE, the release workflow's cache) builds only what
     # changed; without one, everything is built afresh.
