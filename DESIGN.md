@@ -214,8 +214,8 @@ Verso's page, at `jakob.hviid.phd/verso` and for the top of `jakob.hviid.phd/sof
   - The line under the heading names the stable version, and the beta's where one is ahead; Linux's downloads (its
     rpm and deb where the release carries them, each with the command that installs it) and the Mac's disk image come
     from each channel's newest release that carries them, the Mac's stable as "Coming" without one.
-  - `latest.json` for the update check, and `photos.html`, the credits of the showcase server's photos. A picture not taken yet is a place marked
-  for it, and the build lists those.
+  - `latest.json` and `beta.json` for the update check of the rpm and the deb, each channel's, and `photos.html`, the
+    credits of the showcase server's photos. A picture not taken yet is a place marked for it, and the build lists those.
 - **The shared link's card** is `site/social-preview.html`, rendered at 1280 by 640 as `site/social-preview.png`.
 
 ## Screenshots

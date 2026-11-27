@@ -110,7 +110,7 @@ any other.
 | Homebrew (Linux and the Mac) | `jakobhviid/tap/verso@beta`, which a stable release reaches too | `jakobhviid/tap/verso`, until Homebrew's own `homebrew/cask` takes it (then `tap_migrations.json` moves it) |
 | The Mac's updates | Sparkle's beta channel: a beta's build takes betas and releases (`VERSO_CHANNEL`) | Sparkle's default channel |
 | iPhone, iPad, Apple TV | TestFlight: the internal group (`ios/appstore.py beta`), and the external one with the public link once the maintainer says so (`--external`) | App Store: the TestFlight build of the version, sent to review (`ios/appstore.py submit`) |
-| Linux's own update check, Verso's page | untouched | `latest.json` and the page follow it |
+| Linux's own update check, Verso's page | `beta.json`, which a beta's rpm and deb read, and the page's beta channel | `latest.json` and the page follow it |
 
 Apple's version strings are numbers alone, so a beta's Apple builds carry `0.78.0` with their rising build number;
 TestFlight and Sparkle's beta channel, not the number, make them betas. Development builds (Verso Dev on the Mac,

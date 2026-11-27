@@ -36,17 +36,70 @@ pub fn check_now() {
 /// The first look waits until the session has settled, so it never slows the login.
 const FIRST: Duration = Duration::from_secs(5 * 60);
 
-/// Whether `latest` is newer than `running`, both `major.minor.patch`. A development build (`0.0.0`) never is behind:
-/// its version is not a release's.
+/// A release's version, `major.minor.patch` and a beta's suffix (`0.78.0-beta.2`), ordered as semantic versioning
+/// orders them: a beta before the release it leads to, and its parts by number where they are numbers.
+#[derive(Debug, PartialEq, Eq)]
+struct Version {
+    release: (u64, u64, u64),
+    beta: Option<Vec<String>>,
+}
+
+impl Version {
+    fn parse(text: &str) -> Option<Version> {
+        let text = text.trim().trim_start_matches('v');
+        let (numbers, beta) = match text.split_once('-') {
+            Some((numbers, beta)) => (numbers, Some(beta.split('.').map(str::to_owned).collect())),
+            None => (text, None),
+        };
+        let mut parts = numbers.split('.').map(|part| part.parse::<u64>().ok());
+        let release = (parts.next()??, parts.next()??, parts.next()??);
+        parts.next().is_none().then_some(Version { release, beta })
+    }
+}
+
+impl Ord for Version {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        use std::cmp::Ordering;
+        self.release.cmp(&other.release).then_with(|| match (&self.beta, &other.beta) {
+            (None, None) => Ordering::Equal,
+            (None, Some(_)) => Ordering::Greater,
+            (Some(_), None) => Ordering::Less,
+            (Some(mine), Some(theirs)) => {
+                for (one, two) in mine.iter().zip(theirs) {
+                    let order = match (one.parse::<u64>(), two.parse::<u64>()) {
+                        (Ok(one), Ok(two)) => one.cmp(&two),
+                        (Ok(_), Err(_)) => Ordering::Less,
+                        (Err(_), Ok(_)) => Ordering::Greater,
+                        (Err(_), Err(_)) => one.cmp(two),
+                    };
+                    if order != Ordering::Equal {
+                        return order;
+                    }
+                }
+                mine.len().cmp(&theirs.len())
+            }
+        })
+    }
+}
+
+impl PartialOrd for Version {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+/// Whether `latest` is newer than `running`, each a release's version or a beta's. A development build (`0.0.0`) never
+/// is behind: its version is not a release's.
 pub fn is_newer(latest: &str, running: &str) -> bool {
-    let parse = |text: &str| -> Option<(u64, u64, u64)> {
-        let mut parts = text.trim().trim_start_matches('v').split('.').map(|part| part.parse::<u64>().ok());
-        Some((parts.next()??, parts.next()??, parts.next()??))
-    };
-    match (parse(latest), parse(running)) {
-        (Some(latest), Some(running)) => running != (0, 0, 0) && latest > running,
+    match (Version::parse(latest), Version::parse(running)) {
+        (Some(latest), Some(running)) => running.release != (0, 0, 0) && latest > running,
         _ => false,
     }
+}
+
+/// Whether `version` is a beta's (`0.78.0-beta.1`), whose install looks at the beta channel.
+pub fn is_beta(version: &str) -> bool {
+    Version::parse(version).is_some_and(|version| version.beta.is_some())
 }
 
 /// Look now and then once a day, for as long as the daemon runs. `told` keeps the last version told of, so each is
@@ -101,5 +154,17 @@ mod tests {
         assert!(!is_newer("2.19.0", "2.19.1"));
         assert!(!is_newer("2.20.0", "0.0.0"), "a development build is never behind");
         assert!(!is_newer("not a version", "2.19.1"));
+    }
+
+    #[test]
+    fn a_beta_comes_before_its_release_and_after_the_last() {
+        assert!(is_newer("0.78.0", "0.78.0-beta.2"), "the release a beta leads to");
+        assert!(is_newer("0.78.0-beta.2", "0.78.0-beta.1"));
+        assert!(is_newer("0.78.0-beta.10", "0.78.0-beta.9"), "numbers, not text");
+        assert!(is_newer("0.78.0-beta.1", "0.77.0"));
+        assert!(!is_newer("0.77.0", "0.78.0-beta.1"));
+        assert!(!is_newer("0.78.0-beta.1", "0.78.0"));
+        assert!(!is_newer("0.78.0-beta.1", "0.78.0-beta.1"));
+        assert!(is_beta("0.78.0-beta.1") && !is_beta("0.78.0") && !is_beta("nonsense"));
     }
 }

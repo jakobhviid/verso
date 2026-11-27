@@ -1741,7 +1741,10 @@ a Flatpak").
 An rpm or a deb downloaded from a release page is never updated: no repository stands behind it. **The service tells
 of a new release** (`updates.check`): while it runs, with the drive or without it, five minutes after it starts and
 then every 24 hours, it reads Verso's page's `latest.json` (`https://jakob.hviid.phd/verso/latest.json`, the latest
-release's version and the page's address, which `site/build.py` writes) and tells of a newer version once, in a
+release's version and the page's address, which `site/build.py` writes), or, where it is a beta's (`0.78.0-beta.1`),
+`beta.json` beside it (the newest beta where one is ahead of the release, else the release, as the beta channel takes
+both), compares the versions as semantic versioning orders them (a beta before the release it leads to), and tells
+of a newer version once, in a
 notification (the version told of is kept in `~/.local/state/verso/update-told`), and on the tray's menu ("Get Verso
 *version*…", which opens the page) for as long as it runs. It sends nothing but the request and its User-Agent.
 - **On for the rpm and the deb alone:** they carry a channel file beside the programs, `/usr/share/verso/channel`

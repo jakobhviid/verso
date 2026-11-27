@@ -479,6 +479,9 @@ def main(releases_file, output, app_store=None, testflight=TESTFLIGHT):
     (output / "privacy.html").write_text(privacy_page())
     # What a Linux package from this page looks at to tell of a newer release (ARCHITECTURE.md, "Updates on Linux").
     (output / "latest.json").write_text(json.dumps({"version": version, "page": PAGE}) + "\n")
+    # What a beta's package looks at: the newest beta where one is ahead, else the release, as the beta channel takes both.
+    beta_version = linux_beta["tag_name"].lstrip("v") if linux_beta else version
+    (output / "beta.json").write_text(json.dumps({"version": beta_version, "page": PAGE}) + "\n")
     items = [appcast_item(mac, disk_image, mac_notes(releases))] if disk_image else []
     if mac_beta:
         items.append(appcast_item(mac_beta, beta_disk_image, mac_notes([mac_beta]), channel="beta"))

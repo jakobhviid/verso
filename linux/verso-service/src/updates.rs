@@ -11,6 +11,9 @@ use verso_linux::updates::{Check, Release};
 
 /// Written by Verso's page for its latest release (site/build.py): the version and the page's address.
 const LATEST: &str = "https://jakob.hviid.phd/verso/latest.json";
+/// Written by the page for the beta channel: the newest beta where one is ahead of the latest release, else the
+/// release, as the beta channel takes both. A beta's rpm or deb looks here.
+const BETA: &str = "https://jakob.hviid.phd/verso/beta.json";
 
 #[derive(serde::Deserialize)]
 struct Latest {
@@ -34,18 +37,25 @@ fn installed_by_homebrew(program: &Path) -> bool {
     ["/Caskroom/", "/Cellar/", "/.linuxbrew/"].iter().any(|part| text.contains(part))
 }
 
-/// One look, as the daemon makes it once a day. Nothing is sent but the request and its User-Agent.
+/// One look, as the daemon makes it once a day, at this install's channel: a beta's at the beta channel. Nothing is
+/// sent but the request and its User-Agent.
 pub fn check() -> Check {
-    Box::new(|| Box::pin(latest()))
+    let feed = feed(verso_core::product::VERSION);
+    Box::new(move || Box::pin(latest(feed)))
 }
 
-async fn latest() -> Option<Release> {
+/// The feed an install of `version` looks at.
+fn feed(version: &str) -> &'static str {
+    if verso_linux::updates::is_beta(version) { BETA } else { LATEST }
+}
+
+async fn latest(feed: &'static str) -> Option<Release> {
     let client = reqwest::Client::builder()
         .user_agent(verso_core::product::user_agent())
         .timeout(Duration::from_secs(30))
         .build()
         .ok()?;
-    let response = client.get(LATEST).send().await.ok()?.error_for_status().ok()?;
+    let response = client.get(feed).send().await.ok()?.error_for_status().ok()?;
     let latest: Latest = response.json().await.ok()?;
     Some(Release { version: latest.version, page: latest.page })
 }
@@ -60,6 +70,12 @@ mod tests {
         assert!(installed_by_homebrew(Path::new("/home/linuxbrew/.linuxbrew/Cellar/verso/2.19.1/bin/verso-service")));
         assert!(!installed_by_homebrew(Path::new("/usr/bin/verso-service")));
         assert!(!installed_by_homebrew(Path::new("/home/me/.local/bin/verso-service")));
+    }
+
+    #[test]
+    fn a_beta_looks_at_the_beta_channel() {
+        assert_eq!(feed("0.78.0-beta.1"), BETA);
+        assert_eq!(feed("0.78.0"), LATEST);
     }
 
     #[test]
