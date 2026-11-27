@@ -1,9 +1,9 @@
 import XCTest
 
-/// The viewer on the Apple TV, driven with the Siri Remote's buttons (XCUIRemote), against Immich's demo: a video opens
-/// in tvOS's own player, which has the remote whole (its transport bar, scrubbing, its panels), and Menu comes back to
-/// the viewer at the video, where left and right step on. Each step keeps a screenshot, for looking at what the remote
-/// reached.
+/// The viewer on the Apple TV, driven with the Siri Remote's buttons (XCUIRemote), against Immich's demo: a video plays
+/// at once in the viewer, play/pause pauses it, a click or up brings tvOS's own controls over it (scrubbing, the
+/// panels), Menu leaves them for the video playing on, and left and right step on. Each step keeps a screenshot, for
+/// looking at what the remote reached.
 final class TVViewerRemoteTests: XCTestCase {
     override func setUp() {
         continueAfterFailure = false
@@ -38,7 +38,7 @@ final class TVViewerRemoteTests: XCTestCase {
         keep(name)
     }
 
-    func testAVideoPlaysInTheSystemsPlayerWithTheRemoteWhole() throws {
+    func testAVideoPlaysAtOnceWithTheSystemsControlsOnAClick() throws {
         let application = XCUIApplication()
         // All Photos filtered to its videos, and Manage Photos on (a key that is never used), so a video's menu is
         // there, as on a TV that turned it on.
@@ -51,33 +51,49 @@ final class TVViewerRemoteTests: XCTestCase {
         press(.right, "0a right, to the header")
         press(.down, "0b down, to the first video")
         XCUIRemote.shared.press(.select)
-        let play = application.descendants(matching: .any)["Play Video"]
-        XCTAssert(play.waitForExistence(timeout: 10), "the viewer opens at the video, with its play sign")
-        Thread.sleep(forTimeInterval: 1)
-        keep("1 the viewer at a video")
-
-        // The clickpad's middle plays the video, the photo's menu beside it notwithstanding.
-        XCUIRemote.shared.press(.select)
-        XCTAssert(application.otherElements["Video Player"].waitForExistence(timeout: 5), "the click opens the system's player")
+        let viewer = application.descendants(matching: .any)["Viewer"]
+        let controls = application.otherElements["Video Player"]
+        XCTAssert(viewer.waitForExistence(timeout: 10), "the viewer opens at the video")
         Thread.sleep(forTimeInterval: 4)
-        keep("2 the system's player, playing")
-        press(.down, "3 down: the player's panel")
-        press(.up, "4 up: back from the panel")
-        press(.select, "5 select: paused, the transport bar")
-        press(.right, "6 right: scrubbed forward, still in the player")
-        press(.left, "7 left: scrubbed back, still in the player")
-        press(.up, "8 up: the transport bar's buttons")
-        // Menu steps back a layer at a time, as any player on the TV: from the buttons to the transport bar, the bar
-        // hidden, then the player closed, and the viewer is back at the video.
+        keep("1 the video playing in the viewer")
+        press(.playPause, "2 play/pause: paused, with the play sign")
+        press(.playPause, "3 play/pause: playing on")
+
+        // The clickpad's middle brings tvOS's controls over the video, the photo's menu beside it notwithstanding.
+        XCUIRemote.shared.press(.select)
+        XCTAssert(controls.waitForExistence(timeout: 5), "the click brings the system's controls")
+        Thread.sleep(forTimeInterval: 2)
+        keep("4 the system's controls, playing on")
+        press(.down, "5 down: the controls' panel")
+        press(.up, "6 up: back from the panel")
+        press(.right, "7 right: scrubbed forward, in the controls")
+        press(.left, "8 left: scrubbed back, in the controls")
+        // Menu steps back a layer at a time, as any player on the TV, and the video plays on in the viewer.
         var presses = 0
         repeat {
             XCUIRemote.shared.press(.menu)
             presses += 1
-        } while !play.waitForExistence(timeout: 2) && presses < 4
-        XCTAssert(play.exists, "Menu comes back to the viewer at the video")
-        XCTAssert(application.exists && application.state == .runningForeground, "and the app stays open")
-        keep("9 back in the viewer at the video")
-        press(.right, "10 right: the next photo or video")
+            Thread.sleep(forTimeInterval: 1.5)
+        } while controls.exists && presses < 4
+        XCTAssertFalse(controls.exists, "Menu leaves the controls")
+        XCTAssert(viewer.exists && application.state == .runningForeground, "for the viewer, the app still open")
+        keep("9 back in the viewer, the video playing on")
+
+        // Up brings the controls too.
+        XCUIRemote.shared.press(.up)
+        XCTAssert(controls.waitForExistence(timeout: 5), "up brings the system's controls")
+        keep("10 up: the controls")
+        presses = 0
+        repeat {
+            XCUIRemote.shared.press(.menu)
+            presses += 1
+            Thread.sleep(forTimeInterval: 1.5)
+        } while controls.exists && presses < 4
+        XCTAssertFalse(controls.exists, "Menu leaves the controls again")
+        // Left and right step on from a video, as from a photo.
+        press(.right, "11 right: the next video, playing")
+        XCTAssert(viewer.exists, "still in the viewer")
+        press(.left, "12 left: back to the first", settle: 3)
     }
 
     /// The grid moved through with the remote: right and down along the tiles, up back to the Filter menu, a photo

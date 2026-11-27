@@ -6,9 +6,10 @@ import SwiftUI
 // it, as the iPhone's pages slide, and a click brings up what the iPhone's title capsule says, its place over its day
 // and time, and takes it away again. It opens out of its tile and closes into the tile of the photo shown last
 // (TVViewerCover). A Live Photo has the Live Photo sign small in the corner, and play/pause plays its movie over the
-// photo. A video shows its first picture with a play sign; a click, or play/pause, opens it in tvOS's own player, full
-// screen, which has the remote whole (its transport bar, scrubbing, its panels for audio, subtitles and the place and
-// day), as Apple's TV app has it, and Menu comes back to the viewer at the video, where left and right step on. Once a
+// photo. A video plays at once, as in Apple's Photos, and left and right step on from it as from a photo; a click or up
+// brings tvOS's own controls over it, still playing (the timeline, scrubbed with a swipe or left and right, audio,
+// subtitles, the place and the day), as YouTube's up-into-the-controls has it, and Menu leaves them for the video playing
+// on in the viewer; play/pause pauses and plays on, with a play sign while it is paused. Once a
 // video in HDR has put the TV in HDR, it stays there until the viewer closes (TVDisplayMode), rather than going back to
 // SDR and again to HDR from photo to photo.
 
@@ -18,8 +19,10 @@ struct TVViewer: View {
     /// A Live Photo's movie playing over it, and the photo it belongs to.
     @State private var player: AVPlayer?
     @State private var playerItemID: String?
-    /// The system's player, open full screen over the viewer for a video.
+    /// tvOS's own controls, over the video playing in the viewer.
     @State private var video: TVVideoPresentation?
+    /// The video shown is paused, by play/pause.
+    @State private var videoPaused = false
     @State private var details: AssetResponse?
     @State private var showsInfo = false
     @State private var exhausted = false
@@ -67,14 +70,16 @@ struct TVViewer: View {
         // menu took the click, and a video's middle-of-the-clickpad press did not play it.
         Button(action: select) { screen }
             .buttonStyle(TVPressedAsIs())
+            .accessibilityIdentifier("Viewer")
             .onMoveCommand { direction in
                 switch direction {
                 case .left: step(-1)
                 case .right: step(1)
+                case .up: if item?.isVideo == true { showControls() }
                 default: break
                 }
             }
-            .onPlayPauseCommand { if item?.isVideo == true { playVideo() } else { playLive() } }
+            .onPlayPauseCommand { if item?.isVideo == true { pauseOrPlay() } else { playLive() } }
             .onExitCommand { close() }
             .focused($hasFocus)
             .defaultFocus($hasFocus, true)
@@ -86,7 +91,10 @@ struct TVViewer: View {
             .modifier(TVPhotoMenu(item: item, changed: apply))
             .task(id: item?.id) { await show() }
             .task(id: "\(item?.id ?? "")|\(showsInfo)") { await readDetails() }
-            .onDisappear { TVDisplayMode.release() }
+            .onDisappear {
+                player?.pause()
+                TVDisplayMode.release()
+            }
             .task {
                 // Out of its tile, once the viewer is on screen at the tile.
                 guard !expanded else { return }
@@ -96,9 +104,9 @@ struct TVViewer: View {
             .task { await followDebugSteps() }
     }
 
-    /// A click: a video plays, a photo's title capsule comes or goes.
+    /// A click: a video's controls come up, a photo's title capsule comes or goes.
     private func select() {
-        if item?.isVideo == true { playVideo() } else { showsInfo.toggle() }
+        if item?.isVideo == true { showControls() } else { showsInfo.toggle() }
     }
 
     private var screen: some View {
@@ -107,7 +115,7 @@ struct TVViewer: View {
             if let item {
                 // Above the black, or the photo leaving is drawn under it and vanishes rather than sliding away.
                 TVViewerPage(item: item, player: playerItemID == item.id ? player : nil,
-                             tile: expanded ? nil : frames?.frame(item.id))
+                             tile: expanded ? nil : frames?.frame(item.id), paused: videoPaused)
                     .id(item.id)
                     .zIndex(1)
                     .transition(TVDevice.simpler ? .identity : .asymmetric(
@@ -272,31 +280,50 @@ struct TVViewer: View {
         player.play()
     }
 
-    /// The photo shown: the page under the viewer is told, and a Live Photo's movie playing over the last one stops.
+    /// The photo shown: the page under the viewer is told, the last one's movie stops, and a video plays at once, as in
+    /// Photos: the TV held in HDR where it is HDR, and its details read for the controls' info panel.
     private func show() async {
         guard let item else { return }
         shown(item.id)
         player?.pause()
         player = nil
         playerItemID = nil
-    }
-
-    /// The video shown, in the system's player, full screen over the viewer: the TV held in HDR where the video is HDR,
-    /// and the player's info panel saying what the title capsule says of a photo.
-    private func playVideo() {
-        guard let item, item.isVideo, video == nil, let client = model.client else { return }
+        videoPaused = false
+        guard item.isVideo, let client = model.client else { return }
         let asset = client.videoAsset(item.id)
         let playing = AVPlayerItem(asset: asset)
-        let presentation = TVVideoPresentation(player: AVPlayer(playerItem: playing)) { video = nil }
-        video = presentation
-        // At once, as the click asks; the TV goes to HDR once the video turns out to be HDR, and its details follow.
-        presentation.present()
-        Task {
-            await TVDisplayMode.holdHDR(for: asset)
-            let read: AssetResponse? = try? await client.get("assets/\(item.id)")
-            details = read
-            playing.externalMetadata = metadata(titles(for: item))
+        let player = AVPlayer(playerItem: playing)
+        self.player = player
+        playerItemID = item.id
+        // Played to its end, it waits at its start with the play sign, for play/pause.
+        NotificationCenter.default.addObserver(forName: AVPlayerItem.didPlayToEndTimeNotification, object: playing, queue: .main) { _ in
+            Task { @MainActor in
+                guard self.player === player else { return }
+                await player.seek(to: .zero)
+                if self.player === player, player.rate == 0 { videoPaused = true }
+            }
         }
+        player.play()
+        await TVDisplayMode.holdHDR(for: asset)
+        let read: AssetResponse? = try? await client.get("assets/\(item.id)")
+        guard !Task.isCancelled, self.item?.id == item.id else { return }
+        details = read
+        playing.externalMetadata = metadata(titles(for: item))
+    }
+
+    /// tvOS's own controls over the video playing, as it plays: the timeline to scrub, audio, subtitles, the info.
+    private func showControls() {
+        guard item?.isVideo == true, let player, playerItemID == item?.id, video == nil else { return }
+        let presentation = TVVideoPresentation(player: player) { video = nil; videoPaused = player.rate == 0 }
+        video = presentation
+        presentation.present()
+    }
+
+    /// Play/pause on a video: paused where it plays, played on where it is paused.
+    private func pauseOrPlay() {
+        guard let player, playerItemID == item?.id else { return }
+        if player.rate == 0 { player.play() } else { player.pause() }
+        videoPaused = player.rate == 0
     }
 
     private func metadata(_ titles: (title: String, subtitle: String)) -> [AVMetadataItem] {
@@ -320,8 +347,9 @@ private struct TVPressedAsIs: ButtonStyle {
     }
 }
 
-/// tvOS's own player, presented full screen over the viewer as UIKit presents it, so it has the remote whole and Menu
-/// closes it as it closes any video on the TV; the movie stops as it goes.
+/// tvOS's own controls over a video the viewer plays: its player, presented full screen as UIKit presents it, with the
+/// viewer's own playing player, so the video goes on where it was; it has the remote whole, and Menu, a layer at a time,
+/// closes it, the video playing on in the viewer.
 @MainActor
 final class TVVideoPresentation: NSObject, AVPlayerViewControllerDelegate {
     private let controller = AVPlayerViewController()
@@ -342,24 +370,23 @@ final class TVVideoPresentation: NSObject, AVPlayerViewControllerDelegate {
         var top = UIApplication.shared.connectedScenes.compactMap { ($0 as? UIWindowScene)?.keyWindow }.first?.rootViewController
         while let presented = top?.presentedViewController { top = presented }
         guard let top else { return closed() }
-        top.present(controller, animated: true) { [controller] in controller.player?.play() }
+        top.present(controller, animated: true)
     }
 
     nonisolated func playerViewControllerDidEndDismissalTransition(_ playerViewController: AVPlayerViewController) {
-        Task { @MainActor in
-            controller.player?.pause()
-            closed()
-        }
+        Task { @MainActor in closed() }
     }
 }
 
 /// One photo of the viewer, which slides in and out whole: its preview at once where the grid read it, then the
-/// full-size image; a Live Photo's movie over it while it plays; a video's first picture with a play sign.
+/// full-size image; a Live Photo's movie over it while it plays; a video playing over its first picture, with a play sign
+/// while it is paused.
 private struct TVViewerPage: View {
     let item: TVItem
     let player: AVPlayer?
     /// Its tile's frame on screen while the viewer zooms out of it or back into it; nil full screen.
     let tile: CGRect?
+    var paused = false
     @Environment(TVModel.self) private var model
     @State private var image: CGImage?
 
@@ -385,8 +412,11 @@ private struct TVViewerPage: View {
                     ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            if tile == nil, let player { TVPlayerView(player: player) }
-            if tile == nil, item.isVideo {
+            if tile == nil, let player {
+                TVPlayerView(player: player)
+                    .accessibilityIdentifier(item.isVideo ? "Playing Video" : "Live Photo Movie")
+            }
+            if tile == nil, item.isVideo, paused {
                 VStack(spacing: 16) {
                     Image(systemName: "play.circle.fill")
                         .font(.system(size: 120))
@@ -399,7 +429,7 @@ private struct TVViewerPage: View {
                     }
                 }
                 .accessibilityElement(children: .combine)
-                .accessibilityLabel(Text("Play Video"))
+                .accessibilityLabel(Text("Paused"))
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -1,4 +1,5 @@
+- A video plays at once in the viewer. Left and right step to the photo or video beside it, also while it plays. A click or up brings tvOS's own controls over it, still playing: swipe or press left and right to scrub, up for audio and subtitles. Menu hides them again and the video plays on. Play/pause pauses and plays on. Press and hold for the photo's menu.
 - Moving around the photos, on an older Apple TV 4K above all: the grid is rebuilt the way Apple TV's own grids are, and an Apple TV 4K of the 1st or 2nd generation gets a simpler interface (no lift or zoom, the outline alone).
-- The tile under the focus is drawn above its neighbours, its white outline whole.
-- A video: the clickpad's middle plays it, with Manage Photos on too.
-- Filter: Favorites in All Photos works (your own favorites), every combination keeps its photos, and up from the first row reaches Filter.
+- The tile under the focus has its white, square outline, with no dark rounded shape behind it, and sits above its neighbours.
+- Library: Years, Months and All Photos are a menu.
+- Filter: Favorites in All Photos works (your own favorites), every combination keeps its photos, Videos in the Locked Folder keeps its videos, and up from the first row reaches Filter.

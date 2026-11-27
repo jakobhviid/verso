@@ -410,10 +410,12 @@ sections, the pages, the viewer's info), drawn with each platform's own toolkit:
   viewer fills the screen, its photo growing out of its tile as the black comes up, and shrinking back into the tile of
   the photo shown last, as the iPhone's; a click shows or hides the iPhone's title capsule, the place over the day and
   time; left and right slide to the photo beside it, as the iPhone's pages slide; a Live Photo has the Live Photo sign
-  small in the top corner, out of the photo's way, and play/pause plays its movie; a video shows its first picture with
-  a large play sign and its length; a click (the clickpad's middle), or play/pause, opens it in tvOS's own player, full
-  screen, with the remote whole, as Apple's TV app has it (its transport bar, scrubbing, its panels for audio, subtitles
-  and the day), and Menu, a layer at a time, comes back to the viewer at the video. Once a video in HDR has put the TV
+  small in the top corner, out of the photo's way, and play/pause plays its movie; a video plays at once, as in Apple's
+  Photos, and left and right step on from it as from a photo; a click (the clickpad's middle) or up brings tvOS's own
+  controls over it as it plays, as YouTube's up into its controls (the timeline, scrubbed with a swipe or left and
+  right, its panels for audio, subtitles and the day), and Menu, a layer at a time, leaves them for the video playing on
+  in the viewer; play/pause pauses it, with a large play sign and its length, and plays on, and a video played to its
+  end waits at its start with the sign. Once a video in HDR has put the TV
   in HDR, the TV stays there until the viewer closes, where Match Dynamic Range is on: going back to SDR for each photo,
   and to HDR for the next video, blacks the screen out each time. The accent is the system blue, as the iPhone's, set in
   the TV's asset catalog because tvOS's own is white. Settings, at the sidebar's foot in a section of its own, is laid
