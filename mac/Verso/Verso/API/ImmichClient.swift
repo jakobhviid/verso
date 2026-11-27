@@ -270,6 +270,10 @@ final class ImmichClient: Sendable {
     /// Where originals for Quick Look, drags and copied files go when not the shared temporary folders (Locked Folder).
     let transferRoot: URL?
 
+    /// Told whenever the server turns this sign-in down (401, or the core's signed out), from any call, whether its
+    /// caller looks at the error or not. The Apple TV signs itself out on it (TVModel); set once, as an app starts.
+    nonisolated(unsafe) static var onUnauthorized: (@Sendable () -> Void)?
+
     static let userAgent: String = {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
         let os = ProcessInfo.processInfo.operatingSystemVersion
@@ -370,6 +374,7 @@ final class ImmichClient: Sendable {
         switch http.statusCode {
         case 200..<300: return data
         case 401:
+            onUnauthorized?()
             throw ImmichError.unauthorized((try? JSONDecoder().decode(ServerErrorBody.self, from: data))?.text)
         default:
             let message = (try? JSONDecoder().decode(ServerErrorBody.self, from: data))?.text

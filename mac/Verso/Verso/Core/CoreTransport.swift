@@ -789,7 +789,9 @@ private func asClientErrors<Value>(_ call: () async throws -> Value) async throw
         return try await call()
     } catch let error as CoreError {
         switch error {
-        case .signedOut: throw ImmichError.unauthorized(nil)
+        case .signedOut:
+            ImmichClient.onUnauthorized?()
+            throw ImmichError.unauthorized(nil)
         case .notPermitted(let message): throw ImmichError.http(403, message)
         case .notFound: throw ImmichError.http(404, nil)
         case .unreachable(let message): throw URLError(.cannotConnectToHost, userInfo: [NSLocalizedDescriptionKey: message])

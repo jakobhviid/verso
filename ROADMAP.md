@@ -707,8 +707,11 @@ sees an API key:
   "Set Up “name”?" before it makes the key, named after the TV ("Verso on Apple TV (Living Room)").
 - the TV keeps it in its Keychain. The iPhone's Apple TV page lists the TVs set up, by name and the day each was set
   up, each with **Forget** (and **Forget All** where there are several), which asks first and deletes its key. A key
-  forgotten there, or deleted in Immich, signs the TV out the next time it comes back to Verso, and Set Up with iPhone
-  says why; the phone is not touched.
+  forgotten there, or deleted in Immich, signs the TV out as soon as any call meets it (Immich's 401, which the
+  client tells of whether the page looks at the error or not), or as the TV comes back to Verso, and Set Up with iPhone
+  says why; any other failure (the server out of reach, no network) keeps the key, so an outage never makes the person
+  pair again. A reinstall keeps it too: the Keychain outlives the app, and tvOS offloads and reinstalls apps by itself
+  when space runs low; the key stays listed on the iPhone until forgotten there.
 
 **Built** (`ios/TV/`, the `VersoTV` target of the iOS project, with the core's bindings as `VersoCoreTV`): the core for
 tvOS (`mac/build-rust.sh --tvos`), the eight places in tvOS's sidebar-style tab view drawn as the iPhone's pages (DESIGN.md,

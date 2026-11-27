@@ -39,6 +39,10 @@ final class TVModel {
         followLaunchArguments()
         #endif
         if client == nil, let account = TVAccount.load() { use(account) }
+        // A key forgotten on the iPhone or deleted in Immich, met by any call while the TV is in use.
+        ImmichClient.onUnauthorized = { [weak self] in
+            Task { @MainActor in self?.keyRejected() }
+        }
     }
 
     func use(_ account: TVAccount) {
@@ -64,16 +68,21 @@ final class TVModel {
         TVTopShelf.clear()
     }
 
-    /// Immich turning the key down means the TV was forgotten: it signs out and says so. Any other failure (the server
-    /// out of reach) leaves it signed in.
+    /// Asks Immich about the key as the TV comes back to Verso. A key turned down signs it out (`keyRejected`, which the
+    /// client tells of too, from any call); any other failure (the server out of reach, no network) keeps it, so an
+    /// outage never makes the person pair again. A reinstall keeps the key as well: the Keychain outlives the app, and
+    /// tvOS offloads and reinstalls apps by itself when space runs low.
     func checkKey() async {
         guard let client else { return }
-        do {
-            _ = try await client.currentUser()
-        } catch ImmichError.unauthorized {
-            signOut()
-            signedOutReason = String(localized: "This Apple TV was forgotten on your iPhone, or its key was deleted in Immich. Set it up again to come back.")
-        } catch {}
+        _ = try? await client.currentUser()
+    }
+
+    /// Immich turned the key down: the TV was forgotten on the iPhone, or its key deleted in Immich. Its copy goes from
+    /// the Keychain, the Top Shelf empties, and Set Up with iPhone says why.
+    func keyRejected() {
+        guard client != nil else { return }
+        signOut()
+        signedOutReason = String(localized: "This Apple TV was forgotten on your iPhone, or its key was deleted in Immich. Set it up again to come back.")
     }
 
     /// The Top Shelf's memories and newest photos, written again (TVTopShelf).
