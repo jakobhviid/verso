@@ -202,11 +202,19 @@ Verso's page, at `jakob.hviid.phd/verso` and for the top of `jakob.hviid.phd/sof
   (`#5f6477`), which the handwriting keeps.
 - **Fast and private:** one HTML file and one stylesheet, the system's fonts, no framework, nothing loaded from
   elsewhere, no cookies and no counting; the pictures are WebP, those below the first screen loaded as they come near.
-- **Built for the releases there are** by `site/build.py` (`site/build-latest.sh` gathers them): the version and
-  Linux's downloads from the latest release in `jakobhviid/verso` (its rpm and deb where it carries them,
-  each with the command that installs it), the Mac's disk image from the newest
-  release with one or else "Coming", the App Store's and TestFlight's links once given, `latest.json` for the update
-  check, and `photos.html`, the credits of the showcase server's photos. A picture not taken yet is a place marked
+- **Built for the releases there are** by `site/build.py` (`site/build-latest.sh` gathers them), and built again by
+  `ci/release.sh publish` for every release and beta, so each channel's version follows by itself.
+  - **Two paths on every card:** each platform's card has its stable channel, the default (a green dot, Stable, its
+    version and day, how to install it), and beneath it, past a dashed rule and in quieter type, its beta (a blue
+    dot): the newest beta's version, day and command where one came out after the stable release, and else that the
+    beta channel follows stable until the next beta; each beta says it takes every beta and every stable release, and
+    how to go back to stable. The iPhone's card has the App Store as coming (an amber dot) and TestFlight as the way
+    in, at full strength, until the App Store's link is given; TestFlight shows no version, as its builds come from
+    develop between betas. Two blocks rather than a switch between channels: both paths stay in view, without script.
+  - The line under the heading names the stable version, and the beta's where one is ahead; Linux's downloads (its
+    rpm and deb where the release carries them, each with the command that installs it) and the Mac's disk image come
+    from each channel's newest release that carries them, the Mac's stable as "Coming" without one.
+  - `latest.json` for the update check, and `photos.html`, the credits of the showcase server's photos. A picture not taken yet is a place marked
   for it, and the build lists those.
 - **The shared link's card** is `site/social-preview.html`, rendered at 1280 by 640 as `site/social-preview.png`.
 

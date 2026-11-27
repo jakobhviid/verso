@@ -77,8 +77,8 @@
             <a class="button" href="#get">Get Verso</a>
             <a class="button quiet" href="#platforms">See it on each platform</a>
           </p>
-          <p class="version">Free, and open source. Linux {{version}}, released {{published}}:
-            <a href="{{release_url}}">what is new</a>.</p>
+          <p class="version">Free, and open source. Stable {{version}}, released {{published}}:
+            <a href="{{release_url}}">what is new</a>.{{beta_line}}</p>
         </div>
       </div>
     </div>
@@ -266,18 +266,7 @@
         <article class="print get" id="get-linux">
           <h3><picture><img src="icon-linux.svg" alt="" width="48" height="48"></picture>
             <span>Linux<small>x86_64, made for GNOME</small></span><span class="yours">Your system</span></h3>
-          <p>With <a href="https://brew.sh">Homebrew</a>, which keeps it up to date:</p>
-          <pre class="command"><code>brew install jakobhviid/tap/verso</code></pre>
-          <p class="small">The beta channel, a step ahead: <code>brew install --cask jakobhviid/tap/verso@beta</code>, on
-            the Mac too.</p>
-          <p>Then open <strong>Verso</strong> from the app grid and sign in. Or download version {{version}}:</p>
-          <ul class="downloads">
-            {{packages}}<li>{{tarball}}<span>Verso with Verso Drive, the top bar icon and its menu in Files</span></li>
-            <li>{{flatpak}}<span>A test build without Verso Drive, which needs access outside the sandbox</span></li>
-            <li>{{appimage}}<span>The same, as one file with its libraries inside, for older systems such as Ubuntu 24.04</span></li>
-          </ul>
-          <pre class="command"><code>flatpak install --user verso-x86_64.flatpak</code></pre>
-          <pre class="command"><code>chmod +x verso-x86_64.AppImage &amp;&amp; ./verso-x86_64.AppImage</code></pre>
+          {{linux}}
         </article>
         <article class="print get" id="get-mac">
           <h3><picture><img src="icon-mac.png" alt="" width="48" height="48"></picture>

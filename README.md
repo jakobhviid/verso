@@ -25,11 +25,15 @@ it looks and moves as Photos does; with SwiftUI on the Apple TV; with SwiftUI an
 and libadwaita on Linux, made for GNOME. Underneath, the platforms share one core in Rust: the Immich client, the
 drive's layout and the arithmetic that places the grid's dates, so they behave alike.
 
+Every platform has two channels: **stable**, the default, and **beta**, a step ahead with what comes next, which takes
+every beta and every stable release. [Verso's page](https://jakob.hviid.phd/verso/#get) shows each channel's version
+and how to install it.
+
 | Platform | Where it stands |
 |---|---|
 | Linux, x86_64 (GNOME) | Released: Homebrew (`verso`, and `verso@beta` for the beta channel), rpm and deb packages, and a Flatpak and an AppImage test build (below) |
 | Mac (macOS 15 or later) | Released: a signed and notarized disk image from [Verso's page](https://jakob.hviid.phd/verso/), or `brew install --cask jakobhviid/tap/verso` (`verso@beta` for the beta channel); it updates itself |
-| iPhone, iPad and Apple TV | The App Store (0.77.0, in review), and the beta channel through [TestFlight](https://testflight.apple.com/join/7z1ppMM8) |
+| iPhone, iPad and Apple TV | The beta channel through [TestFlight](https://testflight.apple.com/join/7z1ppMM8); the App Store, the stable channel, once Apple has approved it |
 
 ## What it does
 
@@ -107,6 +111,15 @@ brew install jakobhviid/tap/verso
 
 Open **Verso** from the app grid and sign in. Update with `brew upgrade verso`; remove it with `brew uninstall verso`,
 and add `--zap` to remove its settings and cache too.
+
+The beta channel, a step ahead, which takes every beta and every stable release:
+
+```sh
+brew install --cask jakobhviid/tap/verso@beta
+```
+
+Back to stable: `brew uninstall --cask verso@beta`, then `brew install jakobhviid/tap/verso`. A beta's files, the
+packages among them, are on [its release](https://github.com/jakobhviid/verso/releases), marked Pre-release.
 
 ### As an rpm or a deb package
 

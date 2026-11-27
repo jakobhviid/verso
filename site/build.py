@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build Verso's page (jakob.hviid.phd/verso; DESIGN.md, "The website") for the releases there are: site/index.html
-with the latest release's version and download links, its pictures, style, icons and photo credits, written into an
-output folder to be served as it is. Standard library only.
+with each channel's version and download links, its pictures, style, icons and photo credits, written into an output
+folder to be served as it is. Standard library only.
 
     gh api 'repos/jakobhviid/verso/releases?per_page=30' > releases.json
     site/build.py releases.json OUTPUT [--app-store URL] [--testflight URL]
@@ -12,6 +12,11 @@ carries the tarball, and the Mac's disk image from the newest one that carries a
 the disk image's update file beside it (ci/sign-mac-update.sh), the page also carries appcast.xml, Sparkle's feed. The
 iPhone and the iPad come from the App Store and TestFlight, never from GitHub: their links are given here once they
 exist.
+
+Each platform's card shows its two channels (AGENTS.md, "Versioning"): stable, the default, and beneath it the beta,
+a step ahead, with the newest beta's version and files where one came out after the stable release, and else the
+word that the beta channel follows stable. The iPhone, the iPad and the Apple TV have the beta alone until the App
+Store's link is given.
 
 Each {{shot NAME|ALT}} in index.html is the picture site/screenshots/NAME.webp (or .png), with NAME-dark beside it for
 the dark appearance where there is one; a picture not taken yet is a place marked for it, and the build lists them.
@@ -148,12 +153,12 @@ def appcast(items):
 """
 
 
-def newest_beta(every, after):
-    """The newest beta (a published pre-release) with a disk image, where it came out after `after`, the stable
-    release: the beta channel's update. (None, None) otherwise."""
+def newest_beta(every, after, pattern=DISK_IMAGE):
+    """The newest beta (a published pre-release) with an asset matching `pattern` (a disk image unless said), where it
+    came out after `after`, the stable release: the beta channel's. (None, None) otherwise."""
     betas = [release for release in every if release.get("prerelease") and not release.get("draft")]
     betas.sort(key=lambda release: release.get("published_at") or "", reverse=True)
-    beta, image = newest_with(betas, DISK_IMAGE)
+    beta, image = newest_with(betas, pattern)
     if beta and (after is None or (beta.get("published_at") or "") > (after.get("published_at") or "")):
         return beta, image
     return None, None
@@ -178,6 +183,33 @@ def packages(release, version):
                          f'<code>{html.escape(command + file)}</code>. Verso tells you when a new version is out.'
                          '</span></li>\n            ')
     return "".join(items)
+
+
+def channel(kind, body, release=None, only=False, coming=None):
+    """One channel on a platform's card: its name, its version and day where it has a release (or what is coming), then
+    how to install it. A beta beneath a stable channel is quieter; one that is the only way in is not."""
+    label, status = {"stable": ("Stable", "out"), "beta": ("Beta", "beta")}[kind]
+    if coming:
+        status = "soon"
+        detail = f' <span class="when">{html.escape(coming)}</span>'
+    elif release:
+        detail = (f' {html.escape(release["tag_name"].lstrip("v"))}'
+                  f' <span class="when">{html.escape(day(release["published_at"]))}</span>')
+    else:
+        detail = ""
+    classes = f"channel {kind}" + (" only" if only else "")
+    return (f'<div class="{classes}"><h4><span class="status {status}">{label}</span>{detail}</h4>'
+            f'{body}</div>')
+
+
+def beta_ahead(beta, stable_version, install, back, other=""):
+    """The beta channel's words: what it is and how to take it (`other`, another way, after the command), or that it
+    follows stable for now."""
+    lead = ("<p>A step ahead of stable, with what comes next. It may have rough edges.</p>" if beta else
+            f"<p>Nothing ahead of {html.escape(stable_version)} at the moment: the beta channel follows stable until "
+            "the next beta.</p>")
+    return (f'{lead}<pre class="command"><code>{install}</code></pre>{other}'
+            f'<p class="small">It takes every beta and every stable release. Back to stable: {back}.</p>')
 
 
 def day(timestamp):
@@ -345,38 +377,71 @@ def main(releases_file, output, app_store=None, testflight=TESTFLIGHT):
         sys.exit(f"no published release in {releases_file} carries {TARBALL}")
     mac, disk_image = newest_with(releases, DISK_IMAGE)
     version = linux["tag_name"].lstrip("v")
+    linux_beta, _ = newest_beta(every, linux, re.escape(TARBALL))
+    mac_beta, beta_disk_image = newest_beta(every, mac)
+
+    linux_card = channel("stable", (
+        '<p>With <a href="https://brew.sh">Homebrew</a>, which keeps it up to date:</p>'
+        '<pre class="command"><code>brew install jakobhviid/tap/verso</code></pre>'
+        '<p>Then open <strong>Verso</strong> from the app grid and sign in. Or download it:</p>'
+        f'<ul class="downloads">{packages(linux, version)}'
+        f'<li>{link(tarball, f"The tarball, {TARBALL}")}<span>Verso with Verso Drive, the top bar icon and its menu in '
+        'Files</span></li>'
+        f'<li>{link(asset_url(linux, FLATPAK), f"The Flatpak, {FLATPAK}")}<span>A test build without Verso Drive, which '
+        'needs access outside the sandbox</span></li>'
+        f'<li>{link(asset_url(linux, APPIMAGE), f"The AppImage, {APPIMAGE}")}<span>The same, as one file with its '
+        'libraries inside, for older systems such as Ubuntu 24.04</span></li></ul>'
+        '<pre class="command"><code>flatpak install --user verso-x86_64.flatpak</code></pre>'
+        '<pre class="command"><code>chmod +x verso-x86_64.AppImage &amp;&amp; ./verso-x86_64.AppImage</code></pre>'
+    ), release=linux) + channel("beta", beta_ahead(
+        linux_beta, version, "brew install --cask jakobhviid/tap/verso@beta",
+        "<code>brew uninstall --cask verso@beta</code>, then <code>brew install jakobhviid/tap/verso</code>",
+        f'<p>Or its files from <a href="{html.escape(linux_beta["html_url"])}">the beta\'s release</a>.</p>'
+        if linux_beta else "",
+    ), release=linux_beta)
 
     if disk_image:
-        macos = (
+        mac_version = mac["tag_name"].lstrip("v")
+        macos = channel("stable", (
             '<p>One app for the Mac, signed and notarized by Apple. Verso Drive appears in Finder\'s sidebar once you '
             'switch it on.</p>'
             f'<p><a class="button" href="{html.escape(disk_image)}">Download for the Mac</a></p>'
             '<p>Or with <a href="https://brew.sh">Homebrew</a>:</p>'
             '<pre class="command"><code>brew install --cask jakobhviid/tap/verso</code></pre>'
-            f'<p class="small">Version {html.escape(mac["tag_name"].lstrip("v"))}. Open the disk image and drag Verso '
-            'into Applications.</p>'
-        )
+            '<p class="small">Open the disk image and drag Verso into Applications. It updates itself.</p>'
+        ), release=mac) + channel("beta", beta_ahead(
+            mac_beta, mac_version, "brew install --cask jakobhviid/tap/verso@beta",
+            "<code>brew uninstall --cask verso@beta</code>, then <code>brew install --cask jakobhviid/tap/verso</code>",
+            f'<p>Or <a href="{html.escape(beta_disk_image)}">the beta\'s disk image</a>; a beta\'s Verso updates itself '
+            'to the next beta or release.</p>' if mac_beta else "",
+        ), release=mac_beta)
     else:
-        macos = (
-            '<p><span class="status soon">Coming</span></p>'
+        macos = channel("stable", (
             '<p>Verso for the Mac is being finished, and is not released yet. It will come as a disk image, signed '
             'and notarized by Apple, and with Homebrew.</p>'
-        )
-    if app_store or testflight:
-        ios = "".join([
-            f'<p><a class="button" href="{html.escape(app_store)}">Download on the App Store</a></p>' if app_store else "",
-            f'<p>Or try the next version first, in <a href="{html.escape(testflight)}">TestFlight</a>.</p>'
-            if testflight and app_store else "",
-            f'<p><a class="button" href="{html.escape(testflight)}">Join the beta in TestFlight</a></p>'
-            '<p class="small">Install Apple\'s TestFlight app, open the link on the iPhone or the iPad, and accept. On '
-            'an Apple TV signed in to the same Apple Account, Verso is then in its TestFlight app too.</p>'
-            if testflight and not app_store else "",
-        ])
+        ), coming="Coming")
+    testflight_body = (
+        f'<p><a class="button" href="{html.escape(testflight)}">Join the beta in TestFlight</a></p>'
+        '<p class="small">Install Apple\'s TestFlight app, open the link on the iPhone or the iPad, and accept. On '
+        'an Apple TV signed in to the same Apple Account, Verso is then in its TestFlight app too. It takes each new '
+        'build as it comes.</p>'
+    ) if testflight else ""
+    if app_store:
+        ios = channel("stable", f'<p><a class="button" href="{html.escape(app_store)}">Download on the App Store</a></p>') + (
+            channel("beta", '<p>A step ahead of the App Store, with what comes next. It may have rough edges.</p>'
+                    + testflight_body) if testflight else "")
+    elif testflight:
+        ios = channel("stable", "<p>Verso comes to the App Store once Apple has approved it. Until then, the beta is "
+                      "the way in.</p>", coming="Coming to the App Store") + channel("beta", testflight_body, only=True)
     else:
-        ios = (
-            '<p><span class="status soon">Coming</span></p>'
-            '<p>Verso for the iPhone, the iPad and the Apple TV will come through TestFlight first, then the App Store.</p>'
-        )
+        ios = channel("stable", '<p>Verso for the iPhone, the iPad and the Apple TV will come through TestFlight first, '
+                      'then the App Store.</p>', coming="Coming")
+
+    beta_line = ""
+    if linux_beta:
+        beta_line = (f' Beta {html.escape(linux_beta["tag_name"].lstrip("v"))}, '
+                     f'{html.escape(day(linux_beta["published_at"]))}: '
+                     f'<a href="{html.escape(linux_beta["html_url"])}">what is coming</a>.')
 
     values = {
         "page": PAGE,
@@ -385,13 +450,11 @@ def main(releases_file, output, app_store=None, testflight=TESTFLIGHT):
         "version": html.escape(version),
         "published": html.escape(day(linux["published_at"])),
         "release_url": html.escape(linux["html_url"]),
-        "packages": packages(linux, version),
-        "tarball": link(tarball, f"The tarball, {TARBALL}"),
-        "flatpak": link(asset_url(linux, FLATPAK), f"The Flatpak, {FLATPAK}"),
-        "appimage": link(asset_url(linux, APPIMAGE), f"The AppImage, {APPIMAGE}"),
+        "beta_line": beta_line,
+        "linux": linux_card,
         "macos": macos,
         "ios_status": ('<span class="status out">App Store</span>' if app_store
-                       else '<span class="status out">TestFlight</span>' if testflight
+                       else '<span class="status beta">TestFlight</span>' if testflight
                        else '<span class="status soon">Coming</span>'),
         "mac_status": '<span class="status out">Released</span>' if disk_image else '<span class="status soon">Coming</span>',
         "ios": ios,
@@ -417,9 +480,8 @@ def main(releases_file, output, app_store=None, testflight=TESTFLIGHT):
     # What a Linux package from this page looks at to tell of a newer release (ARCHITECTURE.md, "Updates on Linux").
     (output / "latest.json").write_text(json.dumps({"version": version, "page": PAGE}) + "\n")
     items = [appcast_item(mac, disk_image, mac_notes(releases))] if disk_image else []
-    beta, beta_image = newest_beta(every, mac)
-    if beta:
-        items.append(appcast_item(beta, beta_image, mac_notes([beta]), channel="beta"))
+    if mac_beta:
+        items.append(appcast_item(mac_beta, beta_disk_image, mac_notes([mac_beta]), channel="beta"))
     feed = appcast([item for item in items if item])
     if feed:
         (output / "appcast.xml").write_text(feed)

@@ -395,6 +395,7 @@ h3 { font-size: 1.08rem; line-height: 1.3; margin: 0 0 6px; }
 }
 .status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--amber); }
 .status.out::before { background: var(--green); }
+.status.beta::before { background: var(--blue); }
 
 /* A closer look: prints of Verso on Linux, on a sheet. */
 .sheet { display: grid; grid-template-columns: 1.55fr 1fr; grid-template-rows: auto auto; gap: 28px; }
@@ -500,6 +501,13 @@ main > .backup {
 .get h3 small { display: block; font-size: 0.84rem; font-weight: 500; color: var(--muted); letter-spacing: 0; }
 .get p { margin: 0 0 12px; color: var(--text-soft); font-size: 0.96rem; }
 .get .status { margin: 0; }
+/* A card's two channels: stable, the default, and beneath it the beta, a step ahead and quieter, unless it is the only
+   way in (the iPhone's, until the App Store). */
+.channel + .channel { margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--muted); }
+.channel h4 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; font-size: 1rem; margin: 0 0 10px; }
+.channel h4 .when { font-size: 0.84rem; font-weight: 500; color: var(--muted); }
+.channel.beta:not(.only) p { font-size: 0.92rem; }
+.channel.beta:not(.only) p:not(.small) { color: var(--muted); }
 .yours {
   display: none;
   margin-left: auto;
