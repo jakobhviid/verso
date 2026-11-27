@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 # Releases cut by a tag (AGENTS.md, "Versioning"; ARCHITECTURE.md, "Verso's releases"). The maintainer starts each
-# step; the release workflow (.github/workflows/release.yml) runs `build` the same way on a pushed tag.
+# step; the release workflow (.github/workflows/release.yml), started by hand, is the backup that runs `build` the same
+# way on GitHub.
 #
 #   ci/release.sh                  the version the next release would take (ci/version.sh) and its notes
 #   ci/release.sh tag [VERSION]    tag HEAD, clean and on origin/main, as vVERSION (the suggested one when not given),
 #                                  signed, and push the tag
 #   ci/release.sh build TAG        build Linux's files from the tag, in a worktree of its own (the tarball, the AppImage,
-#                                  the rpm and the deb, the Flatpak's source and, where flatpak-builder is, the
-#                                  Flatpak), into target/dist/TAG, and make a draft release of them here
+#                                  the rpm and the deb, the Flatpak's source and the Flatpak, with flatpak-builder or
+#                                  in a container of its own), into target/dist/TAG, and make a draft release of them
+#                                  here
 #   ci/release.sh publish TAG      publish the draft, then bump the tap's `verso` cask (not for a pre-release)
 #
 # --dry-run, anywhere on the line, changes nothing outside this checkout: every tag, push, release and cask change is
@@ -195,7 +197,7 @@ tag_head() {
   [ "$version" = "$suggested" ] || echo "(the suggestion was $suggested)"
   change git tag --sign --message "Verso $version" "$tag" HEAD
   change git push origin "refs/tags/$tag"
-  echo "Next: the release workflow builds its draft, or ci/release.sh build $tag"
+  echo "Next: ci/release.sh build $tag (or, with this machine away, gh workflow run release.yml -f tag=$tag)"
 }
 
 build() {
@@ -257,6 +259,10 @@ build() {
       flatpak build-bundle repo "$out/$flatpak" dev.hviid.Verso --runtime-repo="$flathub"
     )
     files+=("$out/$flatpak")
+  elif command -v podman >/dev/null || command -v docker >/dev/null; then
+    # Without flatpak-builder here, in a container of its own, its runtime and state kept between releases.
+    (cd "$work/verso" && linux/packaging/verso-flatpak.sh "$out")
+    files+=("$out/$flatpak")
   fi
 
   previous=$(previous_tag "$commit" "$version")
@@ -281,8 +287,8 @@ build() {
   done
   if [ ! -e "$out/$flatpak" ]; then
     echo
-    echo "No flatpak-builder here, so no Flatpak: build it in the GNOME VM from $out/verso-source.tar.gz and the"
-    echo "manifest (the lab-desktop-vm skill), then attach it to every draft before publishing:"
+    echo "No flatpak-builder, podman or docker here, so no Flatpak: build it with linux/packaging/verso-flatpak.sh"
+    echo "where podman is, then attach it to every draft before publishing:"
     for release in "${repositories[@]}"; do
       echo "  gh release upload $tag $flatpak --repo $release"
     done
