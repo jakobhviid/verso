@@ -1099,7 +1099,8 @@ app (ARCHITECTURE.md, "Verso on the Mac"). Where Finder's way differs:
   ("Connected to *host*", "*host* is not reachable", "Signed in to *host*" while the drive is off, "Signed out"),
   **Open Verso**, then, signed in, **Show Verso Drive in Finder** and **Turn Off Verso Drive**, or **Turn On Verso
   Drive**, then **Settings…** and **Quit Verso**.
-- **Updates:** Verso on the Mac has no updates of its own yet.
+- **Updates:** Sparkle, from Verso's page's signed feed, on its own schedule and from **Check for Updates…**, for the
+  release run from Applications; a beta's build takes the feed's beta channel too (AGENTS.md, "Versioning").
 - **Files on disk:**
 
   | What | Where |

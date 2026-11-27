@@ -360,9 +360,10 @@ components without our code, which is the main reason to build on them. Nothing 
   beneath), plain rows in grouped boxes. Every tab is a NavigationStack over its own path of `Route` values
   (`ios/Verso/App/Routes.swift`). The Archive in the bar is its photo grid with its own View Options, selection and
   Unarchive, and a tap on its tab goes to its newest photos, as the Library's does.
-- **The account lives in Collections,** as Photos keeps its profile there: its picture with the unread count as a
-  badge (also on the Collections tab), opening the account's sheet, whose first section is the notifications, Verso's
-  and Immich's; beside it "+", for New Album and importing from Photos or Files. No other tab shows the account.
+- **The account stands at the top right of every tab's page on the iPhone,** as Apple's apps keep an account in the
+  top bar, and in Collections alone on the iPad, as Photos keeps its profile there: its picture with the unread count
+  as a badge (also on the Collections tab), opening the account's sheet, whose first section is the notifications,
+  Verso's and Immich's; in Collections, beside it "+", for New Album and importing from Photos or Files.
 - **The Library's top bar holds View Options and Select alone,** beside a large title whose line says what matters
   now: an import's progress (a tap for its details), the days in view, or the count at the newest end. Every page's
   title stays large in the bar's row (under the back button on a pushed page) and never shrinks, with the photos or
@@ -485,7 +486,7 @@ components without our code, which is the main reason to build on them. Nothing 
 | The bell: Verso's notifications and Immich's | The account's sheet in Collections, its first section, each with × and a section of several with Clear All, with a ring round the account's picture while any is kept and the unread count on it and the Collections tab; an import's end as a local notification while in the background |
 | Verso Drive (FUSE on Linux, a File Provider on the Mac) | Verso Drive in the Files app: the Mac's File Provider extension and the same bridge, off until switched on |
 | Immich Crosslink | None for now: Open in Immich and Copy Link, web addresses (ARCHITECTURE.md, Crosslink "Not on the iPhone and the iPad") |
-| Widgets (Featured, Favorites, Album, Person, Place, Chosen) and Shortcuts (Search, Open Album, Next Photo) | The same WidgetKit and App Intents code: Home Screen, Lock Screen and StandBy widgets, Shortcuts, Spotlight; a Control Center control that opens Search |
+| Widgets (the Mac's eight) and Shortcuts (Search, Open Album, Next Photo) | The same WidgetKit and App Intents code: Home Screen, Lock Screen and StandBy widgets, Shortcuts, Spotlight; a Control Center control that opens Search |
 | The menu bar item, the tray | None: iOS has neither |
 | Preferences | The account's sheet: the account, its Immich features, Verso Drive, Administration for admins |
 | Administration | In the account's sheet, for admins: the server's statistics, jobs and users |
@@ -629,6 +630,56 @@ Every idea below is a possible choice, none chosen yet:
 - Verso Drive switched off: the Files app still lists an empty location named after the app, as iOS keeps an
   extension's own default location while its app has none (SPEC, "In the Files app"; ARCHITECTURE, "Verso Drive on
   the iPhone and the iPad"). Whether it can go.
+
+## Parity
+
+Each app of a group keeps up with the others of its group (PRINCIPLES.md, 14): mobile (the iPhone and the iPad, one
+app), the living room (the Apple TV), the desktop (the Mac and Linux). The table is the state of each feature; a gap
+that is not on purpose is a line under it, and goes when it is closed. ✓ built; partial, with what is missing;
+— not there; *by design*, with the reason, where a group goes without it for good.
+
+| Feature | iPhone, iPad | Apple TV | Mac | Linux |
+|---|---|---|---|---|
+| Timeline (years, months, all) | ✓ | ✓ | ✓ | ✓ |
+| Date scroller, viewer's zoom | ✓ | *by design: the remote has no drag or pinch* | ✓ | ✓ |
+| Live Photos, videos | ✓ | ✓ | ✓ | ✓ (the AppImage plays no H.264 or H.265) |
+| A photo's details | ✓ | partial: place and date | ✓ | ✓ |
+| Memories, as stories | ✓ | ✓ | as a gallery, *by design* (ARCHITECTURE.md) | ✓ |
+| Albums, People, Places (by country, then cities) | ✓ | ✓, to look at | ✓ | ✓ (no sort by last visit) |
+| Changing anything (albums, people, edits, tags, favourites, the trash) | ✓ | *by design: the TV's key only reads* | ✓ | ✓ |
+| Sharing (with people, links, comments and likes) | ✓ | *by design* | ✓ | ✓ |
+| Map | ✓ | — | ✓ | ✓ |
+| Search: smart, filters, text in photos and names | ✓ | smart, with quick chips | ✓ | ✓ |
+| Favorites, Archive | ✓ | ✓, to look at | ✓ | ✓ |
+| Trash, Locked Folder | ✓ | *by design* | ✓ | ✓ |
+| Folders, Duplicates | ✓ | — | ✓ | ✓ |
+| Tags | partial: no editing or deleting a tag | *by design* | ✓ | ✓ |
+| Partners | partial: no adding or removing one | follows Immich's setting | ✓ | ✓ |
+| Stacks, and Find Similar Photos | stacks; Similar not shown | — | ✓ | ✓ |
+| Assign Location | — | — | ✓ | ✓ |
+| Import | ✓ (a share extension to come) | *by design* | ✓ | ✓ |
+| Backing up, Free Up Space | ✓ | *by design* | *by design: the phone takes the photos* | *by design: the phone takes the photos* |
+| Verso Drive | ✓ (Files) | *by design: tvOS has no Files* | partial: Finder has no Show in | ✓ |
+| Share, Copy, Save to Photos | ✓ | *by design* | ✓ | partial: no system share picker |
+| Notifications | ✓ | — | ✓ | ✓ |
+| Administration | ✓ | *by design* | ✓ | partial: users only shown, links to Immich |
+| App icon choice | ✓ | partial: Night waits (above, "Verso on the Apple TV") | ✓ | ✓ |
+| Widgets, Shortcuts, Control Center | partial: backing up's Live Activity | the Top Shelf | ✓ (eight widgets, three actions) | — |
+| Menu bar or top bar icon | *by design: iOS has neither* | — | ✓ | ✓ |
+| Immich Crosslink | *by design: iOS cannot target an app* | — | partial: not in Finder | ✓ |
+| Sign-in | ✓ (OIDC, password, API key, the demo) | from the iPhone | ✓ | ✓ |
+| Updates | the App Store, TestFlight | the App Store, TestFlight | Sparkle | the rpm and deb tell; the rest update themselves |
+| Translations | English | English | Italian alone, from Immich Gallery | partial: the window in English |
+
+The gaps within a group, not on purpose:
+- **Mobile:** tag editing, adding a partner, Find Similar Photos and Assign Location, which the desktop has; the share
+  extension and Home Screen widgets (above, "Verso in the system's places").
+- **Desktop, Linux behind the Mac:** widgets and Shortcuts (GNOME's counterpart, a Shell search provider, is parked),
+  Administration's editors, a system share picker, Places' sort by last visit and window tabs ("Linux, to match the
+  Mac").
+- **Desktop, the Mac behind Linux:** Show in from Finder, and Verso Drive's unmount without switching it off and its
+  start at login ("Verso on the Mac").
+- **Every app:** one set of translations for the window's texts (ARCHITECTURE.md, "Translations").
 
 ## Next, in order
 
