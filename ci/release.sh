@@ -161,11 +161,30 @@ in_build_environment() {
   fi
 }
 
+# Run a command holding one of the build slots (VERSO_BUILD_SLOTS, 2 by default): an optimised build of Verso holds
+# 3 to 4.5 GB in each of its two links, and three at once ran the workstation, with a desktop beside them, out of
+# memory. A lane waits here for a slot; the slots are lock files the kernel frees with the process that held one.
+with_build_slot() {
+  local slots=${VERSO_BUILD_SLOTS:-2} slot handle status=0
+  while :; do
+    for slot in $(seq 1 "$slots"); do
+      exec {handle}>"$slot_dir/slot-$slot.lock"
+      if flock -n "$handle"; then
+        "$@" || status=$?
+        exec {handle}>&-
+        return "$status"
+      fi
+      exec {handle}>&-
+    done
+    sleep 5
+  done
+}
+
 # Fedora's lane: the programs built once, in the toolbox, for the tarball, which then the AppImage and the rpm take, so
 # the three carry the same programs, which tell from where they run how they were installed (ARCHITECTURE.md, "One
 # build for Fedora's files").
 build_fedora() {
-  in_build_environment linux/packaging/verso-tarball.sh "$1"
+  with_build_slot in_build_environment linux/packaging/verso-tarball.sh "$1"
   export VERSO_BINARIES=$VERSO_TARGET_ROOT/package/release
   in_build_environment linux/packaging/verso-appimage.sh "$1"
   linux/packaging/verso-packages.sh "$1" rpm
@@ -281,11 +300,12 @@ build() {
   mkdir -p "$out"
   # Three lanes at once, each with a build folder of its own and a log in target/dist/TAG.logs: Fedora's, whose one
   # build of the programs the tarball, the AppImage and the rpm carry; the deb's, built in Ubuntu against its
-  # libraries; and the Flatpak's, from the source archive in its SDK. Two optimised builds link at once, 3 to 4 GB each.
+  # libraries; and the Flatpak's, from the source archive in its SDK. Two optimised builds run at once (with_build_slot).
   # A lane that fails stops the release, with its log's end.
   local logs=$out.logs lane names=() pids=() failed=()
   rm -rf "$logs"
   mkdir -p "$logs"
+  slot_dir=$logs
   start_lane() {
     local name=$1
     shift
@@ -300,8 +320,8 @@ build() {
     pids+=($!)
   }
   start_lane fedora build_fedora "$out"
-  start_lane deb linux/packaging/verso-packages.sh "$out" deb
-  start_lane flatpak build_flatpak "$out"
+  start_lane deb with_build_slot linux/packaging/verso-packages.sh "$out" deb
+  start_lane flatpak with_build_slot build_flatpak "$out"
   echo "Building in three lanes at once; their logs are in $logs"
   for lane in "${!pids[@]}"; do
     if wait "${pids[$lane]}"; then
