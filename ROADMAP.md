@@ -636,7 +636,7 @@ Every idea below is a possible choice, none chosen yet:
 Each app of a group keeps up with the others of its group (PRINCIPLES.md, 14): mobile (the iPhone and the iPad, one
 app), the living room (the Apple TV), the desktop (the Mac and Linux). The table is the state of each feature; a gap
 that is not on purpose is a line under it, and goes when it is closed. ✓ built; partial, with what is missing;
-— not there; *by design*, with the reason, where a group goes without it for good.
+none, not there; *by design*, with the reason, where a group goes without it for good.
 
 | Feature | iPhone, iPad | Apple TV | Mac | Linux |
 |---|---|---|---|---|
@@ -648,25 +648,25 @@ that is not on purpose is a line under it, and goes when it is closed. ✓ built
 | Albums, People, Places (by country, then cities) | ✓ | ✓, to look at | ✓ | ✓ (no sort by last visit) |
 | Changing anything (albums, people, edits, tags, favourites, the trash) | ✓ | *by design: the TV's key only reads* | ✓ | ✓ |
 | Sharing (with people, links, comments and likes) | ✓ | *by design* | ✓ | ✓ |
-| Map | ✓ | — | ✓ | ✓ |
+| Map | ✓ | none | ✓ | ✓ |
 | Search: smart, filters, text in photos and names | ✓ | smart, with quick chips | ✓ | ✓ |
 | Favorites, Archive | ✓ | ✓, to look at | ✓ | ✓ |
 | Trash, Locked Folder | ✓ | *by design* | ✓ | ✓ |
-| Folders, Duplicates | ✓ | — | ✓ | ✓ |
+| Folders, Duplicates | ✓ | none | ✓ | ✓ |
 | Tags | partial: no editing or deleting a tag | *by design* | ✓ | ✓ |
 | Partners | partial: no adding or removing one | follows Immich's setting | ✓ | ✓ |
-| Stacks, and Find Similar Photos | stacks; Similar not shown | — | ✓ | ✓ |
-| Assign Location | — | — | ✓ | ✓ |
+| Stacks, and Find Similar Photos | stacks; Similar not shown | none | ✓ | ✓ |
+| Assign Location | none | none | ✓ | ✓ |
 | Import | ✓ (a share extension to come) | *by design* | ✓ | ✓ |
 | Backing up, Free Up Space | ✓ | *by design* | *by design: the phone takes the photos* | *by design: the phone takes the photos* |
 | Verso Drive | ✓ (Files) | *by design: tvOS has no Files* | partial: Finder has no Show in | ✓ |
 | Share, Copy, Save to Photos | ✓ | *by design* | ✓ | partial: no system share picker |
-| Notifications | ✓ | — | ✓ | ✓ |
+| Notifications | ✓ | none | ✓ | ✓ |
 | Administration | ✓ | *by design* | ✓ | partial: users only shown, links to Immich |
 | App icon choice | ✓ | partial: Night waits (above, "Verso on the Apple TV") | ✓ | ✓ |
-| Widgets, Shortcuts, Control Center | partial: backing up's Live Activity | the Top Shelf | ✓ (eight widgets, three actions) | — |
-| Menu bar or top bar icon | *by design: iOS has neither* | — | ✓ | ✓ |
-| Immich Crosslink | *by design: iOS cannot target an app* | — | partial: not in Finder | ✓ |
+| Widgets, Shortcuts, Control Center | partial: backing up's Live Activity | the Top Shelf | ✓ (eight widgets, three actions) | none |
+| Menu bar or top bar icon | *by design: iOS has neither* | none | ✓ | ✓ |
+| Immich Crosslink | *by design: iOS cannot target an app* | none | partial: not in Finder | ✓ |
 | Sign-in | ✓ (OIDC, password, API key, the demo) | from the iPhone | ✓ | ✓ |
 | Updates | the App Store, TestFlight | the App Store, TestFlight | Sparkle | the rpm and deb tell; the rest update themselves |
 | Translations | English | English | Italian alone, from Immich Gallery | partial: the window in English |
