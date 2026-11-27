@@ -8,7 +8,9 @@ Store Connect. Python's standard library and openssl only, so it runs on the Mac
     ios/appstore.py check                                         the texts' lengths and the screenshots, offline
     ios/appstore.py medium                                        the medium iPhone's pictures, from the large one's
     ios/appstore.py push [--version X.Y.Z] [--platform ios|tvos|all] [--no-screenshots]
-    ios/appstore.py beta [--platform ios|tvos|all]           the beta channel: each newest build's What to Test, in
+    ios/appstore.py beta [--platform ios|tvos|all] [--external]
+                                                              the beta channel: each newest build's What to Test, for
+                                                              the internal testers; with --external, also in
                                                               TestFlight's external groups, and to its beta review
     ios/appstore.py submit [--version X.Y.Z] [--platform ...] the stable channel: the version's newest build, the one
                                                               TestFlight tested, attached and sent to App Review
@@ -394,9 +396,12 @@ def newest_build(connect, app, api, version=None):
     return builds[0] if builds else None
 
 
-def beta(platforms):
-    """The beta channel (AGENTS.md, "Versioning"): each platform's newest build in every external TestFlight group,
-    the public link's among them, and sent to TestFlight's beta review, which the first build of a version needs."""
+def beta(platforms, external):
+    """The beta channel (AGENTS.md, "Versioning"): each platform's newest build with its What to Test, which the
+    internal testers have as soon as Apple has processed it. With `external`, which the maintainer chooses, usually at
+    the end of a day's work, as a build in beta review holds the next of its version back until Apple is done: also in
+    every external TestFlight group, the public link's among them, and sent to TestFlight's beta review, which the
+    first build of a version needs."""
     connect = Connect()
     app = connect.get("/v1/apps", **{"filter[bundleId]": BUNDLE_ID})["data"][0]["id"]
     groups = [group for group in connect.all(f"/v1/apps/{app}/betaGroups")
@@ -413,6 +418,9 @@ def beta(platforms):
         ok &= step("What to Test", lambda: localized(
             connect, f"/v1/builds/{build['id']}/betaBuildLocalizations", "betaBuildLocalizations", "builds",
             build["id"], {"whatsNew": text("what_to_test", platform)}))
+        if not external:
+            print("  for the internal testers; the external groups wait for --external")
+            continue
         for group in groups:
             ok &= step(f"in {group['attributes'].get('name')}", lambda group=group: connect.call(
                 "POST", f"/v1/betaGroups/{group['id']}/relationships/builds",
@@ -502,6 +510,8 @@ def main():
     for name in ("beta", "submit"):
         channel = commands.add_parser(name)
         channel.add_argument("--platform", choices=["ios", "tvos", "all"], default="all")
+        if name == "beta":
+            channel.add_argument("--external", action="store_true")
         if name == "submit":
             channel.add_argument("--version")
     pushing = commands.add_parser("push")
@@ -516,7 +526,7 @@ def main():
         return
     if arguments.command == "beta":
         chosen = list(PLATFORMS) if arguments.platform == "all" else [arguments.platform]
-        sys.exit(0 if beta(chosen) else 1)
+        sys.exit(0 if beta(chosen, arguments.external) else 1)
     if arguments.command == "submit":
         chosen = list(PLATFORMS) if arguments.platform == "all" else [arguments.platform]
         version = arguments.version or subprocess.run([str(ROOT / "ci/version.sh")], capture_output=True, text=True,

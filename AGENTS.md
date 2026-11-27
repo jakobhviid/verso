@@ -109,7 +109,7 @@ any other.
 | GitHub | a pre-release, never Latest | Latest |
 | Homebrew (Linux and the Mac) | `jakobhviid/tap/verso@beta`, which a stable release reaches too | `jakobhviid/tap/verso`, until Homebrew's own `homebrew/cask` takes it (then `tap_migrations.json` moves it) |
 | The Mac's updates | Sparkle's beta channel: a beta's build takes betas and releases (`VERSO_CHANNEL`) | Sparkle's default channel |
-| iPhone, iPad, Apple TV | TestFlight: the internal group, and the external one with the public link (`ios/appstore.py beta`) | App Store: the TestFlight build of the version, sent to review (`ios/appstore.py submit`) |
+| iPhone, iPad, Apple TV | TestFlight: the internal group (`ios/appstore.py beta`), and the external one with the public link once the maintainer says so (`--external`) | App Store: the TestFlight build of the version, sent to review (`ios/appstore.py submit`) |
 | Linux's own update check, Verso's page | untouched | `latest.json` and the page follow it |
 
 Apple's version strings are numbers alone, so a beta's Apple builds carry `0.78.0` with their rising build number;
@@ -118,7 +118,10 @@ the iPhone and the iPad) come straight from the checkout, on any branch, and bel
 
 The maintainer's three requests, and what each runs:
 - **"Release to TestFlight"** (from `develop`): `ios/release.sh` and `ios/release.sh --tvos` on the Mac, then
-  `ios/appstore.py beta`, which sets each build's What to Test (`ios/AppStore/what_to_test.txt`) as it sends it to the testers.
+  `ios/appstore.py beta`, which sets each build's What to Test (`ios/AppStore/what_to_test.txt`) for the internal
+  testers. Then ask the maintainer whether it goes to the external testers too; only on their yes, `ios/appstore.py beta
+  --external` puts it in the external groups and sends it to beta review. That is the maintainer's call, usually at the
+  end of a day's work: a build in beta review holds the next of its version back until Apple is done with it.
 - **"Make a beta"** (from `develop`): `ci/release.sh tag VERSION-beta.N`, then `build`, the Mac's disk image and
   `ci/release.sh mac`, and `publish`, which bumps `verso@beta` and rebuilds the page's feed; with the TestFlight
   release above.
