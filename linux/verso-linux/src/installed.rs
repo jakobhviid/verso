@@ -6,10 +6,19 @@ use std::path::Path;
 
 use verso_core::product::{self, Product};
 
+/// The file Verso's own rpm and deb carry beside the programs to say they are a release's packages, which look for a
+/// newer release (`share/verso/channel`, reading `package`): from the window in `libexec/` and the service in `bin/`,
+/// both find it under the same prefix.
+pub fn channel_file(executable: &Path) -> Option<std::path::PathBuf> {
+    Some(executable.parent()?.parent()?.join("share/verso/channel"))
+}
+
 /// What this process was installed as. Both programs ask it, so they agree.
 pub fn product() -> &'static Product {
     let executable = std::env::current_exe().ok();
+    let channel = executable.as_deref().and_then(channel_file).and_then(|file| std::fs::read_to_string(file).ok());
     product_for(&Signs {
+        channel,
         installed: std::env::var("VERSO_INSTALLED").ok(),
         flatpak: std::env::var_os("FLATPAK_ID").is_some() || Path::new("/.flatpak-info").exists(),
         appimage: std::env::var_os("APPIMAGE").is_some(),
@@ -31,11 +40,15 @@ pub struct Signs {
     pub appimage_mount: Option<std::path::PathBuf>,
     /// This program's own file.
     pub executable: Option<std::path::PathBuf>,
+    /// What the channel file beside the programs says (`channel_file`), where there is one.
+    pub channel: Option<String>,
 }
 
 /// The product the signs make: a Flatpak's sandbox; an AppImage whose mount this program runs from (a program started
-/// from a process an AppImage started inherits `APPIMAGE`, but runs from elsewhere); the rpm's and the deb's programs
-/// in `/usr/bin` and `/usr/libexec`; else the tarball's Verso, which Homebrew installs.
+/// from a process an AppImage started inherits `APPIMAGE`, but runs from elsewhere); the release's rpm and deb, by the
+/// channel file they carry, not by `/usr`, so a build of one's own installed there, or a repository's package, which
+/// updates itself, does not look for a release (ARCHITECTURE.md, "Updates on Linux"); else the tarball's Verso,
+/// which Homebrew installs.
 pub fn product_for(signs: &Signs) -> &'static Product {
     match signs.installed.as_deref() {
         Some("tarball") => return &product::VERSO,
@@ -56,7 +69,7 @@ pub fn product_for(signs: &Signs) -> &'static Product {
     if signs.appimage && from_mount {
         return &product::VERSO_APPIMAGE;
     }
-    if executable.is_some_and(|executable| executable.starts_with("/usr/bin") || executable.starts_with("/usr/libexec")) {
+    if signs.channel.as_deref().map(str::trim) == Some("package") {
         return &product::VERSO_PACKAGE;
     }
     &product::VERSO
@@ -70,12 +83,22 @@ mod tests {
         Signs { executable: Some(executable.into()), ..Signs::default() }
     }
 
+    fn packaged(executable: &str) -> Signs {
+        Signs { channel: Some("package\n".into()), ..running(executable) }
+    }
+
     #[test]
     fn each_way_of_installing_is_told_apart() {
         assert_eq!(product_for(&running("/home/linuxbrew/.linuxbrew/Cellar/verso/0.77.0/libexec/verso")), &product::VERSO);
         assert_eq!(product_for(&running("/home/someone/verso/verso-service")), &product::VERSO);
-        assert_eq!(product_for(&running("/usr/libexec/verso")), &product::VERSO_PACKAGE);
-        assert_eq!(product_for(&running("/usr/bin/verso-service")), &product::VERSO_PACKAGE);
+        assert_eq!(product_for(&packaged("/usr/libexec/verso")), &product::VERSO_PACKAGE);
+        assert_eq!(product_for(&packaged("/usr/bin/verso-service")), &product::VERSO_PACKAGE);
+        // Under /usr without the release's channel file: a build of one's own, or a repository's package.
+        assert_eq!(product_for(&running("/usr/libexec/verso")), &product::VERSO);
+        assert_eq!(
+            (channel_file(Path::new("/usr/libexec/verso")), channel_file(Path::new("/usr/bin/verso-service"))),
+            (Some("/usr/share/verso/channel".into()), Some("/usr/share/verso/channel".into()))
+        );
         assert_eq!(product_for(&Signs { flatpak: true, ..running("/app/bin/verso") }), &product::VERSO_FLATPAK);
         let appimage = Signs {
             appimage: true,
@@ -88,7 +111,7 @@ mod tests {
     #[test]
     fn a_program_that_inherits_an_appimages_signs_is_what_it_runs_as() {
         // The rpm's Verso, started from a terminal an AppImage's Verso opened, inherits APPIMAGE and APPDIR.
-        let inherited = Signs { appimage: true, appimage_mount: Some("/tmp/.mount_versoAb12".into()), ..running("/usr/libexec/verso") };
+        let inherited = Signs { appimage: true, appimage_mount: Some("/tmp/.mount_versoAb12".into()), ..packaged("/usr/libexec/verso") };
         assert_eq!(product_for(&inherited), &product::VERSO_PACKAGE);
     }
 

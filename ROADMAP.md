@@ -751,8 +751,8 @@ the daemon's own look can stop for them.
 1. **COPR for Fedora** (and Fedora's atomic desktops through `rpm-ostree`), built from the release's rpms or its
    sources. Needs the maintainer's Fedora account and a COPR project.
 2. **An apt repository for Ubuntu,** signed, served beside the download page.
-3. **Then:** packages from a repository are built without the `package` feature, so they do not look for releases
-   themselves (ARCHITECTURE.md, "Updates on Linux").
+3. **Then:** packages from a repository leave out the channel file, so they do not look for releases themselves
+   (ARCHITECTURE.md, "Updates on Linux").
 
 ## An AppImage beside the Flatpak
 

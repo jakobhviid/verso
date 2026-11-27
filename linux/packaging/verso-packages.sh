@@ -113,7 +113,7 @@ inside() {
     target=/target/package-$format
     if [ -d /binaries ]; then
         # The programs a release built once for Fedora's files (VERSO_BINARIES; ARCHITECTURE.md, "One build for
-        # Fedora's files"), which tell they are the packages' Verso from where they are installed.
+        # Fedora's files"), which tell they are the packages' Verso by the channel file below.
         mkdir -p "$target/release"
         cp /binaries/verso /binaries/verso-service "$target/release/"
     else
@@ -128,6 +128,10 @@ inside() {
     install -D -m 0755 linux/packaging/verso-launcher.sh "$root/usr/bin/verso"
     install -D -m 0755 "$target/release/verso" "$root/usr/libexec/verso"
     install -D -m 0755 "$target/release/verso-service" "$root/usr/bin/verso-service"
+    # The release's packages, which look for a newer release: the programs read it beside them (verso_linux::installed;
+    # ARCHITECTURE.md, "Updates on Linux"). A repository's packages leave it out.
+    mkdir -p "$root/usr/share/verso"
+    printf 'package\n' > "$root/usr/share/verso/channel"
     strip "$root/usr/libexec/verso" "$root/usr/bin/verso-service"
     # The user service, which runs the installed service, and the desktop entry, which runs the launcher.
     mkdir -p "$root/usr/lib/systemd/user" "$root/usr/share/applications"

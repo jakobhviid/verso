@@ -1744,20 +1744,23 @@ then every 24 hours, it reads Verso's page's `latest.json` (`https://jakob.hviid
 release's version and the page's address, which `site/build.py` writes) and tells of a newer version once, in a
 notification (the version told of is kept in `~/.local/state/verso/update-told`), and on the tray's menu ("Get Verso
 *version*…", which opens the page) for as long as it runs. It sends nothing but the request and its User-Agent.
-- **On for the rpm and the deb alone:** they are built with the `package` feature (`linux/packaging/verso-packages.sh`),
-  which makes the product `VERSO_PACKAGE`: Verso's, with `updates.check` on by default and shown in Preferences
+- **On for the rpm and the deb alone:** they carry a channel file beside the programs, `/usr/share/verso/channel`
+  reading `package` (`linux/packaging/verso-packages.sh`), which the programs read as they start
+  (`verso_linux::installed`, from their own place: `libexec/` and `bin/` both find it under their prefix), and which
+  makes the product `VERSO_PACKAGE`: Verso's, with `updates.check` on by default and shown in Preferences
   (General, Updates), so it can be switched off. Every other build is `VERSO`, `VERSO_FLATPAK` or `VERSO_APPIMAGE`, which hide the
   setting and read it as off, whatever `config.toml` says (`Product::hidden_settings`).
 - **Who looks, besides:** never Homebrew's installs (in its Cellar or a cask's folder, which `brew upgrade` keeps
   current) nor a Flatpak (its remote updates it) or an AppImage (its updater replaces the file), whatever the setting, and not a development build (version 0.0.0),
   which has no release to compare (`linux/verso-service/src/updates.rs`, `verso_linux::updates`). A pre-release is
   never told of: the page names the latest release.
-- **Not chosen: deciding at run time** by where the program is (`/usr/bin`): a build of one's own installed there would
-  look, and packages from a repository, which update themselves, would too. The build says what it is, once, as the
-  Flatpak's does; a repository's packages are built without the feature (ROADMAP.md, "Package repositories").
+- **Not chosen: deciding by where the program is** (`/usr/bin`): a build of one's own installed there would look, and
+  packages from a repository, which update themselves, would too. The release's packages say what they are, in their
+  channel file; a repository's leave it out (ROADMAP.md, "Package repositories"). Nor a build feature for it, which
+  made the same Fedora programs three times for three files ("One build for Fedora's files").
 - **Never replaced in place:** the packages own `/usr`, and files changed under dpkg or rpm break their package
   database. The user updates the way they installed.
-- **Flatpak impact:** none; a Flatpak does not look, and its build has no `package` feature.
+- **Flatpak impact:** none; a Flatpak does not look, and carries no channel file.
 - **Not chosen:** GitHub's releases API (rate-limited without a token, and a second host to name in SECURITY.md); a
   check in the window (it runs only when opened).
 
@@ -1990,8 +1993,9 @@ the license with the third-party licenses.
 - **No maintainer scripts:** the distributions' own triggers refresh the icon cache, the desktop database and the
   MIME cache, and an upgrade or an uninstall reaches the running programs through their watch of their own files
   ("The daemon's lifecycle", step 6).
-- **Built with the `package` feature,** so the service tells of a newer release, which nothing else would bring
-  ("Updates on Linux").
+- **The channel file,** `/usr/share/verso/channel` reading `package`, so the service tells of a newer release, which
+  nothing else would bring ("Updates on Linux"). The rpm carries the programs the tarball does ("One build for
+  Fedora's files"); the deb's are built in Ubuntu, against its libraries.
 - **Checked by the packaging matrix** (`lab/packaging/`, the `lab-packaging-matrix` skill): on Fedora 44 and 43,
   Ubuntu 26.04 and Debian 14 each installs, says its version, has `updates.check` on, finds its libraries, starts its
   window and mounts the lab server's library with originals matching Immich's checksums, then removes cleanly; on
@@ -1999,16 +2003,40 @@ the license with the third-party licenses.
 - **Not chosen: a package for each release of each distribution** (`%{?dist}`, a deb per Ubuntu): one file per format
   is what a release page offers plainly, and the matrix checks it on each system it is for. Repositories, which would
   build per release, are in ROADMAP.md, "Package repositories".
-- **Flatpak impact:** none. The packages are another channel beside it, from the same programs built with the
-  `package` feature in place of the `flatpak` one.
+- **Flatpak impact:** none. The packages are another channel beside it, from the same source, the programs telling at
+  run time which they are.
+
+#### One build for Fedora's files
+
+The tarball, the AppImage and the rpm carry the same two programs, built once in the Fedora 44 toolbox
+(`ci/release.sh build`'s Fedora lane, `VERSO_BINARIES`), which tell as they start how they were installed
+(`verso_linux::installed`): in a Flatpak's sandbox (`FLATPAK_ID`), run from an AppImage's mount (`APPIMAGE`, and the
+program inside `APPDIR`, as a program started from an AppImage's process inherits the first), beside the release
+packages' channel file ("Updates on Linux"), else as the tarball's, which Homebrew installs; `VERSO_INSTALLED` says it
+outright, for checks. The product that makes decides the drive, the sandbox's limits and the look for a newer release
+(`verso_core::product`).
+- **What the person gets checked is what everyone gets:** a check of the tarball is a check of the AppImage's and the
+  rpm's programs, and a problem reported from one reproduces with the others.
+- **A release builds two optimised programs where it built four:** Fedora's, and the deb's in Ubuntu, which needs that
+  distribution's libraries; the Flatpak builds in its own SDK. They link at once, in about 3 1/4 minutes each.
+- **The programs keep the tarball's run path,** `$ORIGIN/lib`, where it bundles libraries the desktop may lack: in the
+  rpm (`/usr/libexec/lib`) and the AppImage it names a folder that is not there, and the system's libraries are found
+  as before.
+- **Not chosen:**
+  - **A build feature for each** (`flatpak`, `appimage`, `package`), which chose the product at build time: the
+    same programs built three times, each its own to check.
+  - **Thin link-time optimisation,** which links in a third of the time and makes the programs a third larger: the
+    release profile is the Apple editions' too, where an app's size shows on its App Store page and counts against
+    cellular downloads and the Apple TV's storage, and on Linux the programs are most of each package's download;
+    the time it saves is the release machine's, unattended.
 
 #### Verso as a Flatpak
 
-One build feature, `flatpak` on both programs (`verso` and `verso-service`), makes the product `VERSO_FLATPAK`: Verso's
-names, folders and app ID, with `Product::sandboxed` set, which every part that would reach outside a sandbox asks. The
-drive is the reason: mounting needs the host's setuid `fusermount3` through host commands (`flatpak-spawn --host`),
-which is no sandbox at all, and Flathub does not accept apps whose core needs host components. So the Flatpak leaves
-the drive out rather than ask for that.
+In a Flatpak's sandbox (`FLATPAK_ID`; "One build for Fedora's files"), both programs (`verso` and `verso-service`)
+are the product `VERSO_FLATPAK`: Verso's names, folders and app ID, with `Product::sandboxed` set, which every part
+that would reach outside a sandbox asks. The drive is the reason: mounting needs the host's setuid `fusermount3`
+through host commands (`flatpak-spawn --host`), which is no sandbox at all, and Flathub does not accept apps whose
+core needs host components. So the Flatpak leaves the drive out rather than ask for that.
 
 **What the Flatpak leaves out,** worded for a store listing:
 
@@ -2064,9 +2092,10 @@ its sandbox: the gallery, the top bar icon and its service, and no Verso Drive, 
 files of an install that name its programs (the user unit, Files' menu, the sidebar's entry and the volume monitor's
 fstab line), which a file that may move, run from a mount that goes with its process, cannot hold.
 
-**One build feature, `appimage` on both programs,** makes the product `VERSO_APPIMAGE`: Verso's names, folders and app
-ID, with the Flatpak's hidden settings (`WITHOUT_DRIVE`), `drive` off and `appimage` on, and `sandboxed` off. The
-Flatpak's flag, `sandboxed`, was asked in two kinds of place, and the AppImage is the case that told them apart:
+**Run from an AppImage's mount** ("One build for Fedora's files"), both programs are the product `VERSO_APPIMAGE`:
+Verso's names, folders and app ID, with the Flatpak's hidden settings (`WITHOUT_DRIVE`), `drive` off and `appimage`
+on, and `sandboxed` off. The Flatpak's flag, `sandboxed`, was asked in two kinds of place, and the AppImage is the case
+that told them apart:
 - **`Product::drive`** (false in both): there is no drive to mount, to show, to unmount from the top bar's menu, to list
   in Files' sidebar, or to say goodbye to when signing out, and Preferences says the drive is not there.
 - **`Product::installed()`** (true for the tarball, the rpm and the deb alone: neither `sandboxed` nor `appimage`):
