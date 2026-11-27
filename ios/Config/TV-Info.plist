@@ -26,6 +26,10 @@
 			</array>
 		</dict>
 	</array>
+	<!-- Standard encryption alone (HTTPS, and Apple's own for the iPhone's connection), as the iPhone's app declares, so
+	     a build needs no answer in App Store Connect before TestFlight's external testers get it. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSHumanReadableCopyright</key>
 	<string>Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO.</string>
 	<!-- Set Up with iPhone: the iPhones nearby with Verso's Set Up Apple TV open (DeviceDiscoveryUI). -->

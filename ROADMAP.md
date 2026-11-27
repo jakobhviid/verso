@@ -788,7 +788,22 @@ the top rather than at the bottom. **Left:**
    (`AppIconNight`, which `make-tv-icons.py` writes), and App Store validation then turns the build down, "Missing the
    Alternate Icon asset", as it carries no App Store size (1280 × 768); in brand assets of its own, with that size,
    the asset catalog does not find it at all. Open: how a tvOS alternate carries its App Store size.
-2. **A walk of the remote's focus**: left and right in the viewer, the story, Years to Months to All Photos at a photo,
+2. **An idea, not decided: the Locked Folder on the TV, opened from the iPhone each time.** The TV's stance today is
+   never the Locked Folder; this would make it never without the iPhone. Immich opens the Locked Folder only to a
+   session unlocked with the PIN: an API key, even one with every permission, is refused ("Elevated permission is
+   required"), so the TV's key never can. A session the iPhone creates for the TV (`POST /sessions`, with a duration)
+   can be unlocked by the iPhone itself with the PIN, sent with the TV's token, so the TV never learns the PIN; the
+   server ends the session at its duration on its own, and a lock (`POST /auth/session/lock`) or a delete ends it at
+   once. How it would look: Locked Folder, a switch in the TV's Settings, off by default; choosing it, the TV asks for
+   the iPhone (Set Up with iPhone's picker), the iPhone asks "Show the Locked Folder on “Living Room”?" with Face ID
+   and, created and unlocked, hands over a session of some minutes; the TV keeps it in memory alone, keeps the
+   Folder's pictures out of its disk cache and the Top Shelf, and locks and deletes the session as it leaves the
+   Folder, so every visit asks the iPhone again; the iPhone's Apple TV page shows a TV with the Folder open and can
+   lock it. No encryption of Verso's own: HTTPS and Apple's connection. The cost: a session has no read-only scope, so
+   for its minutes it could change what it reaches, where the TV's key may only look. Open: whether the TV reaches the
+   iPhone again without the picker; where the iPhone keeps the PIN (typed each time, or in the Keychain behind Face
+   ID); an iPhone signed in with an API key, which cannot create sessions.
+3. **A walk of the remote's focus**: left and right in the viewer, the story, Years to Months to All Photos at a photo,
    the lift of a tile under focus. The Simulator has no remote's keys under `simctl`, and the TV has no UI test target
    yet, so these are for a real Apple TV or for such a target.
 
