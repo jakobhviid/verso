@@ -1,4 +1,5 @@
-// The account's picture on iOS, in Collections' toolbar alone, as Photos keeps the profile in Collections: a circle,
+// The account's picture on iOS, at the top right of every tab's own page on the iPhone, as Apple's apps keep an account
+// in the top bar, and in Collections' toolbar alone on the iPad (accountToolbar): a circle,
 // as an account is everywhere in Verso (DESIGN.md), its profile picture or its initials on Immich's colour for them,
 // with a ring round it while the sheet holds notifications (in the accent, orange where one asks something of the
 // person), and the unread ones' count in the toolbar's red badge. A tap opens the account's sheet (AccountSheet), which
@@ -7,6 +8,38 @@
 
 import SwiftUI
 import UIKit
+
+extension EnvironmentValues {
+    /// A tab's own page on the iPhone, whose top bar ends with the account (AccountToolbarItems).
+    @Entry var accountInTopBar = false
+}
+
+extension View {
+    /// Marks a tab's own page: on the iPhone its top bar ends with the account's button; on the iPad the account stays
+    /// in Collections alone (CollectionsToolbar). Pushed pages are declared outside the page, so the mark stays on it.
+    func accountToolbar() -> some View {
+        environment(\.accountInTopBar, UIDevice.current.userInterfaceIdiom == .phone)
+    }
+}
+
+/// The account's button at the right end of a tab's own page's top bar, after the page's own buttons, which a page
+/// puts last in its toolbar; none while a page is selecting, when the selection has the top bar.
+struct AccountToolbarItems: ToolbarContent {
+    let session: LibrarySession
+    let chrome: LibraryChrome?
+    let shown: Bool
+
+    var body: some ToolbarContent {
+        if shown && chrome?.isSelecting != true {
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            ToolbarItem(placement: .topBarTrailing) {
+                AccountButton(services: session.services) { chrome?.accountShown = true }
+            }
+            // The button draws its own glass, a circle, as on Collections.
+            .sharedBackgroundVisibility(.hidden)
+        }
+    }
+}
 
 struct AccountButton: View {
     let services: AccountServices

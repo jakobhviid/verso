@@ -13,6 +13,8 @@ import VersoCore
 
 struct PeopleView: View {
     let session: LibrarySession
+    @Environment(\.accountInTopBar) private var accountInTopBar
+    @Environment(LibraryChrome.self) private var accountChrome: LibraryChrome?
     /// Shows the hidden people beside the others, marked, as the Mac's view option does.
     @AppStorage("people.includeHidden") private var includeHidden = false
     @AppStorage(CardSize.key) private var cardSize = 0
@@ -64,6 +66,7 @@ struct PeopleView: View {
         .cardPageTitle(String(localized: "People"))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) { viewOptions }
+            AccountToolbarItems(session: session, chrome: accountChrome, shown: accountInTopBar)
         }
         .personRenameAlert($renaming) { person, name in update(person, PersonEdit(name: name)) }
         .sheet(item: $mergeTarget, onDismiss: askToMerge) { target in

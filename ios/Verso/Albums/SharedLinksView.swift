@@ -9,6 +9,8 @@ import SwiftUI
 
 struct SharedLinksView: View {
     let session: LibrarySession
+    @Environment(\.accountInTopBar) private var accountInTopBar
+    @Environment(LibraryChrome.self) private var accountChrome: LibraryChrome?
     @Environment(\.pushRoute) private var pushRoute
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @AppStorage(CardSize.key) private var cardSize = 0
@@ -50,6 +52,7 @@ struct SharedLinksView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) { viewOptions.disabled(!sharing.linksAvailable) }
             ToolbarItem(placement: .topBarTrailing) { newAlbumLink.disabled(!sharing.linksAvailable || ownAlbums.isEmpty) }
+            AccountToolbarItems(session: session, chrome: accountChrome, shown: accountInTopBar)
         }
         .task {
             await sharing.reload()

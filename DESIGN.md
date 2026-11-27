@@ -441,7 +441,8 @@ sections, the pages, the viewer's info), drawn with each platform's own toolkit:
   iPhone and iPad the account's sheet holds them at its top
   in the same two sections, Verso's headed by its lens (the app icon's, without its barrel) and "On This iPhone"; each
   row has a small × in a grey circle that clears it, and a section of more than one has Clear All in its heading. The
-  account's picture in Collections wears a ring while any is kept, read or not, in the accent, orange when one asks
+  account's picture, at the top right of every tab's own page on the iPhone (the rightmost of the top bar's buttons,
+  stepping aside while selecting) and in Collections' top bar alone on the iPad, wears a ring while any is kept, read or not, in the accent, orange when one asks
   something of the person, and the system's red badge counts the unread.
 - **A person is a rounded square, an account a circle,** in Verso on every platform: the shape tells what a picture
   of someone is. A person in the photos (the People page, a person's header, the faces under a photo, Search's

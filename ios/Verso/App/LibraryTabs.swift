@@ -316,12 +316,14 @@ struct LibraryTabs: View {
             Tab("Library", systemImage: "photo.on.rectangle", value: LibraryTab.library) {
                 TabStack(session: session, tab: .library) {
                     LibraryTabView(session: session)
+                        .accountToolbar()
                 }
             }
             ForEach(choices) { choice in
                 Tab(choice.title, systemImage: choice.systemImage, value: LibraryTab.choice(choice)) {
                     TabStack(session: session, tab: .choice(choice)) {
                         ChosenTabPage(session: session, choice: choice)
+                            .accountToolbar()
                     }
                 }
             }
@@ -335,6 +337,7 @@ struct LibraryTabs: View {
             Tab(value: LibraryTab.search, role: .search) {
                 TabStack(session: session, tab: .search) {
                     SearchTabView(session: session)
+                        .accountToolbar()
                 }
             }
         }
@@ -435,7 +438,7 @@ private struct TabStack<Root: View>: View {
     }
 }
 
-/// A page the person put in the tab bar, as its tab's own page; the account is on Collections' page alone.
+/// A page the person put in the tab bar, as its tab's own page, with the account at its top right on the iPhone.
 private struct ChosenTabPage: View {
     let session: LibrarySession
     let choice: TabBarChoice

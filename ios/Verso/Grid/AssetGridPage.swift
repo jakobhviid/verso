@@ -59,6 +59,7 @@ struct AssetGridPage: View {
     /// This page, among the window's pages selecting and those that open at their bottom (LibraryChrome).
     @State private var pageID = UUID()
     @Environment(LibraryChrome.self) private var chrome: LibraryChrome?
+    @Environment(\.accountInTopBar) private var accountInTopBar
     @Environment(\.pushRoute) private var pushRoute
     /// Where the viewer shows: over the tabs, or over a viewer whose details opened this page.
     @Environment(ViewerHost.self) private var viewerHost: ViewerHost?
@@ -265,6 +266,7 @@ struct AssetGridPage: View {
                 }
                 .disabled(model.totalCount == 0 && phone.isEmpty)
             }
+            AccountToolbarItems(session: session, chrome: chrome, shown: accountInTopBar)
         }
     }
 

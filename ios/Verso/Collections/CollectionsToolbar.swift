@@ -1,5 +1,5 @@
-// Collections' toolbar on iOS (ROADMAP.md, M10), the one place the account shows, as Photos keeps the profile in
-// Collections: a "+" menu, then the account's picture with a red badge counting the unread notifications, which its
+// Collections' toolbar on iOS (ROADMAP.md, M10), where the account shows on the iPad, as Photos keeps the profile in
+// Collections, and on the iPhone as on every tab's page (accountToolbar): a "+" menu, then the account's picture with a red badge counting the unread notifications, which its
 // sheet opens with. The menu makes a New Album as Albums does (a name, then the album opens on Collections' stack),
 // and starts an import into the library, from Photos or from Files (ImportPickers.swift). The window presents the
 // account's sheet and the import's pickers (LibraryTabs), as the keyboard's commands ask for them too.

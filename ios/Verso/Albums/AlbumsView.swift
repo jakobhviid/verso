@@ -13,6 +13,8 @@ import VersoCore
 
 struct AlbumsView: View {
     let session: LibrarySession
+    @Environment(\.accountInTopBar) private var accountInTopBar
+    @Environment(LibraryChrome.self) private var accountChrome: LibraryChrome?
 
     // The same settings as the Mac's albums page and Immich's, under the same names, with Photos' sections as iOS's own:
     // by year by default, as the Mac's and Immich's `albums.groupBy`.
@@ -64,6 +66,7 @@ struct AlbumsView: View {
                     naming = true
                 }
             }
+            AccountToolbarItems(session: session, chrome: accountChrome, shown: accountInTopBar)
         }
         .task {
             await session.reloadAlbums()

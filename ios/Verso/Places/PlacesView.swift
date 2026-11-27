@@ -25,6 +25,8 @@ enum PlacesMode: String, CaseIterable, Identifiable {
 
 struct PlacesView: View {
     let session: LibrarySession
+    @Environment(\.accountInTopBar) private var accountInTopBar
+    @Environment(LibraryChrome.self) private var accountChrome: LibraryChrome?
     @Environment(\.pushRoute) private var pushRoute
     @State private var mode: PlacesMode
     @State private var cities: [AssetResponse] = []
@@ -75,6 +77,7 @@ struct PlacesView: View {
                     PlacesViewOptions(sortBy: $sortBy, cardSize: $cardSize, ladder: PlacesLayout.countries, page: cardPage)
                 }
             }
+            AccountToolbarItems(session: session, chrome: accountChrome, shown: accountInTopBar)
         }
         // The cities are read once Places shows them, and again when the server answers after it could not be reached.
         .task(id: "\(mode)-\(session.services.reconnections)") {

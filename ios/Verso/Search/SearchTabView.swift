@@ -22,6 +22,7 @@ struct SearchTabView: View {
     /// Find's askings (⌘F) answered, so each opens the field once.
     @State private var findsAnswered = 0
     @Environment(LibraryChrome.self) private var chrome: LibraryChrome?
+    @Environment(\.accountInTopBar) private var accountInTopBar
 
     var body: some View {
         content
@@ -119,6 +120,7 @@ struct SearchTabView: View {
                       : "line.3.horizontal.decrease.circle.fill")
             }
         }
+        AccountToolbarItems(session: session, chrome: chrome, shown: accountInTopBar)
     }
 
     /// The field's prompt says what it searches.

@@ -9,6 +9,8 @@ import SwiftUI
 
 struct MemoriesView: View {
     let session: LibrarySession
+    @Environment(\.accountInTopBar) private var accountInTopBar
+    @Environment(LibraryChrome.self) private var accountChrome: LibraryChrome?
     @Environment(\.pushRoute) private var pushRoute
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @AppStorage(CardSize.key) private var cardSize = 0
@@ -44,6 +46,7 @@ struct MemoriesView: View {
                         Label("View Options", systemImage: "line.3.horizontal.decrease")
                     }
                 }
+                AccountToolbarItems(session: session, chrome: accountChrome, shown: accountInTopBar)
             }
             .fullScreenCover(item: $playing, onDismiss: showGridAfterStory) { chosen in
                 MemoryStory(model: model, startID: chosen.id) { memory in
