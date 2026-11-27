@@ -284,6 +284,8 @@ check() {
   mkdir -p "$(dirname "$worktree")" "$root/target/release-cache/check-darwin" "$root/target/release-cache/check-registry"
   trap 'git -C "$root" worktree remove --force "$worktree" 2>/dev/null || true' EXIT
   git worktree add --quiet --detach "$worktree" "$commit"
+  # The lab's fixture photos, which git leaves out and seed.sh downloads into this checkout: a contract test uploads one.
+  ln -s "$root/lab/immich-server/fixtures/cache" "$worktree/lab/immich-server/fixtures/cache"
   SECONDS=0
 
   check_step "the gate: clippy (warnings are errors), the tests and the translations, in the toolbox"
