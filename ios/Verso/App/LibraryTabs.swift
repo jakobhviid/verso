@@ -513,9 +513,9 @@ private struct LibraryWindowPresentations: ViewModifier {
             // An Apple TV asking to be set up (AppleTVSetup.shared): Verso listens while signed in, and again as it
             // comes to the front, where iOS stopped it, so a tap on the notification for the TV's request finds it;
             // the Apple TV page opens over this window, the account sheet giving way first.
-            .task(id: session.client.serverURL) { AppleTVSetup.shared.start(client: session.client) }
+            .task(id: session.client.serverURL) { AppleTVSetup.shared.start(services: session.services) }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-                AppleTVSetup.shared.start(client: session.client)
+                AppleTVSetup.shared.start(services: session.services)
             }
             .onDisappear { AppleTVSetup.shared.stop() }
             .onChange(of: AppleTVSetup.shared.pageShown) { _, shown in

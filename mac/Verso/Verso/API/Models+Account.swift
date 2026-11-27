@@ -22,6 +22,12 @@ struct AccountDevice: Decodable, Identifiable, Sendable {
     let updatedAt: String
 }
 
+/// A session made for another device, with its token, which the server shows only as it makes it.
+struct NewAccountDevice: Decodable, Sendable {
+    let id: String
+    let token: String
+}
+
 struct AccountNotification: Decodable, Identifiable, Sendable {
     let id: String
     let title: String

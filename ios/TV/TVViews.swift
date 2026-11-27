@@ -1,7 +1,7 @@
 import SwiftUI
 
 // The TV's places, by priority (ROADMAP.md, "Verso on the Apple TV"): Library, Albums, Search, People, Places, Memories,
-// Favorites and Archive, and Settings at the foot, in tvOS's sidebar-style tab view, each drawn as the iPhone draws its own (DESIGN.md, "The
+// Favorites and Archive, the Locked Folder where Settings shows it (TVLockedFolder), and Settings at the foot, in tvOS's sidebar-style tab view, each drawn as the iPhone draws its own (DESIGN.md, "The
 // apps' interfaces"); one grid size for the sofa, and the photo fills the screen. Nothing here changes the library: the
 // TV's key may only read.
 
@@ -10,6 +10,7 @@ struct TVRootView: View {
     @State private var place = TVPlace.library
     /// A photo a Top Shelf item opened.
     @State private var viewing: TVViewing?
+    @AppStorage(TVLockedFolderSetting.key) private var showsLockedFolder = false
 
     init() {
         #if DEBUG
@@ -37,6 +38,9 @@ struct TVRootView: View {
                     Tab("Archive", systemImage: "archivebox", value: TVPlace.archive) {
                         NavigationStack { TVTimeline(query: TimelineQuery(visibility: "archive"), title: String(localized: "Archive")) }
                     }
+                    if showsLockedFolder {
+                        Tab("Locked Folder", systemImage: "lock", value: TVPlace.lockedFolder) { NavigationStack { TVLockedFolder() } }
+                    }
                 }
                 // In a section of its own, as tvOS puts loose tabs above the sections: at the sidebar's foot.
                 TabSection {
@@ -49,6 +53,14 @@ struct TVRootView: View {
             .task { await model.refreshTopShelf() }
             .task(id: model.opening) { await follow(model.opening) }
             .fullScreenCover(item: $viewing) { viewing in TVViewer(viewing: viewing) }
+            // Leaving the Locked Folder for another place locks it; so does hiding it in Settings.
+            .onChange(of: place, initial: true) { _, place in
+                model.lockedFolderInFront = place == .lockedFolder
+                if place != .lockedFolder { model.lockFolder() }
+            }
+            .onChange(of: showsLockedFolder) { _, shown in
+                if !shown { model.lockFolder() }
+            }
         }
     }
 
@@ -69,5 +81,5 @@ struct TVRootView: View {
 
 /// The TV's places, the tab view's selection. A development build opens at one named by `-tvPlace`.
 enum TVPlace: String, Hashable {
-    case library, albums, memories, search, favorites, people, places, archive, settings
+    case library, albums, memories, search, favorites, people, places, archive, lockedFolder, settings
 }

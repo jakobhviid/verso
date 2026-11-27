@@ -19,7 +19,10 @@ struct VersoTVApp: App {
                 // A Top Shelf item: a memory or a photo (TVShelfData).
                 .onOpenURL { model.open($0) }
                 // Each time the TV comes back to Verso: a key forgotten on the iPhone, or deleted in Immich, signs it out.
-                .task(id: phase) { if phase == .active { await model.checkKey() } }
+                // Leaving the front locks the Locked Folder.
+                .task(id: phase) {
+                    if phase == .active { await model.checkKey() } else { model.lockFolder() }
+                }
         }
     }
 }
@@ -33,6 +36,19 @@ final class TVModel {
     var opening: TVOpening?
     /// Why the TV signed itself out, said on Set Up with iPhone.
     var signedOutReason: String?
+    /// The Locked Folder while the iPhone has it open on this TV (TVLockedFolder), in memory alone.
+    private(set) var lockedFolder: TVLockedFolderVisit?
+    /// Why the Locked Folder did not open, or locked by itself.
+    var lockedFolderReason: String?
+    /// The Locked Folder is the place on screen, so a token the iPhone sends opens it; else it is ended at once.
+    var lockedFolderInFront = false
+    @ObservationIgnored private var checkingKey = false
+
+    /// The Locked Folder's model: its session's client and pictures, which its grid and viewer read in place of the TV's.
+    init(lockedFolder client: ImmichClient, images: ImagePipeline) {
+        self.client = client
+        self.images = images
+    }
 
     init() {
         #if DEBUG
@@ -41,7 +57,7 @@ final class TVModel {
         if client == nil, let account = TVAccount.load() { use(account) }
         // A key forgotten on the iPhone or deleted in Immich, met by any call while the TV is in use.
         ImmichClient.onUnauthorized = { [weak self] in
-            Task { @MainActor in self?.keyRejected() }
+            Task { @MainActor in await self?.unauthorizedSeen() }
         }
     }
 
@@ -62,6 +78,7 @@ final class TVModel {
     /// Signs out of this Apple TV. The key stays in Immich until the iPhone forgets the TV or it is deleted there: a
     /// read-only key may not delete itself.
     func signOut() {
+        lockFolder()
         TVAccount.remove()
         client = nil
         images = nil
@@ -75,6 +92,47 @@ final class TVModel {
     func checkKey() async {
         guard let client else { return }
         _ = try? await client.currentUser()
+    }
+
+    /// A call met Immich's 401: the TV's key turned down, or the Locked Folder's session ended. Immich's answer about
+    /// the key itself decides, asked past the client's own check so it tells of nothing more; the Locked Folder's
+    /// session is checked too.
+    func unauthorizedSeen() async {
+        await lockedFolder?.verify()
+        guard let client, !checkingKey, var request = try? client.request("users/me") else { return }
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        checkingKey = true
+        defer { checkingKey = false }
+        guard let (_, response) = try? await client.session.data(for: request) else { return }
+        if (response as? HTTPURLResponse)?.statusCode == 401, self.client === client { keyRejected() }
+    }
+
+    /// Opens the Locked Folder with the token the iPhone sent: only for a session the server has unlocked, of the
+    /// TV's own account, while the folder is still the place on screen; else the session is ended at once.
+    func openLockedFolder(token: String) async {
+        guard let client, lockedFolder == nil else { return }
+        let visit = TVLockedFolderVisit(server: client.serverURL, apiURL: client.apiURL, token: token)
+        do {
+            let status = try await visit.status()
+            guard status.isElevated else { throw ImmichError.http(403, String(localized: "The server did not unlock the Locked Folder.")) }
+            let (theirs, ours) = (try await visit.user(), try await client.currentUser())
+            guard theirs.id == ours.id else { throw ImmichError.http(403, String(localized: "That iPhone is signed in to another account than this Apple TV.")) }
+            guard lockedFolderInFront, self.client === client, lockedFolder == nil else { return visit.end() }
+            visit.onExpired = { [weak self] reason in self?.lockFolder(reason) }
+            visit.scheduleCheck(status.pinExpiresAt)
+            lockedFolder = visit
+        } catch {
+            visit.end()
+            lockedFolderReason = error.localizedDescription
+        }
+    }
+
+    /// Locks the Locked Folder: its session ends on the server, and its pictures go.
+    func lockFolder(_ reason: String? = nil) {
+        guard let visit = lockedFolder else { return }
+        lockedFolder = nil
+        visit.end()
+        lockedFolderReason = reason
     }
 
     /// Immich turned the key down: the TV was forgotten on the iPhone, or its key deleted in Immich. Its copy goes from

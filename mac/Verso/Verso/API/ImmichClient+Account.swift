@@ -42,6 +42,16 @@ extension ImmichClient {
         if try await Self.core?(apiURL, credential)?.deleteAccountDevice(id) == true { return }
         try await send("DELETE", "sessions/\(id)")
     }
+    /// A session for another device (`POST /sessions`), which the server ends after `duration` seconds, with its token:
+    /// the iPhone makes one for an Apple TV's visit to the Locked Folder, and unlocks it with the PIN for the TV.
+    func createAccountDevice(type: String, os: String, duration: Int) async throws -> NewAccountDevice {
+        struct Body: Encodable { let deviceType: String; let deviceOS: String; let duration: Int }
+        return try await send("POST", "sessions", body: Body(deviceType: type, deviceOS: os, duration: duration))
+    }
+    /// Ends this client's own session (`POST /auth/logout`): the Apple TV's, as it leaves the Locked Folder.
+    func endOwnSession() async throws {
+        try await send("POST", "auth/logout")
+    }
     func deleteOtherAccountDevices() async throws {
         if try await Self.core?(apiURL, credential)?.deleteOtherAccountDevices() == true { return }
         try await send("DELETE", "sessions")

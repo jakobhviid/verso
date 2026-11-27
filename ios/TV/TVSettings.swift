@@ -1,6 +1,7 @@
 // Settings on the Apple TV, at the sidebar's foot: the app's icon, Day or Night, as the iPhone's App Icon page offers
-// its designs (tvOS keeps one icon in light and dark alike, so the person chooses); the account, with Sign Out; and
-// About, with the non-affiliation notice every platform's About carries.
+// its designs (tvOS keeps one icon in light and dark alike, so the person chooses); the Locked Folder in Collections,
+// off until turned on, which the iPhone opens each time (TVLockedFolder); the account, with Sign Out; and About, with
+// the non-affiliation notice every platform's About carries.
 
 import SwiftUI
 import UIKit
@@ -9,6 +10,7 @@ struct TVSettings: View {
     @Environment(TVModel.self) private var tv
     @State private var icon = TVAppIcon.current
     @State private var confirmingSignOut = false
+    @AppStorage(TVLockedFolderSetting.key) private var showsLockedFolder = false
 
     var body: some View {
         ScrollView {
@@ -27,6 +29,15 @@ struct TVSettings: View {
                         }
                     }
                 }
+                }
+                VStack(alignment: .leading, spacing: 24) {
+                    TVSectionHeader(title: String(localized: "Locked Folder"))
+                    Toggle("Show Locked Folder in Collections", isOn: $showsLockedFolder)
+                        .frame(maxWidth: 1100)
+                    Text("It opens only from your iPhone, with Face ID or your PIN, each time, and locks as you leave it. The Apple TV never learns the PIN.")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: 1100, alignment: .leading)
                 }
                 VStack(alignment: .leading, spacing: 24) {
                     TVSectionHeader(title: String(localized: "Account"))

@@ -23,7 +23,13 @@ Problems in the Immich server itself belong to the Immich project:
   share. The Apple TV keeps a key of its own in its Keychain, the same way: one the iPhone's Set Up Apple TV made for
   it, allowed only to read, which the person never sees. Sign Out on the TV forgets it; the key itself stays in Immich
   until Forget on the iPhone's Apple TV page, or deleting it in Immich, ends it, as a read-only key may not delete
-  itself.
+  itself. The key never opens the Locked Folder. With the Locked Folder shown in the TV's Settings, the TV opens it
+  only through the iPhone, each time: Verso on the iPhone asks, with Face ID or the PIN, makes the TV a session of its
+  own that the server ends within the hour, unlocks it with the PIN and sends its token alone, so the TV never learns
+  the PIN. The TV keeps that token in memory, never on disk, keeps the folder's pictures in memory and out of the Top
+  Shelf, and ends the session as it leaves the folder or the front; Lock on the iPhone's Apple TV page ends it too.
+  Unlike the key, the session is not limited to reading, as Immich gives sessions no narrower scope; Verso on the TV
+  changes nothing with it.
 - **The Locked Folder's PIN,** where Touch ID or Face ID opens the folder, once the PIN has been typed. On the Mac it
   is kept in the login keychain, on that Mac only, and given back only after the app's own Touch ID check, with the
   fingerprints enrolled when it was kept. On the iPhone and the iPad it is kept in the Keychain, on that device only,

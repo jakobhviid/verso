@@ -652,8 +652,9 @@ none, not there; *by design*, with the reason, where a group goes without it for
 | Map | ✓ | none | ✓ | ✓ |
 | Search: smart, filters, text in photos and names | ✓ | smart, with quick chips | ✓ | ✓ |
 | Favorites, Archive | ✓ | ✓, to look at | ✓ | ✓ |
-| Trash, Locked Folder | ✓ | *by design* | ✓ | ✓ |
-| The Locked Folder opened by a face or a finger | ✓ (Face ID) | *by design* | ✓ (Touch ID) | none yet: the PIN is typed each time |
+| Trash | ✓ | *by design* | ✓ | ✓ |
+| Locked Folder | ✓ | from the iPhone, each time | ✓ | ✓ |
+| The Locked Folder opened by a face or a finger | ✓ (Face ID) | ✓ (the iPhone's Face ID) | ✓ (Touch ID) | none yet: the PIN is typed each time |
 | Folders, Duplicates | ✓ | none | ✓ | ✓ |
 | Tags | partial: no editing or deleting a tag | *by design* | ✓ | ✓ |
 | Partners | partial: no adding or removing one | follows Immich's setting | ✓ | ✓ |
@@ -739,13 +740,14 @@ form: the same Rust core through the same Swift bindings, built for tvOS as for 
 where it applies; one App Store record with the iPhone, the iPad and the Mac (`dev.hviid.Verso`), through TestFlight
 first.
 
-**What it holds,** by priority (not the menu's order): Library, Albums, Search, People, Places, Memories, Favorites
-and Archive. Search is tvOS's own search screen, with its keyboard and the Siri Remote's dictation, answered by
-Immich's smart search. The Library follows the user's partners as Immich has them set ("show in my timeline"), with no
-setting of its own. Left out on purpose: the Locked Folder and editing, uploads and backup, Verso Drive, sharing,
-the trash and administration. No zoom and no pinch between sizes: one grid size for the sofa, and the photo fills the
-screen. The places sit in tvOS's sidebar-style tab view. Places opens at the countries, most recently visited first,
-each opening its cities, as the iPhone groups them by country: a wall of cities from around the world says nothing.
+**What it holds,** by priority (not the menu's order): Library, Albums, Search, People, Places, Memories, Favorites and
+Archive. Search is tvOS's own search screen, with its keyboard and the Siri Remote's dictation, answered by Immich's
+smart search. The Library follows the user's partners as Immich has them set ("show in my timeline"), with no setting of
+its own. The Locked Folder opens only from the iPhone, each time (below, "The Locked Folder"). Left out on purpose:
+editing, uploads and backup, Verso Drive, sharing, the trash and administration. No zoom and no pinch between sizes: one
+grid size for the sofa, and the photo fills the screen. The places sit in tvOS's sidebar-style tab view. Places opens at
+the countries, most recently visited first, each opening its cities, as the iPhone groups them by country: a wall of
+cities from around the world says nothing.
 
 **Sign-in, from the iPhone alone.** The TV never asks for a server, a password or an OIDC sign-in, and the user never
 sees an API key:
@@ -769,6 +771,26 @@ sees an API key:
   pair again. A reinstall keeps it too: the Keychain outlives the app, and tvOS offloads and reinstalls apps by itself
   when space runs low; the key stays listed on the iPhone until forgotten there.
 
+**The Locked Folder, from the iPhone each time.** Immich opens the Locked Folder only to a session unlocked with the
+PIN: an API key, even one with every permission, is refused ("Elevated permission is required"), so the TV's key never
+can. Locked Folder in the TV's Settings, off until turned on, puts it in Collections, and each visit asks the iPhone:
+- **Unlock with iPhone** (Set Up with iPhone's picker) sends the TV's name and server; Verso on the iPhone asks "Show
+  the Locked Folder on “Living Room”?", with Face ID where it keeps the PIN behind it, or with the PIN typed, makes the
+  TV a session of its own (`POST /sessions`, for an hour, named "Verso on Apple TV (Living Room)"), unlocks it with
+  the PIN through the TV's token (`POST /auth/session/unlock`), and sends the token alone: the TV never learns the PIN.
+  Turned down, with the reason on the TV: an iPhone signed in with an API key, which cannot make sessions; a TV of
+  another server; Immich's demo.
+- the TV opens it only for a session of its own account that the server has unlocked, and only while the folder is
+  still on screen. It keeps the token in memory alone, reads through a connection without a URL cache, keeps the
+  pictures in memory and out of the Top Shelf, asks the server each minute whether the session is still unlocked, and
+  ends it (`POST /auth/logout`) as it leaves the folder or the front or signs out; the server ends it at the hour
+  regardless.
+- the iPhone's Apple TV page lists the TVs with the folder open, each with **Lock**, which deletes the session; the TV
+  sees it within the minute.
+- no encryption of Verso's own: HTTPS and Apple's connection. The cost: a session has no read-only scope, so for its
+  minutes it could change what it reaches, where the TV's key may only look; Verso on the TV changes nothing. The
+  picker shows each time: DeviceDiscoveryUI offers no way back to an iPhone without it.
+
 **Built** (`ios/TV/`, the `VersoTV` target of the iOS project, with the core's bindings as `VersoCoreTV`): the core for
 tvOS (`mac/build-rust.sh --tvos`), the eight places in tvOS's sidebar-style tab view drawn as the iPhone's pages (DESIGN.md,
 "The apps' interfaces", "On the Apple TV"), sharing the iPhone's files where tvOS compiles them (`ios/project.yml`, the
@@ -780,7 +802,8 @@ sidebar's foot (the account, with Sign Out; About, with the non-affiliation noti
 **Top Shelf** (`ios/TVTopShelf`, the `VersoTVTopShelf` extension): today's memories and the newest photos, which the app
 writes into the App Group it shares with the extension each time it starts signed in, so the extension needs no key and
 no network, each opening the app at that memory or photo (`verso://memory/<id>`, `verso://photo/<id>`); it runs in the tvOS
-Simulator against a server, and on a real Apple TV from TestFlight. A development build takes launch arguments to open at a place (`-tvPlace`, `-tvLibraryMode`,
+Simulator against a server, and on a real Apple TV from TestFlight; **the Locked Folder, from the iPhone each
+time** (`ios/TV/TVLockedFolder.swift`, the iPhone's side in `AppleTVSetup`, above). A development build takes launch arguments to open at a place (`-tvPlace`, `-tvLibraryMode`,
 `-tvSearch`, `-tvOpenPhoto`), for looking. Not as the iPhone has them, because a remote has no pinch, no long press and no
 drag: the grid's zoom and the date scroller, a card's menu and Select, the filters sheet in Search, tags, and a
 memory's New mark going away once played, which needs a key that may write; the Library opens at its newest photos at
@@ -790,22 +813,7 @@ the top rather than at the bottom. **Left:**
    (`AppIconNight`, which `make-tv-icons.py` writes), and App Store validation then turns the build down, "Missing the
    Alternate Icon asset", as it carries no App Store size (1280 × 768); in brand assets of its own, with that size,
    the asset catalog does not find it at all. Open: how a tvOS alternate carries its App Store size.
-2. **An idea, not decided: the Locked Folder on the TV, opened from the iPhone each time.** The TV's stance today is
-   never the Locked Folder; this would make it never without the iPhone. Immich opens the Locked Folder only to a
-   session unlocked with the PIN: an API key, even one with every permission, is refused ("Elevated permission is
-   required"), so the TV's key never can. A session the iPhone creates for the TV (`POST /sessions`, with a duration)
-   can be unlocked by the iPhone itself with the PIN, sent with the TV's token, so the TV never learns the PIN; the
-   server ends the session at its duration on its own, and a lock (`POST /auth/session/lock`) or a delete ends it at
-   once. How it would look: Locked Folder, a switch in the TV's Settings, off by default; choosing it, the TV asks for
-   the iPhone (Set Up with iPhone's picker), the iPhone asks "Show the Locked Folder on “Living Room”?" with Face ID
-   and, created and unlocked, hands over a session of some minutes; the TV keeps it in memory alone, keeps the
-   Folder's pictures out of its disk cache and the Top Shelf, and locks and deletes the session as it leaves the
-   Folder, so every visit asks the iPhone again; the iPhone's Apple TV page shows a TV with the Folder open and can
-   lock it. No encryption of Verso's own: HTTPS and Apple's connection. The cost: a session has no read-only scope, so
-   for its minutes it could change what it reaches, where the TV's key may only look. Open: whether the TV reaches the
-   iPhone again without the picker; where the iPhone keeps the PIN (typed each time, or in the Keychain behind Face
-   ID); an iPhone signed in with an API key, which cannot create sessions.
-3. **A walk of the remote's focus**: left and right in the viewer, the story, Years to Months to All Photos at a photo,
+2. **A walk of the remote's focus**: left and right in the viewer, the story, Years to Months to All Photos at a photo,
    the lift of a tile under focus. The Simulator has no remote's keys under `simctl`, and the TV has no UI test target
    yet, so these are for a real Apple TV or for such a target.
 
