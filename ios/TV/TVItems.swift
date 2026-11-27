@@ -33,9 +33,10 @@ struct TVItem: Identifiable, Hashable, Sendable {
                   date: ImmichDate.parse(asset.localDateTime), livePhotoVideoID: asset.livePhotoVideoId, thumbhash: asset.thumbhash)
     }
 
-    /// A month's photos, without the Locked Folder's.
-    static func items(_ month: TimeBucketAssets) -> [TVItem] {
-        month.id.indices.filter { month.visibility?.indices.contains($0) != true || month.visibility?[$0] != "locked" }.map { index in
+    /// A month's photos, without the Locked Folder's, unless the month is the Locked Folder's own (`keepsLocked`), which
+    /// only its session, unlocked from the iPhone, reads.
+    static func items(_ month: TimeBucketAssets, keepsLocked: Bool = false) -> [TVItem] {
+        month.id.indices.filter { keepsLocked || month.visibility?.indices.contains($0) != true || month.visibility?[$0] != "locked" }.map { index in
             TVItem(id: month.id[index], isVideo: !month.isImage[index], isFavorite: month.isFavorite[index],
                    durationMS: month.duration[index]?.milliseconds, date: ImmichDate.parse(month.fileCreatedAt[index]),
                    livePhotoVideoID: month.livePhotoVideoId[index], thumbhash: month.thumbhash[index])
@@ -55,6 +56,9 @@ struct TVViewing: Identifiable {
     let items: [TVItem]
     let index: Int
     var more: (@MainActor () async -> [TVItem]?)?
+
+    /// The photo it opens at, whose tile it grows out of.
+    var startID: String { items.indices.contains(index) ? items[index].id : "" }
 }
 
 /// A timeline: its months, newest first as the server sends them, each read as it comes into view.
@@ -108,7 +112,7 @@ final class TVTimelineModel {
         defer { reading.remove(id) }
         guard let assets = try? await client.timeBucket(id, query),
               let current = months.firstIndex(where: { $0.id == id }) else { return }
-        months[current].items = TVItem.items(assets)
+        months[current].items = TVItem.items(assets, keepsLocked: query.visibility == "locked")
     }
 
     /// Reads the first month not read yet, for the viewer stepping past the last photo it has, and answers every photo.

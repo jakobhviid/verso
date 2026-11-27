@@ -35,6 +35,7 @@ struct TVLibrary: View {
                 .modifier(TVWidth(width: $width))
             }
             .scrollClipDisabled()
+            .modifier(TVViewerCover(viewing: $viewing, focused: $focused) { proxy.scrollTo($0, anchor: .center) })
         }
         .task {
             await model.load(tv.client)
@@ -46,7 +47,6 @@ struct TVLibrary: View {
             }
             #endif
         }
-        .fullScreenCover(item: $viewing) { viewing in TVViewer(viewing: viewing) }
     }
 
     /// Years, Months or All Photos: the system's segmented control, as the iPhone has them.

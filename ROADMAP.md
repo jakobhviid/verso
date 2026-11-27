@@ -795,23 +795,26 @@ can. Locked Folder in the TV's Settings, off until turned on, puts it in Collect
 tvOS (`mac/build-rust.sh --tvos`), the eight places in tvOS's sidebar-style tab view drawn as the iPhone's pages
 (DESIGN.md, "The apps' interfaces", "On the Apple TV"), sharing the iPhone's files where tvOS compiles them
 (`ios/project.yml`, the `VersoTV` sources: the cards of people, places and memories, the search chips, the Library
-modes, the albums', places' and people's arrangement by the shared core), the viewer (the preview, then the full-size
-image; title capsule on a click; the LIVE badge and a Live Photo's movie; videos), memories as stories, the TV's key in
-its Keychain, the iPhone's **Set Up Apple TV** (Account) and the TV's **Set Up with iPhone** (DeviceDiscoveryUI's
-picker); **Settings** at the sidebar's foot (the Top Shelf's rows, the Locked Folder's switch, the account, with Sign
-Out; About, with the non-affiliation notice); the **Top Shelf** (`ios/TVTopShelf`, the `VersoTVTopShelf` extension): the
-rows Settings chooses, in this order: today's memories and the newest photos until turned off, the albums with the
-newest photos first (the shared core's Most Recent Photo, the order the Albums page runs in, so the latest trip's albums
-lead), the newest favorites and the people People shows, in its order, once turned on. The app writes them into the App
-Group it shares with the extension each time it starts signed in and as the rows change, so the extension needs no key
-and no network, each opening the app at that memory, photo, album or person (`verso://memory/<id>`,
-`verso://photo/<id>`, `verso://album/<id>`, `verso://person/<id>`); it runs in the tvOS Simulator against a server, and
-on a real Apple TV from TestFlight; **the Locked Folder, from the iPhone each time** (`ios/TV/TVLockedFolder.swift`, the
-iPhone's side in `AppleTVSetup`, above). A development build takes launch arguments to open at a place (`-tvPlace`,
-`-tvLibraryMode`, `-tvSearch`, `-tvOpenPhoto`), for looking. Not as the iPhone has them, because a remote has no pinch,
-no long press and no drag: the grid's zoom and the date scroller, a card's menu and Select, the filters sheet in Search,
-tags, and a memory's New mark going away once played, which needs a key that may write; the Library opens at its newest
-photos at the top rather than at the bottom. **Left:**
+modes, the albums', places' and people's arrangement by the shared core), the viewer (out of its tile and back into it,
+the photos sliding as they step; the preview, then the full-size image; title capsule on a click; the Live Photo sign
+and its movie; videos in tvOS's own player, with its transport bar, scrubbing and info panel, a click on the remote's
+edge stepping to the next photo, which hold the TV in HDR once one is HDR, until the viewer closes), memories as
+stories, the TV's key in its Keychain, the iPhone's **Set Up Apple TV** (Account) and the TV's **Set Up with iPhone**
+(DeviceDiscoveryUI's picker); **Settings** at the sidebar's foot (the Top Shelf's rows, the Locked Folder's switch, the
+account, with Sign Out; About, with the non-affiliation notice); the **Top Shelf** (`ios/TVTopShelf`, the
+`VersoTVTopShelf` extension): the rows Settings chooses, in this order: today's memories and the newest photos until
+turned off, the albums with the newest photos first (the shared core's Most Recent Photo, the order the Albums page runs
+in, so the latest trip's albums lead), the newest favorites and the people People shows, in its order, once turned on.
+The app writes them into the App Group it shares with the extension each time it starts signed in and as the rows
+change, so the extension needs no key and no network, each opening the app at that memory, photo, album or person
+(`verso://memory/<id>`, `verso://photo/<id>`, `verso://album/<id>`, `verso://person/<id>`); it runs in the tvOS
+Simulator against a server, and on a real Apple TV from TestFlight; **the Locked Folder, from the iPhone each time**
+(`ios/TV/TVLockedFolder.swift`, the iPhone's side in `AppleTVSetup`, above). A development build takes launch arguments
+to open at a place (`-tvPlace`, `-tvLibraryMode`, `-tvSearch`, `-tvOpenPhoto`), for looking, and to step the viewer by
+itself (`-tvViewerSteps left,right,close`), as the Simulator has no remote, for a recording of its slides and its zoom.
+Not as the iPhone has them, because a remote has no pinch, no long press and no drag: the grid's zoom and the date
+scroller, a card's menu and Select, the filters sheet in Search, tags, and a memory's New mark going away once played,
+which needs a key that may write; the Library opens at its newest photos at the top rather than at the bottom. **Left:**
 1. **The Night icon as the app's alternate,** which Settings offers as App Icon, Day or Night, once the app carries it
    (`TVAppIcon.offered`): the asset catalog registers a tvOS alternate only as an image stack beside the brand assets
    (`AppIconNight`, which `make-tv-icons.py` writes), and App Store validation then turns the build down, "Missing the

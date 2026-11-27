@@ -390,9 +390,13 @@ sections, the pages, the viewer's info), drawn with each platform's own toolkit:
   cards, the most recently visited first, each opening its city cards, which open a city's photos; Memories the memory cards, three to a
   row, playing as a story; Favorites and the Archive the grid under their names. Search is tvOS's own search screen with
   the iPhone's start page under it: quick filters, people with their faces, places and recent searches as glass chips
-  and rows, what matches while typing, and the results as the grid. The viewer fills the screen; a click shows or hides
-  the iPhone's title capsule, the place over the day and time, left and right step through, a Live Photo wears the LIVE
-  badge on yellow glass and play/pause plays its movie, and a video plays in tvOS's own player. The accent is the system
+  and rows, what matches while typing, and the results as the grid. The viewer fills the screen, opening out of its tile and
+  closing into the tile of the photo shown last, as the iPhone's; a click shows or hides the iPhone's title capsule, the
+  place over the day and time; left and right slide to the photo beside it, as the iPhone's pages slide; a Live Photo
+  has the Live Photo sign small in the top corner, out of the photo's way, and play/pause plays its movie; a video plays
+  in tvOS's own player, which has the remote while it plays: its transport bar, scrubbing with a swipe, its info panel
+  with the place and the day, and a click on the remote's edge stepping to the photo beside it. Once a video in HDR has put the TV in HDR, the TV stays there until the viewer closes, where Match
+  Dynamic Range is on: going back to SDR for each photo, and to HDR for the next video, blacks the screen out each time. The accent is the system
   blue, as the iPhone's, set in the TV's asset catalog because tvOS's own is white. Settings, at the sidebar's foot
   in a section of its own, has App Icon where the app carries its Night icon (the Day and Night icons as cards, each
   with its name and a tick under the one on the Home Screen), Top Shelf (a switch for each of its rows), Locked Folder (a

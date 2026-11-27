@@ -93,14 +93,17 @@ struct TVSearchResults: View {
     @FocusState private var focused: String?
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 32) {
-                TVPageTitle(query.text.isEmpty ? query.chips.joined(separator: ", ") : query.text, line: line)
-                if let model { TVResultsGrid(model: model, width: width, focused: $focused) { viewing = $0 } }
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 32) {
+                    TVPageTitle(query.text.isEmpty ? query.chips.joined(separator: ", ") : query.text, line: line)
+                    if let model { TVResultsGrid(model: model, width: width, focused: $focused) { viewing = $0 } }
+                }
+                .modifier(TVWidth(width: $width))
             }
-            .modifier(TVWidth(width: $width))
+            .scrollClipDisabled()
+            .modifier(TVViewerCover(viewing: $viewing, focused: $focused) { proxy.scrollTo($0, anchor: .center) })
         }
-        .scrollClipDisabled()
         .task {
             guard model == nil, let client = tv.client else { return }
             let query = query
@@ -110,7 +113,6 @@ struct TVSearchResults: View {
             model = made
             await made.loadMore()
         }
-        .fullScreenCover(item: $viewing) { viewing in TVViewer(viewing: viewing) }
     }
 
     /// The filters beside the words, and how many photos came.

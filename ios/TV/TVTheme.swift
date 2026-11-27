@@ -95,10 +95,12 @@ struct TVRemote: ViewModifier {
     var select: () -> Void = {}
     var playPause: () -> Void = {}
     var menu: () -> Void = {}
+    /// Off while something inside has the remote of its own, as a video's player has.
+    var takesFocus = true
 
     func body(content: Content) -> some View {
         content
-            .focusable()
+            .focusable(takesFocus)
             .onMoveCommand { direction in
                 switch direction {
                 case .left: left()

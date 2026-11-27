@@ -89,6 +89,7 @@ struct TVTileGrid: View {
     let open: (Int) -> Void
     /// Called as a tile comes into view, for a grid that reads on as the end comes near.
     var appeared: ((Int) -> Void)?
+    @Environment(\.tvZoom) private var zoom
 
     var body: some View {
         let metrics = GridTileMetrics(columns: TVMetrics.tileColumns, width: width, spacing: TVMetrics.tileSpacing)
@@ -100,6 +101,7 @@ struct TVTileGrid: View {
                     .tvLifts()
                     .focused(focused, equals: item.id)
                     .zIndex(focused.wrappedValue == item.id ? 1 : 0)
+                    .tvZoomSource(item.id, in: zoom)
                     .id(item.id)
                     .onAppear { appeared?(index) }
             }
@@ -173,16 +175,18 @@ struct TVTimeline: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 32) {
-                TVPageTitle(title, line: line ?? (model.total > 0 ? itemCount(model.total) : ""))
-                content
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 32) {
+                    TVPageTitle(title, line: line ?? (model.total > 0 ? itemCount(model.total) : ""))
+                    content
+                }
+                .modifier(TVWidth(width: $width))
             }
-            .modifier(TVWidth(width: $width))
+            .scrollClipDisabled()
+            .modifier(TVViewerCover(viewing: $viewing, focused: $focused) { proxy.scrollTo($0, anchor: .center) })
         }
-        .scrollClipDisabled()
         .task { await model.load(tv.client) }
-        .fullScreenCover(item: $viewing) { viewing in TVViewer(viewing: viewing) }
     }
 
     @ViewBuilder
@@ -288,14 +292,17 @@ struct TVCityPage: View {
     @FocusState private var focused: String?
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 32) {
-                TVPageTitle(city, line: model.flatMap { $0.items.isEmpty ? nil : itemCount($0.items.count, more: $0.hasMore) } ?? "")
-                if let model { TVResultsGrid(model: model, width: width, focused: $focused) { viewing = $0 } }
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 32) {
+                    TVPageTitle(city, line: model.flatMap { $0.items.isEmpty ? nil : itemCount($0.items.count, more: $0.hasMore) } ?? "")
+                    if let model { TVResultsGrid(model: model, width: width, focused: $focused) { viewing = $0 } }
+                }
+                .modifier(TVWidth(width: $width))
             }
-            .modifier(TVWidth(width: $width))
+            .scrollClipDisabled()
+            .modifier(TVViewerCover(viewing: $viewing, focused: $focused) { proxy.scrollTo($0, anchor: .center) })
         }
-        .scrollClipDisabled()
         .task {
             guard model == nil, let client = tv.client else { return }
             let city = city
@@ -305,6 +312,5 @@ struct TVCityPage: View {
             model = made
             await made.loadMore()
         }
-        .fullScreenCover(item: $viewing) { viewing in TVViewer(viewing: viewing) }
     }
 }
