@@ -118,7 +118,7 @@ the iPhone and the iPad) come straight from the checkout, on any branch, and bel
 
 The maintainer's three requests, and what each runs:
 - **"Release to TestFlight"** (from `develop`): `ios/release.sh` and `ios/release.sh --tvos` on the Mac, then
-  `ios/appstore.py push` (What to Test from `ios/AppStore/what_to_test.txt`) and `ios/appstore.py beta`.
+  `ios/appstore.py beta`, which sets each build's What to Test (`ios/AppStore/what_to_test.txt`) as it sends it to the testers.
 - **"Make a beta"** (from `develop`): `ci/release.sh tag VERSION-beta.N`, then `build`, the Mac's disk image and
   `ci/release.sh mac`, and `publish`, which bumps `verso@beta` and rebuilds the page's feed; with the TestFlight
   release above.

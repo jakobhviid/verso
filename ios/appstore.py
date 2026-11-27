@@ -8,8 +8,8 @@ Store Connect. Python's standard library and openssl only, so it runs on the Mac
     ios/appstore.py check                                         the texts' lengths and the screenshots, offline
     ios/appstore.py medium                                        the medium iPhone's pictures, from the large one's
     ios/appstore.py push [--version X.Y.Z] [--platform ios|tvos|all] [--no-screenshots]
-    ios/appstore.py beta [--platform ios|tvos|all]           the beta channel: each newest build to TestFlight's
-                                                              external groups, and to its beta review
+    ios/appstore.py beta [--platform ios|tvos|all]           the beta channel: each newest build's What to Test, in
+                                                              TestFlight's external groups, and to its beta review
     ios/appstore.py submit [--version X.Y.Z] [--platform ...] the stable channel: the version's newest build, the one
                                                               TestFlight tested, attached and sent to App Review
 
@@ -410,6 +410,9 @@ def beta(platforms):
             continue
         number = build["attributes"].get("version")
         print(f"{api} build {number} ({build['attributes'].get('processingState')}):")
+        ok &= step("What to Test", lambda: localized(
+            connect, f"/v1/builds/{build['id']}/betaBuildLocalizations", "betaBuildLocalizations", "builds",
+            build["id"], {"whatsNew": text("what_to_test", platform)}))
         for group in groups:
             ok &= step(f"in {group['attributes'].get('name')}", lambda group=group: connect.call(
                 "POST", f"/v1/betaGroups/{group['id']}/relationships/builds",

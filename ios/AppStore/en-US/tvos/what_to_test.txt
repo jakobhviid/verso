@@ -1,4 +1,4 @@
-- The Top Shelf: move Verso to the Home Screen's top row, and today's memories and your newest photos show above it; a click opens that memory or photo.
+- Forget this Apple TV on the iPhone (Account, Apple TV), or delete its key in Immich: the TV signs out as soon as it next asks Immich for anything, even while you browse, and Set Up with iPhone says why. A server that is out of reach, or no network, keeps it signed in.
+- Delete Verso and install it again: it stays signed in.
+- The Top Shelf: move Verso to the Home Screen's top row, and today's memories and your newest photos show above it.
 - Settings, at the foot of the sidebar: Sign Out, and About.
-- Forget this Apple TV on the iPhone (Account, Apple TV): the next time you come back to Verso on the TV, it is signed out and says why.
-- Places opens at the countries, each opening its cities.
