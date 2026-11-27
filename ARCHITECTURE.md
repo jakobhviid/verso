@@ -3491,6 +3491,11 @@ the disk image.
   API does not reach stays the maintainer's, in App Store Connect: App Privacy's answers, the price and
   availability, and sending a version to review. Not chosen: fastlane's `deliver`, which does the same through a
   Ruby toolchain and a folder layout of its own, for one command's worth of calls.
+- **Work on develop, releases on main** (AGENTS.md, "Branches"): main moves only when a release is cut, by a
+  fast-forward to develop, so it reads as the history of releases, and the page and a visitor's checkout show what can
+  be downloaded, while develop takes every commit as it comes. A fast-forward keeps one line of commits for both, so
+  every tag is on develop as well, and the version develop's builds carry is the next release's. Not chosen: git
+  flow's release and feature branches and merge commits, which a project of one maintainer would carry for nothing.
 - **Majors stay in step by themselves:** there is one line of tags.
 - **Flatpak impact:** none. The Flatpak is a Linux build and goes out with every release, its version in its source
   archive's `VERSION`; the AppImage goes out with it, built by `ci/release.sh build` from the same tag.

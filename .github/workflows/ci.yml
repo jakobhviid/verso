@@ -1,10 +1,10 @@
 name: ci
 
-# main and pull requests (work pushed to other branches reaches main too, and is checked there once); releases are cut
-# by a tag (release.yml, AGENTS.md, "Versioning").
+# develop, where work goes, main, which a release moves forward to it, and pull requests (AGENTS.md, "Branches");
+# releases are cut by a tag (release.yml, AGENTS.md, "Versioning").
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
   workflow_dispatch:
 

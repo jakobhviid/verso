@@ -620,8 +620,11 @@ Every idea below is a possible choice, none chosen yet:
 
 - Selecting by holding a photo and dragging, as Photos does, in a way that leaves the grid's scrolling alone (the
   gesture tried took every touch from it).
-- Verso in Messages: On This iPhone, the phone's own newest photos from PhotoKit with those on their way to Immich, and
-  videos; and what only a real iPhone shows: its memory, sending, large originals, a server on the local network, and
+- Verso in Messages: Recents and Favorites read only the newest month as the picker opens. The grid asks for more each
+  time its count of photos changes (`PickerGrid`'s `.task(id: feed.photos.count)`), and the feed adds a month at a
+  time, so the first month's photos restart the task while its read still runs, and the new one finds it loading and
+  stops; a page added at once would load on. On This iPhone, the phone's own newest photos from PhotoKit with those
+  on their way to Immich, and videos; and what only a real iPhone shows: its memory, sending, large originals, a server on the local network, and
   the icon.
 - Share on an iPhone: Messages, Mail and AirDrop, a large video on a slow network (the sheet shows no progress while an
   original downloads), Save Image, and the phone's own photos.

@@ -71,6 +71,16 @@ shows ("idle connections go after 4 s, before the server's 5 s"), not as the run
 milestone keeps a line in ROADMAP.md; its story is in the history. "Not chosen" keeps only the alternatives someone
 would propose again. A date stays only where the date is itself the fact.
 
+## Branches
+
+- **`develop` is where work goes:** every commit lands there, and it is pushed there. CI checks it as it checks main.
+- **`main` holds what is released.** A release starts by moving main forward to develop (`git switch main && git merge
+  --ff-only develop && git push`), and `ci/release.sh tag` tags it there. Main only ever moves forward to develop's
+  commits, so both have every tag and `ci/version.sh` numbers develop as the next release.
+- **A fix to a release that cannot wait** goes on main, is released from there, and main is merged into develop.
+- **Verso's page** (`pages.yml`) is built from main: it describes what can be downloaded.
+- **GitHub's default branch is main,** so a visitor reads the released code and README.
+
 ## Versioning
 
 A release is cut by a signed tag (`v0.72.0`), one version line for every platform, and its version is the tag's.
