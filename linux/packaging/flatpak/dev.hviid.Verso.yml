@@ -58,7 +58,7 @@ modules:
         CARGO_HOME: /run/build/verso/cargo
     build-commands:
       # The version the source was made as (`linux/packaging/flatpak/source-archive.sh`), as it has no history to count.
-      - VERSO_VERSION="$(cat VERSION 2>/dev/null)" cargo build --release --locked --features flatpak -p verso -p verso-service
+      - VERSO_VERSION="$(cat VERSION 2>/dev/null)" cargo build --release --locked -p verso -p verso-service
       - install -Dm755 target/release/verso /app/bin/verso
       # The service's, the top bar's and Preferences' texts in the person's language, in /app/share/locale.
       - python3 po/i18n.py mo /app/share/locale

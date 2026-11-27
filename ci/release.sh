@@ -154,17 +154,21 @@ in_build_environment() {
     "$@"
   else
     toolbox run --container "${VERSO_TOOLBOX:-verso}" env \
-      VERSO_TARGET_ROOT="${VERSO_TARGET_ROOT:-}" \
+      VERSO_TARGET_ROOT="${VERSO_TARGET_ROOT:-}" VERSO_BINARIES="${VERSO_BINARIES:-}" \
       CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=cc CC_x86_64_unknown_linux_gnu=cc \
       CXX_x86_64_unknown_linux_gnu=c++ AR_x86_64_unknown_linux_gnu=ar \
       bash -c 'cd "$1" && shift && exec "$@"' _ "$PWD" "$@"
   fi
 }
 
-# The tarball's lane: the tarball, then the AppImage from the same toolbox and build.
-build_tarball_and_appimage() {
+# Fedora's lane: the programs built once, in the toolbox, for the tarball, which then the AppImage and the rpm take, so
+# the three carry the same programs, which tell from where they run how they were installed (ARCHITECTURE.md, "One
+# build for Fedora's files").
+build_fedora() {
   in_build_environment linux/packaging/verso-tarball.sh "$1"
+  export VERSO_BINARIES=$VERSO_TARGET_ROOT/package/release
   in_build_environment linux/packaging/verso-appimage.sh "$1"
+  linux/packaging/verso-packages.sh "$1" rpm
 }
 
 # The Flatpak lane: the source archive, then the Flatpak, with flatpak-builder where it is (the release workflow's
@@ -275,11 +279,10 @@ build() {
   out=$root/target/dist/$tag
   rm -rf "$out"
   mkdir -p "$out"
-  # Three lanes at once, each with a build folder of its own and a log in target/dist/TAG.logs: the tarball and then
-  # the AppImage, from the same toolbox and its build (its libraries are Fedora 44's, and it carries them); the rpm and
-  # then the deb, each in a container of its distribution; and the Flatpak, from the source archive. The rpm and the
-  # deb share a lane because each optimised build takes 3 to 4 GB as it links, and four linking at once ran a 22 GB
-  # workstation out of memory. A lane that fails stops the release, with its log's end.
+  # Three lanes at once, each with a build folder of its own and a log in target/dist/TAG.logs: Fedora's, whose one
+  # build of the programs the tarball, the AppImage and the rpm carry; the deb's, built in Ubuntu against its
+  # libraries; and the Flatpak's, from the source archive in its SDK. Two optimised builds link at once, 3 to 4 GB each.
+  # A lane that fails stops the release, with its log's end.
   local logs=$out.logs lane names=() pids=() failed=()
   rm -rf "$logs"
   mkdir -p "$logs"
@@ -296,8 +299,8 @@ build() {
     names+=("$name")
     pids+=($!)
   }
-  start_lane tarball-and-appimage build_tarball_and_appimage "$out"
-  start_lane rpm-and-deb linux/packaging/verso-packages.sh "$out" rpm deb
+  start_lane fedora build_fedora "$out"
+  start_lane deb linux/packaging/verso-packages.sh "$out" deb
   start_lane flatpak build_flatpak "$out"
   echo "Building in three lanes at once; their logs are in $logs"
   for lane in "${!pids[@]}"; do

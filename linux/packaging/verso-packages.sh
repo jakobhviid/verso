@@ -62,7 +62,12 @@ outside() {
     target_root=${VERSO_TARGET_ROOT:-$PWD/target}
     mkdir -p "$out" "$cargo_home/registry" "$cargo_home/git" "$target_root"
     out=$(cd "$out" && pwd)
+    # Programs already built (VERSO_BINARIES, a folder with verso and verso-service), which the rpm takes rather than
+    # building its own; the deb is always built in Ubuntu, against its libraries.
+    local binaries=()
     for format in "${formats[@]}"; do
+        binaries=()
+        [ -n "${VERSO_BINARIES:-}" ] && [ "$format" = rpm ] && binaries=(-v "$VERSO_BINARIES:/binaries:ro")
         image=$fedora_image
         [ "$format" = deb ] && image=$ubuntu_image
         image=$(builder_image "$engine" "$format" "$image")
@@ -71,6 +76,7 @@ outside() {
         "$engine" run --rm --security-opt label=disable \
             -v "$PWD:/src" -v "$out:/out" -v "$cargo_home/registry:/cargo/registry" -v "$cargo_home/git:/cargo/git" \
             -v "$target_root:/target" \
+            ${binaries[@]+"${binaries[@]}"} \
             -w /src \
             -e VERSO_VERSION="$version" -e SOURCE_DATE_EPOCH="$epoch" -e CARGO_HOME=/cargo \
             "$image" linux/packaging/verso-packages.sh --inside "$format" /out
@@ -105,8 +111,14 @@ inside() {
     [ -e /etc/verso-builder ] || build_packages "$format"
     export VERSO_VERSION
     target=/target/package-$format
-    # Built as the packages' Verso, which tells of a newer release (ARCHITECTURE.md, "Updates on Linux").
-    CARGO_TARGET_DIR=$target cargo build --release --locked --features package -p verso -p verso-service
+    if [ -d /binaries ]; then
+        # The programs a release built once for Fedora's files (VERSO_BINARIES; ARCHITECTURE.md, "One build for
+        # Fedora's files"), which tell they are the packages' Verso from where they are installed.
+        mkdir -p "$target/release"
+        cp /binaries/verso /binaries/verso-service "$target/release/"
+    else
+        CARGO_TARGET_DIR=$target cargo build --release --locked -p verso -p verso-service
+    fi
 
     work=$(mktemp -d)
     # Where dpkg-shlibdeps looks for a package's files.

@@ -69,10 +69,10 @@ fn main() -> glib::ExitCode {
     if std::env::args().nth(1).as_deref() == Some("--probe") {
         return glib::ExitCode::SUCCESS;
     }
-    // Verso's folders, keyring items and service, apart from Immich Mount's (`verso_core::product`); built for a
-    // Flatpak (`--features flatpak`), without what its sandbox cannot reach, as an AppImage (`--features appimage`),
-    // and for the rpm and the deb (`--features package`), with the look for a newer release in Preferences.
-    verso_core::product::set(verso_core::product::built_for(cfg!(feature = "flatpak"), cfg!(feature = "appimage"), cfg!(feature = "package")));
+    // Verso's folders, keyring items and service, apart from Immich Mount's (`verso_core::product`), as it was
+    // installed: a Flatpak, without what its sandbox cannot reach; an AppImage; the rpm or the deb, with the look for a
+    // newer release in Preferences; or the tarball (verso_linux::installed).
+    verso_core::product::set(verso_linux::installed::product());
     let application = adw::Application::builder().application_id(APP_ID).flags(gio::ApplicationFlags::HANDLES_OPEN).build();
     application.connect_startup(|_| load_style());
     application.connect_activate(|application| window_of(application).present());

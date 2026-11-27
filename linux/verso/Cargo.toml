@@ -13,14 +13,6 @@ repository.workspace = true
 name = "verso"
 path = "src/main.rs"
 
-[features]
-# Verso as a Flatpak: what its sandbox cannot reach is left out (ARCHITECTURE.md, "Verso as a Flatpak").
-flatpak = []
-# Verso as an AppImage: the Flatpak's feature set without its sandbox (ARCHITECTURE.md, "Verso as an AppImage").
-appimage = []
-# Verso's own rpm and deb, which tell of a newer release (ARCHITECTURE.md, "Updates on Linux").
-package = []
-
 [dependencies]
 immich-api = { path = "../../shared/immich-api" }
 verso-desktop = { path = "../verso-desktop" }

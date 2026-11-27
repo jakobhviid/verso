@@ -50,11 +50,11 @@ pub struct Product {
     /// Verso Drive is part of this build. The Flatpak's and the AppImage's leave it out (ARCHITECTURE.md, "Verso as a
     /// Flatpak", "Verso as an AppImage").
     pub drive: bool,
-    /// Built for a Flatpak's sandbox (`VERSO_FLATPAK`): its service runs as an instance of the sandbox of its own and
+    /// In a Flatpak's sandbox (`VERSO_FLATPAK`): its service runs as an instance of the sandbox of its own and
     /// starts at login through the portals, no announcements are written at run time, no other app's account can be
     /// taken over, and the keyring is the Secret portal's (ARCHITECTURE.md, "Verso as a Flatpak").
     pub sandboxed: bool,
-    /// Built as an AppImage (`VERSO_APPIMAGE`): its programs are in a mount that goes with the process that started
+    /// Run as an AppImage (`VERSO_APPIMAGE`): its programs are in a mount that goes with the process that started
     /// it, so no systemd unit, desktop entry or announcement can name them; its service runs as an AppImage of its own
     /// and starts at login through an autostart entry (ARCHITECTURE.md, "Verso as an AppImage").
     pub appimage: bool,
@@ -92,7 +92,7 @@ pub const VERSO: Product = Product {
     appimage: false,
 };
 
-/// Verso from its own rpm or deb (`--features package` on both programs; ARCHITECTURE.md, "Updates on Linux"): the same
+/// Verso from its own rpm or deb (its programs in /usr; ARCHITECTURE.md, "Updates on Linux"): the same
 /// app, names and folders, which tells of a newer release, as nothing else updates a package downloaded from a release
 /// page. The look is on until switched off in Preferences (`updates.check`). Homebrew's tarball and the Flatpak are
 /// updated by their own channels, and keep it off and hidden.
@@ -120,37 +120,24 @@ const WITHOUT_DRIVE: &[&str] = &[
     "app.icon_dark",
 ];
 
-/// Verso built as a Flatpak (`--features flatpak` on both programs): the same app, names and folders, with what a
+/// Verso as a Flatpak (in its sandbox): the same app, names and folders, with what a
 /// sandbox cannot reach left out. The drive is off for good, its settings unread; the app icon is its own (Mist, and
 /// Mist Night in the dark style), as a sandboxed app cannot change its launcher.
 pub const VERSO_FLATPAK: Product = Product { hidden_settings: WITHOUT_DRIVE, drive: false, sandboxed: true, ..VERSO };
 
-/// Verso built as an AppImage (`--features appimage` on both programs): the Flatpak's feature set, without a sandbox,
+/// Verso as an AppImage (run from its mount): the Flatpak's feature set, without a sandbox,
 /// so it keeps the sign-in in the session's keyring as the tarball does and reads Immich Mount's account.
 pub const VERSO_APPIMAGE: Product = Product { hidden_settings: WITHOUT_DRIVE, drive: false, appimage: true, ..VERSO };
 
 static CURRENT: OnceLock<&'static Product> = OnceLock::new();
-
-/// The product a build of the programs is, by its features: `flatpak` (the Flatpak), `appimage` (the AppImage),
-/// `package` (the rpm and the deb), else the tarball's Verso. Both programs ask this, so they agree.
-pub fn built_for(flatpak: bool, appimage: bool, package: bool) -> &'static Product {
-    if flatpak {
-        &VERSO_FLATPAK
-    } else if appimage {
-        &VERSO_APPIMAGE
-    } else if package {
-        &VERSO_PACKAGE
-    } else {
-        &VERSO
-    }
-}
 
 /// Say which product this program is. Only the first call counts.
 pub fn set(product: &'static Product) {
     let _ = CURRENT.set(product);
 }
 
-/// The product this program is: the tarball's Verso unless [`set`] said otherwise.
+/// The product this program is: the tarball's Verso unless [`set`] said otherwise (on Linux, as it was installed:
+/// `verso_linux::installed`).
 pub fn current() -> &'static Product {
     CURRENT.get().copied().unwrap_or(&VERSO)
 }
@@ -225,10 +212,6 @@ mod tests {
 
     #[test]
     fn only_the_packages_look_for_a_newer_release() {
-        assert_eq!(
-            (built_for(true, false, false), built_for(false, true, false), built_for(false, false, true), built_for(false, false, false)),
-            (&VERSO_FLATPAK, &VERSO_APPIMAGE, &VERSO_PACKAGE, &VERSO)
-        );
         assert_eq!((VERSO_PACKAGE.folder, VERSO_PACKAGE.bus_name(), VERSO_PACKAGE.sandboxed), (VERSO.folder, VERSO.bus_name(), false));
         assert!(VERSO_PACKAGE.shows("updates.check") && !VERSO_PACKAGE.shows("mount.at_login"));
         assert_eq!(VERSO_PACKAGE.default_for("updates.check"), Some("true"));

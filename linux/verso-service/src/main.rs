@@ -129,9 +129,8 @@ pub(crate) fn cli_command() -> clap::Command {
 
 fn main() -> ExitCode {
     let arguments: Vec<String> = std::env::args().collect();
-    // The Flatpak's build (`--features flatpak`), the AppImage's (`--features appimage`) and the packages' (`--features
-    // package`), as the window's.
-    verso_core::product::set(verso_core::product::built_for(cfg!(feature = "flatpak"), cfg!(feature = "appimage"), cfg!(feature = "package")));
+    // As it was installed, as the window tells it (verso_linux::installed).
+    verso_core::product::set(verso_linux::installed::product());
     if is_leading_flag(&arguments, "--man") {
         return finish(completions::print_man());
     }

@@ -18,6 +18,7 @@ pub mod keyring;
 pub mod fuse;
 pub mod gnome;
 pub mod i18n;
+pub mod installed;
 pub mod mounts;
 pub mod notify;
 pub mod participants;

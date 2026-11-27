@@ -60,8 +60,16 @@ fetch "https://github.com/AppImage/type2-runtime/releases/download/$runtime_vers
 # The version it is released as, built in (`verso_core::product::VERSION`).
 VERSO_VERSION=$(ci/version.sh)
 export VERSO_VERSION
-target=${VERSO_TARGET_ROOT:-$PWD/target}/appimage
-CARGO_TARGET_DIR=$target cargo build --release --locked --features appimage -p verso -p verso-service
+# The programs a release built once for Fedora's files (VERSO_BINARIES, a folder with verso and verso-service;
+# ARCHITECTURE.md, "One build for Fedora's files"), which tell they are the AppImage's from where they run; else built here.
+if [ -n "${VERSO_BINARIES:-}" ]; then
+    target=$(mktemp -d)
+    mkdir -p "$target/release"
+    cp "$VERSO_BINARIES/verso" "$VERSO_BINARIES/verso-service" "$target/release/"
+else
+    target=${VERSO_TARGET_ROOT:-$PWD/target}/appimage
+    CARGO_TARGET_DIR=$target cargo build --release --locked -p verso -p verso-service
+fi
 
 mkdir -p "$out"
 out=$(cd "$out" && pwd)
