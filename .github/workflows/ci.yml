@@ -91,7 +91,11 @@ jobs:
     # Xcode 27, the one the app is built with on the maintainer's Mac, compiles.
     runs-on: macos-26
     steps:
+      # The whole history with its tags: mac/build-rust.sh numbers the build from them (ci/version.sh), and stops
+      # where there are none.
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - name: The newest Xcode
         run: |
           ls -d /Applications/Xcode*.app
