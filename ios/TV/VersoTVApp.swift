@@ -84,7 +84,7 @@ final class TVModel {
                                   credential: .apiKey(account.key))
         self.account = account
         self.client = client
-        images = ImagePipeline(client: client)
+        images = ImagePipeline(client: client, cacheLimit: TVDevice.pictureCache, loadsAtOnce: TVDevice.picturesAtOnce)
         changes = account.changeKey.map {
             ImmichClient(serverURL: server, apiURL: server.appendingPathComponent("api"), credential: .apiKey($0))
         }
@@ -223,7 +223,7 @@ final class TVModel {
             // A session from logging in (`-signInAccessToken`), for servers such as Immich's demo that make no keys.
             let client = ImmichClient(serverURL: url, apiURL: url.appendingPathComponent("api"), credential: .accessToken(token))
             self.client = client
-            images = ImagePipeline(client: client)
+            images = ImagePipeline(client: client, cacheLimit: TVDevice.pictureCache, loadsAtOnce: TVDevice.picturesAtOnce)
         }
     }
     #endif

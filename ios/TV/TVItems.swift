@@ -73,8 +73,10 @@ final class TVTimelineModel: TVPhotoPage {
     enum Phase: Equatable { case loading, loaded, failed(String) }
 
     let query: TimelineQuery
-    private(set) var months: [Month] = []
+    private(set) var months: [Month] = [] { didSet { revision += 1 } }
     private(set) var phase = Phase.loading
+    /// Counts every change to the months, which the grid redraws by (TVPhotoGrid).
+    private(set) var revision = 0
     @ObservationIgnored private var reading: Set<String> = []
 
     init(query: TimelineQuery) {
@@ -130,6 +132,13 @@ final class TVTimelineModel: TVPhotoPage {
             months[index].items = items
         }
         months.removeAll { $0.count <= 0 }
+    }
+
+    /// The viewer over every photo read so far, from a month's photo, which reads the following months as it nears
+    /// their end.
+    func viewing(month index: Int, photo: Int, client: ImmichClient?) -> TVViewing {
+        let before = months.prefix(index).reduce(0) { $0 + ($1.items?.count ?? 0) }
+        return TVViewing(items: items, index: before + photo) { [self] in await readNext(client: client) }
     }
 
     /// Reads the first month not read yet, for the viewer stepping past the last photo it has, and answers every photo.

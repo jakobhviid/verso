@@ -88,92 +88,148 @@ enum TVPhotoActions {
     }
 }
 
-/// A photo's menu, from a press and hold, where Manage Photos is on. `changed` tells the viewer, which keeps its own
-/// list of photos; the page is told through the environment.
-struct TVPhotoMenu: ViewModifier {
-    let item: TVItem?
+/// One entry of a photo's menu: its title and symbol, what it does, and whether it is in red.
+struct TVPhotoMenuEntry {
+    let title: String
+    let systemImage: String
+    /// What it does; nil for Add to Album, which asks for the album first.
+    let action: TVPhotoAction?
+    var destructive = false
+
+    /// A photo's menu where Manage Photos is on, in the iPhone's order (PhotoActionsMenu); none where it is off.
+    @MainActor
+    static func entries(for item: TVItem, place: TVPhotoPlace, model: TVModel) -> [TVPhotoMenuEntry] {
+        guard model.root.changes != nil else { return [] }
+        var entries: [TVPhotoMenuEntry] = []
+        switch place {
+        case .lockedFolder:
+            entries.append(.init(title: String(localized: "Move Out of the Locked Folder"), systemImage: "lock.open", action: .unlock))
+        case .library, .archive:
+            entries.append(.init(title: item.isFavorite ? String(localized: "Unfavorite") : String(localized: "Favorite"),
+                                 systemImage: item.isFavorite ? "heart.slash" : "heart", action: .favorite(!item.isFavorite)))
+            entries.append(.init(title: String(localized: "Add to Album\u{2026}"), systemImage: "rectangle.stack.badge.plus", action: nil))
+            entries.append(place == .archive
+                ? .init(title: String(localized: "Move to Library"), systemImage: "archivebox", action: .unarchive)
+                : .init(title: String(localized: "Archive"), systemImage: "archivebox", action: .archive))
+            entries.append(.init(title: String(localized: "Move to Locked Folder"), systemImage: "lock", action: .lock))
+        }
+        entries.append(.init(title: String(localized: "Delete"), systemImage: "trash", action: .delete, destructive: true))
+        return entries
+    }
+}
+
+/// What a photo's menu asked for, which its host (TVPhotoRequestsHost) asks about, runs and reports: the grid's menu,
+/// from UIKit, and the viewer's, from SwiftUI, alike.
+@MainActor @Observable
+final class TVPhotoRequests {
+    /// An action that asks first, and the photo it is for.
+    var asking: (action: TVPhotoAction, item: TVItem)?
+    /// The photo Add to Album is choosing an album for.
+    var choosingAlbum: TVItem?
+    var failure: String?
+    /// The album a photo was just added to, said once.
+    var added: String?
+    /// Runs an action, set by the host from where it stands (the TV's model, the page's photos).
+    @ObservationIgnored var run: (TVPhotoAction, TVItem, String?) -> Void = { _, _, _ in }
+
+    /// An entry chosen: asked about first where it takes the photo away, the album chosen first for Add to Album.
+    func choose(_ entry: TVPhotoMenuEntry, for item: TVItem) {
+        guard let action = entry.action else { return choosingAlbum = item }
+        if action.asks { asking = (action, item) } else { run(action, item, nil) }
+    }
+}
+
+extension EnvironmentValues {
+    /// The page's photo menu requests, which its grid's menu sends (TVPhotoGrid).
+    @Entry var tvPhotoRequests: TVPhotoRequests?
+}
+
+/// The questions, the album sheet and the answers of a photo's menu, and the actions it runs, with the TV's model, the
+/// page's place and photos from the environment. `changed` tells the viewer, which keeps its own list of photos.
+struct TVPhotoRequestsHost: ViewModifier {
+    let requests: TVPhotoRequests
     var changed: (TVPhotoChange) -> Void = { _ in }
     @Environment(TVModel.self) private var model
     @Environment(\.tvPhotoPlace) private var place
     @Environment(\.tvPhotoPage) private var page
-    @State private var asking: TVPhotoAction?
-    @State private var failure: String?
-    @State private var choosingAlbum = false
-    /// The album a photo was just added to, said once.
-    @State private var added: String?
 
     func body(content: Content) -> some View {
-        content
-            .contextMenu {
-                if let item, model.root.changes != nil { menu(item) }
-            }
+        @Bindable var requests = requests
+        let asking = requests.asking?.action
+        return content
+            .onAppear { requests.run = run }
+            .onChange(of: place) { requests.run = run }
             .confirmationDialog(asking == .lock ? String(localized: "Move to the Locked Folder?") : String(localized: "Delete this photo?"),
-                                isPresented: Binding(get: { asking != nil }, set: { if !$0 { asking = nil } }),
-                                titleVisibility: .visible, presenting: asking) { action in
-                Button(action == .lock ? String(localized: "Move to Locked Folder") : String(localized: "Delete"),
-                       role: .destructive) { run(action) }
-            } message: { action in
-                Text(action == .lock
+                                isPresented: Binding(get: { requests.asking != nil }, set: { if !$0 { requests.asking = nil } }),
+                                titleVisibility: .visible) {
+                Button(asking == .lock ? String(localized: "Move to Locked Folder") : String(localized: "Delete"), role: .destructive) {
+                    if let (action, item) = requests.asking { run(action, item, nil) }
+                }
+            } message: {
+                Text(asking == .lock
                      ? "It leaves this Apple TV, and shows again only in the Locked Folder, opened from your iPhone."
                      : "It goes to Recently Deleted in Immich for 30 days, where your iPhone can restore it.")
             }
-            .alert("Could Not Change the Photo", isPresented: Binding(get: { failure != nil }, set: { if !$0 { failure = nil } })) {
+            .alert("Could Not Change the Photo", isPresented: Binding(get: { requests.failure != nil }, set: { if !$0 { requests.failure = nil } })) {
                 Button("OK") {}
             } message: {
-                Text(failure ?? "")
+                Text(requests.failure ?? "")
             }
-            .alert(added.map { String(localized: "Added to \u{201C}\($0)\u{201D}") } ?? "",
-                   isPresented: Binding(get: { added != nil }, set: { if !$0 { added = nil } })) {
+            .alert(requests.added.map { String(localized: "Added to \u{201C}\($0)\u{201D}") } ?? "",
+                   isPresented: Binding(get: { requests.added != nil }, set: { if !$0 { requests.added = nil } })) {
                 Button("OK") {}
             }
-            .sheet(isPresented: $choosingAlbum) {
-                TVAlbumPicker { album in run(.addToAlbum(album.id), album: album.albumName) }
+            .sheet(item: Binding(get: { requests.choosingAlbum }, set: { requests.choosingAlbum = $0 })) { item in
+                TVAlbumPicker { album in run(.addToAlbum(album.id), item, album.albumName) }
             }
     }
 
-    @ViewBuilder
-    private func menu(_ item: TVItem) -> some View {
-        switch place {
-        case .lockedFolder:
-            Button("Move Out of the Locked Folder", systemImage: "lock.open") { run(.unlock) }
-        case .library, .archive:
-            Button(item.isFavorite ? "Unfavorite" : "Favorite", systemImage: item.isFavorite ? "heart.slash" : "heart") {
-                run(.favorite(!item.isFavorite))
-            }
-            Button("Add to Album…", systemImage: "rectangle.stack.badge.plus") { choosingAlbum = true }
-            if place == .archive {
-                Button("Move to Library", systemImage: "archivebox") { run(.unarchive) }
-            } else {
-                Button("Archive", systemImage: "archivebox") { run(.archive) }
-            }
-            Button("Move to Locked Folder", systemImage: "lock") { asking = .lock }
-        }
-        Button("Delete", systemImage: "trash", role: .destructive) { asking = .delete }
-    }
-
-    private func run(_ action: TVPhotoAction, album: String? = nil) {
-        guard let item else { return }
-        let model = model, place = place
+    private func run(_ action: TVPhotoAction, _ item: TVItem, _ album: String?) {
+        let model = model, place = place, page = page, changed = changed, requests = requests
         Task {
             do {
                 if let change = try await TVPhotoActions.perform(action, on: item.id, model: model, place: place) {
                     changed(change)
                     page?.apply(change)
                 } else {
-                    added = album
+                    requests.added = album
                 }
             } catch ImmichError.http(403, _) where action.addsToAlbum {
                 // A key made before Add to Album may change photos but not albums: turned off and on again, it may.
-                failure = String(localized: "This Apple TV may not do that yet. Turn Manage Photos off and on again in Settings to allow it.")
+                requests.failure = String(localized: "This Apple TV may not do that yet. Turn Manage Photos off and on again in Settings to allow it.")
             } catch ImmichError.unauthorized where place != .lockedFolder {
                 // The second key was made read-only, or forgotten, on the iPhone: Manage Photos turns itself off. In the
                 // Locked Folder a 401 is its session ending, which locks the folder (TVLockedFolderVisit).
                 model.root.stopChanges(reason: String(localized: "Manage Photos was turned off on your iPhone."))
-                failure = String(localized: "Manage Photos was turned off on your iPhone.")
+                requests.failure = String(localized: "Manage Photos was turned off on your iPhone.")
             } catch {
-                failure = error.localizedDescription
+                requests.failure = error.localizedDescription
             }
         }
+    }
+}
+
+/// A photo's menu, from a press and hold, where Manage Photos is on, for a SwiftUI view: the viewer's. The grid's comes
+/// from UIKit's context menu, with the same entries and its page's host (TVPhotoGrid, TVViewerCover).
+struct TVPhotoMenu: ViewModifier {
+    let item: TVItem?
+    var changed: (TVPhotoChange) -> Void = { _ in }
+    @Environment(TVModel.self) private var model
+    @Environment(\.tvPhotoPlace) private var place
+    @State private var requests = TVPhotoRequests()
+
+    func body(content: Content) -> some View {
+        content
+            .contextMenu {
+                if let item {
+                    ForEach(Array(TVPhotoMenuEntry.entries(for: item, place: place, model: model).enumerated()), id: \.offset) { _, entry in
+                        Button(entry.title, systemImage: entry.systemImage, role: entry.destructive ? .destructive : nil) {
+                            requests.choose(entry, for: item)
+                        }
+                    }
+                }
+            }
+            .modifier(TVPhotoRequestsHost(requests: requests, changed: changed))
     }
 }
 

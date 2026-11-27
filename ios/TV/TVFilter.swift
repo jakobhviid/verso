@@ -16,10 +16,15 @@ struct TVFilter: Hashable {
 }
 
 extension TimelineQuery {
-    /// The timeline with the filter's favorites.
+    /// The timeline with the filter's favorites: the account's own, as Immich refuses a partner's photos asked by
+    /// favorite ("Only non-archived, non-trashed, non-favorited, non-locked assets can be requested for other users"),
+    /// and a partner's are not the person's favorites anyway.
     func filtered(_ filter: TVFilter) -> TimelineQuery {
         var query = self
-        if filter.favorites { query.isFavorite = true }
+        if filter.favorites {
+            query.isFavorite = true
+            query.withPartners = nil
+        }
         return query
     }
 

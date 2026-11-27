@@ -44,7 +44,8 @@ struct TVViewer: View {
         more = viewing.more
         self.frames = frames
         self.shown = shown
-        _expanded = State(initialValue: frames?.frame(viewing.startID) == nil)
+        // An older box opens at full screen at once (TVDevice).
+        _expanded = State(initialValue: TVDevice.simpler || frames?.frame(viewing.startID) == nil)
         #if DEBUG
         // A development build opens with the title capsule up (`-tvShowInfo`), to look at it.
         _showsInfo = State(initialValue: UserDefaults.standard.bool(forKey: "tvShowInfo"))
@@ -62,6 +63,45 @@ struct TVViewer: View {
     private var item: TVItem? { items.indices.contains(index) ? items[index] : nil }
 
     var body: some View {
+        // A button, so a click is its own and a press and hold the photo's menu's: on a view with a tap of its own, the
+        // menu took the click, and a video's middle-of-the-clickpad press did not play it.
+        Button(action: select) { screen }
+            .buttonStyle(TVPressedAsIs())
+            .onMoveCommand { direction in
+                switch direction {
+                case .left: step(-1)
+                case .right: step(1)
+                default: break
+                }
+            }
+            .onPlayPauseCommand { if item?.isVideo == true { playVideo() } else { playLive() } }
+            .onExitCommand { close() }
+            .focused($hasFocus)
+            .defaultFocus($hasFocus, true)
+            .task {
+                // Once the cover is up: asked as it appears, tvOS leaves the focus where it was.
+                try? await Task.sleep(for: .milliseconds(300))
+                hasFocus = true
+            }
+            .modifier(TVPhotoMenu(item: item, changed: apply))
+            .task(id: item?.id) { await show() }
+            .task(id: "\(item?.id ?? "")|\(showsInfo)") { await readDetails() }
+            .onDisappear { TVDisplayMode.release() }
+            .task {
+                // Out of its tile, once the viewer is on screen at the tile.
+                guard !expanded else { return }
+                try? await Task.sleep(for: .milliseconds(30))
+                withAnimation(.smooth(duration: zoomSeconds(0.4))) { expanded = true }
+            }
+            .task { await followDebugSteps() }
+    }
+
+    /// A click: a video plays, a photo's title capsule comes or goes.
+    private func select() {
+        if item?.isVideo == true { playVideo() } else { showsInfo.toggle() }
+    }
+
+    private var screen: some View {
         ZStack {
             Color.black.opacity(expanded ? 1 : 0)
             if let item {
@@ -70,35 +110,14 @@ struct TVViewer: View {
                              tile: expanded ? nil : frames?.frame(item.id))
                     .id(item.id)
                     .zIndex(1)
-                    .transition(.asymmetric(insertion: .move(edge: direction > 0 ? .trailing : .leading),
-                                            removal: .move(edge: direction > 0 ? .leading : .trailing)))
+                    .transition(TVDevice.simpler ? .identity : .asymmetric(
+                        insertion: .move(edge: direction > 0 ? .trailing : .leading),
+                        removal: .move(edge: direction > 0 ? .leading : .trailing)))
             }
         }
         .ignoresSafeArea()
         .overlay(alignment: .top) { chrome.opacity(expanded ? 1 : 0) }
         .overlay(alignment: .topLeading) { liveSign.opacity(expanded ? 1 : 0) }
-        .modifier(TVRemote(left: { step(-1) }, right: { step(1) },
-                           select: { if item?.isVideo == true { playVideo() } else { showsInfo.toggle() } },
-                           playPause: { if item?.isVideo == true { playVideo() } else { playLive() } },
-                           menu: { close() }))
-        .focused($hasFocus)
-        .defaultFocus($hasFocus, true)
-        .task {
-            // Once the cover is up: asked as it appears, tvOS leaves the focus where it was.
-            try? await Task.sleep(for: .milliseconds(300))
-            hasFocus = true
-        }
-        .modifier(TVPhotoMenu(item: item, changed: apply))
-        .task(id: item?.id) { await show() }
-        .task(id: "\(item?.id ?? "")|\(showsInfo)") { await readDetails() }
-        .onDisappear { TVDisplayMode.release() }
-        .task {
-            // Out of its tile, once the viewer is on screen at the tile.
-            guard !expanded else { return }
-            try? await Task.sleep(for: .milliseconds(30))
-            withAnimation(.smooth(duration: zoomSeconds(0.4))) { expanded = true }
-        }
-        .task { await followDebugSteps() }
     }
 
     /// A development build steps by itself (`-tvViewerSteps right,right,left,close`, one every two seconds), as the
@@ -166,7 +185,7 @@ struct TVViewer: View {
 
     /// Back into the tile of the photo shown, where it is on screen, then gone; else gone at once.
     private func close() {
-        guard let item, frames?.frame(item.id) != nil else { return closeNow() }
+        guard !TVDevice.simpler, let item, frames?.frame(item.id) != nil else { return closeNow() }
         withAnimation(.smooth(duration: zoomSeconds(0.35))) { expanded = false } completion: { closeNow() }
     }
 
@@ -197,7 +216,8 @@ struct TVViewer: View {
             return
         }
         direction = by
-        withAnimation(.smooth(duration: 0.35)) { index = next }
+        // An older box steps at once (TVDevice).
+        withAnimation(TVDevice.simpler ? nil : .smooth(duration: 0.35)) { index = next }
         // Near the last photo read, the page reads on.
         if by > 0, next >= items.count - 3 { Task { await readOn() } }
     }
@@ -225,7 +245,7 @@ struct TVViewer: View {
             return
         }
         direction = 1
-        withAnimation(.smooth(duration: 0.35)) {
+        withAnimation(TVDevice.simpler ? nil : .smooth(duration: 0.35)) {
             items.remove(at: at)
             index = min(index, items.count - 1)
         }
@@ -293,6 +313,13 @@ struct TVViewer: View {
     }
 }
 
+/// The viewer's button: the screen as it is, without tvOS's lift or highlight, which a whole screen has no use for.
+private struct TVPressedAsIs: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label.focusEffectDisabled()
+    }
+}
+
 /// tvOS's own player, presented full screen over the viewer as UIKit presents it, so it has the remote whole and Menu
 /// closes it as it closes any video on the TV; the movie stops as it goes.
 @MainActor
@@ -307,6 +334,8 @@ final class TVVideoPresentation: NSObject, AVPlayerViewControllerDelegate {
         controller.appliesPreferredDisplayCriteriaAutomatically = false
         controller.player = player
         controller.delegate = self
+        // What the remote's tests wait for (VersoTVUITests).
+        controller.view.accessibilityIdentifier = "Video Player"
     }
 
     func present() {
@@ -339,6 +368,7 @@ private struct TVViewerPage: View {
             GeometryReader { geometry in
                 // Its ThumbHash where the server has no picture for it yet, as a tile shows it.
                 if let picture = image ?? model.images?.cachedThumbnail(item.id, size: .preview)
+                    ?? model.images?.cachedTile(item.id, size: .preview, pixels: TVGridTile.pixels)
                     ?? item.thumbhash.flatMap({ ThumbHash.cachedImage(base64: $0) }) {
                     // Filling a frame that goes from the tile's square to the photo fitted to the screen, so the
                     // photo grows out of its tile as the tile shows it, and back.
@@ -423,40 +453,49 @@ enum TVDisplayMode {
     private static var displayManager: AVDisplayManager? { displayWindow?.avDisplayManager }
 }
 
-/// Where a page's tiles are on screen, by photo, which they write as they are laid out: the viewer zooms out of the
-/// tile it opens at, and back into the tile of the photo it shows last (tvOS has no zoom transition of its own for a
-/// full-screen cover, which the iPhone's uses).
+/// A page's grid, as the viewer asks it (TVPhotoGrid serves it): where a photo's tile is on screen, which the viewer
+/// zooms out of and back into (tvOS has no zoom transition of its own for a full-screen cover, which the iPhone's
+/// uses); scrolling a stepped-to photo's tile into view under the viewer; and the focus on that tile as it closes.
 @MainActor
 final class TVTileFrames {
-    var frames: [String: CGRect] = [:]
+    var locate: ((String) -> CGRect?)?
+    var scroll: ((String) -> Void)?
+    var focus: ((String) -> Void)?
+    /// A month's photos at the top of the grid.
+    var scrollToSection: ((String) -> Void)?
 
     /// A tile's frame on screen, where it is on screen.
     func frame(_ id: String) -> CGRect? {
-        guard let frame = frames[id], frame.intersects(CGRect(x: 0, y: 0, width: 1920, height: 1080)) else { return nil }
+        guard let frame = locate?(id), frame.intersects(CGRect(x: 0, y: 0, width: 1920, height: 1080)) else { return nil }
         return frame
     }
 }
 
 extension EnvironmentValues {
-    /// The page's tile frames, which its tiles write (TVViewerCover).
+    /// The page's grid, which the viewer finds its tiles in (TVViewerCover).
     @Entry var tvTileFrames: TVTileFrames?
 }
 
-/// The viewer over a page of tiles, as the iPhone opens a photo: it grows out of its tile, and closes into the tile of
-/// the photo shown last, which the page scrolls to under the viewer and the focus lands on after it. The cover is
-/// clear and comes without the system's animation; the viewer draws the zoom itself.
+/// The viewer over a page's grid, as the iPhone opens a photo: it grows out of its tile, and closes into the tile of the
+/// photo shown last, which the grid scrolls to under the viewer and puts the focus on after it. The cover is clear and
+/// comes without the system's animation; the viewer draws the zoom itself. The page's photo menus ask their questions
+/// here (TVPhotoRequestsHost), as the grid's menu comes from UIKit.
 struct TVViewerCover: ViewModifier {
     @Binding var viewing: TVViewing?
-    var focused: FocusState<String?>.Binding
-    /// Keeps a photo's tile in view; nil where the page cannot scroll to it.
-    var scroll: ((String) -> Void)?
-    @State private var frames = TVTileFrames()
+    /// The page's grid, where the page scrolls it itself (the Library's Months); else the cover's own.
+    var frames: TVTileFrames?
+    @State private var ownFrames = TVTileFrames()
+    @State private var requests = TVPhotoRequests()
+
+    private var grid: TVTileFrames { frames ?? ownFrames }
     @State private var presented: TVViewing?
     @State private var shownID: String?
 
     func body(content: Content) -> some View {
         content
-            .environment(\.tvTileFrames, frames)
+            .environment(\.tvTileFrames, grid)
+            .environment(\.tvPhotoRequests, requests)
+            .modifier(TVPhotoRequestsHost(requests: requests))
             .onChange(of: viewing?.id) {
                 var instant = Transaction()
                 instant.disablesAnimations = true
@@ -464,11 +503,11 @@ struct TVViewerCover: ViewModifier {
             }
             .fullScreenCover(item: Binding(get: { presented }, set: { presented = $0; if $0 == nil { viewing = nil } }),
                              onDismiss: closed) { viewing in
-                TVViewer(viewing: viewing, frames: frames) { id in
+                TVViewer(viewing: viewing, frames: grid) { id in
                     // The photo it opens at is on screen, its tile what the zoom starts from: only a step scrolls.
                     let stepped = shownID != nil
                     shownID = id
-                    if stepped { scroll?(id) }
+                    if stepped { grid.scroll?(id) }
                 }
                 .presentationBackground(.clear)
             }
@@ -481,7 +520,7 @@ struct TVViewerCover: ViewModifier {
         // Once the viewer has gone: while it goes, tvOS puts the focus back where it was before it opened.
         Task {
             try? await Task.sleep(for: .milliseconds(150))
-            focused.wrappedValue = id
+            grid.focus?(id)
         }
     }
 }

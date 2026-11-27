@@ -397,34 +397,39 @@ sections, the pages, the viewer's info), drawn with each platform's own toolkit:
   first; People the rounded squares with their names on them, in the server's order and without the hidden and the
   unnamed; Places the iPhone's country cards, the most recently visited first, each opening its city cards, which open a
   city's photos; Memories the memory cards, three to a row, playing as a story; Favorites and the Archive the grid under
-  their names. The tile under the focus lifts and wears a thin white outline. A grid's page has a Filter menu beside its
-  title (All Photos', Favorites', the Archive's, an album's, a person's, the Locked Folder's): Favorites and Videos,
-  each ticked when on, the Filter's icon filled while one is; an album's offers Favorites alone. Search is tvOS's own
-  search screen with the iPhone's start page under it: quick filters, people with their faces, places and recent
-  searches as glass chips and rows, what matches while typing, and the results as the grid. The viewer fills the screen,
-  its photo growing out of its tile as the black comes up, and shrinking back into the tile of the photo shown last, as
-  the iPhone's; a click shows or hides the iPhone's title capsule, the place over the day and time; left and right slide
-  to the photo beside it, as the iPhone's pages slide; a Live Photo has the Live Photo sign small in the top corner, out
-  of the photo's way, and play/pause plays its movie; a video shows its first picture with a large play sign and its
-  length; a click, or play/pause, opens it in tvOS's own player, full screen, with the remote whole, as Apple's TV app
-  has it (its transport bar, scrubbing, its panels for audio, subtitles and the day), and Menu, a layer at a time, comes
-  back to the viewer at the video. Once a video in HDR has put the TV in HDR, the TV stays there until the viewer
-  closes, where Match Dynamic Range is on: going back to SDR for each photo, and to HDR for the next video, blacks the
-  screen out each time. The accent is the system blue, as the iPhone's, set in the TV's asset catalog because tvOS's own
-  is white. Settings, at the sidebar's foot in a section of its own, is laid out as tvOS's own Settings: the app's icon
-  large on the left with its name and version, and on the right a list a row at a time, each with its value, opening a
-  page where it holds more than a switch. Library: Top Shelf ("Memories, Recent", a switch for each row on its page),
-  Show Locked Folder in Collections, Manage Photos (On or Off, its page with Turn On with iPhone, or Turn Off).
-  Appearance: App Icon, where the app carries its Night icon (the Day and Night icons as cards, each with its name and a
-  tick under the one on the Home Screen). Account: the name, email and server, what this Apple TV may do ("Can view",
-  "Can view and change") and Sign Out in red. About Verso, on its page. With Manage Photos on, a press and hold on a
-  photo, in a grid or full screen, opens its menu in the iPhone's order: Favorite, Add to Album… (the albums in a sheet,
-  in Albums' order and sections, each with its count), Archive (Move to Library in the Archive), Move to Locked Folder
-  and Delete in red, the last two asking first; in the Locked Folder, Move Out of the Locked Folder and Delete. The
-  Locked Folder, until the iPhone opens it, is a lock over its name, a line on how it opens and Unlock with iPhone, the
-  system's picker, as Set Up with iPhone is; open, it is the grid under its name, as Favorites. The Top Shelf shows the
-  rows Settings chooses, Memories, Recent, Albums, Favorites and People in that order, as rows of wide pictures
-  (People's square), each with its title (the memory's, the album's, the person's name, or the day the photo was taken).
+  their names. The tile under the focus lifts above its neighbours with a thin white outline (UIKit's collection view
+  draws it on top, which a SwiftUI grid cannot). On the Apple TV 4K of the 1st and 2nd generation, and the Apple TV HD,
+  the simpler interface: the outline without the lift and its shadow, and the viewer without its zoom and slide, the
+  photo there at once (`TVDevice`, by model, else by less than 4 GB). A grid's page has a Filter menu beside its title
+  (All Photos', Favorites', the Archive's, an album's, a person's, the Locked Folder's): Favorites and Videos, each
+  ticked when on, the Filter's icon filled while one is; an album's offers Favorites alone. Favorites are the account's
+  own, without a partner's photos. The header is a focus area of its own, so up from any photo of the first row comes to
+  the Filter menu. Search is tvOS's own search screen with the iPhone's start page under it: quick filters, people with
+  their faces, places and recent searches as glass chips and rows, what matches while typing, and the results as the
+  grid. The viewer fills the screen, its photo growing out of its tile as the black comes up, and shrinking back into
+  the tile of the photo shown last, as the iPhone's; a click shows or hides the iPhone's title capsule, the place over
+  the day and time; left and right slide to the photo beside it, as the iPhone's pages slide; a Live Photo has the Live
+  Photo sign small in the top corner, out of the photo's way, and play/pause plays its movie; a video shows its first
+  picture with a large play sign and its length; a click (the clickpad's middle), or play/pause, opens it in tvOS's own
+  player, full screen, with the remote whole, as Apple's TV app has it (its transport bar, scrubbing, its panels for
+  audio, subtitles and the day), and Menu, a layer at a time, comes back to the viewer at the video. Once a video in HDR
+  has put the TV in HDR, the TV stays there until the viewer closes, where Match Dynamic Range is on: going back to SDR
+  for each photo, and to HDR for the next video, blacks the screen out each time. The accent is the system blue, as the
+  iPhone's, set in the TV's asset catalog because tvOS's own is white. Settings, at the sidebar's foot in a section of
+  its own, is laid out as tvOS's own Settings: the app's icon large on the left with its name and version, and on the
+  right a list a row at a time, each with its value, opening a page where it holds more than a switch. Library: Top
+  Shelf ("Memories, Recent", a switch for each row on its page), Show Locked Folder in Collections, Manage Photos (On or
+  Off, its page with Turn On with iPhone, or Turn Off). Appearance: App Icon, where the app carries its Night icon (the
+  Day and Night icons as cards, each with its name and a tick under the one on the Home Screen). Account: the name,
+  email and server, what this Apple TV may do ("Can view", "Can view and change") and Sign Out in red. About Verso, on
+  its page. With Manage Photos on, a press and hold on a photo, in a grid or full screen, opens its menu in the iPhone's
+  order: Favorite, Add to Album… (the albums in a sheet, in Albums' order and sections, each with its count), Archive
+  (Move to Library in the Archive), Move to Locked Folder and Delete in red, the last two asking first; in the Locked
+  Folder, Move Out of the Locked Folder and Delete. The Locked Folder, until the iPhone opens it, is a lock over its
+  name, a line on how it opens and Unlock with iPhone, the system's picker, as Set Up with iPhone is; open, it is the
+  grid under its name, as Favorites. The Top Shelf shows the rows Settings chooses, Memories, Recent, Albums, Favorites
+  and People in that order, as rows of wide pictures (People's square), each with its title (the memory's, the album's,
+  the person's name, or the day the photo was taken).
 - **The Backup page** is backing up's one page on the iPhone and the iPad: a list of iOS's own whose top is the page's
   status, centred, as Settings' feature pages have theirs: a cloud symbol (the accent while it works, and only then
   pulsing with the system's variable colour; green with a tick when backed up; grey while it waits; orange when the

@@ -16,35 +16,42 @@ struct TVLibrary: View {
     @State private var favorites: TVTimelineModel?
     @State private var videos: TVResultsModel?
     @State private var viewing: TVViewing?
-    @State private var width = TVMetrics.pageWidth
-    @FocusState private var focused: String?
+    /// All Photos' grid, which Months scrolls and focuses at a photo picked there.
+    @State private var grid = TVTileFrames()
 
     init() {
         #if DEBUG
         if let name = UserDefaults.standard.string(forKey: "tvLibraryMode"), let start = LibraryMode(rawValue: name) {
             _mode = State(initialValue: start)
         }
+        // All Photos filtered to its videos (`-tvFilterVideos YES`), for the remote's tests of a video (VersoTVUITests).
+        if UserDefaults.standard.bool(forKey: "tvFilterVideos") { _filter = State(initialValue: TVFilter(videos: true)) }
         #endif
     }
 
     var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                VStack(alignment: .leading, spacing: 32) {
-                    TVPageTitle(title: String(localized: "Library"), line: count) {
-                        HStack(spacing: 24) {
-                            if mode == .all { TVFilterMenu(filter: $filter) }
-                            modePicker
-                        }
-                    }
-                    content(proxy)
+        VStack(alignment: .leading, spacing: 24) {
+            TVPageTitle(title: String(localized: "Library"), line: count) {
+                HStack(spacing: 24) {
+                    if mode == .all { TVFilterMenu(filter: $filter) }
+                    modePicker
                 }
-                .modifier(TVWidth(width: $width))
             }
-            .scrollClipDisabled()
-            .modifier(TVViewerCover(viewing: $viewing, focused: $focused) { proxy.scrollTo($0, anchor: .center) })
-            .environment(\.tvPhotoPage, videos ?? favorites ?? model)
+            // Up from anywhere in the photos comes to the filter and the modes, however few the photos.
+            .focusSection()
+            if mode == .all {
+                TVPhotos(content: videos.map { .results($0) } ?? .timeline(favorites ?? model)) { viewing = $0 } retry: {
+                    Task { if filter.isOn { await show(filter) } else { await model.reload(tv.client) } }
+                }
+            } else {
+                ScrollViewReader { proxy in
+                    ScrollView { overview(proxy) }
+                        .scrollClipDisabled()
+                }
+            }
         }
+        .modifier(TVViewerCover(viewing: $viewing, frames: grid))
+        .environment(\.tvPhotoPage, videos ?? favorites ?? model)
         .task(id: filter) { if filter.isOn || videos != nil || favorites != nil { await show(filter) } }
         // Years and Months show the whole library: the filter is All Photos'.
         .onChange(of: mode) { if mode != .all { filter = TVFilter() } }
@@ -104,8 +111,9 @@ struct TVLibrary: View {
         .frame(width: 720)
     }
 
+    /// Years or Months.
     @ViewBuilder
-    private func content(_ proxy: ScrollViewProxy) -> some View {
+    private func overview(_ proxy: ScrollViewProxy) -> some View {
         switch model.phase {
         case .loading:
             ProgressView().frame(maxWidth: .infinity, minHeight: 400)
@@ -117,16 +125,7 @@ struct TVLibrary: View {
             if model.months.isEmpty {
                 TVNotice(title: "No Photos", systemImage: "photo.on.rectangle")
             } else {
-                switch mode {
-                case .years: years(proxy)
-                case .months: months(proxy)
-                case .all:
-                    if let videos {
-                        TVResultsGrid(model: videos, width: width, focused: $focused) { viewing = $0 }
-                    } else {
-                        TVTimelineGrid(model: favorites ?? model, focused: $focused, width: width) { viewing = $0 }
-                    }
-                }
+                if mode == .years { years(proxy) } else { months(proxy) }
             }
         }
     }
@@ -166,15 +165,15 @@ struct TVLibrary: View {
         }
     }
 
-    /// A photo picked in Months: All Photos at it.
+    /// A photo picked in Months: All Photos at it, once its month is read.
     private func show(_ photo: String, in month: String, _ proxy: ScrollViewProxy) {
         mode = .all
         Task {
             try? await Task.sleep(for: .milliseconds(250))
-            proxy.scrollTo(month, anchor: .top)
-            try? await Task.sleep(for: .milliseconds(400))
-            proxy.scrollTo(photo, anchor: .center)
-            focused = photo
+            grid.scrollToSection?(month)
+            try? await Task.sleep(for: .milliseconds(600))
+            grid.scroll?(photo)
+            grid.focus?(photo)
         }
     }
 }

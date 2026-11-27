@@ -40,15 +40,27 @@ final class TVViewerRemoteTests: XCTestCase {
 
     func testAVideoPlaysInTheSystemsPlayerWithTheRemoteWhole() throws {
         let application = XCUIApplication()
+        // All Photos filtered to its videos, and Manage Photos on (a key that is never used), so a video's menu is
+        // there, as on a TV that turned it on.
         application.launchArguments = ["-signInServer", "https://demo.immich.app", "-signInAccessToken", try demoToken(),
-                                       "-tvOpenVideo", "YES"]
+                                       "-tvPlace", "library", "-tvFilterVideos", "YES", "-tvChangeKey", "unused"]
         application.launch()
+        XCTAssert(application.collectionViews.cells.firstMatch.waitForExistence(timeout: 60), "the videos' grid")
+        Thread.sleep(forTimeInterval: 3)
+        // From the sidebar to the Filter menu, down to the first video, and a click opens it, as a person goes.
+        press(.right, "0a right, to the header")
+        press(.down, "0b down, to the first video")
+        XCUIRemote.shared.press(.select)
         let play = application.descendants(matching: .any)["Play Video"]
-        XCTAssert(play.waitForExistence(timeout: 60), "the viewer opens at a video, with its play sign")
-        Thread.sleep(forTimeInterval: 2)
+        XCTAssert(play.waitForExistence(timeout: 10), "the viewer opens at the video, with its play sign")
+        Thread.sleep(forTimeInterval: 1)
         keep("1 the viewer at a video")
 
-        press(.select, "2 the system's player, playing", settle: 4)
+        // The clickpad's middle plays the video, the photo's menu beside it notwithstanding.
+        XCUIRemote.shared.press(.select)
+        XCTAssert(application.otherElements["Video Player"].waitForExistence(timeout: 5), "the click opens the system's player")
+        Thread.sleep(forTimeInterval: 4)
+        keep("2 the system's player, playing")
         press(.down, "3 down: the player's panel")
         press(.up, "4 up: back from the panel")
         press(.select, "5 select: paused, the transport bar")
@@ -66,5 +78,60 @@ final class TVViewerRemoteTests: XCTestCase {
         XCTAssert(application.exists && application.state == .runningForeground, "and the app stays open")
         keep("9 back in the viewer at the video")
         press(.right, "10 right: the next photo or video")
+    }
+
+    /// The grid moved through with the remote: right and down along the tiles, up back to the Filter menu, a photo
+    /// opened and closed again, the focus back on its tile.
+    func testTheGridMovesWithTheRemote() throws {
+        let application = XCUIApplication()
+        application.launchArguments = ["-signInServer", "https://demo.immich.app", "-signInAccessToken", try demoToken(),
+                                       "-tvPlace", "library"]
+        application.launch()
+        let filter = application.buttons.containing(.staticText, identifier: "Filter").firstMatch
+        XCTAssert(filter.waitForExistence(timeout: 60), "the Library's Filter menu")
+        Thread.sleep(forTimeInterval: 4)
+        keep("g1 the Library")
+        press(.right, "g2 right, into the photos")
+        press(.down, "g3 down")
+        press(.right, "g4 right")
+        press(.right, "g5 right")
+        press(.down, "g6 down")
+        press(.up, "g7 up")
+        // Up from the arch, which is not under the Filter menu, comes to it (the header is a focus area): seen in the
+        // screenshot, as tvOS tells no focus of a menu's button.
+        press(.up, "g8 up, to the Filter menu")
+        press(.down, "g10 down, back into the photos")
+        press(.select, "g11 a photo opened", settle: 3)
+        press(.menu, "g12 closed, the focus on its tile", settle: 3)
+    }
+
+    /// The Filter menu's choices one after another, and the grid has photos after each: every combination of Favorites
+    /// and Videos, on and off again.
+    func testEveryFilterLeavesPhotosInTheGrid() throws {
+        let application = XCUIApplication()
+        application.launchArguments = ["-signInServer", "https://demo.immich.app", "-signInAccessToken", try demoToken(),
+                                       "-tvPlace", "library"]
+        application.launch()
+        let photos = application.collectionViews["Photos"].cells
+        XCTAssert(photos.firstMatch.waitForExistence(timeout: 60), "the Library's grid")
+        Thread.sleep(forTimeInterval: 3)
+        press(.right, "f0 right, to the Filter menu")
+        // Favorites is the menu's first choice, Videos its second.
+        let steps: [(downs: Int, name: String)] = [(0, "favorites on"), (1, "videos on too"), (0, "favorites off"),
+                                                   (1, "videos off"), (1, "videos on"), (0, "favorites on too"),
+                                                   (1, "videos off"), (0, "favorites off")]
+        for (number, step) in steps.enumerated() {
+            XCUIRemote.shared.press(.select)
+            Thread.sleep(forTimeInterval: 1)
+            for _ in 0..<step.downs { XCUIRemote.shared.press(.down) }
+            XCUIRemote.shared.press(.select)
+            Thread.sleep(forTimeInterval: 1)
+            // Photos, or none where the demo has none (it has no favorite videos), never a failure.
+            let shown = photos.firstMatch.waitForExistence(timeout: 30) || application.staticTexts["No Photos"].exists
+            Thread.sleep(forTimeInterval: 2)
+            keep("f\(number + 1) \(step.name)")
+            XCTAssert(shown, "photos in the grid, or none, with \(step.name)")
+            XCTAssertFalse(application.staticTexts["Can't Load Photos"].exists, "no failure with \(step.name)")
+        }
     }
 }

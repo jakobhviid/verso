@@ -1,5 +1,4 @@
-- Videos: a video shows a play sign; click it to open the Apple TV's own player, with scrubbing, the transport bar and its audio and subtitle buttons. Menu goes back, a step at a time, to the viewer, where left and right go on.
-- Photos grow out of their tile as they open, and shrink back into it as they close. The tile under the focus has a thin white outline.
-- Filter, beside the title of All Photos, Favorites, the Archive, albums, people and the Locked Folder: favorites, videos, or both.
-- Manage Photos: the long-press menu has Add to Album, with your albums in the order Albums shows them. A TV that turned Manage Photos on before this build turns it off and on again to allow it.
-- Settings: the row under the focus is no longer cut off at the left.
+- Moving around the photos, on an older Apple TV 4K above all: the grid is rebuilt the way Apple TV's own grids are, and an Apple TV 4K of the 1st or 2nd generation gets a simpler interface (no lift or zoom, the outline alone).
+- The tile under the focus is drawn above its neighbours, its white outline whole.
+- A video: the clickpad's middle plays it, with Manage Photos on too.
+- Filter: Favorites in All Photos works (your own favorites), every combination keeps its photos, and up from the first row reaches Filter.

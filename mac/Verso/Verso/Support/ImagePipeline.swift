@@ -7,7 +7,7 @@ import ImageIO
 /// fast scrolling responsive.
 final class ImagePipeline: Sendable {
     let client: ImmichClient
-    private let thumbnailSlots = ThumbnailLoadSlots(limit: 6)
+    private let thumbnailSlots: ThumbnailLoadSlots
     // NSCache is thread-safe.
     nonisolated(unsafe) private let cache: NSCache<NSString, CGImage>
 
@@ -23,10 +23,13 @@ final class ImagePipeline: Sendable {
     /// Lets the kept HDR photos go when macOS runs short of memory.
     private let memoryPressure = DispatchSource.makeMemoryPressureSource(eventMask: [.warning, .critical])
 
-    init(client: ImmichClient) {
+    /// `cacheLimit` is how much of the decoded pictures are kept, and `loadsAtOnce` how many a grid loads together: less
+    /// for an older Apple TV (TVDevice).
+    init(client: ImmichClient, cacheLimit: Int = 512 << 20, loadsAtOnce: Int = 6) {
         self.client = client
+        thumbnailSlots = ThumbnailLoadSlots(limit: loadsAtOnce)
         let cache = NSCache<NSString, CGImage>()
-        cache.totalCostLimit = 512 << 20
+        cache.totalCostLimit = cacheLimit
         self.cache = cache
         memoryPressure.setEventHandler { [weak self] in self?.releaseHDR() }
         memoryPressure.resume()
@@ -75,6 +78,25 @@ final class ImagePipeline: Sendable {
         let image = await thumbnail(id, size: size)
         await thumbnailSlots.release()
         return image
+    }
+
+    /// A grid tile's picture decoded at the tile's size (`pixels` on its longer side), not the size it was sent at: a
+    /// sixth of the decoding and the memory of the TV's previews, which come at 1440. Kept apart from the full picture.
+    func tileThumbnail(_ id: String, size: ImmichClient.ThumbnailSize, pixels: Int) async -> CGImage? {
+        guard !Task.isCancelled else { return nil }
+        if let cached = cachedTile(id, size: size, pixels: pixels) { return cached }
+        guard await thumbnailSlots.acquire() else { return nil }
+        let image = await load(client.thumbnailRequest(id, size: size), key: Self.tileKey(id, size, pixels), maxPixelSize: pixels)
+        await thumbnailSlots.release()
+        return image
+    }
+
+    func cachedTile(_ id: String, size: ImmichClient.ThumbnailSize, pixels: Int) -> CGImage? {
+        cache.object(forKey: Self.tileKey(id, size, pixels) as NSString)
+    }
+
+    private static func tileKey(_ id: String, _ size: ImmichClient.ThumbnailSize, _ pixels: Int) -> String {
+        "\(id)-\(size.rawValue)-tile\(pixels)"
     }
 
     func personThumbnail(_ id: String) async -> CGImage? {

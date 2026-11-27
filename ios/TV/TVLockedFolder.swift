@@ -30,7 +30,7 @@ final class TVLockedFolderVisit {
 
     init(server: URL, apiURL: URL, token: String, owner: TVModel) {
         client = ImmichClient(serverURL: server, apiURL: apiURL, credential: .accessToken(token)).explorePrivateClient()
-        model = TVModel(lockedFolder: client, images: ImagePipeline(client: client), owner: owner)
+        model = TVModel(lockedFolder: client, images: ImagePipeline(client: client, cacheLimit: TVDevice.pictureCache, loadsAtOnce: TVDevice.picturesAtOnce), owner: owner)
     }
 
     /// The session's unlock as the server has it: elevated, and until when.

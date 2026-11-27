@@ -89,22 +89,14 @@ struct TVSearchResults: View {
     @Environment(TVModel.self) private var tv
     @State private var model: TVResultsModel?
     @State private var viewing: TVViewing?
-    @State private var width = TVMetrics.pageWidth
-    @FocusState private var focused: String?
 
     var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                VStack(alignment: .leading, spacing: 32) {
-                    TVPageTitle(query.text.isEmpty ? query.chips.joined(separator: ", ") : query.text, line: line)
-                    if let model { TVResultsGrid(model: model, width: width, focused: $focused) { viewing = $0 } }
-                }
-                .modifier(TVWidth(width: $width))
-            }
-            .scrollClipDisabled()
-            .modifier(TVViewerCover(viewing: $viewing, focused: $focused) { proxy.scrollTo($0, anchor: .center) })
-            .environment(\.tvPhotoPage, model)
+        VStack(alignment: .leading, spacing: 24) {
+            TVPageTitle(query.text.isEmpty ? query.chips.joined(separator: ", ") : query.text, line: line)
+            if let model { TVPhotos(content: .results(model)) { viewing = $0 } }
         }
+        .modifier(TVViewerCover(viewing: $viewing))
+        .environment(\.tvPhotoPage, model)
         .task {
             guard model == nil, let client = tv.client else { return }
             let query = query
