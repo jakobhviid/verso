@@ -97,10 +97,35 @@ by the largest kind among the commit subjects since it, which is what the next r
 
 The bump is a suggestion: the maintainer tags it, or another number after the last. A `BREAKING CHANGE` footer is
 not scanned; mark breaking changes with `!` in the subject. Subjects stay Conventional Commits, because they make the
-release notes (`ci/release-notes.sh`: `feat` under New, `fix` under Fixed). A pre-release is a tag such as
-`v1.0.0-beta.1`, published as a pre-release and kept out of the cask; the tree after it numbers itself as the release
-it leads to (1.0.0). Verso stays at 0.x until its public launch; 1.0.0 is that launch. A checkout without the tags
-has no version: `ci/version.sh` stops and asks for them.
+release notes (`ci/release-notes.sh`: `feat` under New, `fix` under Fixed). A checkout without the tags has no
+version: `ci/version.sh` stops and asks for them. A version number says nothing about maturity: 1.0 is a version like
+any other.
+
+**Two channels** (PRINCIPLES.md, 15), stable and beta, each on every platform:
+
+| | Beta, from `develop` | Stable, from `main` |
+|---|---|---|
+| Tag | a pre-release, `v0.78.0-beta.1`; the tree after it numbers itself as the release it leads to | `v0.78.0` |
+| GitHub | a pre-release, never Latest | Latest |
+| Homebrew (Linux and the Mac) | `jakobhviid/tap/verso@beta`, which a stable release reaches too | `jakobhviid/tap/verso`, until Homebrew's own `homebrew/cask` takes it (then `tap_migrations.json` moves it) |
+| The Mac's updates | Sparkle's beta channel: a beta's build takes betas and releases (`VERSO_CHANNEL`) | Sparkle's default channel |
+| iPhone, iPad, Apple TV | TestFlight: the internal group, and the external one with the public link (`ios/appstore.py beta`) | App Store: the TestFlight build of the version, sent to review (`ios/appstore.py submit`) |
+| Linux's own update check, Verso's page | untouched | `latest.json` and the page follow it |
+
+Apple's version strings are numbers alone, so a beta's Apple builds carry `0.78.0` with their rising build number;
+TestFlight and Sparkle's beta channel, not the number, make them betas. Development builds (Verso Dev on the Mac,
+the iPhone and the iPad) come straight from the checkout, on any branch, and belong to no channel.
+
+The maintainer's three requests, and what each runs:
+- **"Release to TestFlight"** (from `develop`): `ios/release.sh` and `ios/release.sh --tvos` on the Mac, then
+  `ios/appstore.py push` (What to Test from `ios/AppStore/what_to_test.txt`) and `ios/appstore.py beta`.
+- **"Make a beta"** (from `develop`): `ci/release.sh tag VERSION-beta.N`, then `build`, the Mac's disk image and
+  `ci/release.sh mac`, and `publish`, which bumps `verso@beta` and rebuilds the page's feed; with the TestFlight
+  release above.
+- **"Make a stable release"**: `main` moves forward to the tested commit (Branches, above), then `ci/release.sh tag`,
+  `build`, the Mac's disk image and `mac`, and `publish`, which bumps both casks and rebuilds the page; then
+  `ios/appstore.py push --version VERSION` and `ios/appstore.py submit`, which sends the tested TestFlight builds to App
+  Review. Releasing an approved version stays the maintainer's, in App Store Connect.
 
 **A push releases nothing.** The maintainer cuts a release with `ci/release.sh`, on the Linux workstation; `--dry-run`
 on any step shows what it would do and changes nothing outside the checkout:

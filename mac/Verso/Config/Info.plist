@@ -73,6 +73,9 @@
 	<string>Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO. “Immich” is used only to describe the server this software works with, and remains the mark of its owner.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Verso connects to your Immich server, which may be on your local network.</string>
+	<!-- The channel this build updates on, stable or beta (mac/build-rust.sh; Updates.swift). -->
+	<key>VersoUpdateChannel</key>
+	<string>$(VERSO_CHANNEL)</string>
 	<key>SUFeedURL</key>
 	<string>https://jakob.hviid.phd/verso/appcast.xml</string>
 	<key>SUPublicEDKey</key>

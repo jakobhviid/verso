@@ -3530,6 +3530,15 @@ the disk image.
   the same with the same scripts, started by hand when the machines are away; its TestFlight uploads wait for Xcode 27
   on the runner. CI still checks every push on GitHub, where nobody needs to be there, and its older Xcode catches
   code only the newest compiles.
+- **Two channels, stable and beta** (AGENTS.md, "Versioning"; PRINCIPLES.md, 15): betas from `develop`, tagged as
+  pre-releases, go to TestFlight, the `verso@beta` cask and Sparkle's beta channel; stable releases from `main` to the
+  App Store, the `verso` cask, Sparkle's default channel, GitHub's Latest and Verso's page. A stable release promotes
+  what its beta tested: the same commit, and on Apple's stores the same build, as App Store Connect sends a TestFlight
+  build to review as it is. The channel is where a build goes, never what its number says: Apple's version strings
+  take numbers alone, so a beta's Apple builds carry the version it leads to with a rising build number, and 1.0
+  marks nothing. Not chosen: a beta app of its own (another bundle identifier, App Group and Keychain group, and
+  testers' libraries and sign-ins starting over at every release); `verso-beta` for the cask's name, as Homebrew
+  names a channel with `@` (`firefox@beta`), which its users know.
 - **Work on develop, releases on main** (AGENTS.md, "Branches"): main moves only when a release is cut, by a
   fast-forward to develop, so it reads as the history of releases, and the page and a visitor's checkout show what can
   be downloaded, while develop takes every commit as it comes. A fast-forward keeps one line of commits for both, so

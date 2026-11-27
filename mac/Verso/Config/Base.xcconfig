@@ -4,5 +4,7 @@
 // The version, until mac/build-rust.sh has written the release line's.
 MARKETING_VERSION = 0.0.0
 CURRENT_PROJECT_VERSION = 1
+// The update channel (Updates.swift): stable, unless mac/build-rust.sh numbers a beta.
+VERSO_CHANNEL = stable
 #include? "../../build/Version.xcconfig"
 #include? "../../Config/Local.xcconfig"

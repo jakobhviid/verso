@@ -27,9 +27,9 @@ drive's layout and the arithmetic that places the grid's dates, so they behave a
 
 | Platform | Where it stands |
 |---|---|
-| Linux, x86_64 (GNOME) | Released as 0.x builds: Homebrew, rpm and deb packages, and a Flatpak and an AppImage test build (below) |
-| Mac (macOS 15 or later) | Released as 0.x builds: a signed and notarized disk image from [Verso's page](https://jakob.hviid.phd/verso/), or `brew install --cask jakobhviid/tap/verso`; it updates itself |
-| iPhone, iPad and Apple TV | In beta through [TestFlight](https://testflight.apple.com/join/7z1ppMM8); the App Store after it |
+| Linux, x86_64 (GNOME) | Released: Homebrew (`verso`, and `verso@beta` for the beta channel), rpm and deb packages, and a Flatpak and an AppImage test build (below) |
+| Mac (macOS 15 or later) | Released: a signed and notarized disk image from [Verso's page](https://jakob.hviid.phd/verso/), or `brew install --cask jakobhviid/tap/verso` (`verso@beta` for the beta channel); it updates itself |
+| iPhone, iPad and Apple TV | The App Store (0.77.0, in review), and the beta channel through [TestFlight](https://testflight.apple.com/join/7z1ppMM8) |
 
 ## What it does
 

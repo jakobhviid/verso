@@ -24,7 +24,9 @@ root=$PWD
 
 repository=jakobhviid/verso
 tap=jakobhviid/homebrew-tap
+# The two channels' casks (AGENTS.md, "Versioning"): stable's from main's releases, beta's from develop's betas too.
 cask=Casks/verso.rb
+beta_cask=Casks/verso@beta.rb
 tarball=verso-x86_64.tar.gz
 flatpak=verso-x86_64.flatpak
 appimage=verso-x86_64.AppImage
@@ -108,8 +110,9 @@ release_text() {
   notes=$(ci/release-notes.sh "$previous" "$end")
   runtime=$(sed -n "s/^runtime-version: '\(.*\)'$/\1/p" "$tree/linux/packaging/flatpak/dev.hviid.Verso.yml")
   upgrade='Upgrade with `brew upgrade verso`.'
-  is_prerelease "$version" && upgrade="A pre-release: Homebrew's cask stays at the last release."
-  printf "Evaluation build for x86_64 Linux. Needs GNOME 49's libraries or newer, libadwaita 1.8 and GTK 4.18 "
+  is_prerelease "$version" &&
+    upgrade='A beta, from the beta channel: `brew install --cask jakobhviid/tap/verso@beta` takes it, and `verso` stays at the last stable release.'
+  printf "Verso for x86_64 Linux. Needs GNOME 49's libraries or newer, libadwaita 1.8 and GTK 4.18 "
   printf '(Fedora 43 and newer, Ubuntu 25.10 and 26.04 LTS, Debian 14, Arch); on an older system Verso says so as it '
   printf 'starts, and the AppImage and the Flatpak below run there, without Verso Drive. From the tarball, which Homebrew installs, '
   printf 'Verso Drive needs FUSE 3, and its menu in Files nautilus-python. %s\n\n' "$upgrade"
@@ -393,11 +396,49 @@ cask_for() {
   if [ -n "$3" ]; then cask_at linux "$1" "$2" | cask_at macos "$1" "$3"; else cask_at linux "$1" "$2"; fi
 }
 
+# A cask's text in the tap; for the beta's, where the tap has none yet, the stable one's made the beta's.
+cask_text() {
+  local file=$1 text
+  if text=$(gh api "repos/$tap/contents/$file" --jq .content 2>/dev/null); then
+    printf '%s' "$text" | base64 --decode
+  elif [ "$file" = "$beta_cask" ]; then
+    gh api "repos/$tap/contents/$cask" --jq .content | base64 --decode | beta_cask_of
+  else
+    die "$tap has no $file"
+  fi
+}
+
+# The beta channel's cask from the stable one's (stdin): its own name, the channel in its name and description, and a
+# livecheck that takes pre-releases.
+beta_cask_of() {
+  sed -e 's/^cask "verso" do$/cask "verso@beta" do/' \
+    -e 's/^  name "Verso for Immich"$/  name "Verso for Immich (beta)"/' \
+    -e 's/^  desc "\(.*\) (unofficial)"$/  desc "\1 (unofficial, beta channel)"/' \
+    -e '/^  conflicts_with cask: /d' \
+    -e 's/strategy :github_latest/strategy :github_releases/'
+}
+
+# Each channel's cask names the other as one it conflicts with, as both install the same app; and neither calls the
+# build an evaluation build, which is a channel's word for nothing.
+cask_channels() {
+  local file=$1 other=verso@beta
+  [ "$file" = "$beta_cask" ] && other=verso
+  awk -v line="  conflicts_with cask: \"$other\"" '
+    $0 == line { have = 1 }
+    { lines[NR] = $0 }
+    END {
+      for (n = 1; n <= NR; n++) {
+        if (!have && lines[n] ~ /^  name "/) { print line; print ""; have = 1 }
+        print lines[n]
+      }
+    }' | sed 's/^      An evaluation build\. /      /'
+}
+
 bump_cask() {
-  local version=$1 sha=$2 mac_sha=${3:-} current at updated clone
-  current=$(gh api "repos/$tap/contents/$cask" --jq .content | base64 --decode)
+  local file=$1 version=$2 sha=$3 mac_sha=${4:-} current at updated clone
+  current=$(cask_text "$file")
   at=$(printf '%s\n' "$current" | awk '$0 == "  on_linux do" { inside = 1 } inside && /^    version / { gsub(/[^0-9a-z.~-]/, "", $2); print $2; exit }')
-  updated=$(printf '%s\n' "$current" | cask_for "$version" "$sha" "$mac_sha")
+  updated=$(printf '%s\n' "$current" | cask_for "$version" "$sha" "$mac_sha" | cask_channels "$file")
   if [ "$current" = "$updated" ]; then
     echo "The cask is at $version already."
     return
@@ -405,18 +446,18 @@ bump_cask() {
     echo "The cask is at $at, after $version: it stays."
     return
   fi
-  grep -q "^    sha256 \"$sha\"$" <<< "$updated" || die "$tap's $cask has no on_linux sha256 line to set; bump it by hand"
-  echo "The cask's bump, in $tap:"
-  diff -u --label "a/$cask" --label "b/$cask" <(printf '%s\n' "$current") <(printf '%s\n' "$updated") || true
+  grep -q "^    sha256 \"$sha\"$" <<< "$updated" || die "$tap's $file has no on_linux sha256 line to set; bump it by hand"
+  echo "$file's bump, in $tap:"
+  diff -u --label "a/$file" --label "b/$file" <(printf '%s\n' "$current") <(printf '%s\n' "$updated") || true
   if [ "$dry_run" = yes ]; then
-    echo "dry run, would commit it to $tap's main as \"verso $version\" and push it"
+    echo "dry run, would commit it to $tap's main as \"$(basename "$file" .rb) $version\" and push it"
     return
   fi
   clone=$(mktemp -d)
   gh repo clone "$tap" "$clone/tap" -- --quiet --depth 1
-  cask_for "$version" "$sha" "$mac_sha" < "$clone/tap/$cask" > "$clone/verso.rb"
-  mv "$clone/verso.rb" "$clone/tap/$cask"
-  git -C "$clone/tap" commit --quiet --message "verso $version" -- "$cask"
+  printf '%s\n' "$updated" > "$clone/tap/$file"
+  git -C "$clone/tap" add "$file"
+  git -C "$clone/tap" commit --quiet --message "$(basename "$file" .rb) $version" -- "$file"
   git -C "$clone/tap" push --quiet origin HEAD
   rm -rf "$clone"
 }
@@ -454,14 +495,16 @@ publish() {
       change gh release edit "$tag" --repo "$release" --draft=false "${latest[@]}"
     fi
   done
-  if is_prerelease "$version"; then
-    echo "A pre-release: the cask stays at the last release."
-    return
-  fi
   mac_digest=$(gh release view "$tag" --repo "${repositories[-1]}" --json assets \
     --jq ".assets[] | select(.name == \"verso-$version.dmg\") | .digest")
-  bump_cask "$version" "${first_digest#sha256:}" "${mac_digest#sha256:}"
-  # Verso's page, its latest.json and Sparkle's feed follow the release.
+  # A beta reaches the beta channel's cask alone; a stable release reaches both, so the beta channel takes it too.
+  if is_prerelease "$version"; then
+    echo "A beta: verso@beta takes it, and verso stays at the last stable release."
+  else
+    bump_cask "$cask" "$version" "${first_digest#sha256:}" "${mac_digest#sha256:}"
+  fi
+  bump_cask "$beta_cask" "$version" "${first_digest#sha256:}" "${mac_digest#sha256:}"
+  # Verso's page, its latest.json and Sparkle's feed follow the release; a beta reaches the feed's beta channel.
   change gh workflow run pages.yml --repo "$repository" --ref main
 }
 

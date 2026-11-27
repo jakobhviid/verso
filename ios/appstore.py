@@ -8,6 +8,10 @@ Store Connect. Python's standard library and openssl only, so it runs on the Mac
     ios/appstore.py check                                         the texts' lengths and the screenshots, offline
     ios/appstore.py medium                                        the medium iPhone's pictures, from the large one's
     ios/appstore.py push [--version X.Y.Z] [--platform ios|tvos|all] [--no-screenshots]
+    ios/appstore.py beta [--platform ios|tvos|all]           the beta channel: each newest build to TestFlight's
+                                                              external groups, and to its beta review
+    ios/appstore.py submit [--version X.Y.Z] [--platform ...] the stable channel: the version's newest build, the one
+                                                              TestFlight tested, attached and sent to App Review
 
 push reads the API key as ios/release.sh does: ASC_KEY_ID, ASC_ISSUER_ID, and the key file (ASC_KEY_FILE, else
 ~/.appstoreconnect/private_keys/AuthKey_<ASC_KEY_ID>.p8). The review contact comes from ios/AppStore/contact.local
@@ -381,6 +385,82 @@ def push(version, platforms, with_screenshots):
     return ok
 
 
+def newest_build(connect, app, api, version=None):
+    """A platform's newest build, of `version` where one is named; None where there is none."""
+    params = {"filter[app]": app, "filter[preReleaseVersion.platform]": api, "sort": "-uploadedDate", "limit": 1}
+    if version:
+        params["filter[preReleaseVersion.version]"] = version
+    builds = connect.get("/v1/builds", **params)["data"]
+    return builds[0] if builds else None
+
+
+def beta(platforms):
+    """The beta channel (AGENTS.md, "Versioning"): each platform's newest build in every external TestFlight group,
+    the public link's among them, and sent to TestFlight's beta review, which the first build of a version needs."""
+    connect = Connect()
+    app = connect.get("/v1/apps", **{"filter[bundleId]": BUNDLE_ID})["data"][0]["id"]
+    groups = [group for group in connect.all(f"/v1/apps/{app}/betaGroups")
+              if not group["attributes"].get("isInternalGroup")]
+    ok = True
+    for platform in platforms:
+        api = PLATFORMS[platform]["api"]
+        build = newest_build(connect, app, api)
+        if build is None:
+            print(f"{api}: no build")
+            continue
+        number = build["attributes"].get("version")
+        print(f"{api} build {number} ({build['attributes'].get('processingState')}):")
+        for group in groups:
+            ok &= step(f"in {group['attributes'].get('name')}", lambda group=group: connect.call(
+                "POST", f"/v1/betaGroups/{group['id']}/relationships/builds",
+                {"data": [{"type": "builds", "id": build["id"]}]}))
+
+        def review():
+            try:
+                connect.create("betaAppReviewSubmissions", {}, {"build": related("builds", build["id"])})
+            except RuntimeError as error:
+                # A build TestFlight already reviewed, or one whose version passed beta review before, needs none.
+                if " 409 " not in str(error):
+                    raise
+        ok &= step("sent to TestFlight's beta review where it needs one", review)
+    return ok
+
+
+def submit(version, platforms):
+    """The stable channel (PRINCIPLES.md, 15): the version's newest build, the one TestFlight tested, attached to the
+    App Store version and sent to App Review; releasing it once approved stays the maintainer's, in App Store Connect."""
+    connect = Connect()
+    app = connect.get("/v1/apps", **{"filter[bundleId]": BUNDLE_ID})["data"][0]["id"]
+    ok = True
+    for platform in platforms:
+        api = PLATFORMS[platform]["api"]
+        versions = connect.all(f"/v1/apps/{app}/appStoreVersions", **{"filter[platform]": api})
+        editable = next((item for item in versions if item["attributes"].get("appStoreState") in EDITABLE
+                         and item["attributes"].get("versionString") == version), None)
+        if editable is None:
+            print(f"{api}: no version {version} being prepared (ios/appstore.py push --version {version} makes it)")
+            ok = False
+            continue
+        build = newest_build(connect, app, api, version)
+        if build is None or build["attributes"].get("processingState") != "VALID":
+            print(f"{api}: no processed build of {version} in TestFlight")
+            ok = False
+            continue
+        print(f"{api} {version}, build {build['attributes'].get('version')}:")
+        ok &= step("the build attached", lambda: connect.call(
+            "PATCH", f"/v1/appStoreVersions/{editable['id']}/relationships/build",
+            {"data": {"type": "builds", "id": build["id"]}}))
+
+        def review():
+            submission = connect.create("reviewSubmissions", {"platform": api}, {"app": related("apps", app)})
+            connect.create("reviewSubmissionItems", {}, {
+                "reviewSubmission": related("reviewSubmissions", submission["id"]),
+                "appStoreVersion": related("appStoreVersions", editable["id"])})
+            connect.patch("reviewSubmissions", submission["id"], {"submitted": True})
+        ok &= step("sent to App Review", review)
+    return ok
+
+
 def upload_set(connect, localization, display, files):
     """A display type's pictures, in order, sent again only where they changed."""
     sets = connect.all(f"/v1/appStoreVersionLocalizations/{localization}/appScreenshotSets")
@@ -416,6 +496,11 @@ def main():
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("check")
     commands.add_parser("medium")
+    for name in ("beta", "submit"):
+        channel = commands.add_parser(name)
+        channel.add_argument("--platform", choices=["ios", "tvos", "all"], default="all")
+        if name == "submit":
+            channel.add_argument("--version")
     pushing = commands.add_parser("push")
     pushing.add_argument("--version")
     pushing.add_argument("--platform", choices=["ios", "tvos", "all"], default="all")
@@ -426,6 +511,14 @@ def main():
     if arguments.command == "medium":
         medium()
         return
+    if arguments.command == "beta":
+        chosen = list(PLATFORMS) if arguments.platform == "all" else [arguments.platform]
+        sys.exit(0 if beta(chosen) else 1)
+    if arguments.command == "submit":
+        chosen = list(PLATFORMS) if arguments.platform == "all" else [arguments.platform]
+        version = arguments.version or subprocess.run([str(ROOT / "ci/version.sh")], capture_output=True, text=True,
+                                                      check=True).stdout.strip()
+        sys.exit(0 if submit(version.split("-")[0], chosen) else 1)
     if not check():
         sys.exit("the listing has problems: nothing was sent")
     version = arguments.version or subprocess.run([str(ROOT / "ci/version.sh")], capture_output=True, text=True,

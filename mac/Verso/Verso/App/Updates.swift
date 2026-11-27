@@ -17,11 +17,21 @@ enum Updates {
         #endif
     }
 
-    static let controller = SPUStandardUpdaterController(startingUpdater: enabled, updaterDelegate: nil,
+    static let controller = SPUStandardUpdaterController(startingUpdater: enabled, updaterDelegate: channel,
                                                          userDriverDelegate: nil)
+    /// Kept here: the controller holds its delegate weakly.
+    private static let channel = UpdateChannel()
 
     /// Starts the updater at launch, which then checks on Sparkle's schedule once the person has agreed to.
     static func start() { _ = controller }
+}
+
+/// The channel a build updates on (AGENTS.md, "Versioning"; PRINCIPLES.md, 15): a beta's build, from `develop`, takes the
+/// feed's beta items as well as its releases; a release's takes releases alone, Sparkle's default channel.
+final class UpdateChannel: NSObject, SPUUpdaterDelegate {
+    func allowedChannels(for updater: SPUUpdater) -> Set<String> {
+        Bundle.main.object(forInfoDictionaryKey: "VersoUpdateChannel") as? String == "beta" ? ["beta"] : []
+    }
 }
 
 /// ⌘Q closes Verso's windows and leaves the menu bar icon running, Verso Drive's account with it, as Immich Mount's app

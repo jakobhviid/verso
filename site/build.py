@@ -104,10 +104,11 @@ def mac_notes(releases):
     return '<!doctype html><meta charset="utf-8">' + style + "".join(parts)
 
 
-def appcast(mac, disk_image, notes=""):
-    """Sparkle's feed with the one update, from the disk image's update file (ci/sign-mac-update.sh): the version
-    Sparkle compares is the build number, and the disk image's size and signature are what the app checks before
-    installing it. None when the release carries no update file."""
+def appcast_item(mac, disk_image, notes="", channel=None):
+    """One update in Sparkle's feed, from the disk image's update file (ci/sign-mac-update.sh): the version Sparkle
+    compares is the build number, and the disk image's size and signature are what the app checks before installing
+    it; a beta's carries Sparkle's `beta` channel, which only a beta's build takes (mac/Verso/Verso/App/Updates.swift).
+    None when the release carries no update file."""
     name = disk_image.rsplit("/", 1)[-1]
     update_url = asset_url(mac, name + ".update")
     if update_url is None:
@@ -120,23 +121,42 @@ def appcast(mac, disk_image, notes=""):
     published = datetime.fromisoformat(mac["published_at"].replace("Z", "+00:00"))
     # CDATA keeps the notes' HTML as it is; their text is escaped, so "]]>" cannot occur in it.
     description = f"      <description><![CDATA[{notes}]]></description>\n" if notes else ""
-    return f"""<?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
-  <channel>
-    <title>Verso</title>
-    <link>{PAGE}</link>
-    <item>
+    beta = f"      <sparkle:channel>{html.escape(channel)}</sparkle:channel>\n" if channel else ""
+    return f"""    <item>
       <title>Verso {html.escape(version)}</title>
       <pubDate>{email.utils.format_datetime(published)}</pubDate>
       <sparkle:version>{html.escape(update["build"])}</sparkle:version>
       <sparkle:shortVersionString>{html.escape(version)}</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-{description}      <enclosure url="{html.escape(disk_image)}" length="{size}" type="application/octet-stream"
+{beta}{description}      <enclosure url="{html.escape(disk_image)}" length="{size}" type="application/octet-stream"
                  sparkle:edSignature="{html.escape(update["signature"])}"/>
     </item>
-  </channel>
+"""
+
+
+def appcast(items):
+    """Sparkle's feed: the stable release's update, and the newest beta's where it is newer, on the beta channel."""
+    if not items:
+        return None
+    return f"""<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>Verso</title>
+    <link>{PAGE}</link>
+{"".join(items)}  </channel>
 </rss>
 """
+
+
+def newest_beta(every, after):
+    """The newest beta (a published pre-release) with a disk image, where it came out after `after`, the stable
+    release: the beta channel's update. (None, None) otherwise."""
+    betas = [release for release in every if release.get("prerelease") and not release.get("draft")]
+    betas.sort(key=lambda release: release.get("published_at") or "", reverse=True)
+    beta, image = newest_with(betas, DISK_IMAGE)
+    if beta and (after is None or (beta.get("published_at") or "") > (after.get("published_at") or "")):
+        return beta, image
+    return None, None
 
 
 def link(url, text):
@@ -318,7 +338,8 @@ def privacy_page():
 
 
 def main(releases_file, output, app_store=None, testflight=TESTFLIGHT):
-    releases = published(json.loads(Path(releases_file).read_text()))
+    every = json.loads(Path(releases_file).read_text())
+    releases = published(every)
     linux, tarball = newest_with(releases, re.escape(TARBALL))
     if linux is None:
         sys.exit(f"no published release in {releases_file} carries {TARBALL}")
@@ -395,7 +416,11 @@ def main(releases_file, output, app_store=None, testflight=TESTFLIGHT):
     (output / "privacy.html").write_text(privacy_page())
     # What a Linux package from this page looks at to tell of a newer release (ARCHITECTURE.md, "Updates on Linux").
     (output / "latest.json").write_text(json.dumps({"version": version, "page": PAGE}) + "\n")
-    feed = appcast(mac, disk_image, mac_notes(releases)) if disk_image else None
+    items = [appcast_item(mac, disk_image, mac_notes(releases))] if disk_image else []
+    beta, beta_image = newest_beta(every, mac)
+    if beta:
+        items.append(appcast_item(beta, beta_image, mac_notes([beta]), channel="beta"))
+    feed = appcast([item for item in items if item])
     if feed:
         (output / "appcast.xml").write_text(feed)
     for name in ("style.css", "mark.svg", "llms.txt"):

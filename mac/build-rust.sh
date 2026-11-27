@@ -91,6 +91,13 @@ python3 po/i18n.py apple "$out/Localization"
 # The release line's version (ci/version.sh), the same as the Linux packages', and the build number, the build's UTC
 # time to the minute (20261122.1435), which rises with every build as TestFlight, the App Store and Sparkle need, also
 # between two builds of one version; Config/Base.xcconfig reads them.
-printf 'MARKETING_VERSION = %s\nCURRENT_PROJECT_VERSION = %s\n' "$(ci/version.sh)" "$(date -u +%Y%m%d.%H%M)" \
+# A beta's version without its suffix (0.78.0 for 0.78.0-beta.1): Apple's version strings are numbers alone, and
+# TestFlight and Sparkle's beta channel, not the number, are what make a build a beta (AGENTS.md, "Versioning").
+# The update channel the Mac app takes from Sparkle's feed: a beta's build takes betas as well as releases.
+version=$(ci/version.sh)
+marketing=${version%%-*}
+channel=stable
+[ "$version" = "$marketing" ] || channel=beta
+printf 'MARKETING_VERSION = %s\nCURRENT_PROJECT_VERSION = %s\nVERSO_CHANNEL = %s\n' "$marketing" "$(date -u +%Y%m%d.%H%M)" "$channel" \
   > "$out/Version.xcconfig"
 echo "built $out/VersoBridge.xcframework and $out/Generated/verso_bridge.swift ($profile$([ "$ios" = yes ] && echo ', with iOS')$([ "$tvos" = yes ] && echo ', with tvOS'))"
