@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Build Verso on the Mac as it is released (ARCHITECTURE.md, "Verso on the Mac", "Signing for release"): the bridge for
 # both Mac architectures, the app archived and signed with Developer ID, notarized and stapled, in a disk image that
-# is signed, notarized and stapled in turn. The release workflow runs it on GitHub's macOS runner; on the maintainer's
-# Mac it runs in a Terminal window, where the login keychain is open (the mac-dev skill).
+# is signed, notarized and stapled in turn. On the maintainer's Mac it runs in a Terminal window, where the login
+# keychain is open (the mac-dev skill); the release workflow, the backup, runs it on GitHub's macOS runner.
 #
 #   mac/release.sh [--unsigned | --not-notarized]
 #

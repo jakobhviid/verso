@@ -107,15 +107,13 @@ on any step shows what it would do and changes nothing outside the checkout:
 1. `ci/release.sh` suggests the next version and prints its notes.
 2. `ci/release.sh tag [VERSION]` tags a clean HEAD that is on `origin/main`, signed, and pushes the tag.
 3. `ci/release.sh build TAG` builds Linux's files from the tag in a worktree of its own (the tarball and the AppImage
-   in the toolbox, the rpm and the deb each in a container of its distribution, with podman, the Flatpak's source,
-   and the Flatpak where `flatpak-builder` is) into `target/dist/TAG`, and makes a draft release
-   of them, "Verso 0.72.0 (Linux)", here, which Homebrew's `verso` cask and Verso's page download from. The release
-   workflow
-   (`.github/workflows/release.yml`) runs this step on every pushed tag, the Flatpak included, and adds the Mac's disk
-   image, signed and notarized, once the Mac's secrets are set (its `macos` job names them); so after `tag`, this
-   step is the workflow's, not the workstation's. By hand, the workflow rehearses a tag with `--dry-run`. On the
-   workstation, which has no flatpak, the Flatpak is built in the GNOME VM from the source archive, as the step
-   prints.
+   in the toolbox; the rpm, the deb and the Flatpak each in a container, with podman: the packages in their
+   distributions', the Flatpak in a Fedora one with `flatpak-builder`, `linux/packaging/verso-flatpak.sh`, its GNOME
+   runtime kept between releases) into `target/dist/TAG`, and makes a draft release of them, "Verso 0.72.0 (Linux)",
+   here, which Homebrew's `verso` cask and Verso's page download from. The Apple editions are built on the Mac, below.
+   **Releases are built on the maintainer's machines;** the release workflow (`.github/workflows/release.yml`) is the
+   backup, started by hand with the tag when the workstation or the Mac is away (`gh workflow run release.yml -f
+   tag=TAG`): it does this step, the Mac's disk image and the TestFlight uploads on GitHub's runners.
 4. The maintainer checks the draft, installed in the lab's desktop VMs, and `ci/release.sh publish TAG` publishes both
    drafts and bumps the cask in `jakobhviid/homebrew-tap`.
 
@@ -133,9 +131,9 @@ at once (ARCHITECTURE.md, "Verso's releases"):
   beside Linux ("Verso 3.9.0 (Linux and macOS)"), with a macOS section in its notes since the previous Mac release.
   `mac/release.sh` builds its disk image, signed with Developer ID and notarized, in a Terminal window on the Mac;
   `ci/sign-mac-update.sh` signs it for Sparkle on the workstation, and both are attached to the tag's drafts.
-- iOS ships through TestFlight and the App Store, never on GitHub: the release workflow's `ios` job uploads the
-  iPhone's and the iPad's build and the Apple TV's (`ios/release.sh`, `--tvos`) once their secrets are set, as
-  `ios/release.sh` does on the Mac. `ios/appstore.py push` fills the App Store listing and TestFlight's texts from
+- iOS ships through TestFlight and the App Store, never on GitHub: `ios/release.sh` uploads the iPhone's and the iPad's
+  build, and `--tvos` the Apple TV's, from the Mac; the release workflow's `ios` job does the same as the backup, and
+  only from Xcode 27 or later. `ios/appstore.py push` fills the App Store listing and TestFlight's texts from
   `ios/AppStore/`; sending a version to review is the maintainer's.
 - There is no rolling "latest" release: each platform's newest is found on its own; the cask follows GitHub's Latest
   here.

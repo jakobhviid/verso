@@ -3491,6 +3491,14 @@ the disk image.
   API does not reach stays the maintainer's, in App Store Connect: App Privacy's answers, the price and
   availability, and sending a version to review. Not chosen: fastlane's `deliver`, which does the same through a
   Ruby toolchain and a folder layout of its own, for one command's worth of calls.
+- **Releases are built on the maintainer's machines, GitHub's runners the backup:** the workstation builds Linux's
+  files (`ci/release.sh build`, its containers with podman, the Flatpak's among them) in minutes from warm caches,
+  where the release workflow took most of an hour, and the Mac builds the Apple editions with the newest Xcode (27.2,
+  where GitHub's newest was 26.6, whose iOS 26 SDK the App Store refuses from April 2027 and whose builds run on iOS 27
+  in its compatibility mode), and is where the maintainer checks them before they ship. The release workflow does
+  the same with the same scripts, started by hand when the machines are away; its TestFlight uploads wait for Xcode 27
+  on the runner. CI still checks every push on GitHub, where nobody needs to be there, and its older Xcode catches
+  code only the newest compiles.
 - **Work on develop, releases on main** (AGENTS.md, "Branches"): main moves only when a release is cut, by a
   fast-forward to develop, so it reads as the history of releases, and the page and a visitor's checkout show what can
   be downloaded, while develop takes every commit as it comes. A fast-forward keeps one line of commits for both, so

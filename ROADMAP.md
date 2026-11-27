@@ -118,9 +118,8 @@ the import panel, Change Password and the profile picture.
    - a Mac edition at parity with Linux ("Verso on the Mac", below)
    - a map whose tiles allow the traffic: done, Linux's maps draw the Immich server's own map setting (ARCHITECTURE,
      "Verso's window", the map)
-   - every release built by the release workflow (`.github/workflows/release.yml`), as Immich Mount's are, in place
-     of the builds on the workstation: built (Linux's files with the Flatpak, and the Mac's disk image once the Mac's
-     secrets are set); left, its first run on a tag, after a rehearsal by hand (`--dry-run`), and the secrets
+   - every release built on the maintainer's machines, the release workflow the backup started by hand (AGENTS.md,
+     "Versioning"): built; left, a whole release cut that way, the Flatpak from its container among it
    - decided with the maintainer:
      - **The history:** public since 2026-11-24, with what came before 23 November at 13:45 in one commit and
        the commits since kept, tagged from `v0.72.1`. The whole earlier history, every branch, tag and release's
@@ -327,17 +326,9 @@ Immich Crosslink, the protocol between apps, and the takeover of Immich Mount's 
      2. The Immich client's calls: the typed calls (ARCHITECTURE.md, "Typed calls") bring immich-api's models, and
         the Swift models and `ImmichClient` go as the views take the bridge's records.
 
-**Releases are cut by a tag** (AGENTS.md, "Versioning", has how; ARCHITECTURE, "Verso's releases", why). Not built
-yet, beside step 6's list:
-- Until Actions is on, the Mac's disk image built on the Mac (`mac/release.sh` in the maintainer's session, notarized
-  with the API key file) and attached to the draft, and the iPhone app sent to TestFlight from the Mac
-  (`ios/release.sh`, with an App Store Connect API key).
-- `ci/release.sh publish` rebuilding Verso's page, once the maintainer has checked the draft (installed in the lab's
-  desktop VMs, and the Mac build).
-- The workflow running the same steps on a pushed tag once Actions is switched on and holds the signing secrets; the
-  scripts are what it calls, so the two never differ.
-- Verso's page served (step 7): the rpm's and the deb's look for a newer release reads its `latest.json`
-  (ARCHITECTURE.md, "Updates on Linux"), and tells of nothing until the page answers.
+**Releases are cut by a tag** (AGENTS.md, "Versioning", has how; ARCHITECTURE, "Verso's releases", why), built on the
+maintainer's machines, with `ci/release.sh publish` rebuilding Verso's page, whose `latest.json` the rpm's and the
+deb's look for a newer release reads. What is left is in step 6's list.
 
 ## M10. Verso on iOS
 

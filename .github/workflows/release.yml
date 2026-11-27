@@ -1,23 +1,20 @@
 name: release
 
-# A pushed tag (ci/release.sh tag) builds Linux's files and makes the draft release, as `ci/release.sh build` does on
-# the workstation, the Flatpak included; then the Mac's disk image, signed, notarized and signed for Sparkle, joins the
-# draft when the Mac's secrets are set; and the iPhone's, the iPad's and the Apple TV's builds go to TestFlight when
-# theirs are. The maintainer checks the draft and publishes it with `ci/release.sh publish`
-# (AGENTS.md, "Versioning").
+# The backup of a release made on the maintainer's machines (AGENTS.md, "Versioning"), started by hand with a tag that
+# ci/release.sh tag pushed (`gh workflow run release.yml -f tag=v0.78.0`), when the workstation or the Mac is away:
+# Linux's files and the draft release, as `ci/release.sh build` makes them, the Flatpak included; the Mac's disk image,
+# signed, notarized and signed for Sparkle, joining the draft; and the iPhone's, the iPad's and the Apple TV's builds to
+# TestFlight, only from Xcode 27 or later. The maintainer checks the draft and publishes it with `ci/release.sh publish`.
 on:
-  push:
-    tags: ["v[0-9]*"]
-  # A rehearsal by hand: every file built from a tag, and no draft made, nothing attached (ci/release.sh --dry-run).
   workflow_dispatch:
     inputs:
       tag:
-        description: "The tag to build, such as v0.75.0"
+        description: "The tag to build, such as v0.78.0"
         required: true
       dry_run:
-        description: "Build only: no draft, nothing attached"
+        description: "Build only: no draft, nothing attached, nothing uploaded"
         type: boolean
-        default: true
+        default: false
 
 permissions:
   contents: write
@@ -277,6 +274,13 @@ jobs:
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           upload=$([ "$DRY_RUN" = yes ] && echo --no-upload || true)
+          # The App Store asks for the iOS 27 SDK from April 2027, and a build made with an older one runs on iOS 27 in
+          # its compatibility mode: from an older Xcode, the runner builds and uploads nothing.
+          major=$(xcodebuild -version | sed -n 's/^Xcode \([0-9]*\).*/\1/p')
+          if [ "${major:-0}" -lt 27 ]; then
+            echo "::notice::Xcode $major on this runner: built, not uploaded to TestFlight (Xcode 27 or later uploads)."
+            upload=--no-upload
+          fi
           ios/release.sh $upload
           VERSO_BRIDGE_BUILT=1 ios/release.sh --tvos $upload
       - name: The keychain and the keys removed
