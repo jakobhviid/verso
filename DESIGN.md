@@ -415,8 +415,10 @@ sections, the pages, the viewer's info), drawn with each platform's own toolkit:
   controls over it as it plays, as YouTube's up into its controls (the timeline, scrubbed with a swipe or left and
   right, its panels for audio, subtitles and the day), and Menu, a layer at a time, leaves them for the video playing on
   in the viewer; play/pause pauses it, with a large play sign and its length, and plays on, and a video played to its
-  end waits at its start with the sign. Once a video in HDR has put the TV
-  in HDR, the TV stays there until the viewer closes, where Match Dynamic Range is on: going back to SDR for each photo,
+  end waits at its start with the sign. A video stepped to slides in as its picture, as a photo does, and starts once it
+  lies still, the movie taking over from the picture at its first frame; a video that cannot play says so over its
+  picture, with the system's reason. Once a video in HDR has put the TV in HDR, the TV stays there until the viewer
+  closes, where Match Dynamic Range is on: going back to SDR for each photo,
   and to HDR for the next video, blacks the screen out each time. The accent is the system blue, as the iPhone's, set in
   the TV's asset catalog because tvOS's own is white. Settings, at the sidebar's foot in a section of its own, is laid
   out as tvOS's own Settings: the app's icon large on the left with its name and version, and on the right a list a row

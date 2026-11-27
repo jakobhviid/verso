@@ -11,7 +11,7 @@ enum TVDevice {
     /// The simpler interface. A development build takes `-tvSimpler YES` or `NO` to look at either.
     static let simpler: Bool = {
         #if DEBUG
-        if let said = UserDefaults.standard.object(forKey: "tvSimpler") as? Bool { return said }
+        if UserDefaults.standard.object(forKey: "tvSimpler") != nil { return UserDefaults.standard.bool(forKey: "tvSimpler") }
         #endif
         if older.contains(model) { return true }
         if model.hasPrefix("AppleTV") { return false }
@@ -26,6 +26,16 @@ enum TVDevice {
         return withUnsafeBytes(of: &system.machine) { bytes in
             String(decoding: bytes.prefix { $0 != 0 }, as: UTF8.self)
         }
+    }()
+
+    /// Whether the box plays HLG, the HDR an iPhone records its videos in (Dolby Vision 8.4 over an HLG base): Apple's
+    /// specifications list it from the Apple TV 4K (2nd generation) on; the 1st generation has HDR10 and Dolby Vision
+    /// 5 alone, and the Apple TV HD no HDR. A development build takes `-tvPlaysHLG NO` to look at the other way.
+    static let playsHLG: Bool = {
+        #if DEBUG
+        if UserDefaults.standard.object(forKey: "tvPlaysHLG") != nil { return UserDefaults.standard.bool(forKey: "tvPlaysHLG") }
+        #endif
+        return !["AppleTV5,3", "AppleTV6,2"].contains(model)
     }()
 
     /// How much of the decoded pictures to keep in memory, and how many to load at once.

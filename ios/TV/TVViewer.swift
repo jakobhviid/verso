@@ -1,4 +1,5 @@
 import AVKit
+import os
 import SwiftUI
 
 // The viewer on the TV, as the iPhone's (ios/Verso/Viewer/PhotoViewer.swift) where a remote can have it: a photo filling
@@ -9,9 +10,13 @@ import SwiftUI
 // photo. A video plays at once, as in Apple's Photos, and left and right step on from it as from a photo; a click or up
 // brings tvOS's own controls over it, still playing (the timeline, scrubbed with a swipe or left and right, audio,
 // subtitles, the place and the day), as YouTube's up-into-the-controls has it, and Menu leaves them for the video playing
-// on in the viewer; play/pause pauses and plays on, with a play sign while it is paused. Once a
-// video in HDR has put the TV in HDR, it stays there until the viewer closes (TVDisplayMode), rather than going back to
-// SDR and again to HDR from photo to photo.
+// on in the viewer; play/pause pauses and plays on, with a play sign while it is paused. A video stepped to slides in as
+// its picture and starts once the slide has settled, and its player shows once it has a frame, so the video takes over
+// from its picture where it lies. On a box without HLG (TVDevice), an iPhone's HDR video plays converted to SDR; a video
+// that cannot play says why over its picture. Once a video in HDR has put the TV in HDR, it stays there until the viewer
+// closes (TVDisplayMode), rather than going back to SDR and again to HDR from photo to photo.
+
+private let videoLog = Logger(subsystem: "dev.hviid.Verso", category: "video")
 
 struct TVViewer: View {
     @State private var items: [TVItem]
@@ -23,6 +28,10 @@ struct TVViewer: View {
     @State private var video: TVVideoPresentation?
     /// The video shown is paused, by play/pause.
     @State private var videoPaused = false
+    /// Why the video shown cannot play.
+    @State private var videoFailure: String?
+    /// A photo has been shown: the next comes by a step, sliding in.
+    @State private var shownOne = false
     @State private var details: AssetResponse?
     @State private var showsInfo = false
     @State private var exhausted = false
@@ -115,7 +124,8 @@ struct TVViewer: View {
             if let item {
                 // Above the black, or the photo leaving is drawn under it and vanishes rather than sliding away.
                 TVViewerPage(item: item, player: playerItemID == item.id ? player : nil,
-                             tile: expanded ? nil : frames?.frame(item.id), paused: videoPaused)
+                             tile: expanded ? nil : frames?.frame(item.id), paused: videoPaused,
+                             failure: videoFailure)
                     .id(item.id)
                     .zIndex(1)
                     .transition(TVDevice.simpler ? .identity : .asymmetric(
@@ -289,9 +299,45 @@ struct TVViewer: View {
         player = nil
         playerItemID = nil
         videoPaused = false
+        videoFailure = nil
+        let stepped = shownOne
+        shownOne = true
         guard item.isVideo, let client = model.client else { return }
+        // Stepped to, it starts once its picture has slid in: a player put on the page during the slide is not part of
+        // it, and stood in the middle at once while the picture slid in under it.
+        if stepped, !TVDevice.simpler {
+            try? await Task.sleep(for: .milliseconds(350))
+            guard !Task.isCancelled else { return }
+        }
         let asset = client.videoAsset(item.id)
-        let playing = AVPlayerItem(asset: asset)
+        let hlg = await Self.isHLG(asset)
+        guard !Task.isCancelled else { return }
+        // On a box without HLG (TVDevice), an iPhone's HDR video plays converted to SDR; should the box refuse that, as
+        // recorded, and only then does the viewer say why.
+        var playing: AVPlayerItem?
+        if hlg, !TVDevice.playsHLG, let converted = await Self.convertedToSDR(asset) {
+            playing = await play(converted, of: item)
+            if playing == nil, !Task.isCancelled, self.item?.id == item.id {
+                videoLog.error("the video converted to SDR cannot play: \(videoFailure ?? "", privacy: .public); playing it as recorded")
+                videoFailure = nil
+            }
+        }
+        if playing == nil, !Task.isCancelled, self.item?.id == item.id {
+            playing = await play(AVPlayerItem(asset: asset), of: item)
+        }
+        guard let playing, !Task.isCancelled, self.item?.id == item.id else { return }
+        // The TV goes to HDR for a video in HDR, but not to an HLG the box cannot give it.
+        if !hlg || TVDevice.playsHLG { await TVDisplayMode.holdHDR(for: asset) }
+        let read: AssetResponse? = try? await client.get("assets/\(item.id)")
+        guard !Task.isCancelled, self.item?.id == item.id else { return }
+        details = read
+        playing.externalMetadata = metadata(titles(for: item))
+    }
+
+    /// The video's player, playing in the viewer: the item where it starts, nil where it cannot play (`videoFailure`
+    /// says why) or the viewer has moved on.
+    private func play(_ playing: AVPlayerItem, of item: TVItem) async -> AVPlayerItem? {
+        guard !Task.isCancelled, self.item?.id == item.id else { return nil }
         let player = AVPlayer(playerItem: playing)
         self.player = player
         playerItemID = item.id
@@ -303,12 +349,64 @@ struct TVViewer: View {
                 if self.player === player, player.rate == 0 { videoPaused = true }
             }
         }
+        NotificationCenter.default.addObserver(forName: AVPlayerItem.failedToPlayToEndTimeNotification, object: playing, queue: .main) { note in
+            let error = note.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? Error
+            Task { @MainActor in
+                guard self.player === player else { return }
+                videoFailure = Self.reason(error)
+                videoLog.error("a video stopped: \(videoFailure ?? "", privacy: .public)")
+            }
+        }
         player.play()
-        await TVDisplayMode.holdHDR(for: asset)
-        let read: AssetResponse? = try? await client.get("assets/\(item.id)")
-        guard !Task.isCancelled, self.item?.id == item.id else { return }
-        details = read
-        playing.externalMetadata = metadata(titles(for: item))
+        // Ready, or failed, within 30 seconds; and ready is not playing: a composition the box refuses fails as it renders
+        // the first frames, while the sound plays on. A failure in its first second and a half is this attempt's; the
+        // video plays meanwhile.
+        var loading = 0, ready = 0
+        while self.player === player, videoFailure == nil, playing.status != .failed, loading < 300, ready < 15 {
+            try? await Task.sleep(for: .milliseconds(100))
+            if Task.isCancelled { return nil }
+            if playing.status == .readyToPlay { ready += 1 } else { loading += 1 }
+        }
+        if playing.status == .failed, self.player === player, videoFailure == nil { videoFailure = Self.reason(playing.error) }
+        guard self.player === player, videoFailure == nil else {
+            if self.player === player { videoLog.error("a video cannot play: \(videoFailure ?? "", privacy: .public)") }
+            return nil
+        }
+        return playing
+    }
+
+    /// Whether the video is in HLG, as an iPhone records its HDR (Dolby Vision 8.4 over an HLG base).
+    private static func isHLG(_ asset: AVAsset) async -> Bool {
+        guard let track = try? await asset.loadTracks(withMediaType: .video).first,
+              let format = try? await track.load(.formatDescriptions).first else { return false }
+        return CMFormatDescriptionGetExtension(format, extensionKey: kCMFormatDescriptionExtension_TransferFunction)
+            as? String == kCMFormatDescriptionTransferFunction_ITU_R_2100_HLG as String
+    }
+
+    /// The video through a composition that renders it in SDR, Rec. 709, at most 1920 wide, so a box without HLG has
+    /// only to decode it: its decoder takes HEVC Main 10, the HDR it cannot give. The Simulator plays no composition at
+    /// all (AVFoundation -11800, -19230, an H.264 video in SDR too), so this is checked on the box itself.
+    private static func convertedToSDR(_ asset: AVAsset) async -> AVPlayerItem? {
+        guard var configuration = try? await AVVideoComposition.Configuration(for: asset) else { return nil }
+        configuration.colorPrimaries = AVVideoColorPrimaries_ITU_R_709_2
+        configuration.colorTransferFunction = AVVideoTransferFunction_ITU_R_709_2
+        configuration.colorYCbCrMatrix = AVVideoYCbCrMatrix_ITU_R_709_2
+        let width = max(configuration.renderSize.width, configuration.renderSize.height)
+        if width > 1920 { configuration.renderScale = Float(1920 / width) }
+        let playing = AVPlayerItem(asset: asset)
+        playing.videoComposition = AVVideoComposition(configuration: configuration)
+        videoLog.notice("an HLG video plays converted to SDR, at \(configuration.renderScale) of its size")
+        return playing
+    }
+
+    /// Why a video cannot play, as the system says it, with its error's domain and code for a report.
+    private static func reason(_ error: Error?) -> String {
+        guard let error = error as NSError? else { return String(localized: "The video stopped.") }
+        var codes = "\(error.domain) \(error.code)"
+        if let underlying = error.userInfo[NSUnderlyingErrorKey] as? NSError {
+            codes += ", \(underlying.domain) \(underlying.code)"
+        }
+        return "\(error.localizedFailureReason ?? error.localizedDescription) (\(codes))"
     }
 
     /// tvOS's own controls over the video playing, as it plays: the timeline to scrub, audio, subtitles, the info.
@@ -387,6 +485,7 @@ private struct TVViewerPage: View {
     /// Its tile's frame on screen while the viewer zooms out of it or back into it; nil full screen.
     let tile: CGRect?
     var paused = false
+    var failure: String?
     @Environment(TVModel.self) private var model
     @State private var image: CGImage?
 
@@ -416,7 +515,16 @@ private struct TVViewerPage: View {
                 TVPlayerView(player: player)
                     .accessibilityIdentifier(item.isVideo ? "Playing Video" : "Live Photo Movie")
             }
-            if tile == nil, item.isVideo, paused {
+            if tile == nil, item.isVideo, let failure {
+                VStack(spacing: 12) {
+                    Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 64))
+                    Text("Can't Play This Video").font(.headline)
+                    Text(failure).font(.caption).multilineTextAlignment(.center).frame(maxWidth: 900)
+                }
+                .foregroundStyle(.white)
+                .padding(40)
+                .background(.black.opacity(0.6), in: .rect(cornerRadius: 24))
+            } else if tile == nil, item.isVideo, paused {
                 VStack(spacing: 16) {
                     Image(systemName: "play.circle.fill")
                         .font(.system(size: 120))
@@ -588,8 +696,21 @@ struct TVPlayerView: UIViewRepresentable {
         if view.playerLayer.player !== player { view.playerLayer.player = player }
     }
 
+    /// The player's layer, hidden until it has a frame, so the picture under it shows until the movie takes over.
     final class PlayerView: UIView {
         override static var layerClass: AnyClass { AVPlayerLayer.self }
         var playerLayer: AVPlayerLayer { layer as! AVPlayerLayer }
+        private var readiness: NSKeyValueObservation?
+
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            playerLayer.opacity = 0
+            readiness = playerLayer.observe(\.isReadyForDisplay, options: [.new]) { [weak self] layer, _ in
+                let ready = layer.isReadyForDisplay
+                DispatchQueue.main.async { self?.playerLayer.opacity = ready ? 1 : 0 }
+            }
+        }
+
+        required init?(coder: NSCoder) { fatalError("not from a storyboard") }
     }
 }

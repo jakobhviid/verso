@@ -91,7 +91,12 @@ final class TVViewerRemoteTests: XCTestCase {
         } while controls.exists && presses < 4
         XCTAssertFalse(controls.exists, "Menu leaves the controls again")
         // Left and right step on from a video, as from a photo.
-        press(.right, "11 right: the next video, playing")
+        // Its picture slides in, and the video starts once it lies still.
+        XCUIRemote.shared.press(.right)
+        Thread.sleep(forTimeInterval: 0.15)
+        keep("11a right: the next video's picture sliding in")
+        Thread.sleep(forTimeInterval: 1.5)
+        keep("11b right: the next video, playing")
         XCTAssert(viewer.exists, "still in the viewer")
         press(.left, "12 left: back to the first", settle: 3)
     }
