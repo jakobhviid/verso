@@ -43,9 +43,10 @@ struct TVItem: Identifiable, Hashable, Sendable {
         }
     }
 
-    /// Photos from a search or a memory, without the Locked Folder's.
-    static func items(_ assets: [AssetResponse]) -> [TVItem] {
-        assets.filter { $0.visibility != "locked" }.map(TVItem.init)
+    /// Photos from a search or a memory, without the Locked Folder's, unless the search is the Locked Folder's own
+    /// (`keepsLocked`), which only its session, unlocked from the iPhone, reads.
+    static func items(_ assets: [AssetResponse], keepsLocked: Bool = false) -> [TVItem] {
+        assets.filter { keepsLocked || $0.visibility != "locked" }.map(TVItem.init)
     }
 }
 

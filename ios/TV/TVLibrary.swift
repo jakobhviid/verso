@@ -2,7 +2,7 @@ import SwiftUI
 import VersoCore
 
 // The Library on the TV, as the iPhone's (ios/Verso/Library/LibraryOverviewPage.swift, LibraryTabView.swift): a large
-// "Library" title with Years, Months and All Photos beside it. Years are a card for each year, a photo from its fullest
+// "Library" title with a menu of Years, Months and All Photos beside it. Years are a card for each year, a photo from its fullest
 // month with the year written over it; Months are each month's name over a mosaic of a few photos from different days,
 // the day written on each; All Photos is the grid. What Years and Months show is arranged by the shared core
 // (`overviewYears`, `overviewPicks`), as on the iPhone. Newest first, the iPhone's Newest at the Top.
@@ -100,16 +100,23 @@ struct TVLibrary: View {
         }
     }
 
+    /// Years, Months or All Photos, as a menu: the one shown on its button, the three in its list. A segmented control
+    /// changed the page as the focus crossed it on the way to the Filter menu.
     private var modePicker: some View {
-        Picker("Years, Months or All", selection: $mode) {
-            Text("Years").tag(LibraryMode.years)
-            Text("Months").tag(LibraryMode.months)
-            Text("All Photos").tag(LibraryMode.all)
+        Menu {
+            Picker("Years, Months or All", selection: $mode) {
+                Label("Years", systemImage: "square.grid.2x2").tag(LibraryMode.years)
+                Label("Months", systemImage: "rectangle.grid.1x2").tag(LibraryMode.months)
+                Label("All Photos", systemImage: "square.grid.3x3").tag(LibraryMode.all)
+            }
+        } label: {
+            Label(modeTitle, systemImage: "chevron.up.chevron.down")
+                .labelStyle(.titleAndIcon)
         }
-        .pickerStyle(.segmented)
-        .labelsHidden()
-        .frame(width: 720)
+        .fixedSize()
     }
+
+    private var modeTitle: String { String(localized: mode.title) }
 
     /// Years or Months.
     @ViewBuilder

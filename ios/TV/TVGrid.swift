@@ -132,7 +132,9 @@ struct TVTimeline: View {
         guard let client = tv.client else { return }
         if filter.videos {
             let query = query
-            let found = TVResultsModel { page in try await client.searchPage(query.videos(filter, page: page), smart: false) }
+            let found = TVResultsModel(keepsLocked: query.visibility == "locked") { page in
+                try await client.searchPage(query.videos(filter, page: page), smart: false)
+            }
             videos = found
             await found.loadMore()
             return
@@ -188,7 +190,11 @@ final class TVResultsModel: TVPhotoPage {
     @ObservationIgnored private var page = 1
     @ObservationIgnored private var reading = false
 
-    init(fetch: @escaping @Sendable (Int) async throws -> SearchResponse.Assets) {
+    /// The Locked Folder's photos are kept where the list is its own (its videos, filtered), and left out elsewhere.
+    private let keepsLocked: Bool
+
+    init(keepsLocked: Bool = false, fetch: @escaping @Sendable (Int) async throws -> SearchResponse.Assets) {
+        self.keepsLocked = keepsLocked
         self.fetch = fetch
     }
 
@@ -205,7 +211,7 @@ final class TVResultsModel: TVPhotoPage {
         do {
             let response = try await fetch(page)
             let known = Set(items.map(\.id))
-            items += TVItem.items(response.items).filter { !known.contains($0.id) }
+            items += TVItem.items(response.items, keepsLocked: keepsLocked).filter { !known.contains($0.id) }
             hasMore = response.nextPage.flatMap(Int.init).map { $0 > page } ?? false
             page += 1
             phase = .loaded
