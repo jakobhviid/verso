@@ -84,12 +84,24 @@ struct TVLockedFolder: View {
     @State private var waiting = false
 
     var body: some View {
-        if let visit = tv.lockedFolder {
-            TVTimeline(query: TimelineQuery(visibility: "locked"), title: String(localized: "Locked Folder"))
-                .environment(visit.model)
-        } else {
-            locked
+        Group {
+            if let visit = tv.lockedFolder {
+                TVTimeline(query: TimelineQuery(visibility: "locked"), title: String(localized: "Locked Folder"))
+                    .environment(visit.model)
+            } else {
+                locked
+            }
         }
+        .task { await followLaunchArguments() }
+    }
+
+    /// A development build opens the folder with a session's token (`-tvLockedFolderToken`), as the iPhone would send
+    /// it, for a check of the folder and of its session ending without the iPhone and its picker.
+    private func followLaunchArguments() async {
+        #if DEBUG
+        guard tv.lockedFolder == nil, let token = UserDefaults.standard.string(forKey: "tvLockedFolderToken") else { return }
+        await tv.openLockedFolder(token: token)
+        #endif
     }
 
     private var locked: some View {

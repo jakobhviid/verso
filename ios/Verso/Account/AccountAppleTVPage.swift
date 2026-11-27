@@ -364,6 +364,9 @@ final class AppleTVSetup {
         do {
             try await client.deleteAccountDevice(tv.id)
             openFolders.removeAll { $0.id == tv.id }
+        } catch ImmichError.http(let status, _) where status == 400 || status == 404 {
+            // Ended already, by the TV leaving the folder or by the server at the hour: Immich answers 400 for it.
+            openFolders.removeAll { $0.id == tv.id }
         } catch {
             self.error = String(localized: "The Locked Folder on \u{201C}\(tv.name)\u{201D} could not be locked: \(error.localizedDescription)")
         }

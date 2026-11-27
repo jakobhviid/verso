@@ -43,6 +43,9 @@ final class TVModel {
     /// The Locked Folder is the place on screen, so a token the iPhone sends opens it; else it is ended at once.
     var lockedFolderInFront = false
     @ObservationIgnored private var checkingKey = false
+    /// A token is being checked to open the Locked Folder: a second one meanwhile is let go, as ending its visit would
+    /// end the session both share where it is the same token.
+    @ObservationIgnored private var openingLockedFolder = false
     @ObservationIgnored private var topShelfRefresh: Task<Void, Never>?
 
     /// The Locked Folder's model: its session's client and pictures, which its grid and viewer read in place of the TV's.
@@ -112,7 +115,9 @@ final class TVModel {
     /// Opens the Locked Folder with the token the iPhone sent: only for a session the server has unlocked, of the
     /// TV's own account, while the folder is still the place on screen; else the session is ended at once.
     func openLockedFolder(token: String) async {
-        guard let client, lockedFolder == nil else { return }
+        guard let client, lockedFolder == nil, !openingLockedFolder else { return }
+        openingLockedFolder = true
+        defer { openingLockedFolder = false }
         let visit = TVLockedFolderVisit(server: client.serverURL, apiURL: client.apiURL, token: token)
         do {
             let status = try await visit.status()

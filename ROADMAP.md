@@ -810,11 +810,12 @@ change, so the extension needs no key and no network, each opening the app at th
 (`verso://memory/<id>`, `verso://photo/<id>`, `verso://album/<id>`, `verso://person/<id>`); it runs in the tvOS
 Simulator against a server, and on a real Apple TV from TestFlight; **the Locked Folder, from the iPhone each time**
 (`ios/TV/TVLockedFolder.swift`, the iPhone's side in `AppleTVSetup`, above). A development build takes launch arguments
-to open at a place (`-tvPlace`, `-tvLibraryMode`, `-tvSearch`, `-tvOpenPhoto`), for looking, and to step the viewer by
-itself (`-tvViewerSteps left,right,close`), as the Simulator has no remote, for a recording of its slides and its zoom.
-Not as the iPhone has them, because a remote has no pinch, no long press and no drag: the grid's zoom and the date
-scroller, a card's menu and Select, the filters sheet in Search, tags, and a memory's New mark going away once played,
-which needs a key that may write; the Library opens at its newest photos at the top rather than at the bottom. **Left:**
+to open at a place (`-tvPlace`, `-tvLibraryMode`, `-tvSearch`, `-tvOpenPhoto`), for looking, to open the Locked Folder
+with a session's token (`-tvLockedFolderToken`), and to step the viewer by itself (`-tvViewerSteps left,right,close`),
+as the Simulator has no remote, for a recording of its slides and its zoom. Not as the iPhone has them, because a remote
+has no pinch, no long press and no drag: the grid's zoom and the date scroller, a card's menu and Select, the filters
+sheet in Search, tags, and a memory's New mark going away once played, which needs a key that may write; the Library
+opens at its newest photos at the top rather than at the bottom. **Left:**
 1. **The Night icon as the app's alternate,** which Settings offers as App Icon, Day or Night, once the app carries it
    (`TVAppIcon.offered`): the asset catalog registers a tvOS alternate only as an image stack beside the brand assets
    (`AppIconNight`, which `make-tv-icons.py` writes), and App Store validation then turns the build down, "Missing the
