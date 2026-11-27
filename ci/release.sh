@@ -157,6 +157,37 @@ in_build_environment() {
   fi
 }
 
+# The tarball's lane: the tarball, then the AppImage from the same toolbox and build.
+build_tarball_and_appimage() {
+  in_build_environment linux/packaging/verso-tarball.sh "$1"
+  in_build_environment linux/packaging/verso-appimage.sh "$1"
+}
+
+# The Flatpak lane: the source archive, then the Flatpak, with flatpak-builder where it is (the release workflow's
+# container), else in a container of its own (linux/packaging/verso-flatpak.sh), else none, which build then says.
+build_flatpak() {
+  local out=$1 cache
+  linux/packaging/flatpak/source-archive.sh "$out"
+  if command -v flatpak-builder >/dev/null; then
+    mkdir "$out/flatpak"
+    cp linux/packaging/flatpak/dev.hviid.Verso.yml "$out/verso-source.tar.gz" "$out/flatpak/"
+    cd "$out/flatpak"
+    flatpak remote-add --user --if-not-exists flathub "$flathub"
+    # A state directory kept between builds (VERSO_FLATPAK_STATE, the release workflow's cache) builds only what
+    # changed; without one, everything is built afresh.
+    if [ -n "${VERSO_FLATPAK_STATE:-}" ]; then
+      cache=(--state-dir="$VERSO_FLATPAK_STATE")
+    else
+      cache=(--disable-cache)
+    fi
+    flatpak-builder --user --install-deps-from=flathub --force-clean "${cache[@]}" --repo=repo build \
+      dev.hviid.Verso.yml
+    flatpak build-bundle repo "$out/$flatpak" dev.hviid.Verso --runtime-repo="$flathub"
+  elif command -v podman >/dev/null || command -v docker >/dev/null; then
+    linux/packaging/verso-flatpak.sh "$out"
+  fi
+}
+
 suggest() {
   [ $# -eq 0 ] || usage
   local version tag previous notes
@@ -232,39 +263,47 @@ build() {
   out=$root/target/dist/$tag
   rm -rf "$out"
   mkdir -p "$out"
-  (cd "$work/verso" && in_build_environment linux/packaging/verso-tarball.sh "$out")
-  # The AppImage, from the same toolbox: its libraries are Fedora 44's, and it carries them.
-  (cd "$work/verso" && in_build_environment linux/packaging/verso-appimage.sh "$out")
-  # The rpm and the deb, each in a container of its distribution, with podman or docker here.
-  (cd "$work/verso" && linux/packaging/verso-packages.sh "$out")
-  (cd "$work/verso" && linux/packaging/flatpak/source-archive.sh "$out")
+  # Four lanes at once, each with a build folder of its own and a log in target/dist/TAG.logs: the tarball and then the
+  # AppImage, from the same toolbox and its build (its libraries are Fedora 44's, and it carries them); the rpm and the
+  # deb, each in a container of its distribution; and the Flatpak, from the source archive. A lane that fails stops
+  # the release, with its log's end.
+  local logs=$out.logs lane names=() pids=() failed=()
+  rm -rf "$logs"
+  mkdir -p "$logs"
+  start_lane() {
+    local name=$1
+    shift
+    # Its command on a line of its own, so `set -e` stops the lane at its first failure.
+    (
+      cd "$work/verso"
+      "$@"
+    ) > "$logs/$name.log" 2>&1 &
+    names+=("$name")
+    pids+=($!)
+  }
+  start_lane tarball-and-appimage build_tarball_and_appimage "$out"
+  start_lane rpm linux/packaging/verso-packages.sh "$out" rpm
+  start_lane deb linux/packaging/verso-packages.sh "$out" deb
+  start_lane flatpak build_flatpak "$out"
+  echo "Building in four lanes at once; their logs are in $logs"
+  for lane in "${!pids[@]}"; do
+    if wait "${pids[$lane]}"; then
+      echo "  ${names[$lane]}: built"
+    else
+      echo "  ${names[$lane]}: failed"
+      failed+=("${names[$lane]}")
+    fi
+  done
+  for lane in ${failed[@]+"${failed[@]}"}; do
+    echo
+    echo "The end of $logs/$lane.log:"
+    tail -20 "$logs/$lane.log"
+  done
+  [ ${#failed[@]} -eq 0 ] || die "${failed[*]} failed"
   files=("$out/$tarball" "$out/$appimage" "$out/$(rpm_of "$version")" "$out/$(deb_of "$version")")
   # Where zsyncmake was here, AppImage updaters have their file to read.
   [ ! -e "$out/$appimage.zsync" ] || files+=("$out/$appimage.zsync")
-  if command -v flatpak-builder >/dev/null; then
-    mkdir "$out/flatpak"
-    cp "$work/verso/linux/packaging/flatpak/dev.hviid.Verso.yml" "$out/verso-source.tar.gz" "$out/flatpak/"
-    (
-      cd "$out/flatpak"
-      flatpak remote-add --user --if-not-exists flathub "$flathub"
-      # A state directory kept between builds (VERSO_FLATPAK_STATE, the release workflow's cache) builds only what
-      # changed; without one, everything is built afresh.
-      if [ -n "${VERSO_FLATPAK_STATE:-}" ]; then
-        cache=(--state-dir="$VERSO_FLATPAK_STATE")
-      else
-        cache=(--disable-cache)
-      fi
-      flatpak-builder --user --install-deps-from=flathub --force-clean "${cache[@]}" --repo=repo build \
-        dev.hviid.Verso.yml
-      flatpak build-bundle repo "$out/$flatpak" dev.hviid.Verso --runtime-repo="$flathub"
-    )
-    files+=("$out/$flatpak")
-  elif command -v podman >/dev/null || command -v docker >/dev/null; then
-    # Without flatpak-builder here, in a container of its own, its runtime and state kept between releases.
-    (cd "$work/verso" && linux/packaging/verso-flatpak.sh "$out")
-    files+=("$out/$flatpak")
-  fi
-
+  [ ! -e "$out/$flatpak" ] || files+=("$out/$flatpak")
   previous=$(previous_tag "$commit" "$version")
   release_text "$version" "$previous" "$commit" "$work/verso" > "$out/notes.md"
   title="Verso $version (Linux)"
