@@ -263,10 +263,11 @@ build() {
   out=$root/target/dist/$tag
   rm -rf "$out"
   mkdir -p "$out"
-  # Four lanes at once, each with a build folder of its own and a log in target/dist/TAG.logs: the tarball and then the
-  # AppImage, from the same toolbox and its build (its libraries are Fedora 44's, and it carries them); the rpm and the
-  # deb, each in a container of its distribution; and the Flatpak, from the source archive. A lane that fails stops
-  # the release, with its log's end.
+  # Three lanes at once, each with a build folder of its own and a log in target/dist/TAG.logs: the tarball and then
+  # the AppImage, from the same toolbox and its build (its libraries are Fedora 44's, and it carries them); the rpm and
+  # then the deb, each in a container of its distribution; and the Flatpak, from the source archive. The rpm and the
+  # deb share a lane because each optimised build takes 3 to 4 GB as it links, and four linking at once ran a 22 GB
+  # workstation out of memory. A lane that fails stops the release, with its log's end.
   local logs=$out.logs lane names=() pids=() failed=()
   rm -rf "$logs"
   mkdir -p "$logs"
@@ -282,10 +283,9 @@ build() {
     pids+=($!)
   }
   start_lane tarball-and-appimage build_tarball_and_appimage "$out"
-  start_lane rpm linux/packaging/verso-packages.sh "$out" rpm
-  start_lane deb linux/packaging/verso-packages.sh "$out" deb
+  start_lane rpm-and-deb linux/packaging/verso-packages.sh "$out" rpm deb
   start_lane flatpak build_flatpak "$out"
-  echo "Building in four lanes at once; their logs are in $logs"
+  echo "Building in three lanes at once; their logs are in $logs"
   for lane in "${!pids[@]}"; do
     if wait "${pids[$lane]}"; then
       echo "  ${names[$lane]}: built"
