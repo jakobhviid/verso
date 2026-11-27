@@ -510,6 +510,45 @@ private struct LibraryWindowPresentations: ViewModifier {
                         }
                 }
             }
+            // An Apple TV asking to be set up (AppleTVSetup.shared): Verso listens while signed in, and again as it
+            // comes to the front, where iOS stopped it, so a tap on the notification for the TV's request finds it;
+            // the Apple TV page opens over this window, the account sheet giving way first.
+            .task(id: session.client.serverURL) { AppleTVSetup.shared.start(client: session.client) }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                AppleTVSetup.shared.start(client: session.client)
+            }
+            .onDisappear { AppleTVSetup.shared.stop() }
+            .onChange(of: AppleTVSetup.shared.pageShown) { _, shown in
+                if shown && inThisWindow(AppleTVSetup.shared.pageWindow) && chrome.accountShown {
+                    chrome.accountShown = false
+                }
+            }
+            .sheet(isPresented: appleTVPageShown) {
+                NavigationStack {
+                    AccountAppleTVPage(services: session.services)
+                        .toolbar {
+                            ToolbarItem(placement: .confirmationAction) {
+                                Button(role: .close) { AppleTVSetup.shared.pageShown = false }
+                            }
+                        }
+                }
+            }
+    }
+
+    /// Whether a page asked for in `window` shows in this one: it was in front, or the window in front, or this one,
+    /// was not known.
+    private func inThisWindow(_ window: AnyObject?) -> Bool {
+        window == nil || chrome.window == nil || window === chrome.window
+    }
+
+    /// The Apple TV page shows in this window, once the account sheet, which one window cannot show beside it, is gone.
+    private var appleTVPageShown: Binding<Bool> {
+        let setup = AppleTVSetup.shared
+        let chrome = chrome
+        let here = inThisWindow(setup.pageWindow)
+        return Binding(
+            get: { setup.pageShown && here && !chrome.accountShown },
+            set: { shown in if !shown { setup.pageShown = false } })
     }
 
     /// The Backup page shows in this window: asked for while it was in front, or while the window in front, or this

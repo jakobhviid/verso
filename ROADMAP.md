@@ -755,7 +755,10 @@ sees an API key:
   session.
 - it travels to the TV over the local network with Apple's DeviceDiscoveryUI (tvOS 16 and later): the TV offers
   "Set Up with iPhone", the iPhone running Verso shows up, the TV says its name, and Verso on the iPhone asks
-  "Set Up “name”?" before it makes the key, named after the TV ("Verso on Apple TV (Living Room)").
+  "Set Up “name”?" before it makes the key, named after the TV ("Verso on Apple TV (Living Room)"). Verso listens
+  while it is open and signed in, not on one page, so a tap on the notification iOS shows for the TV's request opens
+  Verso to the question, on the Apple TV page, which opens over whatever was in front; on Immich's demo, which is
+  everyone's, it says no.
 - the TV keeps it in its Keychain. The iPhone's Apple TV page lists the TVs set up, by name and the day each was set
   up, each with **Forget** (and **Forget All** where there are several), which asks first and deletes its key. A key
   forgotten there, or deleted in Immich, signs the TV out as soon as any call meets it (Immich's 401, which the

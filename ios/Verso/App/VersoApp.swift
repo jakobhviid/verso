@@ -14,10 +14,13 @@ struct VersoApp: App {
     init() {
         CoreTransport.install() // the endpoint calls through the shared Rust core
         // The Backup page opens in the window in front, one of several on an iPad.
-        BackupCenter.shared.frontWindow = {
+        let frontWindow: () -> AnyObject? = {
             UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.flatMap(\.windows)
                 .first(where: \.isKeyWindow)
         }
+        BackupCenter.shared.frontWindow = frontWindow
+        // As does the Apple TV page, when a TV asks to be set up.
+        AppleTVSetup.shared.frontWindow = frontWindow
     }
 
     var body: some Scene {

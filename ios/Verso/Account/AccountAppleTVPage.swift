@@ -1,14 +1,16 @@
 import Network
 import SwiftUI
 
-/// Set Up Apple TV (ROADMAP.md, "Verso on the Apple TV"): while this page is open, the iPhone can be found by Verso on an
-/// Apple TV nearby, through Apple's DeviceDiscoveryUI. The TV that connects says its name, and Verso asks here whether
+/// Set Up Apple TV (ROADMAP.md, "Verso on the Apple TV"): while Verso is open and signed in, the iPhone can be found by
+/// Verso on an Apple TV nearby, through Apple's DeviceDiscoveryUI, and a tap on the notification iOS shows for the TV's
+/// request opens Verso, already listening (AppleTVSetup.shared, which the window starts). The TV that connects says its
+/// name, and Verso opens this page wherever it was and asks here whether
 /// to set it up: only on Allow does the iPhone make the TV a key of its own, allowed to read only, named after the TV,
 /// and send it with the server's address. The person never sees the key. The TVs set up are listed by their names, each
 /// with Forget, which deletes its key and so signs it out, and Forget All where there are several; each asks first.
 struct AccountAppleTVPage: View {
     let services: AccountServices
-    @State private var setup = AppleTVSetup()
+    private let setup = AppleTVSetup.shared
     @State private var forgetting: AppleTVSetup.TV?
     @State private var forgettingAll = false
 
@@ -87,9 +89,12 @@ struct AccountAppleTVPage: View {
         } message: {
             Text("This Apple TV gets a key of its own that may only view your library.")
         }
-        .onAppear { setup.start(client: services.client) }
+        .onAppear {
+            setup.pagesOnScreen += 1
+            setup.start(client: services.client)
+        }
+        .onDisappear { setup.pagesOnScreen -= 1 }
         .task { await setup.list(client: services.client) }
-        .onDisappear { setup.stop() }
     }
 }
 
@@ -126,13 +131,35 @@ final class AppleTVSetup {
     private(set) var asking: String?
     private var listener: NWListener?
     private var waiting: (connection: NWConnection, name: String, client: ImmichClient)?
+    /// The signed-in account's client, which a TV's key is made through.
+    private var client: ImmichClient?
+
+    /// The app's one listener, which the window starts while signed in and starts again as the app comes back to the
+    /// front, as iOS stops a listener in the background: a tap on the notification for a TV's request must find it.
+    static let shared = AppleTVSetup()
+    /// The Apple TV page opens over the window in front when a TV asks while no Apple TV page is on screen.
+    var pageShown = false
+    @ObservationIgnored private(set) weak var pageWindow: AnyObject?
+    /// The window in front, which the app tells (VersoApp), as this knows no UIKit.
+    @ObservationIgnored var frontWindow: () -> AnyObject? = { nil }
+    /// How many Apple TV pages are on screen: the account sheet's, or the one a TV's request opened.
+    @ObservationIgnored var pagesOnScreen = 0
 
     func start(client: ImmichClient) {
+        self.client = client
         guard listener == nil else { return }
         do {
             let listener = try NWListener(service: NWListener.Service(applicationService: Self.service), using: .applicationService)
             listener.newConnectionHandler = { [weak self] connection in
-                Task { @MainActor in self?.serve(connection, client: client) }
+                Task { @MainActor in self?.serve(connection) }
+            }
+            // Gone in the background, or failed: the next start makes another.
+            listener.stateUpdateHandler = { [weak self, weak listener] state in
+                switch state {
+                case .failed, .cancelled:
+                    Task { @MainActor in if let self, self.listener === listener { self.listener = nil } }
+                default: break
+                }
             }
             listener.start(queue: .main)
             self.listener = listener
@@ -141,21 +168,33 @@ final class AppleTVSetup {
         }
     }
 
+    /// Signed out: no TV can be set up until signed in again.
     func stop() {
         listener?.cancel()
         listener = nil
+        client = nil
     }
 
-    /// A TV connected: it says its name first, and the person is asked about it by that name. A second TV while one
-    /// waits is turned away.
-    private func serve(_ connection: NWConnection, client: ImmichClient) {
-        guard waiting == nil else { return connection.cancel() }
+    /// A TV connected: it says its name first, and the person is asked about it by that name, on the Apple TV page,
+    /// which opens in front where none is on screen. A second TV while one waits is turned away, and so is any on
+    /// Immich's demo, where Verso makes no keys, as it is everyone's.
+    private func serve(_ connection: NWConnection) {
+        guard waiting == nil, let client else { return connection.cancel() }
         connection.start(queue: .main)
         connection.receive(minimumIncompleteLength: 1, maximumLength: 4096) { [weak self] data, _, _, _ in
             Task { @MainActor in
                 guard let self else { return connection.cancel() }
                 let fields = data.flatMap { try? JSONDecoder().decode([String: String].self, from: $0) } ?? [:]
                 let name = fields["name"].flatMap { $0.isEmpty ? nil : $0 } ?? String(localized: "Apple TV")
+                if self.pagesOnScreen == 0 {
+                    self.pageWindow = self.frontWindow()
+                    self.pageShown = true
+                }
+                if BackupCenter.isPublicDemo(client.serverURL) {
+                    self.send(["refused": "true"], over: connection)
+                    self.state = .failed(String(localized: "Immich's demo server is everyone's, so Verso sets up no Apple TV on it. Sign in to your own server to set one up."))
+                    return
+                }
                 self.waiting = (connection, name, client)
                 self.asking = name
             }
