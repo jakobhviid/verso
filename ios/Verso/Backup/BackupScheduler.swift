@@ -34,6 +34,8 @@ enum BackupScheduler {
     private static var registered = false
     /// Background processing or refresh tasks under way, whose passes are theirs to end.
     private static var running = 0
+    /// A background processing or refresh task's run is under way, whose passes it ends before it completes.
+    static var isRunningTask: Bool { running > 0 }
 
     /// Registers the background tasks; called before the app finishes launching.
     static func register() {

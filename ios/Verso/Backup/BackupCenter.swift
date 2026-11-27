@@ -17,6 +17,7 @@
 import Foundation
 import Observation
 import Photos
+import UIKit
 import UserNotifications
 
 @MainActor @Observable
@@ -67,6 +68,8 @@ final class BackupCenter {
     @ObservationIgnored private var launched = false
     /// Verso is in the foreground.
     @ObservationIgnored private var active = false
+    /// UIKit's background time for a pass under way as Verso left the front (`finishBeforeSuspension`).
+    @ObservationIgnored private var leaving = UIBackgroundTaskIdentifier.invalid
     @ObservationIgnored private var tilesRefreshing = false
     @ObservationIgnored private var tilesAgain = false
     @ObservationIgnored private var progressTask: Task<Void, Never>?
@@ -520,9 +523,34 @@ final class BackupCenter {
         self.active = active
         Task {
             await engine?.setForeground(active)
-            if active { await refresh() }
+            if active { await refresh() } else { await finishBeforeSuspension() }
         }
+        if active { endLeaving() }
         followProgress()
+    }
+
+    /// A pass under way as Verso leaves the front, outside the system's background runs (a person's run, a background
+    /// processing or refresh task, which end their passes themselves), goes on under UIKit's background time until it
+    /// ends, and stops when that time runs out, before iOS suspends Verso: the store is in the App Group's container,
+    /// and iOS ends an app suspended while it holds a lock on a file there (0xdead10cc), as a write under way does.
+    private func finishBeforeSuspension() async {
+        guard let engine, !active, leaving == .invalid, !BackupScheduler.isContinuing, !BackupScheduler.isRunningTask,
+              await engine.isRunning else { return }
+        leaving = UIApplication.shared.beginBackgroundTask(withName: "Backup pass") {
+            Task { @MainActor in
+                await engine.cancelPass()
+                await engine.passesEnded()
+                BackupCenter.shared.endLeaving()
+            }
+        }
+        await engine.passesEnded()
+        endLeaving()
+    }
+
+    private func endLeaving() {
+        guard leaving != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(leaving)
+        leaving = .invalid
     }
 
     #if DEBUG

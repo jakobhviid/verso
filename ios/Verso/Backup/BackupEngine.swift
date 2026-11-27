@@ -263,6 +263,11 @@ actor BackupEngine {
         pass?.cancel()
     }
 
+    /// Returns once no pass is under way, without starting one.
+    func passesEnded() async {
+        while let pass { await pass.value }
+    }
+
     /// Verso came to the foreground or went to the background. Coming forward, the library is read again and new photos
     /// go at once; going back, what was sent at once is cancelled, to go again through the background session.
     func setForeground(_ active: Bool) async {

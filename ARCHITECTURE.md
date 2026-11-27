@@ -3123,7 +3123,10 @@ it is iOS's alone.
   not new fingerprints; `remote`, per account and fingerprint, whether Immich has it, in its trash or not, and whether
   Verso sent it or saw it in the trash; `backup`, each photo's state and the person's decision per account; `journal`,
   each step's intent before it and its result after; `meta`, the change token and the runs' marks. About 30 MB at
-  100,000 photos, read in pages; every write is a short transaction, closed before Verso is suspended. Not chosen:
+  100,000 photos, read in pages; every write is a short transaction, closed before Verso is suspended: a pass under
+  way as Verso leaves the front, outside the system's background runs, goes on under UIKit's background time and stops
+  when it runs out, as iOS ends an app suspended while it holds a lock on a file in the App Group's container
+  (0xdead10cc). Not chosen:
   redb (one process, where an extension may need the store), Core Data and SwiftData (slow batch writes at this size).
 - **Recovery:** the first pass after a launch works every journal step without a result out again from facts: an
   upload the background session still carries is left to it; any other is checked with the server by its fingerprint,
