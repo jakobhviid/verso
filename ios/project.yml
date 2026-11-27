@@ -363,7 +363,7 @@ targets:
         embed: false
       - sdk: Security.framework
 
-  # The Apple TV's Top Shelf (TVTopShelf): today's memories and the newest photos, as the app last wrote them into the
+  # The Apple TV's Top Shelf (TVTopShelf): the rows chosen in the app's Settings, as the app last wrote them into the
   # App Group they share, so it needs no key and no network.
   VersoTVTopShelf:
     type: app-extension

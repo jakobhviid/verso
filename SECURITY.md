@@ -42,9 +42,10 @@ Problems in the Immich server itself belong to the Immich project:
   your cache directory (`~/.cache/verso`), and thumbnails in the desktop's thumbnail cache. Signing out (**Sign Out…**
   in Verso, or `verso-service logout`) removes them. On the Mac, the iPhone and the iPad the viewer keeps the original
   movies of the last 40 Live Photos it played or fetched ahead, in the app's caches folder, and signing out removes
-  them. The Apple TV keeps, for its Top Shelf, the previews of today's memories' first photos and of the newest
-  photos (none from the Locked Folder), in a caches folder of the App Group it shares with its Top Shelf extension,
-  written again each time it starts and removed by Sign Out. Files that could not be uploaded are kept in
+  them. The Apple TV keeps, for its Top Shelf, the previews of the rows its Settings chooses (today's memories' first
+  photos and the newest photos until changed; the albums' covers, the newest favorites and people's faces once turned
+  on; none from the Locked Folder), in a caches folder of the App Group it shares with its Top Shelf extension, written
+  again each time it starts and as the rows change, and removed by Sign Out. Files that could not be uploaded are kept in
   `~/.local/share/verso/not-uploaded/`; they are yours, and signing out leaves them. On the iPhone and the iPad,
   originals opened through Verso Drive stay in iOS's copy of its location until iOS removes them, or until turning the
   drive off or signing out removes the location whole, files in its Upload folder not yet uploaded included (Verso asks

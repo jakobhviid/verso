@@ -1,4 +1,2 @@
-- Forget this Apple TV on the iPhone (Account, Apple TV), or delete its key in Immich: the TV signs out as soon as it next asks Immich for anything, even while you browse, and Set Up with iPhone says why. A server that is out of reach, or no network, keeps it signed in.
-- Delete Verso and install it again: it stays signed in.
-- The Top Shelf: move Verso to the Home Screen's top row, and today's memories and your newest photos show above it.
-- Settings, at the foot of the sidebar: Sign Out, and About.
+- The Locked Folder: in Settings, turn on Show Locked Folder in Collections, open it and choose Unlock with iPhone, then your iPhone. On the iPhone, allow it with Face ID or your PIN. Leaving the Locked Folder, or going to the Home Screen, locks it; the next visit asks the iPhone again. Lock on the iPhone (Account, Apple TV) locks it on the TV within a minute.
+- The Top Shelf: in Settings, Top Shelf, choose its rows: Memories, Recent, Albums, Favorites and People. Albums come with the newest photos first, as Albums shows them. With Verso in the Home Screen's top row, a click on an item opens that memory, photo, album or person.

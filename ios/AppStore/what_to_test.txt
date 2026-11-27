@@ -1,4 +1,2 @@
-- Setting up an Apple TV from its notification: on the TV choose Set Up with iPhone and your iPhone, then tap the notification on the iPhone; Verso opens to Set Up “name”? from wherever it was. Setting up from Account, Apple TV works as before.
-- The account's picture stands at the top right of every tab on the iPhone (Library, the tabs you chose, Collections, Search), with its notifications' badge; on the iPad it stays in Collections.
-- The Backup page: a section for each subject, what needs you first. The bar's parts are rows you can open, Left Out has a page of its own, and Free Up Space is a row opening its page.
-- The Apple TV page (Account, Apple TV): the Apple TVs you set up, each with Forget, which asks first and shows when it is done.
+- The Locked Folder opens with Face ID after every launch once you have typed the PIN: Verso keeps the PIN in the Keychain behind Face ID. Account, Unlock with Face ID turns it off and forgets the PIN. Free Up Space's hidden photos use the same Face ID.
+- The Apple TV's Locked Folder: on the TV, turn on Show Locked Folder in Collections in Settings and choose Unlock with iPhone. Verso asks Show the Locked Folder on “name”? and opens it there with Face ID or your PIN. Account, Apple TV lists the TVs with it open, each with Lock.

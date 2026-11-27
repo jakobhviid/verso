@@ -58,8 +58,9 @@ drive's layout and the arithmetic that places the grid's dates, so they behave a
   without asking, and keeps your favorites, the albums you choose and anything recent.
 - **Verso in Messages:** pick a photo from your library straight into a message.
 
-**On the Apple TV:** your library from the sofa, memories as stories, and today's memories and the newest photos on the
-Top Shelf. It is set up from the iPhone, with a key that may only look, and changes nothing.
+**On the Apple TV:** your library from the sofa, memories as stories, and on the Top Shelf the rows you choose: today's
+memories, the newest photos, albums, favorites or people. It is set up from the iPhone, with a key that may only look,
+and changes nothing; the Locked Folder opens there only from the iPhone, with Face ID or the PIN, each time.
 
 **On the Mac:** widgets with your photos, Shortcuts actions, and an icon in the menu bar.
 

@@ -101,12 +101,14 @@ struct TVAlbumCard: View {
 }
 
 /// Every album in sections by year, the newest first and each section's albums by their most recent photo, as the
-/// iPhone's Albums opens: the arrangement the shared core makes (`AlbumsOptions`, its defaults).
+/// iPhone's Albums opens: the arrangement the shared core makes (`AlbumsOptions`, its defaults). An album a Top Shelf
+/// item asked for opens once the albums are read.
 struct TVAlbums: View {
     @Environment(TVModel.self) private var tv
     @State private var albums: [Album] = []
     @State private var phase = TVPhase.loading
     @State private var previews = AlbumPreviews()
+    @State private var opened: Album?
 
     var body: some View {
         ScrollView {
@@ -129,6 +131,15 @@ struct TVAlbums: View {
         }
         .scrollClipDisabled()
         .task { await load() }
+        .onChange(of: tv.opening) { openAsked() }
+        .navigationDestination(item: $opened) { album in TVAlbumPage(album: album) }
+    }
+
+    /// The album a Top Shelf item asked for; one no longer there is let go.
+    private func openAsked() {
+        guard case .album(let id) = tv.opening, phase == .loaded else { return }
+        tv.opening = nil
+        opened = albums.first { $0.id == id }
     }
 
     private var sections: some View {
@@ -163,6 +174,7 @@ struct TVAlbums: View {
         do {
             albums = try await client.albums()
             phase = .loaded
+            openAsked()
         } catch {
             phase = .failed(error.localizedDescription)
         }
@@ -203,6 +215,8 @@ struct TVAlbumPage: View {
 struct TVPeople: View {
     @Environment(TVModel.self) private var tv
     @State private var people: [Person] = []
+    /// A person a Top Shelf item asked for, whose photos open over the faces.
+    @State private var opened: Person?
     @State private var phase = TVPhase.loading
     @State private var page = 1
     @State private var hasMore = true
@@ -231,6 +245,19 @@ struct TVPeople: View {
         }
         .scrollClipDisabled()
         .task { await loadMore() }
+        .onChange(of: tv.opening) { openAsked() }
+        .navigationDestination(item: $opened) { person in TVTimeline(query: TimelineQuery(personId: person.id), title: person.name) }
+    }
+
+    /// The person a Top Shelf item asked for, from the faces read or else from Immich; one no longer there is let go.
+    private func openAsked() {
+        guard case .person(let id) = tv.opening, phase == .loaded else { return }
+        tv.opening = nil
+        if let person = people.first(where: { $0.id == id }) {
+            opened = person
+        } else if let client = tv.client {
+            Task { opened = try? await client.person(id) }
+        }
     }
 
     private var faces: some View {
@@ -266,6 +293,7 @@ struct TVPeople: View {
                 page += 1
             } while added == 0 && hasMore
             phase = .loaded
+            openAsked()
         } catch is CancellationError {
         } catch {
             hasMore = false

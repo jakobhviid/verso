@@ -43,6 +43,7 @@ final class TVModel {
     /// The Locked Folder is the place on screen, so a token the iPhone sends opens it; else it is ended at once.
     var lockedFolderInFront = false
     @ObservationIgnored private var checkingKey = false
+    @ObservationIgnored private var topShelfRefresh: Task<Void, Never>?
 
     /// The Locked Folder's model: its session's client and pictures, which its grid and viewer read in place of the TV's.
     init(lockedFolder client: ImmichClient, images: ImagePipeline) {
@@ -79,6 +80,7 @@ final class TVModel {
     /// read-only key may not delete itself.
     func signOut() {
         lockFolder()
+        topShelfRefresh?.cancel()
         TVAccount.remove()
         client = nil
         images = nil
@@ -143,18 +145,23 @@ final class TVModel {
         signedOutReason = String(localized: "This Apple TV was forgotten on your iPhone, or its key was deleted in Immich. Set it up again to come back.")
     }
 
-    /// The Top Shelf's memories and newest photos, written again (TVTopShelf).
+    /// The Top Shelf's rows, written again (TVTopShelf); a refresh still running is cancelled, so the last one writes.
     func refreshTopShelf() async {
         guard let client, let images else { return }
-        await TVTopShelf.refresh(client: client, images: images)
+        topShelfRefresh?.cancel()
+        let refresh = Task { await TVTopShelf.refresh(client: client, images: images) }
+        topShelfRefresh = refresh
+        await refresh.value
     }
 
-    /// A link from the Top Shelf: `memory/<id>` or `photo/<id>`, after the app's scheme.
+    /// A link from the Top Shelf: `memory/<id>`, `photo/<id>`, `album/<id>` or `person/<id>`, after the app's scheme.
     func open(_ url: URL) {
         let id = url.lastPathComponent
         switch url.host() {
         case "memory": opening = .memory(id)
         case "photo": opening = .photo(id)
+        case "album": opening = .album(id)
+        case "person": opening = .person(id)
         default: break
         }
     }
@@ -177,8 +184,10 @@ final class TVModel {
     #endif
 }
 
-/// Where a Top Shelf item opens the app: a memory's story, or a photo in the viewer.
+/// Where a Top Shelf item opens the app: a memory's story, a photo in the viewer, an album's or a person's photos.
 enum TVOpening: Equatable {
     case memory(String)
     case photo(String)
+    case album(String)
+    case person(String)
 }

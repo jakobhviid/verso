@@ -4,13 +4,16 @@ Immich is the photo server you run yourself, at home or on a server of your own.
 
 ON THE BIG SCREEN
 • The timeline by year, by month or every photo
-• Memories as stories, and today's memories and your newest photos on the Top Shelf
+• Memories as stories, and on the Top Shelf the rows you choose: today's memories, your newest photos, albums, favorites or people
 • Albums, people, places by country, favorites and the archive
 • Search with the Siri Remote's dictation, answered by Immich's smart search
 • Photos full screen, with Live Photos and videos playing
 
 SET UP FROM YOUR IPHONE
-Open Verso on your iPhone, choose Set Up Apple TV, and pick this TV. The iPhone gives it a key of its own that may only look: the TV never changes, deletes or shares anything, and never opens the Locked Folder. Forget it on the iPhone to sign it out.
+Open Verso on your iPhone, choose Set Up Apple TV, and pick this TV. The iPhone gives it a key of its own that may only look: the TV never changes, deletes or shares anything. Forget it on the iPhone to sign it out.
+
+THE LOCKED FOLDER, FROM YOUR IPHONE
+Turn it on in Settings, and the Locked Folder opens on the TV only from your iPhone, with Face ID or your PIN, each time. The TV never learns the PIN, and the folder locks again as you leave it.
 
 Verso is free and open source, under the MIT license. The Apple TV is set up with Verso on an iPhone signed in to an Immich server, version 3.2 or later.
 

@@ -64,11 +64,16 @@ struct TVRootView: View {
         }
     }
 
-    /// A Top Shelf item: a memory opens in Memories, which plays it; a photo opens in the viewer here.
+    /// A Top Shelf item: a memory opens in Memories, which plays it; an album in Albums and a person in People, which
+    /// open their pages; a photo opens in the viewer here.
     private func follow(_ opening: TVOpening?) async {
         switch opening {
         case .memory:
             place = .memories
+        case .album:
+            place = .albums
+        case .person:
+            place = .people
         case .photo(let id):
             model.opening = nil
             guard let client = model.client, let asset = try? await client.asset(id), asset.visibility != "locked" else { return }

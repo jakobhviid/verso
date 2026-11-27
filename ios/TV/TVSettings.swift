@@ -1,5 +1,6 @@
 // Settings on the Apple TV, at the sidebar's foot: the app's icon, Day or Night, as the iPhone's App Icon page offers
-// its designs (tvOS keeps one icon in light and dark alike, so the person chooses); the Locked Folder in Collections,
+// its designs (tvOS keeps one icon in light and dark alike, so the person chooses); what the Top Shelf shows, a switch
+// for each of its rows (TVTopShelf has what each holds, and its order); the Locked Folder in Collections,
 // off until turned on, which the iPhone opens each time (TVLockedFolder); the account, with Sign Out; and About, with
 // the non-affiliation notice every platform's About carries.
 
@@ -29,6 +30,17 @@ struct TVSettings: View {
                         }
                     }
                 }
+                }
+                VStack(alignment: .leading, spacing: 24) {
+                    TVSectionHeader(title: String(localized: "Top Shelf"))
+                    ForEach(TVShelfData.Row.allCases, id: \.self) { row in
+                        TVTopShelfRowSwitch(row: row) { Task { await tv.refreshTopShelf() } }
+                            .frame(maxWidth: 1100)
+                    }
+                    Text("Above Verso when it is in the top row of the Home Screen. Albums come with the newest photos first, as Albums shows them; people as People does.")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: 1100, alignment: .leading)
                 }
                 VStack(alignment: .leading, spacing: 24) {
                     TVSectionHeader(title: String(localized: "Locked Folder"))
@@ -92,6 +104,25 @@ struct TVSettings: View {
     private static var notice: String {
         Bundle.main.object(forInfoDictionaryKey: "NSHumanReadableCopyright") as? String
             ?? "Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO."
+    }
+}
+
+/// A Top Shelf row's switch, kept in the app's settings (TVShelfData.Row.settingKey); the shelf is written again as it
+/// changes.
+private struct TVTopShelfRowSwitch: View {
+    let row: TVShelfData.Row
+    let changed: () -> Void
+    @AppStorage private var shown: Bool
+
+    init(row: TVShelfData.Row, changed: @escaping () -> Void) {
+        self.row = row
+        self.changed = changed
+        _shown = AppStorage(wrappedValue: row.shownByDefault, row.settingKey)
+    }
+
+    var body: some View {
+        Toggle(row.title, isOn: $shown)
+            .onChange(of: shown) { changed() }
     }
 }
 

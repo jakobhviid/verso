@@ -395,11 +395,12 @@ sections, the pages, the viewer's info), drawn with each platform's own toolkit:
   badge on yellow glass and play/pause plays its movie, and a video plays in tvOS's own player. The accent is the system
   blue, as the iPhone's, set in the TV's asset catalog because tvOS's own is white. Settings, at the sidebar's foot
   in a section of its own, has App Icon where the app carries its Night icon (the Day and Night icons as cards, each
-  with its name and a tick under the one on the Home Screen), Locked Folder (a switch that shows it in Collections, off
-  until turned on), Account (the server's name and Sign Out in red) and About. The Locked Folder, until the iPhone opens
+  with its name and a tick under the one on the Home Screen), Top Shelf (a switch for each of its rows), Locked Folder (a
+  switch that shows it in Collections, off until turned on), Account (the server's name and Sign Out in red) and About. The Locked Folder, until the iPhone opens
   it, is a lock over its name, a line on how it opens and Unlock with iPhone, the system's picker, as Set Up with iPhone
-  is; open, it is the grid under its name, as Favorites. The Top Shelf shows Memories and
-  Recent as rows of wide pictures, each with its title (the memory's, or the day the photo was taken).
+  is; open, it is the grid under its name, as Favorites. The Top Shelf shows the rows Settings
+  chooses, Memories, Recent, Albums, Favorites and People in that order, as rows of wide pictures (People's square), each
+  with its title (the memory's, the album's, the person's name, or the day the photo was taken).
 - **The Backup page** is backing up's one page on the iPhone and the iPad: a list of iOS's own whose top is the page's
   status, centred, as Settings' feature pages have theirs: a cloud symbol (the accent while it works, and only then
   pulsing with the system's variable colour; green with a tick when backed up; grey while it waits; orange when the
