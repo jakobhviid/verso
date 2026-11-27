@@ -109,8 +109,9 @@ on any step shows what it would do and changes nothing outside the checkout:
 3. `ci/release.sh build TAG` builds Linux's files from the tag in a worktree of its own (the tarball and the AppImage
    in the toolbox; the rpm, the deb and the Flatpak each in a container, with podman: the packages in their
    distributions', the Flatpak in a Fedora one with `flatpak-builder`, `linux/packaging/verso-flatpak.sh`, its GNOME
-   runtime kept between releases), three lanes at once (the rpm and the deb share one, for memory) with a log each in
-   `target/dist/TAG.logs`, their builds kept between releases in `target/release-cache`, into
+   runtime kept between releases), in three lanes at once with a log each in `target/dist/TAG.logs` (Fedora's, which
+   builds the programs once for the tarball, the AppImage and the rpm; the deb's; the Flatpak's), at most two of their
+   optimised builds at a time, for memory, their builds kept between releases in `target/release-cache`, into
    `target/dist/TAG`, and makes a draft release of them, "Verso 0.72.0 (Linux)",
    here, which Homebrew's `verso` cask and Verso's page download from. The Apple editions are built on the Mac, below.
    **Releases are built on the maintainer's machines;** the release workflow (`.github/workflows/release.yml`) is the
