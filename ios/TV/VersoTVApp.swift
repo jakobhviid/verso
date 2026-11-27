@@ -48,10 +48,23 @@ final class TVModel {
     @ObservationIgnored private var openingLockedFolder = false
     @ObservationIgnored private var topShelfRefresh: Task<Void, Never>?
 
+    /// With Manage Photos on, the client of the second key, which may change and delete photos (TVPhotoMenu).
+    private(set) var changes: ImmichClient?
+    /// Why Manage Photos turned itself off, said on its page.
+    var changesReason: String?
+    @ObservationIgnored private var account: TVAccount?
+    /// The TV's own model, for the Locked Folder's, whose photos are changed through its session but only where the TV's
+    /// Manage Photos is on.
+    @ObservationIgnored private(set) weak var owner: TVModel?
+
+    /// The TV's own model: this, or the one a Locked Folder's model belongs to.
+    var root: TVModel { owner ?? self }
+
     /// The Locked Folder's model: its session's client and pictures, which its grid and viewer read in place of the TV's.
-    init(lockedFolder client: ImmichClient, images: ImagePipeline) {
+    init(lockedFolder client: ImmichClient, images: ImagePipeline, owner: TVModel) {
         self.client = client
         self.images = images
+        self.owner = owner
     }
 
     init() {
@@ -69,8 +82,31 @@ final class TVModel {
         guard let server = URL(string: account.server) else { return }
         let client = ImmichClient(serverURL: server, apiURL: server.appendingPathComponent("api"),
                                   credential: .apiKey(account.key))
+        self.account = account
         self.client = client
         images = ImagePipeline(client: client)
+        changes = account.changeKey.map {
+            ImmichClient(serverURL: server, apiURL: server.appendingPathComponent("api"), credential: .apiKey($0))
+        }
+    }
+
+    /// Manage Photos on, with the second key the iPhone sent.
+    func allowChanges(key: String) {
+        guard var account else { return }
+        account.changeKey = key
+        account.save()
+        use(account)
+        changesReason = nil
+    }
+
+    /// Manage Photos off: the second key goes from this TV at once, and asks nothing. It stays in Immich, as a key may
+    /// not delete itself, until Read Only or Forget on the iPhone's Apple TV page.
+    func stopChanges(reason: String? = nil) {
+        guard var account, account.changeKey != nil else { return }
+        account.changeKey = nil
+        account.save()
+        use(account)
+        changesReason = reason
     }
 
     func signIn(_ account: TVAccount) {
@@ -85,7 +121,9 @@ final class TVModel {
         lockFolder()
         topShelfRefresh?.cancel()
         TVAccount.remove()
+        account = nil
         client = nil
+        changes = nil
         images = nil
         TVTopShelf.clear()
     }
@@ -118,7 +156,7 @@ final class TVModel {
         guard let client, lockedFolder == nil, !openingLockedFolder else { return }
         openingLockedFolder = true
         defer { openingLockedFolder = false }
-        let visit = TVLockedFolderVisit(server: client.serverURL, apiURL: client.apiURL, token: token)
+        let visit = TVLockedFolderVisit(server: client.serverURL, apiURL: client.apiURL, token: token, owner: self)
         do {
             let status = try await visit.status()
             guard status.isElevated else { throw ImmichError.http(403, String(localized: "The server did not unlock the Locked Folder.")) }
@@ -179,6 +217,8 @@ final class TVModel {
         guard let server = defaults.string(forKey: "signInServer"), let url = URL(string: server) else { return }
         if let key = defaults.string(forKey: "signInAPIKey") {
             signIn(TVAccount(server: server, key: key))
+            // Manage Photos' second key (`-tvChangeKey`), as the iPhone sends it.
+            if let changeKey = defaults.string(forKey: "tvChangeKey") { allowChanges(key: changeKey) }
         } else if let token = defaults.string(forKey: "signInAccessToken") {
             // A session from logging in (`-signInAccessToken`), for servers such as Immich's demo that make no keys.
             let client = ImmichClient(serverURL: url, apiURL: url.appendingPathComponent("api"), credential: .accessToken(token))

@@ -1,8 +1,13 @@
-// Settings on the Apple TV, at the sidebar's foot: the app's icon, Day or Night, as the iPhone's App Icon page offers
-// its designs (tvOS keeps one icon in light and dark alike, so the person chooses); what the Top Shelf shows, a switch
-// for each of its rows (TVTopShelf has what each holds, and its order); the Locked Folder in Collections,
-// off until turned on, which the iPhone opens each time (TVLockedFolder); the account, with Sign Out; and About, with
-// the non-affiliation notice every platform's About carries.
+// Settings on the Apple TV, at the sidebar's foot, laid out as tvOS's own Settings: the app's icon large on the left,
+// with its name and version, and a list on the right, a row at a time under the remote's focus, each saying its value
+// and opening a page of its own where it holds more than a switch.
+// - Library: the Top Shelf's rows (TVTopShelf has what each holds, and its order), the Locked Folder in Collections,
+//   off until turned on, which the iPhone opens each time (TVLockedFolder), and Manage Photos, off until the iPhone
+//   allows it (TVManagePhotos).
+// - Appearance: the app's icon, Day or Night, as the iPhone's App Icon page offers its designs (tvOS keeps one icon in
+//   light and dark alike, so the person chooses), once the app carries its Night icon.
+// - Account: who is signed in, to which server, what this Apple TV may do, and Sign Out.
+// - About Verso: the version, the credit, the non-affiliation notice every platform's About carries, and the AI line.
 
 import SwiftUI
 import UIKit
@@ -11,78 +16,121 @@ struct TVSettings: View {
     @Environment(TVModel.self) private var tv
     @State private var icon = TVAppIcon.current
     @State private var confirmingSignOut = false
+    @State private var user: User?
+    /// The Top Shelf's rows turned on, read again as Settings comes back from their page.
+    @State private var shelf = ""
     @AppStorage(TVLockedFolderSetting.key) private var showsLockedFolder = false
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 48) {
-                TVPageTitle("Settings")
+        HStack(alignment: .top, spacing: 80) {
+            VStack(spacing: 20) {
+                Image(icon.preview)
+                    .resizable()
+                    .aspectRatio(5 / 3, contentMode: .fit)
+                    .frame(width: 520)
+                    .clipShape(.rect(cornerRadius: 32, style: .continuous))
+                    .shadow(color: .black.opacity(0.35), radius: 24, y: 12)
+                Text("Verso").font(.title2.bold())
+                Text(Self.version).font(.callout).foregroundStyle(.secondary)
+            }
+            .frame(width: 620)
+            .padding(.top, 140)
+            Form {
+                Section {
+                    NavigationLink { TVTopShelfSettings() } label: { LabeledContent("Top Shelf", value: shelf) }
+                    Toggle(isOn: $showsLockedFolder) {
+                        // tvOS tints a switch's label; the rows around it are in the text's own colour.
+                        Text("Show Locked Folder in Collections").foregroundStyle(.primary)
+                    }
+                    NavigationLink { TVManagePhotos() } label: {
+                        LabeledContent("Manage Photos", value: tv.changes == nil ? String(localized: "Off") : String(localized: "On"))
+                    }
+                } header: {
+                    Text("Library")
+                } footer: {
+                    Text("The Locked Folder opens only from your iPhone, with Face ID or your PIN, each time. Manage Photos lets a press and hold on a photo favorite, archive, delete or lock it, once your iPhone allows it.")
+                }
                 if TVAppIcon.offered {
-                VStack(alignment: .leading, spacing: 24) {
-                    TVSectionHeader(title: String(localized: "App Icon"))
-                    HStack(spacing: TVMetrics.cardSpacing) {
-                        ForEach(TVAppIcon.allCases) { choice in
-                            Button { choose(choice) } label: {
-                                TVAppIconChoice(icon: choice, chosen: choice == icon)
-                            }
-                            .buttonStyle(TVLiftStyle(cornerRadius: TVMetrics.cardRadius))
-                            .tvLifts()
-                        }
+                    Section("Appearance") {
+                        NavigationLink { TVAppIconPage(icon: $icon) } label: { LabeledContent("App Icon", value: icon.title) }
                     }
                 }
-                }
-                VStack(alignment: .leading, spacing: 24) {
-                    TVSectionHeader(title: String(localized: "Top Shelf"))
-                    ForEach(TVShelfData.Row.allCases, id: \.self) { row in
-                        TVTopShelfRowSwitch(row: row) { Task { await tv.refreshTopShelf() } }
-                            .frame(maxWidth: 1100)
+                Section {
+                    if let user {
+                        LabeledContent("Name", value: user.name)
+                        LabeledContent("Email", value: user.email)
                     }
-                    Text("Above Verso when it is in the top row of the Home Screen. Albums come with the newest photos first, as Albums shows them; people as People does.")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: 1100, alignment: .leading)
-                }
-                VStack(alignment: .leading, spacing: 24) {
-                    TVSectionHeader(title: String(localized: "Locked Folder"))
-                    Toggle("Show Locked Folder in Collections", isOn: $showsLockedFolder)
-                        .frame(maxWidth: 1100)
-                    Text("It opens only from your iPhone, with Face ID or your PIN, each time, and locks as you leave it. The Apple TV never learns the PIN.")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: 1100, alignment: .leading)
-                }
-                VStack(alignment: .leading, spacing: 24) {
-                    TVSectionHeader(title: String(localized: "Account"))
-                    if let server = tv.client?.serverURL.host() {
-                        Text(server)
-                            .font(.headline)
-                    }
+                    LabeledContent("Server", value: tv.client?.serverURL.host() ?? "")
+                    LabeledContent("This Apple TV", value: tv.changes == nil ? String(localized: "Can view") : String(localized: "Can view and change"))
                     Button("Sign Out", role: .destructive) { confirmingSignOut = true }
-                    Text("The key the iPhone made for this Apple TV stays in Immich until you forget the Apple TV on the iPhone, or delete the key in Immich.")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: 1100, alignment: .leading)
+                } header: {
+                    Text("Account")
+                } footer: {
+                    Text("Set up from your iPhone with a key of its own. It stays in Immich until you forget this Apple TV on your iPhone (Account, Apple TV), or delete it in Immich.")
                 }
-                VStack(alignment: .leading, spacing: 12) {
-                    TVSectionHeader(title: String(localized: "About"))
-                    Text("Verso \(Self.version), by Jakob Hviid, under the MIT license. Built from Immich Gallery for the Mac, by Alessandro Craciun, with contributions by Jakob Hviid.")
-                    Text(Self.notice)
-                        .foregroundStyle(.secondary)
-                    Text("Parts of this project were written with the assistance of AI coding agents. All changes are reviewed by the maintainer.")
-                        .foregroundStyle(.secondary)
+                Section {
+                    NavigationLink("About Verso") { TVAboutPage() }
                 }
-                .font(.callout)
-                .frame(maxWidth: 1100, alignment: .leading)
-                // Text is not focusable: a last focusable row lets the remote scroll down to About.
-                .focusable()
             }
         }
-        .scrollClipDisabled()
+        .task { user = try? await tv.client?.currentUser() }
+        .onAppear { shelf = TVTopShelf.summary }
         .confirmationDialog("Sign out of this Apple TV?", isPresented: $confirmingSignOut, titleVisibility: .visible) {
             Button("Sign Out", role: .destructive) { tv.signOut() }
         } message: {
             Text("Set it up with your iPhone again to come back.")
         }
+    }
+
+    /// The release line's version and the build, as the iPhone's About says it.
+    static var version: String {
+        let info = Bundle.main.infoDictionary ?? [:]
+        let version = info["CFBundleShortVersionString"] as? String ?? "0.0.0"
+        guard let build = info["CFBundleVersion"] as? String, build != version else { return version }
+        return "\(version) (\(build))"
+    }
+
+    /// The non-affiliation notice the app's Info.plist carries, which SPEC.md words.
+    static var notice: String {
+        Bundle.main.object(forInfoDictionaryKey: "NSHumanReadableCopyright") as? String
+            ?? "Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO."
+    }
+}
+
+/// The Top Shelf's rows, a switch each, with what decides their order.
+private struct TVTopShelfSettings: View {
+    @Environment(TVModel.self) private var tv
+
+    var body: some View {
+        Form {
+            Section {
+                ForEach(TVShelfData.Row.allCases, id: \.self) { row in
+                    TVTopShelfRowSwitch(row: row) { Task { await tv.refreshTopShelf() } }
+                }
+            } footer: {
+                Text("Above Verso when it is in the top row of the Home Screen, in this order. Albums come with the newest photos first, as Albums shows them; people as People does.")
+            }
+        }
+        .frame(maxWidth: 1200)
+        .navigationTitle("Top Shelf")
+    }
+}
+
+/// The app's icon, Day or Night, as cards with a tick under the one on the Home Screen.
+private struct TVAppIconPage: View {
+    @Binding var icon: TVAppIcon
+
+    var body: some View {
+        HStack(spacing: TVMetrics.cardSpacing) {
+            ForEach(TVAppIcon.allCases) { choice in
+                Button { choose(choice) } label: {
+                    TVAppIconChoice(icon: choice, chosen: choice == icon)
+                }
+                .buttonStyle(TVLiftStyle(cornerRadius: TVMetrics.cardRadius))
+                .tvLifts()
+            }
+        }
+        .navigationTitle("App Icon")
     }
 
     private func choose(_ choice: TVAppIcon) {
@@ -91,19 +139,22 @@ struct TVSettings: View {
             if error == nil { Task { @MainActor in icon = choice } }
         }
     }
+}
 
-    /// The release line's version and the build, as the iPhone's About says it.
-    private static var version: String {
-        let info = Bundle.main.infoDictionary ?? [:]
-        let version = info["CFBundleShortVersionString"] as? String ?? "0.0.0"
-        guard let build = info["CFBundleVersion"] as? String, build != version else { return version }
-        return "\(version) (\(build))"
-    }
-
-    /// The non-affiliation notice the app's Info.plist carries, which SPEC.md words.
-    private static var notice: String {
-        Bundle.main.object(forInfoDictionaryKey: "NSHumanReadableCopyright") as? String
-            ?? "Verso is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by the Immich project or FUTO."
+/// Who made Verso, from what, the notice every platform's About carries, and the AI line.
+private struct TVAboutPage: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            Text("Verso \(TVSettings.version)").font(.title3.bold())
+            Text("By Jakob Hviid, under the MIT license. Built from Immich Gallery for the Mac, by Alessandro Craciun, with contributions by Jakob Hviid.")
+            Text(TVSettings.notice).foregroundStyle(.secondary)
+            Text("Parts of this project were written with the assistance of AI coding agents. All changes are reviewed by the maintainer.")
+                .foregroundStyle(.secondary)
+        }
+        .font(.callout)
+        .frame(maxWidth: 1200, alignment: .leading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .navigationTitle("About Verso")
     }
 }
 
@@ -121,7 +172,7 @@ private struct TVTopShelfRowSwitch: View {
     }
 
     var body: some View {
-        Toggle(row.title, isOn: $shown)
+        Toggle(isOn: $shown) { Text(row.title).foregroundStyle(.primary) }
             .onChange(of: shown) { changed() }
     }
 }

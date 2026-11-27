@@ -19,6 +19,12 @@ import VersoCore
 enum TVTopShelf {
     private static let counts: [TVShelfData.Row: Int] = [.memories: 8, .recent: 12, .albums: 10, .favorites: 12, .people: 10]
 
+    /// The rows on, as Settings names them: "Memories, Recent", or "Off".
+    static var summary: String {
+        let rows = rowsShown
+        return rows.isEmpty ? String(localized: "Off") : rows.map(\.title).joined(separator: ", ")
+    }
+
     /// The rows Settings has on (TVShelfData.Row.settingKey).
     static var rowsShown: [TVShelfData.Row] {
         TVShelfData.Row.allCases.filter { UserDefaults.standard.object(forKey: $0.settingKey) as? Bool ?? $0.shownByDefault }

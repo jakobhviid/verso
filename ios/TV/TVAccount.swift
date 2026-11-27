@@ -3,9 +3,11 @@ import Security
 
 /// The server and the read-only key the iPhone made for this TV, kept in the TV's Keychain. The person never sees the key:
 /// the iPhone makes it and hands it over, and Forget on the iPhone's Apple TV page, or deleting it in Immich, ends it.
+/// With Manage Photos on, a second key beside it, which may change and delete photos alone.
 struct TVAccount: Codable, Sendable {
     let server: String
     let key: String
+    var changeKey: String?
 
     private static let service = (Bundle.main.bundleIdentifier ?? "dev.hviid.Verso") + ".tv-account"
 

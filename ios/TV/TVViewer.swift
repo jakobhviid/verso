@@ -72,7 +72,8 @@ struct TVViewer: View {
         .overlay(alignment: .topLeading) { liveSign }
         .modifier(TVRemote(left: { step(-1) }, right: { step(1) }, select: { showsInfo.toggle() },
                            playPause: { playLive() }, menu: { dismiss() }, takesFocus: !playingVideo))
-        .task(id: index) { await show() }
+        .modifier(TVPhotoMenu(item: playingVideo ? nil : item, changed: apply))
+        .task(id: item?.id) { await show() }
         .task(id: "\(item?.id ?? "")|\(showsInfo)") { await readDetails() }
         .onDisappear { TVDisplayMode.release() }
         .task { await followDebugSteps() }
@@ -169,6 +170,21 @@ struct TVViewer: View {
         }
         items = all
         return true
+    }
+
+    /// A photo the menu changed: its heart, or gone, the next taking its place, and the viewer closing after the last.
+    private func apply(_ change: TVPhotoChange) {
+        guard let at = items.firstIndex(where: { $0.id == change.id }) else { return }
+        if case .favorite(_, let on) = change {
+            items[at].isFavorite = on
+            return
+        }
+        direction = 1
+        withAnimation(.smooth(duration: 0.35)) {
+            items.remove(at: at)
+            index = min(index, items.count - 1)
+        }
+        if items.isEmpty { dismiss() }
     }
 
     // MARK: Movies

@@ -28,9 +28,9 @@ final class TVLockedFolderVisit {
     /// Told when the server no longer has the session unlocked, with the reason to show.
     var onExpired: (String) -> Void = { _ in }
 
-    init(server: URL, apiURL: URL, token: String) {
+    init(server: URL, apiURL: URL, token: String, owner: TVModel) {
         client = ImmichClient(serverURL: server, apiURL: apiURL, credential: .accessToken(token)).explorePrivateClient()
-        model = TVModel(lockedFolder: client, images: ImagePipeline(client: client))
+        model = TVModel(lockedFolder: client, images: ImagePipeline(client: client), owner: owner)
     }
 
     /// The session's unlock as the server has it: elevated, and until when.

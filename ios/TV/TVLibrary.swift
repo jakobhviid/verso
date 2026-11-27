@@ -36,6 +36,7 @@ struct TVLibrary: View {
             }
             .scrollClipDisabled()
             .modifier(TVViewerCover(viewing: $viewing, focused: $focused) { proxy.scrollTo($0, anchor: .center) })
+            .environment(\.tvPhotoPage, model)
         }
         .task {
             await model.load(tv.client)

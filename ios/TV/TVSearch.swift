@@ -103,6 +103,7 @@ struct TVSearchResults: View {
             }
             .scrollClipDisabled()
             .modifier(TVViewerCover(viewing: $viewing, focused: $focused) { proxy.scrollTo($0, anchor: .center) })
+            .environment(\.tvPhotoPage, model)
         }
         .task {
             guard model == nil, let client = tv.client else { return }

@@ -28,8 +28,12 @@ Problems in the Immich server itself belong to the Immich project:
   own that the server ends within the hour, unlocks it with the PIN and sends its token alone, so the TV never learns
   the PIN. The TV keeps that token in memory, never on disk, keeps the folder's pictures in memory and out of the Top
   Shelf, and ends the session as it leaves the folder or the front; Lock on the iPhone's Apple TV page ends it too.
-  Unlike the key, the session is not limited to reading, as Immich gives sessions no narrower scope; Verso on the TV
-  changes nothing with it.
+  Unlike the key, the session is not limited to reading, as Immich gives sessions no narrower scope; with it Verso on
+  the TV changes only what Manage Photos does in the folder. **Manage Photos,** off until turned on in the TV's
+  Settings, gives the TV a second key, made by the iPhone after Allow and Face ID (or the passcode), allowed to change
+  and delete photos alone (Immich's `asset.update` and `asset.delete`): it favorites, archives, moves to the Locked
+  Folder and deletes to Recently Deleted, from a photo's menu, asking first before the last two. Turning it off on the
+  TV forgets that key there at once; Read Only or Forget on the iPhone's Apple TV page deletes it in Immich.
 - **The Locked Folder's PIN,** where Touch ID or Face ID opens the folder, once the PIN has been typed. On the Mac it
   is kept in the login keychain, on that Mac only, and given back only after the app's own Touch ID check, with the
   fingerprints enrolled when it was kept. On the iPhone and the iPad it is kept in the Keychain, on that device only,

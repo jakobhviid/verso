@@ -376,35 +376,43 @@ sections, the pages, the viewer's info), drawn with each platform's own toolkit:
   Info with a close button, in the background colour with rounded corners and a soft shadow, the cards the iPhone's.
   Under the pointer, cards lift and Collections' rows and headers light up. A window narrower than a regular width is
   laid out as an iPhone.
-- **On the Apple TV,** the iPhone's pages at a sofa's distance (ROADMAP.md, "Verso on the Apple TV"): the same type, colours
-  and cards, each shared from the iPhone's files where tvOS compiles them and drawn after them where it does not; a
-  page's title large and bold at the leading edge with its line under it, scrolling away with the page. Focus takes the
-  place of a finger as a quiet lift: the focused tile or card grows a little, with a soft shadow beneath and its corners
-  rounding, never tvOS's platter with its wide spacing; cards that lie edge to edge in a card (a month's mosaic) are
-  ringed in white instead. The Library has Years, Months and All Photos in the system's segmented control beside its title,
-  opening on All Photos: Years are a card for each year, Months each month's name over a mosaic of photos from different
-  days with the day on each, and All Photos the grid, square tiles six to a row with eight points between them, each
-  month under its name, the newest first (the iPhone's Newest at the Top, as the remote's focus starts at the top). Albums
-  are the iPhone's album cards, four to a row, in sections by year with the most recent photo first; People the rounded
-  squares with their names on them, in the server's order and without the hidden and the unnamed; Places the iPhone's country
-  cards, the most recently visited first, each opening its city cards, which open a city's photos; Memories the memory cards, three to a
-  row, playing as a story; Favorites and the Archive the grid under their names. Search is tvOS's own search screen with
-  the iPhone's start page under it: quick filters, people with their faces, places and recent searches as glass chips
-  and rows, what matches while typing, and the results as the grid. The viewer fills the screen, opening out of its tile and
-  closing into the tile of the photo shown last, as the iPhone's; a click shows or hides the iPhone's title capsule, the
-  place over the day and time; left and right slide to the photo beside it, as the iPhone's pages slide; a Live Photo
-  has the Live Photo sign small in the top corner, out of the photo's way, and play/pause plays its movie; a video plays
-  in tvOS's own player, which has the remote while it plays: its transport bar, scrubbing with a swipe, its info panel
-  with the place and the day, and a click on the remote's edge stepping to the photo beside it. Once a video in HDR has put the TV in HDR, the TV stays there until the viewer closes, where Match
-  Dynamic Range is on: going back to SDR for each photo, and to HDR for the next video, blacks the screen out each time. The accent is the system
-  blue, as the iPhone's, set in the TV's asset catalog because tvOS's own is white. Settings, at the sidebar's foot
-  in a section of its own, has App Icon where the app carries its Night icon (the Day and Night icons as cards, each
-  with its name and a tick under the one on the Home Screen), Top Shelf (a switch for each of its rows), Locked Folder (a
-  switch that shows it in Collections, off until turned on), Account (the server's name and Sign Out in red) and About. The Locked Folder, until the iPhone opens
-  it, is a lock over its name, a line on how it opens and Unlock with iPhone, the system's picker, as Set Up with iPhone
-  is; open, it is the grid under its name, as Favorites. The Top Shelf shows the rows Settings
-  chooses, Memories, Recent, Albums, Favorites and People in that order, as rows of wide pictures (People's square), each
-  with its title (the memory's, the album's, the person's name, or the day the photo was taken).
+- **On the Apple TV,** the iPhone's pages at a sofa's distance (ROADMAP.md, "Verso on the Apple TV"): the same type,
+  colours and cards, each shared from the iPhone's files where tvOS compiles them and drawn after them where it does
+  not; a page's title large and bold at the leading edge with its line under it, scrolling away with the page. Focus
+  takes the place of a finger as a quiet lift: the focused tile or card grows a little, with a soft shadow beneath and
+  its corners rounding, never tvOS's platter with its wide spacing; cards that lie edge to edge in a card (a month's
+  mosaic) are ringed in white instead. The Library has Years, Months and All Photos in the system's segmented control
+  beside its title, opening on All Photos: Years are a card for each year, Months each month's name over a mosaic of
+  photos from different days with the day on each, and All Photos the grid, square tiles six to a row with eight points
+  between them, each month under its name, the newest first (the iPhone's Newest at the Top, as the remote's focus
+  starts at the top). Albums are the iPhone's album cards, four to a row, in sections by year with the most recent photo
+  first; People the rounded squares with their names on them, in the server's order and without the hidden and the
+  unnamed; Places the iPhone's country cards, the most recently visited first, each opening its city cards, which open a
+  city's photos; Memories the memory cards, three to a row, playing as a story; Favorites and the Archive the grid under
+  their names. Search is tvOS's own search screen with the iPhone's start page under it: quick filters, people with
+  their faces, places and recent searches as glass chips and rows, what matches while typing, and the results as the
+  grid. The viewer fills the screen, opening out of its tile and closing into the tile of the photo shown last, as the
+  iPhone's; a click shows or hides the iPhone's title capsule, the place over the day and time; left and right slide to
+  the photo beside it, as the iPhone's pages slide; a Live Photo has the Live Photo sign small in the top corner, out of
+  the photo's way, and play/pause plays its movie; a video plays in tvOS's own player, which has the remote while it
+  plays: its transport bar, scrubbing with a swipe, its info panel with the place and the day, and a click on the
+  remote's edge stepping to the photo beside it. Once a video in HDR has put the TV in HDR, the TV stays there until the
+  viewer closes, where Match Dynamic Range is on: going back to SDR for each photo, and to HDR for the next video,
+  blacks the screen out each time. The accent is the system blue, as the iPhone's, set in the TV's asset catalog because
+  tvOS's own is white. Settings, at the sidebar's foot in a section of its own, is laid out as tvOS's own Settings: the
+  app's icon large on the left with its name and version, and on the right a list a row at a time, each with its value,
+  opening a page where it holds more than a switch. Library: Top Shelf ("Memories, Recent", a switch for each row on its
+  page), Show Locked Folder in Collections, Manage Photos (On or Off, its page with Turn On with iPhone, or Turn Off).
+  Appearance: App Icon, where the app carries its Night icon (the Day and Night icons as cards, each with its name and a
+  tick under the one on the Home Screen). Account: the name, email and server, what this Apple TV may do ("Can view",
+  "Can view and change") and Sign Out in red. About Verso, on its page. With Manage Photos on, a press and hold on a
+  photo, in a grid or full screen, opens its menu in the iPhone's order: Favorite, Archive (Move to Library in the
+  Archive), Move to Locked Folder and Delete in red, the last two asking first; in the Locked Folder, Move Out of the
+  Locked Folder and Delete. The Locked Folder, until the iPhone opens it, is a lock over its name, a line on how it
+  opens and Unlock with iPhone, the system's picker, as Set Up with iPhone is; open, it is the grid under its name, as
+  Favorites. The Top Shelf shows the rows Settings chooses, Memories, Recent, Albums, Favorites and People in that
+  order, as rows of wide pictures (People's square), each with its title (the memory's, the album's, the person's name,
+  or the day the photo was taken).
 - **The Backup page** is backing up's one page on the iPhone and the iPad: a list of iOS's own whose top is the page's
   status, centred, as Settings' feature pages have theirs: a cloud symbol (the accent while it works, and only then
   pulsing with the system's variable colour; green with a tick when backed up; grey while it waits; orange when the

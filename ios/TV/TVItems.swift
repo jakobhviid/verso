@@ -63,10 +63,10 @@ struct TVViewing: Identifiable {
 
 /// A timeline: its months, newest first as the server sends them, each read as it comes into view.
 @MainActor @Observable
-final class TVTimelineModel {
+final class TVTimelineModel: TVPhotoPage {
     struct Month: Identifiable {
         let id: String
-        let count: Int
+        var count: Int
         var items: [TVItem]?
     }
 
@@ -113,6 +113,23 @@ final class TVTimelineModel {
         guard let assets = try? await client.timeBucket(id, query),
               let current = months.firstIndex(where: { $0.id == id }) else { return }
         months[current].items = TVItem.items(assets, keepsLocked: query.visibility == "locked")
+    }
+
+    /// A photo a menu changed (TVPhotoMenu): a favorite's heart, or gone from the timeline, as from Favorites once it is
+    /// no longer one.
+    func apply(_ change: TVPhotoChange) {
+        for index in months.indices {
+            guard var items = months[index].items, let at = items.firstIndex(where: { $0.id == change.id }) else { continue }
+            switch change {
+            case .favorite(_, let on) where !(query.isFavorite == true && !on):
+                items[at].isFavorite = on
+            default:
+                items.remove(at: at)
+                months[index].count -= 1
+            }
+            months[index].items = items
+        }
+        months.removeAll { $0.count <= 0 }
     }
 
     /// Reads the first month not read yet, for the viewer stepping past the last photo it has, and answers every photo.

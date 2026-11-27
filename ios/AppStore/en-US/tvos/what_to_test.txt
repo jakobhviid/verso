@@ -1,2 +1,5 @@
-- The Locked Folder: in Settings, turn on Show Locked Folder in Collections, open it and choose Unlock with iPhone, then your iPhone. On the iPhone, allow it with Face ID or your PIN. Leaving the Locked Folder, or going to the Home Screen, locks it; the next visit asks the iPhone again. Lock on the iPhone (Account, Apple TV) locks it on the TV within a minute.
-- The Top Shelf: in Settings, Top Shelf, choose its rows: Memories, Recent, Albums, Favorites and People. Albums come with the newest photos first, as Albums shows them. With Verso in the Home Screen's top row, a click on an item opens that memory, photo, album or person.
+- Manage Photos: Settings, Manage Photos, Turn On with iPhone; on the iPhone, Allow and Face ID. Then press and hold a photo, in a grid or full screen: Favorite, Archive, Move to Locked Folder, Delete. Turn Off on the TV, or Read Only on the iPhone (Account, Apple TV), takes it away.
+- Settings: laid out as the Apple TV's own Settings, with the Top Shelf, the Locked Folder, Manage Photos, your account and About.
+- Videos: the remote scrubs, shows the info panel, and a click on its edge steps to the next photo.
+- The viewer: photos slide as you step, open out of their tile and close into it; a small Live Photo sign in the corner; HDR stays on once a video turned it on.
+- The Locked Folder shows its photos; Lock on the iPhone closes it on the TV within a minute, and the TV stays signed in.

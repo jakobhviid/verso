@@ -1,3 +1,4 @@
+import LocalAuthentication
 import Network
 import SwiftUI
 
@@ -14,6 +15,11 @@ import SwiftUI
 /// makes the TV a session of its own for an hour, unlocks it with the PIN, and sends the session's token alone; the TV
 /// never learns the PIN, and ends the session as it leaves the folder. The TVs with the folder open are listed, each
 /// with Lock, which ends its session.
+///
+/// A TV turning Manage Photos on asks the same way: on Allow and Face ID (or the passcode), as it gives the TV the
+/// right to change the library, the iPhone makes it a second key, allowed to change and delete photos alone, beside
+/// its read-only key. The TV is then listed with "Can change photos" and Read Only, which deletes that key; taking the
+/// right away asks nothing.
 struct AccountAppleTVPage: View {
     let services: AccountServices
     private let setup = AppleTVSetup.shared
@@ -52,11 +58,20 @@ struct AccountAppleTVPage: View {
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                             }
+                            if tv.changeKeyID != nil {
+                                Text("Can change photos")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.orange)
+                            }
                         }
                         Spacer()
                         if setup.removing.contains(tv.id) {
                             ProgressView()
                         } else {
+                            if tv.changeKeyID != nil, tv.changeKeyID != tv.id {
+                                Button("Read Only") { Task { await setup.readOnly(tv, client: services.client) } }
+                                    .buttonStyle(.borderless)
+                            }
                             Button("Forget", role: .destructive) { forgetting = tv }
                                 .buttonStyle(.borderless)
                         }
@@ -127,6 +142,14 @@ struct AccountAppleTVPage: View {
                  ? "Face ID unlocks it there for this visit. It locks as the Apple TV leaves it."
                  : "Your PIN unlocks it there for this visit, and the Apple TV never learns it. It locks as the Apple TV leaves it.")
         }
+        .alert(setup.askingChanges.map { String(localized: "Let \u{201C}\($0)\u{201D} change your photos?") } ?? "",
+               isPresented: Binding(get: { setup.askingChanges != nil },
+                                    set: { if !$0 { setup.answerChanges(false) } })) {
+            Button("Allow") { setup.answerChanges(true) }
+            Button("Don't Allow", role: .cancel) { setup.answerChanges(false) }
+        } message: {
+            Text("From a long press, it can favorite, archive and delete photos, and move them to the Locked Folder. Turn it off on the Apple TV, or choose Read Only here.")
+        }
         .alert(setup.asking.map { String(localized: "Set Up \u{201C}\($0)\u{201D}?") } ?? "", isPresented: Binding(
             get: { setup.asking != nil }, set: { if !$0 { setup.answer(false) } })) {
             Button("Allow") { setup.answer(true) }
@@ -153,6 +176,8 @@ final class AppleTVSetup {
         let id: String
         let name: String
         let since: Date?
+        /// Its second key, which may change photos, where Manage Photos is on.
+        var changeKeyID: String?
     }
 
     /// The service the TV browses for (both Info.plists' `NSApplicationServices`).
@@ -160,6 +185,10 @@ final class AppleTVSetup {
     /// The name of the TVs' keys in Immich, by which the page lists them.
     nonisolated static let keyName = "Verso on Apple TV"
     /// What a TV's key may do: view, nothing else (Immich's permissions).
+    /// The name of the TVs' second keys, which Manage Photos makes.
+    nonisolated static let changeKeyName = "Verso on Apple TV, changes"
+    /// What that key may do: change photos (favorite, archive, the Locked Folder) and delete them, nothing else.
+    nonisolated static let changePermissions = ["asset.update", "asset.delete"]
     nonisolated static let permissions = ["asset.read", "asset.view", "asset.download", "album.read", "person.read",
                                           "memory.read", "map.read", "partner.read", "tag.read", "stack.read",
                                           "user.read", "userPreference.read", "server.about"]
@@ -181,6 +210,8 @@ final class AppleTVSetup {
     private(set) var asking: String?
     /// The TV asking to show the Locked Folder, by the name it gave.
     private(set) var askingLockedFolder: String?
+    /// The TV asking to change photos (Manage Photos), by the name it gave.
+    private(set) var askingChanges: String?
     /// The PIN is kept behind Face ID for the account, so allowing the TV's Locked Folder asks for Face ID, not the PIN.
     private(set) var lockedFolderKept = false
     private var listener: NWListener?
@@ -256,6 +287,14 @@ final class AppleTVSetup {
                     return
                 }
                 self.waiting = (connection, name, client)
+                if fields["purpose"] == "changes" {
+                    if fields["server"].flatMap(URL.init(string:)).map(Self.sameServer(client.serverURL)) != true {
+                        self.refuse(String(localized: "This iPhone is signed in to another server than the Apple TV."))
+                    } else {
+                        self.askingChanges = name
+                    }
+                    return
+                }
                 guard fields["purpose"] == "lockedFolder" else {
                     self.asking = name
                     return
@@ -337,6 +376,46 @@ final class AppleTVSetup {
         }
     }
 
+    /// Manage Photos for the TV waiting: Allow, then Face ID or the passcode, as it gives the TV the right to change the
+    /// library; then the TV's second key, allowed to change and delete photos alone.
+    func answerChanges(_ allowed: Bool) {
+        guard let (connection, name, client) = waiting, askingChanges != nil else { return }
+        askingChanges = nil
+        guard allowed else { return refuse(nil) }
+        waiting = nil
+        Task {
+            let reason = String(localized: "Let \u{201C}\(name)\u{201D} change your photos")
+            guard (try? await LAContext().evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason)) == true else {
+                send(["refused": "true"], over: connection)
+                state = .failed(String(localized: "\u{201C}\(name)\u{201D} was not allowed to change photos: Face ID or the passcode is needed."))
+                return
+            }
+            do {
+                let key = try await client.createAccountKey(name: "\(Self.changeKeyName) (\(name))", permissions: Self.changePermissions)
+                send(["changeKey": key.secret], over: connection)
+                state = .waiting
+                await list(client: client)
+            } catch {
+                send(["refused": "true"], over: connection)
+                state = .failed(String(localized: "\u{201C}\(name)\u{201D} could not be allowed to change photos: \(error.localizedDescription)"))
+            }
+        }
+    }
+
+    /// Takes a TV's right to change photos away: its second key is deleted, and asks nothing.
+    func readOnly(_ tv: TV, client: ImmichClient) async {
+        guard let changeKeyID = tv.changeKeyID else { return }
+        error = nil
+        removing.insert(tv.id)
+        do {
+            try await client.deleteAccountKey(changeKeyID)
+            if let index = tvs.firstIndex(where: { $0.id == tv.id }) { tvs[index].changeKeyID = nil }
+        } catch {
+            self.error = String(localized: "\u{201C}\(tv.name)\u{201D} could not be made read-only: \(error.localizedDescription)")
+        }
+        removing.remove(tv.id)
+    }
+
     /// Turns the waiting TV down, telling it why where there is a reason, which the page says too.
     private func refuse(_ reason: String?) {
         guard let (connection, _, _) = waiting else { return }
@@ -379,22 +458,29 @@ final class AppleTVSetup {
                         completion: .contentProcessed { _ in connection.cancel() })
     }
 
-    /// The TVs' keys, by the name they were made with, the newest first.
+    /// The TV a key was made for, by the name it was made with under `prefix`; nil for another key.
+    nonisolated private static func tvName(_ keyName: String, prefix: String) -> String? {
+        if keyName == prefix { return String(localized: "Apple TV") }
+        guard keyName.hasPrefix(prefix + " ("), keyName.hasSuffix(")") else { return nil }
+        return String(keyName.dropFirst(prefix.count + 2).dropLast())
+    }
+
+    /// The TVs' keys, by the name they were made with, the newest first, each with its second key where Manage Photos
+    /// made one; a second key whose TV's own is gone is listed alone, to be forgotten.
     func list(client: ImmichClient) async {
         do {
             let keys = try await client.accountKeys()
-            tvs = keys.compactMap { key in
-                let name: String
-                if key.name == Self.keyName {
-                    name = String(localized: "Apple TV")
-                } else if key.name.hasPrefix(Self.keyName + " ("), key.name.hasSuffix(")") {
-                    name = String(key.name.dropFirst(Self.keyName.count + 2).dropLast())
-                } else {
-                    return nil
-                }
-                return TV(id: key.id, name: name, since: key.createdAt.flatMap(ImmichDate.parse))
+            var changeKeys: [String: String] = [:]
+            for key in keys { if let name = Self.tvName(key.name, prefix: Self.changeKeyName) { changeKeys[name] = key.id } }
+            var found = keys.compactMap { key -> TV? in
+                guard let name = Self.tvName(key.name, prefix: Self.keyName) else { return nil }
+                return TV(id: key.id, name: name, since: key.createdAt.flatMap(ImmichDate.parse), changeKeyID: changeKeys.removeValue(forKey: name))
             }
-            .sorted { ($0.since ?? .distantPast) > ($1.since ?? .distantPast) }
+            for key in keys where changeKeys.values.contains(key.id) {
+                found.append(TV(id: key.id, name: Self.tvName(key.name, prefix: Self.changeKeyName) ?? key.name,
+                                 since: key.createdAt.flatMap(ImmichDate.parse), changeKeyID: key.id))
+            }
+            tvs = found.sorted { ($0.since ?? .distantPast) > ($1.since ?? .distantPast) }
             error = nil
         } catch {
             self.error = String(localized: "The Apple TVs could not be read: \(error.localizedDescription)")
@@ -415,6 +501,7 @@ final class AppleTVSetup {
         removing.formUnion(chosen.map(\.id))
         for tv in chosen {
             do {
+                if let changeKeyID = tv.changeKeyID, changeKeyID != tv.id { try await client.deleteAccountKey(changeKeyID) }
                 try await client.deleteAccountKey(tv.id)
                 tvs.removeAll { $0.id == tv.id }
             } catch {

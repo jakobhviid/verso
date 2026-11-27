@@ -1,2 +1,2 @@
-- The Locked Folder opens with Face ID after every launch once you have typed the PIN: Verso keeps the PIN in the Keychain behind Face ID. Account, Unlock with Face ID turns it off and forgets the PIN. Free Up Space's hidden photos use the same Face ID.
-- The Apple TV's Locked Folder: on the TV, turn on Show Locked Folder in Collections in Settings and choose Unlock with iPhone. Verso asks Show the Locked Folder on “name”? and opens it there with Face ID or your PIN. Account, Apple TV lists the TVs with it open, each with Lock.
+- Approving the Apple TV's Locked Folder asks for Face ID once. The Locked Folder on this iPhone opens with one Face ID scan.
+- The Apple TV's Manage Photos: when the TV asks, Allow and Face ID give it a key to favorite, archive, delete and lock photos. Account, Apple TV shows "Can change photos" with Read Only, which takes it away.

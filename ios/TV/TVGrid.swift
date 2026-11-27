@@ -98,6 +98,7 @@ struct TVTileGrid: View {
             ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                 Button { open(index) } label: { TVGridTile(item: item, side: metrics.side) }
                     .buttonStyle(TVLiftStyle(scale: 1.07))
+                    .modifier(TVPhotoMenu(item: item))
                     .tvLifts()
                     .focused(focused, equals: item.id)
                     .zIndex(focused.wrappedValue == item.id ? 1 : 0)
@@ -185,6 +186,8 @@ struct TVTimeline: View {
             }
             .scrollClipDisabled()
             .modifier(TVViewerCover(viewing: $viewing, focused: $focused) { proxy.scrollTo($0, anchor: .center) })
+            .environment(\.tvPhotoPage, model)
+            .environment(\.tvPhotoPlace, query.visibility == "locked" ? .lockedFolder : query.visibility == "archive" ? .archive : .library)
         }
         .task { await model.load(tv.client) }
     }
@@ -218,7 +221,7 @@ func itemCount(_ count: Int, more: Bool = false) -> String {
 
 /// A list of photos read page by page: a search's results, a city's photos.
 @MainActor @Observable
-final class TVResultsModel {
+final class TVResultsModel: TVPhotoPage {
     enum Phase: Equatable { case loading, loaded, failed(String) }
 
     private(set) var items: [TVItem] = []
@@ -230,6 +233,12 @@ final class TVResultsModel {
 
     init(fetch: @escaping @Sendable (Int) async throws -> SearchResponse.Assets) {
         self.fetch = fetch
+    }
+
+    /// A photo a menu changed (TVPhotoMenu): a favorite's heart, or gone from the results.
+    func apply(_ change: TVPhotoChange) {
+        guard let at = items.firstIndex(where: { $0.id == change.id }) else { return }
+        if case .favorite(_, let on) = change { items[at].isFavorite = on } else { items.remove(at: at) }
     }
 
     func loadMore() async {
@@ -302,6 +311,7 @@ struct TVCityPage: View {
             }
             .scrollClipDisabled()
             .modifier(TVViewerCover(viewing: $viewing, focused: $focused) { proxy.scrollTo($0, anchor: .center) })
+            .environment(\.tvPhotoPage, model)
         }
         .task {
             guard model == nil, let client = tv.client else { return }

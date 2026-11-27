@@ -60,7 +60,8 @@ drive's layout and the arithmetic that places the grid's dates, so they behave a
 
 **On the Apple TV:** your library from the sofa, memories as stories, and on the Top Shelf the rows you choose: today's
 memories, the newest photos, albums, favorites or people. It is set up from the iPhone, with a key that may only look,
-and changes nothing; the Locked Folder opens there only from the iPhone, with Face ID or the PIN, each time.
+and changes nothing unless you turn on Manage Photos, which your iPhone allows; the Locked Folder opens there only from
+the iPhone, with Face ID or the PIN, each time.
 
 **On the Mac:** widgets with your photos, Shortcuts actions, and an icon in the menu bar.
 
