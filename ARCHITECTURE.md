@@ -1954,7 +1954,9 @@ looks as the build's libadwaita does, not as the host's, which is why it is for 
 One `verso` package per format, made by `linux/packaging/verso-packages.sh`, which `ci/release.sh build` runs beside
 the tarball, so a release carries `verso-<version>.x86_64.rpm` and `verso_<version>_amd64.deb`. Each is built in a
 fresh container of its distribution (podman, else docker), from the tag's tree, with that distribution's Rust,
-libraries and Nautilus:
+libraries and Nautilus. The container starts from a builder image of the distribution with those build packages
+installed, made once and named for the package list and the base image, so a change to either makes a new one, and
+the build itself is kept between releases (`target/release-cache`), so only Verso's own crates are compiled again:
 - **The rpm, in Fedora 44, for Fedora 43 and newer,** as the tarball is built: its programs ask for no glibc newer
   than Fedora 43's.
 - **The deb, in Ubuntu 26.04 LTS, for it, its successors and Debian 14:** one deb for both, built on the older

@@ -162,20 +162,7 @@ jobs:
             sleep 30
           done
           build=$(sed -n 's/^CURRENT_PROJECT_VERSION = //p' mac/build/Version.xcconfig)
-          ci/sign-mac-update.sh "$dmg" "$RUNNER_TEMP/keys/sparkle.pem" "$build"
-          gh release upload "$TAG" "$dmg" "$dmg.update" --clobber
-          # The macOS section covers everything since the previous Mac release, whose users skip the Linux-only ones;
-          # Sparkle's update window shows it (site/build.py).
-          previous=$(gh release list --limit 50 --json tagName,isDraft --jq '.[] | select(.isDraft | not) | .tagName' |
-            while read -r tag; do
-              if gh release view "$tag" --json assets --jq '.assets[].name' | grep -q '\.dmg$'; then echo "$tag"; break; fi
-            done)
-          notes=$(ci/release-notes.sh ${previous:+"$previous"} "$TAG")
-          body=$(gh release view "$TAG" --json body --jq .body)
-          title=$(gh release view "$TAG" --json name --jq .name | sed 's/ (Linux)$/ (Linux and macOS)/')
-          printf '## macOS\n\n`verso-%s.dmg`, for macOS 15 or later, signed and notarized; Verso offers it in Check for Updates…, or `brew upgrade --cask verso`.\n\n%s\n\n## Linux\n\n%s\n' \
-            "$version" "$notes" "$body" > "$RUNNER_TEMP/notes.md"
-          gh release edit "$TAG" --title "$title" --notes-file "$RUNNER_TEMP/notes.md"
+          VERSO_SPARKLE_KEY="$RUNNER_TEMP/keys/sparkle.pem" ci/release.sh mac "$TAG" "$dmg" "$build"
       - name: The keychain and the keys removed
         if: always() && steps.secrets.outputs.present == 'yes'
         run: |

@@ -10,6 +10,9 @@
 #                                  the rpm and the deb, the Flatpak's source and the Flatpak, with flatpak-builder or
 #                                  in a container of its own), into target/dist/TAG, and make a draft release of them
 #                                  here
+#   ci/release.sh mac TAG DMG BUILD  the Mac's disk image (mac/release.sh's, BUILD its app's build number), signed for
+#                                  Sparkle with VERSO_SPARKLE_KEY (default ~/.config/verso-release/sparkle-ed25519.pem)
+#                                  and attached to the draft, whose title and notes then name macOS
 #   ci/release.sh publish TAG      publish the draft, then bump the tap's `verso` cask (not for a pre-release)
 #
 # --dry-run, anywhere on the line, changes nothing outside this checkout: every tag, push, release and cask change is
@@ -32,7 +35,7 @@ flathub=https://dl.flathub.org/repo/flathub.flatpakrepo
 version_pattern='^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$'
 
 usage() {
-  echo "usage: ci/release.sh [tag [VERSION] | build TAG | publish TAG] [--dry-run]" >&2
+  echo "usage: ci/release.sh [tag [VERSION] | build TAG | mac TAG DMG BUILD | publish TAG] [--dry-run]" >&2
   exit 2
 }
 
@@ -151,6 +154,7 @@ in_build_environment() {
     "$@"
   else
     toolbox run --container "${VERSO_TOOLBOX:-verso}" env \
+      VERSO_TARGET_ROOT="${VERSO_TARGET_ROOT:-}" \
       CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=cc CC_x86_64_unknown_linux_gnu=cc \
       CXX_x86_64_unknown_linux_gnu=c++ AR_x86_64_unknown_linux_gnu=ar \
       bash -c 'cd "$1" && shift && exec "$@"' _ "$PWD" "$@"
@@ -252,11 +256,19 @@ build() {
     fi
   done
 
-  # A worktree of the tag of its own, so the files are built from exactly what the tag holds.
-  mkdir -p "${XDG_CACHE_HOME:-$HOME/.cache}"
-  work=$(mktemp -d "${XDG_CACHE_HOME:-$HOME/.cache}/verso-release.XXXXXX")
+  # A worktree of the tag of its own, so the files are built from exactly what the tag holds; at the same path every
+  # time, so Cargo takes Verso's own crates for the same ones from release to release.
+  work=${XDG_CACHE_HOME:-$HOME/.cache}/verso-release
+  git -C "$root" worktree remove --force "$work/verso" 2>/dev/null || true
+  rm -rf "$work"
+  git -C "$root" worktree prune
+  mkdir -p "$work"
   trap 'git -C "$root" worktree remove --force "$work/verso" 2>/dev/null || true; rm -rf "$work"' EXIT
   git worktree add --quiet --detach "$work/verso" "$commit"
+  # The builds outside the worktree, kept between releases, so Cargo builds again only what changed: each lane's in a
+  # folder of its own under target/release-cache (the release workflow gives its cache's instead).
+  export VERSO_TARGET_ROOT=${VERSO_TARGET_ROOT:-$root/target/release-cache}
+  mkdir -p "$VERSO_TARGET_ROOT"
   built=$(cd "$work/verso" && ci/version.sh)
   [ "$built" = "$version" ] || die "the tree at $tag numbers itself $built, not $version"
 
@@ -277,7 +289,9 @@ build() {
     # Its command on a line of its own, so `set -e` stops the lane at its first failure.
     (
       cd "$work/verso"
+      SECONDS=0
       "$@"
+      echo "the lane took $((SECONDS / 60))m $((SECONDS % 60))s"
     ) > "$logs/$name.log" 2>&1 &
     names+=("$name")
     pids+=($!)
@@ -288,7 +302,7 @@ build() {
   echo "Building in three lanes at once; their logs are in $logs"
   for lane in "${!pids[@]}"; do
     if wait "${pids[$lane]}"; then
-      echo "  ${names[$lane]}: built"
+      echo "  ${names[$lane]}: built, $(tail -1 "$logs/${names[$lane]}.log" | sed 's/^the lane //')"
     else
       echo "  ${names[$lane]}: failed"
       failed+=("${names[$lane]}")
@@ -424,10 +438,42 @@ publish() {
   change gh workflow run pages.yml --repo "$repository" --ref main
 }
 
+# The Mac's disk image on the tag's draft: signed for Sparkle, attached, and the draft's title and notes naming macOS,
+# with a macOS section covering everything since the previous Mac release, whose users skip the Linux-only ones;
+# Sparkle's update window shows it (site/build.py). The release workflow runs the same.
+mac_release() {
+  [ $# -eq 3 ] || usage
+  local tag=$1 dmg=$2 build=$3 version key previous notes body title
+  version=$(version_of "$tag")
+  key=${VERSO_SPARKLE_KEY:-$HOME/.config/verso-release/sparkle-ed25519.pem}
+  signed_in_to_github
+  [ -f "$dmg" ] || die "no disk image at $dmg"
+  [ "$(basename "$dmg")" = "verso-$version.dmg" ] || die "$dmg is not verso-$version.dmg"
+  gh release view "$tag" --repo "$repository" >/dev/null 2>&1 || die "no release $tag yet: ci/release.sh build $tag first"
+  ci/sign-mac-update.sh "$dmg" "$key" "$build"
+  change gh release upload "$tag" "$dmg" "$dmg.update" --repo "$repository" --clobber
+  previous=$(gh release list --repo "$repository" --limit 50 --json tagName,isDraft \
+    --jq '.[] | select(.isDraft | not) | .tagName' | while read -r earlier; do
+      if gh release view "$earlier" --repo "$repository" --json assets --jq '.assets[].name' | grep -q '\.dmg$'; then
+        echo "$earlier"
+        break
+      fi
+    done)
+  notes=$(ci/release-notes.sh ${previous:+"$previous"} "$tag")
+  body=$(gh release view "$tag" --repo "$repository" --json body --jq .body)
+  case $body in "## macOS"*) echo "The draft names macOS already."; return ;; esac
+  title=$(gh release view "$tag" --repo "$repository" --json name --jq .name | sed 's/ (Linux)$/ (Linux and macOS)/')
+  printf '## macOS\n\n`verso-%s.dmg`, for macOS 15 or later, signed and notarized; Verso offers it in Check for Updates…, or `brew upgrade --cask verso`.\n\n%s\n\n## Linux\n\n%s\n' \
+    "$version" "$notes" "$body" > "$root/target/dist/$tag.mac-notes.md"
+  change gh release edit "$tag" --repo "$repository" --title "$title" --notes-file "$root/target/dist/$tag.mac-notes.md"
+  echo "The Mac's disk image is on $tag's draft, \"$title\"."
+}
+
 case "${1:-}" in
   "") suggest ;;
   tag) shift; tag_head "$@" ;;
   build) shift; build "$@" ;;
+  mac) shift; mac_release "$@" ;;
   publish) shift; publish "$@" ;;
   *) usage ;;
 esac

@@ -110,7 +110,7 @@ on any step shows what it would do and changes nothing outside the checkout:
    in the toolbox; the rpm, the deb and the Flatpak each in a container, with podman: the packages in their
    distributions', the Flatpak in a Fedora one with `flatpak-builder`, `linux/packaging/verso-flatpak.sh`, its GNOME
    runtime kept between releases), three lanes at once (the rpm and the deb share one, for memory) with a log each in
-   `target/dist/TAG.logs`, into
+   `target/dist/TAG.logs`, their builds kept between releases in `target/release-cache`, into
    `target/dist/TAG`, and makes a draft release of them, "Verso 0.72.0 (Linux)",
    here, which Homebrew's `verso` cask and Verso's page download from. The Apple editions are built on the Mac, below.
    **Releases are built on the maintainer's machines;** the release workflow (`.github/workflows/release.yml`) is the
@@ -131,8 +131,9 @@ at once (ARCHITECTURE.md, "Verso's releases"):
 - An Apple build is made on the Mac, never on the Linux workstation, and ships only after the maintainer has
   checked it there. It goes on the GitHub release of the tag it was built from, whose title then names macOS
   beside Linux ("Verso 3.9.0 (Linux and macOS)"), with a macOS section in its notes since the previous Mac release.
-  `mac/release.sh` builds its disk image, signed with Developer ID and notarized, in a Terminal window on the Mac;
-  `ci/sign-mac-update.sh` signs it for Sparkle on the workstation, and both are attached to the tag's drafts.
+  `mac/release.sh` builds its disk image, signed with Developer ID and notarized, in a Terminal window on the Mac,
+  while the workstation builds Linux's files; `ci/release.sh mac TAG DMG BUILD` then signs it for Sparkle on the
+  workstation, attaches both to the tag's draft and names macOS in its title and notes.
 - iOS ships through TestFlight and the App Store, never on GitHub: `ios/release.sh` uploads the iPhone's and the iPad's
   build, and `--tvos` the Apple TV's, from the Mac; the release workflow's `ios` job does the same as the backup, and
   only from Xcode 27 or later. `ios/appstore.py push` fills the App Store listing and TestFlight's texts from

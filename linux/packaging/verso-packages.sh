@@ -2,7 +2,8 @@
 # Build Verso's rpm and deb packages for x86_64 into OUT_DIR (ARCHITECTURE.md, "Packaging"):
 #   verso-VERSION.x86_64.rpm   built in Fedora 44, for Fedora 43 and newer
 #   verso_VERSION_amd64.deb    built in Ubuntu 26.04 LTS, the older of the two it is for, for it and Debian 14
-# Each is built in a fresh container of its distribution (podman, else docker), from this tree, with that
+# Each is built in a fresh container of its distribution's builder image (podman, else docker; the distribution with
+# its build packages, made once, builder_image), from this tree, with that
 # distribution's Rust, libraries and Nautilus, so the Files extension in C is built against the Nautilus it loads in and
 # the dependencies are the ones its own tools find. Run from the repository's root:
 #
@@ -22,6 +23,26 @@ ubuntu_image=${VERSO_UBUNTU_IMAGE:-docker.io/library/ubuntu:26.04}
 die() {
     echo "verso-packages.sh: $*" >&2
     exit 1
+}
+
+# The builder's image for a package: its distribution's image with what the package is built with, made once and named
+# for the list (this script's build_packages) and the base, so a change to either makes a new one, and a later build
+# starts at once rather than installing some 500 packages. VERSO_REFRESH_BUILDERS=1 makes it again, for the
+# distribution's updates.
+builder_image() {
+    local engine=$1 format=$2 base=$3 tag context
+    tag=$( (printf '%s\n' "$base"; declare -f build_packages) | sha256sum | cut -c1-12)
+    if [ "${VERSO_REFRESH_BUILDERS:-}" != 1 ] && "$engine" image inspect "localhost/verso-$format-builder:$tag" >/dev/null 2>&1; then
+        echo "localhost/verso-$format-builder:$tag"
+        return
+    fi
+    context=$(mktemp -d)
+    cp "$0" "$context/verso-packages.sh"
+    printf 'FROM %s\nCOPY verso-packages.sh /verso-packages.sh\nRUN bash /verso-packages.sh --builder %s\n' "$base" "$format" \
+        > "$context/Containerfile"
+    "$engine" build -q --pull=newer -t "localhost/verso-$format-builder:$tag" "$context" >&2
+    rm -rf "$context"
+    echo "localhost/verso-$format-builder:$tag"
 }
 
 # On the build machine: one container for each package.
@@ -44,9 +65,10 @@ outside() {
     for format in "${formats[@]}"; do
         image=$fedora_image
         [ "$format" = deb ] && image=$ubuntu_image
+        image=$(builder_image "$engine" "$format" "$image")
         echo "Verso $version: the $format, in $image"
         # The tree at a fixed path, so the build is the same wherever the checkout is; not relabelled for SELinux.
-        "$engine" run --rm --pull=newer --security-opt label=disable \
+        "$engine" run --rm --security-opt label=disable \
             -v "$PWD:/src" -v "$out:/out" -v "$cargo_home/registry:/cargo/registry" -v "$cargo_home/git:/cargo/git" \
             -v "$target_root:/target" \
             -w /src \
@@ -56,12 +78,14 @@ outside() {
 }
 
 # In the distribution's container, as root, from the tree's root.
-inside() {
-    local format=$1 out=$2 version=${VERSO_VERSION:?} work target root extensions licenses
-    case $format in
+# What a package is built with, in its distribution: installed into the builder's image once (builder_image), or into
+# the container where it has none.
+build_packages() {
+    case $1 in
         rpm)
             dnf install -y -q --setopt=install_weak_deps=False gcc cargo rust pkgconf-pkg-config gtk4-devel \
                 libadwaita-devel libshumate-devel nautilus-devel blueprint-compiler python3 rpm-build binutils findutils
+            dnf clean all
             ;;
         deb)
             export DEBIAN_FRONTEND=noninteractive
@@ -69,9 +93,16 @@ inside() {
             apt-get install -y -qq --no-install-recommends gcc libc6-dev pkg-config cargo rustc libgtk-4-dev \
                 libadwaita-1-dev libshumate-dev libnautilus-extension-dev blueprint-compiler python3 dpkg-dev binutils \
                 ca-certificates >/dev/null
+            rm -rf /var/lib/apt/lists/*
             ;;
-        *) die "no package format $format" ;;
+        *) die "no package format $1" ;;
     esac
+    touch /etc/verso-builder
+}
+
+inside() {
+    local format=$1 out=$2 version=${VERSO_VERSION:?} work target root extensions licenses
+    [ -e /etc/verso-builder ] || build_packages "$format"
     export VERSO_VERSION
     target=/target/package-$format
     # Built as the packages' Verso, which tells of a newer release (ARCHITECTURE.md, "Updates on Linux").
@@ -172,6 +203,8 @@ inside() {
 if [ "${1:-}" = --inside ]; then
     shift
     inside "$@"
+elif [ "${1:-}" = --builder ]; then
+    build_packages "${2:?}"
 else
     outside "$@"
 fi
