@@ -1,11 +1,13 @@
 name: ci
 
-# develop, where work goes, main, which a release moves forward to it, and pull requests (AGENTS.md, "Branches");
-# releases are cut by a tag (release.yml, AGENTS.md, "Versioning").
+# What runs without the maintainer's machines (AGENTS.md, "The green gate"): a pull request, which comes from someone
+# else's code; a weekly run, which meets Immich's newest release as it comes out; and a run by hand. A push runs
+# nothing: the local gate comes before every push, and ci/release.sh check, on the workstation and Erebus, checks what
+# a release is tagged from, with the Mac's side checked on the Mac as it is built.
 on:
-  push:
-    branches: [main, develop]
   pull_request:
+  schedule:
+    - cron: "17 5 * * 1"
   workflow_dispatch:
 
 # A newer push to the same branch makes an older run's result moot.
@@ -35,12 +37,13 @@ jobs:
 
   contract:
     # immich-api against a real Immich server: the lab's seed in the runner's Docker (lab/immich-server/ci.sh), then
-    # every contract test, the spec check included, on the oldest supported version and the current one.
+    # every contract test, the spec check included, on the oldest supported version, the current one (as
+    # ci/release.sh check has them), and Immich's newest release, so a change upstream shows within the week.
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        immich: [v3.2.0, v3.3.6]
+        immich: [v3.2.0, v3.3.6, newest]
     steps:
       - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
@@ -60,7 +63,12 @@ jobs:
           path: lab/immich-server/fixtures/cache
           key: fixtures-${{ hashFiles('lab/immich-server/fixtures/manifest.json') }}
       - name: Immich ${{ matrix.immich }}, seeded
-        run: lab/immich-server/ci.sh ${{ matrix.immich }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=${{ matrix.immich }}
+          [ "$version" != newest ] || version=$(gh api repos/immich-app/immich/releases/latest --jq .tag_name)
+          lab/immich-server/ci.sh "$version"
       - name: Contract tests
         run: |
           set -a; . lab/immich-server/.env.local; set +a

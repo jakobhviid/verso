@@ -122,10 +122,11 @@ The maintainer's three requests, and what each runs:
   testers. Then ask the maintainer whether it goes to the external testers too; only on their yes, `ios/appstore.py beta
   --external` puts it in the external groups and sends it to beta review. That is the maintainer's call, usually at the
   end of a day's work: a build in beta review holds the next of its version back until Apple is done with it.
-- **"Make a beta"** (from `develop`): `ci/release.sh tag VERSION-beta.N`, then `build`, the Mac's disk image and
+- **"Make a beta"** (from `develop`): `ci/release.sh check`, `ci/release.sh tag VERSION-beta.N`, then `build`, the Mac's disk image and
   `ci/release.sh mac`, and `publish`, which bumps `verso@beta` and rebuilds the page's feed; with the TestFlight
   release above.
-- **"Make a stable release"**: `main` moves forward to the tested commit (Branches, above), then `ci/release.sh tag`,
+- **"Make a stable release"**: `main` moves forward to the tested commit (Branches, above), then `ci/release.sh check`,
+  `ci/release.sh tag`,
   `build`, the Mac's disk image and `mac`, and `publish`, which bumps both casks and rebuilds the page; then
   `ios/appstore.py push --version VERSION` and `ios/appstore.py submit`, which sends the tested TestFlight builds to App
   Review. Releasing an approved version stays the maintainer's, in App Store Connect.
@@ -133,8 +134,13 @@ The maintainer's three requests, and what each runs:
 **A push releases nothing.** The maintainer cuts a release with `ci/release.sh`, on the Linux workstation; `--dry-run`
 on any step shows what it would do and changes nothing outside the checkout:
 1. `ci/release.sh` suggests the next version and prints its notes.
-2. `ci/release.sh tag [VERSION]` tags a clean HEAD that is on `origin/main`, signed, and pushes the tag.
-3. `ci/release.sh build TAG` builds Linux's files from the tag in a worktree of its own (the tarball and the AppImage
+2. `ci/release.sh check` checks HEAD from a clean worktree of it: the gate in the toolbox (clippy, the
+   tests, the translations), the portable crates built for macOS in a container with rustup, and `immich-api`'s
+   contract tests against a lab server of each supported Immich version on Erebus (`ind-immich-contract-*`, kept warm
+   between releases). The Mac's side is checked as the Mac builds it: `mac/release.sh` runs `check.py` first.
+3. `ci/release.sh tag [VERSION]` tags a clean, checked HEAD that is on `origin/main` (a beta's on `origin/develop`),
+   signed, and pushes the tag.
+4. `ci/release.sh build TAG` builds Linux's files from the tag in a worktree of its own (the tarball and the AppImage
    in the toolbox; the rpm, the deb and the Flatpak each in a container, with podman: the packages in their
    distributions', the Flatpak in a Fedora one with `flatpak-builder`, `linux/packaging/verso-flatpak.sh`, its GNOME
    runtime kept between releases), in three lanes at once with a log each in `target/dist/TAG.logs` (Fedora's, which
@@ -180,17 +186,17 @@ cargo test --workspace
 cargo check -p immich-api -p verso-core --no-default-features --target aarch64-apple-darwin   # the core stays portable
 ```
 
-CI (`.github/workflows/ci.yml`) runs the first two lines with `--exclude verso` on Ubuntu, and checks Verso's window
-separately in a `fedora:44` container, because it needs GTK 4.18, libadwaita 1.8 and `blueprint-compiler`, and builds
-the Files extension there. It also checks the translations against the sources (`python3 po/i18n.py check`) and runs
-`immich-api`'s contract tests against Immich in Docker. CI runs on every push to `main` and on pull requests, a newer
-push cancelling an older run; the local gate still comes first, before every push. The toolbox has every library,
-so the local gate covers the whole workspace.
+The toolbox has every library, so the local gate covers the whole workspace. The third line needs `rustup`, which
+Fedora's Rust lacks: `ci/release.sh check` runs it in a container that has it, before every release.
 
-The macOS side (`mac/`, and the bridge built for macOS) has no gate on Linux. CI's `macos` job builds the app and its
-extensions unsigned and runs `mac/Verso/check.py` on a Mac runner, with the newest Xcode GitHub has (older than the
-Mac's: what both compile is what CI checks); a change to it is still built and checked on the Mac (the `mac-dev`
-skill).
+**Checks are local, as the builds are.** What a release is tagged from passes `ci/release.sh check` on the workstation
+and Erebus (Versioning, above), and the Mac's side is checked as the Mac builds it (`mac/release.sh` runs
+`mac/Verso/check.py`; the `mac-dev` skill). A push runs nothing on GitHub. CI (`.github/workflows/ci.yml`) is for what
+needs no machine of the maintainer's: a pull request, which is someone else's code; a weekly run, whose contract tests
+also meet Immich's newest release as it comes out; and a run by hand (`gh workflow run ci.yml`). It runs the gate on
+Ubuntu with `--exclude verso`, Verso's window and the Files extension in a `fedora:44` container (GTK 4.18, libadwaita
+1.8 and `blueprint-compiler`), the contract tests against Immich in Docker, and the Mac's side on a macOS runner with
+the newest Xcode GitHub has. A red run is looked at the day it comes, and fixed or reported.
 
 There is deliberately no `cargo fmt` gate. Readability is a review concern; readable names are required (no
 single-letter bindings), per the house style.

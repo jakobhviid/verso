@@ -81,6 +81,9 @@ notarize() {
 
 ./build-rust.sh release
 (cd Verso && xcodegen --quiet)
+# The app's offline checks first, as a release is checked on the machines it is built on (ci/release.sh check has
+# Linux's side): about a minute.
+(cd Verso && python3 check.py)
 
 # The archive is universal: the Release configuration builds both architectures, and the bridge has both.
 settings=()

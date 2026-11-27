@@ -4,8 +4,13 @@
 # way on GitHub.
 #
 #   ci/release.sh                  the version the next release would take (ci/version.sh) and its notes
-#   ci/release.sh tag [VERSION]    tag HEAD, clean and on origin/main, as vVERSION (the suggested one when not given),
-#                                  signed, and push the tag
+#   ci/release.sh check [REF]      check REF (HEAD when not given) from a clean worktree of it, as a release needs:
+#                                  clippy, the tests and the translations in the toolbox; the portable crates for
+#                                  macOS in a container with rustup; Immich's contract tests against a lab server of
+#                                  each supported version on Erebus (the lab-immich-server skill). A commit that
+#                                  passes is noted in target/release-checks, which `tag` asks for
+#   ci/release.sh tag [VERSION]    tag HEAD, clean, checked and on origin/main (a beta's on origin/develop), as vVERSION
+#                                  (the suggested one when not given), signed, and push the tag
 #   ci/release.sh build TAG        build Linux's files from the tag, in a worktree of its own (the tarball, the AppImage,
 #                                  the rpm and the deb, the Flatpak's source and the Flatpak, with flatpak-builder or
 #                                  in a container of its own), into target/dist/TAG, and make a draft release of them
@@ -35,9 +40,14 @@ rpm_of() { echo "verso-$1.x86_64.rpm"; }
 deb_of() { echo "verso_$1_amd64.deb"; }
 flathub=https://dl.flathub.org/repo/flathub.flatpakrepo
 version_pattern='^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$'
+# The Immich versions a release's contract tests run against: the oldest Verso supports (SPEC.md, "Supported
+# versions") and the newest the lab is made for. CI's weekly run adds Immich's newest release.
+contract_versions=(v3.2.0 v3.3.6)
+# Commits that passed `check`, one file each, named by the commit.
+checked_dir=$root/target/release-checks
 
 usage() {
-  echo "usage: ci/release.sh [tag [VERSION] | build TAG | mac TAG DMG BUILD | publish TAG] [--dry-run]" >&2
+  echo "usage: ci/release.sh [check [REF] | tag [VERSION] | build TAG | mac TAG DMG BUILD | publish TAG] [--dry-run]" >&2
   exit 2
 }
 
@@ -240,17 +250,82 @@ suggest() {
   printf '%s\n' "${notes:-(nothing users see changed)}"
 }
 
+# One of check's steps, timed.
+check_step() { printf '%6ss  %s\n' "$SECONDS" "$*"; }
+
+# The contract tests against a lab server of one Immich version on Erebus, warm from its snapshot where it is there,
+# reached through a tunnel to this host; the server stays up, warm, for the next release (AGENTS.md, "Testing on
+# Erebus"). The lab's scripts run from this checkout, which has Erebus beside it; the tests from the worktree.
+check_contract() {
+  local version=$1 worktree=$2 name env port=2295
+  name=ind-immich-contract-${version//./-}
+  env=$root/lab/immich-server/.env.$name.local
+  check_step "Immich $version: the contract tests, against $name on Erebus"
+  IMMICH_VERSION=$version IMMICH_INSTANCE=$name lab/immich-server/up.sh
+  [ -f "$env" ] || IMMICH_INSTANCE=$name lab/immich-server/seed.sh
+  IMMICH_INSTANCE=$name SHOWCASE_PORT=$port lab/immich-server/tunnel.sh open
+  local status=0
+  (cd "$worktree" && in_build_environment env CARGO_TARGET_DIR="$root/target/release-cache/check" bash -c \
+    'set -a; . "$1"; set +a; IMMICH_URL=http://127.0.0.1:$2 cargo test -q -p immich-api --tests -- --ignored --test-threads=1' \
+    _ "$env" "$port") || status=$?
+  IMMICH_INSTANCE=$name SHOWCASE_PORT=$port lab/immich-server/tunnel.sh close
+  [ "$status" -eq 0 ] || die "the contract tests failed against Immich $version"
+}
+
+# What a release is checked by, on this machine, from a clean worktree of the commit: CI's checks, made the release's
+# (ARCHITECTURE.md, "Verso's releases"). The Apple side is checked on the Mac as it is built (mac/release.sh).
+check() {
+  [ $# -le 1 ] || usage
+  local commit worktree=${XDG_CACHE_HOME:-$HOME/.cache}/verso-check/verso
+  commit=$(git rev-parse --verify --quiet "${1:-HEAD}^{commit}") || die "no commit ${1:-HEAD} here"
+  echo "Checking $(git log -1 --format='%h %s' "$commit")"
+  git -C "$root" worktree remove --force "$worktree" 2>/dev/null || true
+  git -C "$root" worktree prune
+  mkdir -p "$(dirname "$worktree")" "$root/target/release-cache/check-darwin" "$root/target/release-cache/check-registry"
+  trap 'git -C "$root" worktree remove --force "$worktree" 2>/dev/null || true' EXIT
+  git worktree add --quiet --detach "$worktree" "$commit"
+  SECONDS=0
+
+  check_step "the gate: clippy (warnings are errors), the tests and the translations, in the toolbox"
+  (cd "$worktree" && in_build_environment env CARGO_TARGET_DIR="$root/target/release-cache/check" bash -c \
+    'cargo clippy -q --workspace --all-targets -- -D warnings && cargo test -q --workspace && python3 po/i18n.py check') ||
+    die "the gate failed"
+
+  # Fedora's Rust has no rustup to add the target, so a container with rustup checks it.
+  check_step "the portable crates build for macOS (aarch64-apple-darwin), without TLS, in a container with rustup"
+  local engine
+  engine=$(command -v podman || command -v docker) || die "podman or docker checks the portable crates for macOS"
+  "$engine" run --rm --security-opt label=disable -v "$worktree:/src:ro" -v "$root/target/release-cache/check-darwin:/target" \
+    -v "$root/target/release-cache/check-registry:/usr/local/cargo/registry" -w /src docker.io/library/rust:1 bash -c \
+    'rustup target add aarch64-apple-darwin >/dev/null 2>&1 && CARGO_TARGET_DIR=/target cargo check -q --locked \
+       -p immich-api -p verso-core --no-default-features --target aarch64-apple-darwin' ||
+    die "the portable crates do not build for macOS"
+
+  local version
+  for version in "${contract_versions[@]}"; do check_contract "$version" "$worktree"; done
+
+  mkdir -p "$checked_dir"
+  date -u +%Y-%m-%dT%H:%M:%SZ > "$checked_dir/$commit"
+  check_step "$(git log -1 --format=%h "$commit") passed: ci/release.sh tag takes it"
+}
+
 tag_head() {
   [ $# -le 1 ] || usage
-  local suggested version tag last released
+  local suggested version tag last released branch head
   [ -z "$(git status --porcelain)" ] || refuse "the checkout has changes; a release is tagged on a clean HEAD"
-  git fetch --quiet origin main
-  git merge-base --is-ancestor HEAD origin/main ||
-    refuse "HEAD ($(git rev-parse --short HEAD)) is not on origin/main; a release is tagged on what main holds"
   suggested=$(ci/version.sh)
   version=${1:-$suggested}
   tag=v${version#v}
   version=$(version_of "$tag")
+  # A release is tagged on what main holds, a beta on what develop holds (AGENTS.md, "Branches").
+  branch=main
+  is_prerelease "$version" && branch=develop
+  git fetch --quiet origin "$branch"
+  git merge-base --is-ancestor HEAD "origin/$branch" ||
+    refuse "HEAD ($(git rev-parse --short HEAD)) is not on origin/$branch; $tag is tagged on what $branch holds"
+  head=$(git rev-parse HEAD)
+  [ -f "$checked_dir/$head" ] ||
+    refuse "HEAD ($(git rev-parse --short HEAD)) has not passed the release's checks: ci/release.sh check
   ! git rev-parse --quiet --verify "refs/tags/$tag" >/dev/null || refuse "$tag is there already"
   ! git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null || refuse "$tag is on origin already"
   released=$(git tag --points-at HEAD --list 'v[0-9]*' | grep -v -- - || true)
@@ -541,6 +616,7 @@ mac_release() {
 
 case "${1:-}" in
   "") suggest ;;
+  check) shift; check "$@" ;;
   tag) shift; tag_head "$@" ;;
   build) shift; build "$@" ;;
   mac) shift; mac_release "$@" ;;

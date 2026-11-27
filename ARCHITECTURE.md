@@ -2712,8 +2712,8 @@ architectures, joins them with `lipo`, generates the Swift bindings with uniffi 
 `VersoBridge.xcframework`; it also writes the translations for Finder's action names and the version for Xcode.
 XcodeGen writes the Xcode project from `mac/Verso/project.yml`, so the project is a text file that reviews well. The
 team ID stays out of the repository, in the git-ignored `mac/Config/Local.xcconfig`. **CI's `macos` job builds all of
-it on GitHub's macOS runner,** unsigned, and runs the core's and the bridge's tests and the app's offline checks, so a
-Rust change is checked against the Swift side without a Mac at hand; the Mac runs the same steps too (the mac-dev
+it on GitHub's macOS runner,** unsigned, and runs the core's and the bridge's tests and the app's offline checks, for a
+pull request, weekly and by hand; the Mac runs the same steps too (the mac-dev
 skill).
 
 **The development build** is Verso Dev (`mac/Verso/dev-app.sh`; AGENTS.md, "Development environment"), with an
@@ -3543,8 +3543,13 @@ the disk image.
   where GitHub's newest was 26.6, whose iOS 26 SDK the App Store refuses from April 2027 and whose builds run on iOS 27
   in its compatibility mode), and is where the maintainer checks them before they ship. The release workflow does
   the same with the same scripts, started by hand when the machines are away; its TestFlight uploads wait for Xcode 27
-  on the runner. CI still checks every push on GitHub, where nobody needs to be there, and its older Xcode catches
-  code only the newest compiles.
+  on the runner.
+- **Checked where they are built:** `ci/release.sh check` runs the gate, the portable crates for macOS and the
+  contract tests against each supported Immich version (on lab servers on Erebus) from a clean worktree of the
+  commit, and `tag` takes only a commit that passed; the Mac checks its side as it builds it. CI runs on pull requests,
+  weekly (with Immich's newest release) and by hand, for what needs none of the maintainer's machines: on every push
+  it would repeat the local gate and the Mac's builds, ten minutes a push, for a result nobody waits on. Not chosen:
+  CI as the release gate, which would make a release wait on GitHub's runners, the thing local builds avoid.
 - **Two channels, stable and beta** (AGENTS.md, "Versioning"; PRINCIPLES.md, 15): betas from `develop`, tagged as
   pre-releases, go to TestFlight, the `verso@beta` cask and Sparkle's beta channel; stable releases from `main` to the
   App Store, the `verso` cask, Sparkle's default channel, GitHub's Latest and Verso's page. A stable release promotes
