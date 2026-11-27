@@ -2398,8 +2398,11 @@ to come.
     `LockedFolderFaceID` on the iPhone and the iPad), as Immich opens the folder only to a session unlocked with the
     PIN, so a face or a finger can stand in for it only where the device keeps the PIN. On the iPhone and the iPad the
     Keychain item carries an access control of `biometryCurrentSet` (`WhenPasscodeSetThisDeviceOnly`): iOS reads the
-    face before it gives the PIN back, never for the passcode, and the enrolment it was kept with, kept beside it,
-    tells Verso to forget it once another face or finger is enrolled. On the Mac the app's own Touch ID check guards
+    face before it gives the PIN back, never for the passcode. Face ID guards the PIN, so it is asked for once, as the
+    PIN gives access (the folder opening here, or on an Apple TV), and never for taking access away. iOS asks for a
+    face to read anything of an item behind it, its attributes too, so a second item beside it, without Face ID and
+    holding nothing secret, notes that a PIN is kept and the faces enrolled then: asking whether Face ID can open the
+    folder reads the note alone, and another face or finger enrolled has Verso forget the PIN. On the Mac the app's own Touch ID check guards
     the item, with the enrolment kept the same way. Kept per server and user; forgotten on signing out, on a PIN the
     server turns down (400; a 401 is the sign-in) and when the setting is turned off or on. Not chosen: the PIN in
     memory for one run of Verso, which asks for it again after every launch.

@@ -305,7 +305,11 @@ final class AppleTVSetup {
         let key = lockedFolderKey, epoch = LockedFolderFaceID.epoch
         Task {
             var code = typed.flatMap { $0.isEmpty ? nil : $0 }
-            if code == nil, let key, case .pin(let kept) = await LockedFolderFaceID.pin(for: key) { code = kept }
+            // The one face this asks for: the PIN gives the TV access. Taking it away again asks for none.
+            if code == nil, let key,
+               case .pin(let kept) = await LockedFolderFaceID.pin(for: key, reason: String(localized: "Show the Locked Folder on \u{201C}\(name)\u{201D}")) {
+                code = kept
+            }
             guard let code else {
                 send(["refused": "true"], over: connection)
                 state = .failed(String(localized: "The Locked Folder was not opened on \u{201C}\(name)\u{201D}: Face ID or the PIN is needed each time."))

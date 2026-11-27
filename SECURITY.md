@@ -34,7 +34,8 @@ Problems in the Immich server itself belong to the Immich project:
   is kept in the login keychain, on that Mac only, and given back only after the app's own Touch ID check, with the
   fingerprints enrolled when it was kept. On the iPhone and the iPad it is kept in the Keychain, on that device only,
   behind Face ID (or Touch ID) itself: the Keychain asks for one of the faces or fingers enrolled when it was kept
-  before it gives the PIN back, and the device's passcode never does. Enrolling another face or finger, a PIN the
+  before it gives the PIN back, and the device's passcode never does. Beside it, without Face ID, a note says that a PIN
+  is kept and which faces were enrolled then, and nothing more. Enrolling another face or finger, a PIN the
   server turns down, signing out and turning the setting off forget it (Unlock with Touch ID in the Mac's Settings,
   Security; Unlock with Face ID in the account's sheet on the iPhone and the iPad). On Linux it is typed each time and
   kept nowhere.

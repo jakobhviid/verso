@@ -4,6 +4,12 @@
 // it gives the PIN back, and the device's passcode never does. The Mac keeps its PIN behind the app's own Touch ID
 // check (LockedFolderTouchID); here the Keychain is the guard. Enrolling another face or finger, a PIN the server
 // turns down, signing out and turning Unlock with Face ID off forget it; until it is kept, the PIN is typed.
+//
+// Face ID guards the PIN, so it is asked for once, at the moment the PIN gives access: the Locked Folder opening here,
+// or on an Apple TV. Anything read from the item behind it asks for a face, its attributes too, so the note that a PIN
+// is kept, with the faces enrolled then, is a second item beside it without Face ID, holding nothing secret; asking
+// whether Face ID can open the folder reads the note alone. Taking access away (locking, a TV's session ended) asks
+// nothing.
 
 import LocalAuthentication
 import Security
@@ -14,6 +20,8 @@ enum LockedFolderFaceID {
     /// Account ▸ Locked Folder ▸ Unlock with Face ID; on unless turned off.
     static let enabledKey = "lockedFolder.faceID"
     nonisolated private static let service = (Bundle.main.bundleIdentifier ?? "Verso") + ".locked-folder"
+    /// The note beside each kept PIN: that it is kept, and the faces enrolled then.
+    nonisolated private static let noteService = service + ".note"
 
     /// Bumped whenever kept PINs are forgotten, so an unlock that started before cannot keep its PIN afterwards.
     private(set) static var epoch = 0
@@ -51,21 +59,21 @@ enum LockedFolderFaceID {
         key(server: services.client.serverURL, userID: services.cacheUserID)
     }
 
-    nonisolated private static func query(_ key: String?) -> [String: Any] {
+    nonisolated private static func query(_ key: String?, service: String = service) -> [String: Any] {
         var query: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service]
         if let key { query[kSecAttrAccount as String] = key }
         return query
     }
 
-    /// The enrollment the kept PIN was kept with, read without asking for a face; nil when no PIN is kept.
+    /// The enrollment the kept PIN was kept with, from the note beside it, which asks for no face; nil when no PIN is
+    /// kept.
     private static func keptEnrollment(_ key: String) -> Data? {
-        var query = query(key)
-        query[kSecReturnAttributes as String] = true
+        var query = query(key, service: noteService)
+        query[kSecReturnData as String] = true
         query[kSecMatchLimit as String] = kSecMatchLimitOne
         var result: CFTypeRef?
-        guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess,
-              let attributes = result as? [String: Any] else { return nil }
-        return attributes[kSecAttrGeneric as String] as? Data ?? Data()
+        guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess else { return nil }
+        return result as? Data
     }
 
     /// A PIN is kept for the key, with the faces enrolled now, and Face ID is on: the Locked Folder may offer it.
@@ -84,25 +92,40 @@ enum LockedFolderFaceID {
             throw error!.takeRetainedValue() as any Error
         }
         // An item behind Face ID is replaced by deleting it, which asks for no face, and adding the new one.
-        SecItemDelete(query(key) as CFDictionary)
+        delete(key)
         var item = query(key)
         item[kSecValueData as String] = Data(pin.utf8)
         item[kSecAttrAccessControl as String] = access
-        item[kSecAttrGeneric as String] = enrollment
         item[kSecAttrLabel as String] = "Verso Locked Folder"
-        let status = SecItemAdd(item as CFDictionary, nil)
+        var status = SecItemAdd(item as CFDictionary, nil)
         guard status == errSecSuccess else { throw KeychainFailure(status: status) }
+        var note = query(key, service: noteService)
+        note[kSecValueData as String] = enrollment
+        note[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+        note[kSecAttrLabel as String] = "Verso Locked Folder (kept)"
+        status = SecItemAdd(note as CFDictionary, nil)
+        guard status == errSecSuccess else {
+            delete(key)
+            throw KeychainFailure(status: status)
+        }
     }
 
-    /// Asks for Face ID, through the Keychain, and gives the kept PIN. A PIN kept with other faces enrolled, or one the
-    /// Keychain no longer gives, is forgotten; a cancelled or failed face keeps it for the next time.
-    static func pin(for key: String) async -> Outcome {
+    /// The PIN and the note beside it; neither asks for a face to be deleted.
+    nonisolated private static func delete(_ key: String?) {
+        SecItemDelete(query(key) as CFDictionary)
+        SecItemDelete(query(key, service: noteService) as CFDictionary)
+    }
+
+    /// Asks for Face ID once, through the Keychain, and gives the kept PIN; `reason` says what it opens. A PIN kept with
+    /// other faces enrolled, or one the Keychain no longer gives, is forgotten; a cancelled or failed face keeps it for
+    /// the next time.
+    static func pin(for key: String, reason: String = String(localized: "Unlock the Locked Folder")) async -> Outcome {
         guard let kept = keptEnrollment(key) else { return .unavailable }
         guard kept == enrollment else {
             forget(key)
             return .unavailable
         }
-        let epoch = self.epoch, reason = String(localized: "Unlock the Locked Folder")
+        let epoch = self.epoch
         let (status, pin) = await Task.detached { Self.read(key, reason: reason) }.value
         guard epoch == self.epoch else { return .unavailable }
         switch status {
@@ -110,6 +133,7 @@ enum LockedFolderFaceID {
             guard let pin else { return .unavailable }
             return .pin(pin)
         case errSecItemNotFound:
+            forget(key)
             return .unavailable
         case errSecUserCanceled, errSecAuthFailed, errSecInteractionNotAllowed:
             return .cancelled
@@ -141,7 +165,7 @@ enum LockedFolderFaceID {
 
     static func forget(_ key: String) {
         epoch += 1
-        SecItemDelete(query(key) as CFDictionary)
+        delete(key)
     }
 
     /// Signing out forgets the account's PIN, and only its.
@@ -153,7 +177,7 @@ enum LockedFolderFaceID {
     /// Turning Face ID off or on forgets every kept PIN.
     static func forgetAll() {
         epoch += 1
-        SecItemDelete(query(nil) as CFDictionary)
+        delete(nil)
     }
 
     struct KeychainFailure: LocalizedError {
