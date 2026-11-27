@@ -11,6 +11,10 @@ struct TVLibrary: View {
     @Environment(TVModel.self) private var tv
     @State private var model = TVTimelineModel(query: TimelineQuery(withPartners: true))
     @State private var mode = LibraryMode.all
+    /// All Photos' Filter menu (TVFilter): the favorites as a timeline of their own, or the videos as a search.
+    @State private var filter = TVFilter()
+    @State private var favorites: TVTimelineModel?
+    @State private var videos: TVResultsModel?
     @State private var viewing: TVViewing?
     @State private var width = TVMetrics.pageWidth
     @FocusState private var focused: String?
@@ -27,8 +31,11 @@ struct TVLibrary: View {
         ScrollViewReader { proxy in
             ScrollView {
                 VStack(alignment: .leading, spacing: 32) {
-                    TVPageTitle(title: String(localized: "Library"), line: model.total > 0 ? itemCount(model.total) : "") {
-                        modePicker
+                    TVPageTitle(title: String(localized: "Library"), line: count) {
+                        HStack(spacing: 24) {
+                            if mode == .all { TVFilterMenu(filter: $filter) }
+                            modePicker
+                        }
                     }
                     content(proxy)
                 }
@@ -36,21 +43,56 @@ struct TVLibrary: View {
             }
             .scrollClipDisabled()
             .modifier(TVViewerCover(viewing: $viewing, focused: $focused) { proxy.scrollTo($0, anchor: .center) })
-            .environment(\.tvPhotoPage, model)
+            .environment(\.tvPhotoPage, videos ?? favorites ?? model)
         }
+        .task(id: filter) { if filter.isOn || videos != nil || favorites != nil { await show(filter) } }
+        // Years and Months show the whole library: the filter is All Photos'.
+        .onChange(of: mode) { if mode != .all { filter = TVFilter() } }
         .task {
             await model.load(tv.client)
             #if DEBUG
             // A development build opens the viewer at a photo of the newest month (`-tvOpenPhoto 3`), to look at it.
             if let first = model.months.first, UserDefaults.standard.object(forKey: "tvOpenPhoto") != nil {
                 await model.read(first.id, client: tv.client)
+                // Once its tile is on screen, which the viewer zooms out of.
+                try? await Task.sleep(for: .seconds(3))
                 viewing = TVViewing(items: model.items, index: UserDefaults.standard.integer(forKey: "tvOpenPhoto"))
+            }
+            // Or at the newest videos (`-tvOpenVideo YES`), for the UI tests of the system's player (VersoTVUITests).
+            if UserDefaults.standard.bool(forKey: "tvOpenVideo"), let client = tv.client {
+                var videos = AdvancedSearchRequest(size: 5)
+                videos.type = "VIDEO"
+                videos.order = "desc"
+                let found = TVItem.items((try? await client.searchPage(videos, smart: false))?.items ?? [])
+                if !found.isEmpty { viewing = TVViewing(items: found, index: 0) }
             }
             #endif
         }
     }
 
     /// Years, Months or All Photos: the system's segmented control, as the iPhone has them.
+    private var count: String {
+        if let videos { return videos.items.isEmpty ? "" : itemCount(videos.items.count, more: videos.hasMore) }
+        let shown = favorites ?? model
+        return shown.total > 0 ? itemCount(shown.total) : ""
+    }
+
+    /// All Photos as the filter has them: the favorites, as a timeline of their own, or the videos, from a search.
+    private func show(_ filter: TVFilter) async {
+        guard let client = tv.client else { return }
+        if filter.videos {
+            let found = TVResultsModel { page in
+                try await client.searchPage(TimelineQuery().videos(filter, page: page), smart: false)
+            }
+            videos = found
+            await found.loadMore()
+        } else {
+            videos = nil
+            favorites = filter.favorites ? TVTimelineModel(query: model.query.filtered(filter)) : nil
+            await favorites?.load(client)
+        }
+    }
+
     private var modePicker: some View {
         Picker("Years, Months or All", selection: $mode) {
             Text("Years").tag(LibraryMode.years)
@@ -78,7 +120,12 @@ struct TVLibrary: View {
                 switch mode {
                 case .years: years(proxy)
                 case .months: months(proxy)
-                case .all: TVTimelineGrid(model: model, focused: $focused, width: width) { viewing = $0 }
+                case .all:
+                    if let videos {
+                        TVResultsGrid(model: videos, width: width, focused: $focused) { viewing = $0 }
+                    } else {
+                        TVTimelineGrid(model: favorites ?? model, focused: $focused, width: width) { viewing = $0 }
+                    }
                 }
             }
         }

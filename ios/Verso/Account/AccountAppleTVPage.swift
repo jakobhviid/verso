@@ -148,7 +148,7 @@ struct AccountAppleTVPage: View {
             Button("Allow") { setup.answerChanges(true) }
             Button("Don't Allow", role: .cancel) { setup.answerChanges(false) }
         } message: {
-            Text("From a long press, it can favorite, archive and delete photos, and move them to the Locked Folder. Turn it off on the Apple TV, or choose Read Only here.")
+            Text("From a long press, it can favorite, archive and delete photos, add them to albums, and move them to the Locked Folder. Turn it off on the Apple TV, or choose Read Only here.")
         }
         .alert(setup.asking.map { String(localized: "Set Up \u{201C}\($0)\u{201D}?") } ?? "", isPresented: Binding(
             get: { setup.asking != nil }, set: { if !$0 { setup.answer(false) } })) {
@@ -187,8 +187,9 @@ final class AppleTVSetup {
     /// What a TV's key may do: view, nothing else (Immich's permissions).
     /// The name of the TVs' second keys, which Manage Photos makes.
     nonisolated static let changeKeyName = "Verso on Apple TV, changes"
-    /// What that key may do: change photos (favorite, archive, the Locked Folder) and delete them, nothing else.
-    nonisolated static let changePermissions = ["asset.update", "asset.delete"]
+    /// What that key may do: change photos (favorite, archive, the Locked Folder), add them to albums and delete them,
+    /// nothing else.
+    nonisolated static let changePermissions = ["asset.update", "asset.delete", "albumAsset.create"]
     nonisolated static let permissions = ["asset.read", "asset.view", "asset.download", "album.read", "person.read",
                                           "memory.read", "map.read", "partner.read", "tag.read", "stack.read",
                                           "user.read", "userPreference.read", "server.about"]

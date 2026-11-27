@@ -5,7 +5,8 @@ import UIKit
 
 // Manage Photos on the Apple TV (ROADMAP.md, "Verso on the Apple TV"), off until Settings turns it on through the
 // iPhone: a press and hold on a photo, in a grid or the viewer, opens its menu in the iPhone's order (PhotoActionsMenu):
-// Favorite, Archive (Move to Library in the Archive), Move to Locked Folder, and Delete at the foot; in the Locked
+// Favorite, Add to Album (the albums as Albums orders them, TVAlbumPicker), Archive (Move to Library in the Archive),
+// Move to Locked Folder, and Delete at the foot; in the Locked
 // Folder, Move Out of the Locked Folder and Delete. Moving to the Locked Folder and deleting ask first. The actions go
 // through the TV's second key, which may change and delete photos alone, and in the Locked Folder through its session,
 // which the iPhone unlocked; without Manage Photos there is no menu.
@@ -13,10 +14,15 @@ import UIKit
 /// What a photo's menu does.
 enum TVPhotoAction: Hashable {
     case favorite(Bool)
+    case addToAlbum(String)
     case archive, unarchive, lock, unlock, delete
 
     /// Asked first: what takes the photo out of the TV's reach, or towards being gone.
     var asks: Bool { self == .lock || self == .delete }
+
+    var addsToAlbum: Bool {
+        if case .addToAlbum = self { true } else { false }
+    }
 }
 
 /// What a page, and the viewer over it, do once a photo's menu changed it.
@@ -62,13 +68,17 @@ enum TVPhotoActions {
         let force = false
     }
 
-    static func perform(_ action: TVPhotoAction, on id: String, model: TVModel, place: TVPhotoPlace) async throws -> TVPhotoChange {
+    /// The change a page and the viewer take, or nil where the photo stays as it was (added to an album).
+    static func perform(_ action: TVPhotoAction, on id: String, model: TVModel, place: TVPhotoPlace) async throws -> TVPhotoChange? {
         let client = place == .lockedFolder ? model.client : model.root.changes
         guard let client else { throw ImmichError.http(403, String(localized: "Manage Photos is off on this Apple TV.")) }
         switch action {
         case .favorite(let on):
             try await client.send("PUT", "assets", body: Update(ids: [id], isFavorite: on))
             return .favorite(id, on)
+        case .addToAlbum(let album):
+            try await client.changeAlbumAssets(album, ids: [id])
+            return nil
         case .archive: try await client.send("PUT", "assets", body: Update(ids: [id], visibility: "archive"))
         case .unarchive, .unlock: try await client.send("PUT", "assets", body: Update(ids: [id], visibility: "timeline"))
         case .lock: try await client.send("PUT", "assets", body: Update(ids: [id], visibility: "locked"))
@@ -88,6 +98,9 @@ struct TVPhotoMenu: ViewModifier {
     @Environment(\.tvPhotoPage) private var page
     @State private var asking: TVPhotoAction?
     @State private var failure: String?
+    @State private var choosingAlbum = false
+    /// The album a photo was just added to, said once.
+    @State private var added: String?
 
     func body(content: Content) -> some View {
         content
@@ -109,6 +122,13 @@ struct TVPhotoMenu: ViewModifier {
             } message: {
                 Text(failure ?? "")
             }
+            .alert(added.map { String(localized: "Added to \u{201C}\($0)\u{201D}") } ?? "",
+                   isPresented: Binding(get: { added != nil }, set: { if !$0 { added = nil } })) {
+                Button("OK") {}
+            }
+            .sheet(isPresented: $choosingAlbum) {
+                TVAlbumPicker { album in run(.addToAlbum(album.id), album: album.albumName) }
+            }
     }
 
     @ViewBuilder
@@ -120,6 +140,7 @@ struct TVPhotoMenu: ViewModifier {
             Button(item.isFavorite ? "Unfavorite" : "Favorite", systemImage: item.isFavorite ? "heart.slash" : "heart") {
                 run(.favorite(!item.isFavorite))
             }
+            Button("Add to Album…", systemImage: "rectangle.stack.badge.plus") { choosingAlbum = true }
             if place == .archive {
                 Button("Move to Library", systemImage: "archivebox") { run(.unarchive) }
             } else {
@@ -130,14 +151,20 @@ struct TVPhotoMenu: ViewModifier {
         Button("Delete", systemImage: "trash", role: .destructive) { asking = .delete }
     }
 
-    private func run(_ action: TVPhotoAction) {
+    private func run(_ action: TVPhotoAction, album: String? = nil) {
         guard let item else { return }
         let model = model, place = place
         Task {
             do {
-                let change = try await TVPhotoActions.perform(action, on: item.id, model: model, place: place)
-                changed(change)
-                page?.apply(change)
+                if let change = try await TVPhotoActions.perform(action, on: item.id, model: model, place: place) {
+                    changed(change)
+                    page?.apply(change)
+                } else {
+                    added = album
+                }
+            } catch ImmichError.http(403, _) where action.addsToAlbum {
+                // A key made before Add to Album may change photos but not albums: turned off and on again, it may.
+                failure = String(localized: "This Apple TV may not do that yet. Turn Manage Photos off and on again in Settings to allow it.")
             } catch ImmichError.unauthorized where place != .lockedFolder {
                 // The second key was made read-only, or forgotten, on the iPhone: Manage Photos turns itself off. In the
                 // Locked Folder a 401 is its session ending, which locks the folder (TVLockedFolderVisit).

@@ -72,6 +72,8 @@ struct TVSettings: View {
                     NavigationLink("About Verso") { TVAboutPage() }
                 }
             }
+            // A row grows under the focus, past the list's edge: drawn whole, not cut off there.
+            .scrollClipDisabled()
         }
         .task { user = try? await tv.client?.currentUser() }
         .onAppear { shelf = TVTopShelf.summary }
@@ -111,6 +113,7 @@ private struct TVTopShelfSettings: View {
                 Text("Above Verso when it is in the top row of the Home Screen, in this order. Albums come with the newest photos first, as Albums shows them; people as People does.")
             }
         }
+        .scrollClipDisabled()
         .frame(maxWidth: 1200)
         .navigationTitle("Top Shelf")
     }

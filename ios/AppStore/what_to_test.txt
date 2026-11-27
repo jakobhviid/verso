@@ -1,3 +1,1 @@
-- Approving the Apple TV's Locked Folder asks for Face ID once. The Locked Folder on this iPhone opens with one Face ID scan.
-- The Apple TV's Manage Photos: when the TV asks, Allow and Face ID give it a key to favorite, archive, delete and lock photos. Account, Apple TV shows "Can change photos" with Read Only, which takes it away.
-- Backing up: leaving Verso while it checks your library against Immich no longer closes it in the background.
+- The Apple TV's Manage Photos also asks to add photos to albums: a TV that had it on turns it off and on again, and Allow with Face ID.

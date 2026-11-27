@@ -1,5 +1,5 @@
-- Manage Photos: Settings, Manage Photos, Turn On with iPhone; on the iPhone, Allow and Face ID. Then press and hold a photo, in a grid or full screen: Favorite, Archive, Move to Locked Folder, Delete. Turn Off on the TV, or Read Only on the iPhone (Account, Apple TV), takes it away.
-- Settings: laid out as the Apple TV's own Settings, with the Top Shelf, the Locked Folder, Manage Photos, your account and About.
-- Videos: the remote scrubs, shows the info panel, and a click on its edge steps to the next photo.
-- The viewer: photos slide as you step, open out of their tile and close into it; a small Live Photo sign in the corner; HDR stays on once a video turned it on.
-- The Locked Folder shows its photos; Lock on the iPhone closes it on the TV within a minute, and the TV stays signed in.
+- Videos: a video shows a play sign; click it to open the Apple TV's own player, with scrubbing, the transport bar and its audio and subtitle buttons. Menu goes back, a step at a time, to the viewer, where left and right go on.
+- Photos grow out of their tile as they open, and shrink back into it as they close. The tile under the focus has a thin white outline.
+- Filter, beside the title of All Photos, Favorites, the Archive, albums, people and the Locked Folder: favorites, videos, or both.
+- Manage Photos: the long-press menu has Add to Album, with your albums in the order Albums shows them. A TV that turned Manage Photos on before this build turns it off and on again to allow it.
+- Settings: the row under the focus is no longer cut off at the left.

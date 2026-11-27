@@ -3,7 +3,8 @@ import VersoCore
 
 // The photo grid on the TV, as the iPhone's (ios/Verso/Grid/TimelineGrid.swift, GridTile.swift): square tiles close
 // together, edge to edge, each month under its name, the newest photos first (the iPhone's Newest at the Top). A tile
-// lifts under the remote's focus; a click opens the photo in the viewer, which steps through the photos of the page.
+// lifts under the remote's focus, with a thin white outline; a click opens the photo in the viewer, which steps through the
+// photos of the page.
 
 /// One square of the grid: the thumbnail filling it, its ThumbHash until the thumbnail comes, a favorite's heart at the
 /// bottom left and a video's length at the bottom right on a soft shade, as the iPhone's tile draws them.
@@ -89,20 +90,26 @@ struct TVTileGrid: View {
     let open: (Int) -> Void
     /// Called as a tile comes into view, for a grid that reads on as the end comes near.
     var appeared: ((Int) -> Void)?
-    @Environment(\.tvZoom) private var zoom
+    @Environment(\.tvTileFrames) private var frames
 
     var body: some View {
         let metrics = GridTileMetrics(columns: TVMetrics.tileColumns, width: width, spacing: TVMetrics.tileSpacing)
         LazyVGrid(columns: Array(repeating: GridItem(.fixed(metrics.side), spacing: metrics.spacing), count: metrics.columns),
                   alignment: .leading, spacing: metrics.spacing) {
             ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                Button { open(index) } label: { TVGridTile(item: item, side: metrics.side) }
+                Button { open(index) } label: {
+                    TVGridTile(item: item, side: metrics.side)
+                        // A thin white outline round the tile under the focus, as well as its lift.
+                        .overlay {
+                            if focused.wrappedValue == item.id { Rectangle().strokeBorder(.white, lineWidth: 3) }
+                        }
+                }
                     .buttonStyle(TVLiftStyle(scale: 1.07))
                     .modifier(TVPhotoMenu(item: item))
                     .tvLifts()
                     .focused(focused, equals: item.id)
                     .zIndex(focused.wrappedValue == item.id ? 1 : 0)
-                    .tvZoomSource(item.id, in: zoom)
+                    .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { frames?.frames[item.id] = $0 }
                     .id(item.id)
                     .onAppear { appeared?(index) }
             }
@@ -167,6 +174,9 @@ struct TVTimeline: View {
     @State private var viewing: TVViewing?
     @State private var width = TVMetrics.pageWidth
     @FocusState private var focused: String?
+    /// The Filter menu's choice (TVFilter), and the videos it found where it asks for them.
+    @State private var filter = TVFilter()
+    @State private var videos: TVResultsModel?
 
     init(query: TimelineQuery, title: String, line: String? = nil) {
         self.query = query
@@ -179,17 +189,44 @@ struct TVTimeline: View {
         ScrollViewReader { proxy in
             ScrollView {
                 VStack(alignment: .leading, spacing: 32) {
-                    TVPageTitle(title, line: line ?? (model.total > 0 ? itemCount(model.total) : ""))
-                    content
+                    TVPageTitle(title: title, line: line ?? count) {
+                        TVFilterMenu(filter: $filter, offersVideos: query.searchable)
+                    }
+                    if let videos {
+                        TVResultsGrid(model: videos, width: width, focused: $focused) { viewing = $0 }
+                    } else {
+                        content
+                    }
                 }
                 .modifier(TVWidth(width: $width))
             }
             .scrollClipDisabled()
             .modifier(TVViewerCover(viewing: $viewing, focused: $focused) { proxy.scrollTo($0, anchor: .center) })
-            .environment(\.tvPhotoPage, model)
+            .environment(\.tvPhotoPage, videos ?? model)
             .environment(\.tvPhotoPlace, query.visibility == "locked" ? .lockedFolder : query.visibility == "archive" ? .archive : .library)
         }
-        .task { await model.load(tv.client) }
+        .task(id: filter) { await show(filter) }
+    }
+
+    private var count: String {
+        if let videos { return videos.items.isEmpty ? "" : itemCount(videos.items.count, more: videos.hasMore) }
+        return model.total > 0 ? itemCount(model.total) : ""
+    }
+
+    /// The page's photos as the filter has them: the timeline, narrowed to the favorites where asked, or its videos.
+    private func show(_ filter: TVFilter) async {
+        guard let client = tv.client else { return }
+        if filter.videos {
+            let query = query
+            let found = TVResultsModel { page in try await client.searchPage(query.videos(filter, page: page), smart: false) }
+            videos = found
+            await found.loadMore()
+            return
+        }
+        videos = nil
+        let filtered = query.filtered(filter)
+        if model.query != filtered { model = TVTimelineModel(query: filtered) }
+        await model.load(client)
     }
 
     @ViewBuilder

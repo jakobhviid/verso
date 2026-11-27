@@ -287,6 +287,20 @@ targets:
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "The walk puts a photo into the library and takes it out after."
         INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: "The walk puts a photo into the library."
 
+  # The TV's viewer driven with the Siri Remote's buttons, on the tvOS Simulator (ios/TVUITests): a video in the system's
+  # player, with the remote whole. The Simulator has no remote of its own to drive from a script.
+  VersoTVUITests:
+    type: bundle.ui-testing
+    platform: tvOS
+    sources:
+      - TVUITests
+    dependencies:
+      - target: VersoTV
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(VERSO_IDENTITY).TVUITests
+        GENERATE_INFOPLIST_FILE: YES
+
   # The core's bindings for the Apple TV, as VersoCore is for the iPhone (`mac/build-rust.sh --tvos` adds its slices).
   VersoCoreTV:
     type: library.static
@@ -393,6 +407,10 @@ schemes:
         VersoTV: all
     run:
       config: Debug
+    test:
+      config: Debug
+      targets:
+        - VersoTVUITests
     archive:
       config: Release
   Verso:
