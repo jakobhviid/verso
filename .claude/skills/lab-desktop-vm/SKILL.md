@@ -21,7 +21,7 @@ lab/gnome-vm/up.sh && lab/gnome-vm/session.sh              # warm: about 14 s, t
 lab/gnome-vm/run-in-session.sh -d /opt/verso/verso          # -d: a GUI app, detached (once Verso is in, below)
 lab/gnome-vm/run-in-session.sh -d nautilus /home/tester/Verso
 lab/gnome-vm/shot.sh /tmp/verso.png                         # then look at it with the Read tool
-lab/gnome-vm/down.sh                                        # when the working session ends
+lab/gnome-vm/down.sh                                        # when the VM is stale or its resources are wanted
 ```
 
 **Warm VMs** (AGENTS.md, "Testing on Erebus"): `up.sh` restores a VM that has its `fresh` snapshot, taken once it

@@ -1,11 +1,12 @@
 # Warm lab instances (AGENTS.md, "Testing on Erebus"). Sourced after lib/erebus.sh, with P set to the project.
 #
-# An instance stays up for a working session and carries user.expires. Once set up it gets a stateless snapshot,
+# An instance stays up between sessions for days, as Erebus is local hardware whose only costs are the time to set an
+# instance up and the resources it holds, and carries user.expires. Once set up it gets a stateless snapshot,
 # "fresh", taken while stopped; each later start restores it, so a check never sees an earlier one's leftovers.
 # Restoring and booting the GNOME VM takes about 14 s against 140 s to build it. A stateful snapshot is slower (16 s),
 # needs the VM's memory as disk, and does not bring the desktop session back.
 
-WARM_HOURS=${WARM_HOURS:-12}
+WARM_HOURS=${WARM_HOURS:-72}
 FRESH_SNAPSHOT=fresh
 
 # The expiry for an instance started now.

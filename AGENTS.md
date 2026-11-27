@@ -277,12 +277,13 @@ a Verso change is checked by hand, in the VMs of the `lab-desktop-vm` and `lab-b
 (`mac-dev`).
 
 Rules:
-- **Lab instances are disposable, and stay warm for a working session.** A VM or server may stay up between checks
-  and is deleted when the session ends. Any `ind-` instance found at the start of a session may be destroyed and
-  created again at will, unless it is kept (`user.keep=true`) or another agent of this session is using it. Warm is
+- **Lab instances are disposable, and stay warm for days.** Erebus is the maintainer's own hardware: an instance costs
+  only the time to set it up and the resources it holds, so a VM or server stays up between checks and between
+  sessions, and is reused rather than built again. Any `ind-` instance found at the start of a session may be
+  destroyed and created again at will, unless it is kept (`user.keep=true`) or another agent is using it. Warm is
   not dirty: snapshot an instance once it is set up, and restore that snapshot before each check, so no check passes
-  on what an earlier one left. Give each instance `user.expires` (a UTC time, at most 12 hours ahead); a session
-  starts by deleting the expired ones, so an abandoned session leaves nothing for long. Never run the Erebus
+  on what an earlier one left. Give each instance `user.expires` (a UTC time; `lab/warm.sh` gives 72 hours, renewed
+  as it is used); a session starts by deleting the expired ones, so an abandoned instance goes by itself. Never run the Erebus
   teardown script with `--delete`: other projects' instances run there too.
 - **Prefix instance names with `ind-`,** and work in the `lab` project. Agents that run at the same time use a name
   suffix of their own (`ind-gnome-2`), and leave each other's instances alone.
