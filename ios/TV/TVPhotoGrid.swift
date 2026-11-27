@@ -214,6 +214,7 @@ struct TVPhotoGrid: UIViewRepresentable {
             if let item = items[key], let tv {
                 cell.contentConfiguration = UIHostingConfiguration { TVGridTile(item: item, side: side).environment(tv) }
                     .margins(.all, 0)
+                    .background { Color.clear }
             } else {
                 cell.contentConfiguration = UIHostingConfiguration { Rectangle().fill(.quaternary) }.margins(.all, 0)
             }
@@ -307,26 +308,48 @@ struct TVPhotoGrid: UIViewRepresentable {
     }
 }
 
-/// A tile's cell: above its neighbours while focused, with a thin white outline, lifted with a soft shadow on a newer
-/// box, the outline alone on an older one (TVDevice).
+/// A tile's cell: above its neighbours while focused, with a thin white outline at its square edge, lifted with a soft
+/// shadow on a newer box, the outline alone on an older one (TVDevice). UIKit's own focus look (a dark rounded platter)
+/// is cleared, and the outline is a view of its own over the tile, not the content's border, which the platter's
+/// rounding showed through at the corners.
 final class TVPhotoCell: UICollectionViewCell {
+    private let outline = UIView()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.clipsToBounds = true
-        contentView.layer.borderColor = UIColor.white.cgColor
+        backgroundConfiguration = .clear()
         layer.shadowColor = UIColor.black.cgColor
         layer.shadowOffset = CGSize(width: 0, height: 14)
         layer.shadowRadius = 24
+        outline.isUserInteractionEnabled = false
+        outline.backgroundColor = .clear
+        outline.layer.borderColor = UIColor.white.cgColor
+        outline.layer.borderWidth = 3
+        outline.isHidden = true
+        outline.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(outline)
+        NSLayoutConstraint.activate([
+            outline.leadingAnchor.constraint(equalTo: leadingAnchor),
+            outline.trailingAnchor.constraint(equalTo: trailingAnchor),
+            outline.topAnchor.constraint(equalTo: topAnchor),
+            outline.bottomAnchor.constraint(equalTo: bottomAnchor),
+        ])
     }
 
     required init?(coder: NSCoder) { fatalError("not from a storyboard") }
+
+    override func updateConfiguration(using state: UICellConfigurationState) {
+        super.updateConfiguration(using: state)
+        // Whatever the state, no platter of UIKit's behind the tile.
+        backgroundConfiguration = .clear()
+    }
 
     override func didUpdateFocus(in context: UIFocusUpdateContext, with coordinator: UIFocusAnimationCoordinator) {
         super.didUpdateFocus(in: context, with: coordinator)
         let focused = isFocused
         layer.zPosition = focused ? 1 : 0
-        contentView.layer.borderWidth = focused ? 3 : 0
-        contentView.layer.cornerRadius = focused ? 6 : 0
+        bringSubviewToFront(outline)
+        outline.isHidden = !focused
         guard !TVDevice.simpler else { return }
         coordinator.addCoordinatedAnimations { [self] in
             transform = focused ? CGAffineTransform(scaleX: 1.07, y: 1.07) : .identity
@@ -339,8 +362,7 @@ final class TVPhotoCell: UICollectionViewCell {
         layer.zPosition = 0
         transform = .identity
         layer.shadowOpacity = 0
-        contentView.layer.borderWidth = 0
-        contentView.layer.cornerRadius = 0
+        outline.isHidden = true
     }
 }
 
