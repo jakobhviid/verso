@@ -61,3 +61,18 @@ first, and ARCHITECTURE.md is updated with the reason.
     what a desktop happens to ship, even when that makes it larger: one package with both interfaces and both
     toolkits, about 100 MB more where the other toolkit is missing, beats a smaller one that fails to start
     somewhere (the maintainer's choice, 2026-11; ROADMAP.md, "Package repositories").
+
+14. **No platform left behind.** Verso is one app on three kinds of device: mobile (the iPhone and the iPad), the
+    living room (the Apple TV) and the desktop (the Mac and Linux). A feature added to one app of a group is built for
+    the others of its group in the same piece of work, or gets a line in ROADMAP.md's parity table saying why not yet
+    and when; one that would fit another group is weighed there too, on purpose rather than by accident. Where a
+    group goes without a feature for good, the table says why: backing up and Free Up Space are mobile's, as the
+    phone is where photos are taken; the Apple TV has no Verso Drive, as tvOS has no Files. Every `feat:` commit says
+    which apps it reached (the maintainer's choice, 2026-11).
+
+15. **Stable is what beta tested.** Two channels, one version line: beta, from `develop`, to TestFlight, the
+    `verso@beta` cask and Sparkle's beta channel; stable, from `main`, to the App Store, the `verso` cask, Sparkle's
+    default channel and GitHub's Latest. A stable release promotes what its beta tested, the same commit and, where a
+    store allows it, the same build: the App Store gets the TestFlight build that testers had. A version number says
+    nothing about a channel; 1.0 is a version like any other (the maintainer's choice, 2026-11; AGENTS.md,
+    "Versioning").
