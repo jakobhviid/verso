@@ -24,6 +24,14 @@ Problems in the Immich server itself belong to the Immich project:
   it, allowed only to read, which the person never sees. Sign Out on the TV forgets it; the key itself stays in Immich
   until Forget on the iPhone's Apple TV page, or deleting it in Immich, ends it, as a read-only key may not delete
   itself.
+- **The Locked Folder's PIN,** where Touch ID or Face ID opens the folder, once the PIN has been typed. On the Mac it
+  is kept in the login keychain, on that Mac only, and given back only after the app's own Touch ID check, with the
+  fingerprints enrolled when it was kept. On the iPhone and the iPad it is kept in the Keychain, on that device only,
+  behind Face ID (or Touch ID) itself: the Keychain asks for one of the faces or fingers enrolled when it was kept
+  before it gives the PIN back, and the device's passcode never does. Enrolling another face or finger, a PIN the
+  server turns down, signing out and turning the setting off forget it (Unlock with Touch ID in the Mac's Settings,
+  Security; Unlock with Face ID in the account's sheet on the iPhone and the iPad). On Linux it is typed each time and
+  kept nowhere.
 - **Copies of your photos:** server thumbnails, the gallery's pictures and the parts of originals that were read, in
   your cache directory (`~/.cache/verso`), and thumbnails in the desktop's thumbnail cache. Signing out (**Sign Out…**
   in Verso, or `verso-service logout`) removes them. On the Mac, the iPhone and the iPad the viewer keeps the original
@@ -81,7 +89,7 @@ Problems in the Immich server itself belong to the Immich project:
   has on the assets it made, and with each photo never edited, its iCloud identifier, when it was taken and where, as
   Immich's own app does, so that app knows it; it never deletes on the server, and never backs up to Immich's public
   demo. Hidden photos go into your Locked Folder, never your timeline; freeing them unlocks its session with your PIN,
-  kept in memory for that run of Verso alone, and locks it again after. Free Up Space deletes photos from the phone
+  typed, or given by Face ID where the Locked Folder keeps it, and locks it again after. Free Up Space deletes photos from the phone
   only after you review them and iOS asks, and only those whose every part Immich holds, checked as the review opens
   and again right before (the same checksum and size, the original readable on the server); they go to Recently
   Deleted for 30 days, while Verso checks Immich for them. Verso Drive uploads files you copy into its Upload folder,

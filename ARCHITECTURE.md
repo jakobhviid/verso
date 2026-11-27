@@ -2394,6 +2394,15 @@ to come.
     protection Keychain (`kSecUseDataProtectionKeychain`): the login Keychain, where a Mac app's items go unless it
     asks, ignores the setting and travels with Time Machine and Migration Assistant. An item kept otherwise is
     converted as it is read (on the Mac, moved out of the login Keychain, which Sign Out also clears).
+  - **The Locked Folder's PIN is kept for Touch ID and Face ID** (`LockedFolderTouchID` on the Mac,
+    `LockedFolderFaceID` on the iPhone and the iPad), as Immich opens the folder only to a session unlocked with the
+    PIN, so a face or a finger can stand in for it only where the device keeps the PIN. On the iPhone and the iPad the
+    Keychain item carries an access control of `biometryCurrentSet` (`WhenPasscodeSetThisDeviceOnly`): iOS reads the
+    face before it gives the PIN back, never for the passcode, and the enrolment it was kept with, kept beside it,
+    tells Verso to forget it once another face or finger is enrolled. On the Mac the app's own Touch ID check guards
+    the item, with the enrolment kept the same way. Kept per server and user; forgotten on signing out, on a PIN the
+    server turns down (400; a 401 is the sign-in) and when the setting is turned off or on. Not chosen: the PIN in
+    memory for one run of Verso, which asks for it again after every launch.
 - **Dragging originals out,** as Photos does: a photo in the selection brings the whole selection, in the grid's
   order, one outside it only itself; nothing is downloaded before a receiver asks for the file. The grid ("The photo
   grid on the Mac") drags as AppKit drags files, on macOS 15 and 26 alike: each photo a promised file

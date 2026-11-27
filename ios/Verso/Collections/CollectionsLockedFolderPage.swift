@@ -1,11 +1,9 @@
-// The Locked Folder on iOS, opened from Utilities in Collections: unlocked with Immich's PIN, and from then on, while
-// Verso runs, with Face ID or the device's passcode (ROADMAP.md, M10: "The Locked Folder behind Face ID, with Immich's
-// PIN once per session"). As on the Mac (ExploreLockedView), its photos show in a session of their own whose media
-// skips the disk cache, and it locks on leaving the page, on Lock, when Verso goes to the background, on signing out,
-// and when the server's unlock expires; locking discards that session with its media and files. Face ID is offered
-// once the app's Info.plist says why it asks (NSFaceIDUsageDescription); until then the PIN unlocks it each time.
+// The Locked Folder on iOS, opened from Utilities in Collections: unlocked with Immich's PIN, and once the PIN is kept
+// in the Keychain behind Face ID (LockedFolderFaceID), with Face ID, which the page asks for as it opens. As on the Mac
+// (ExploreLockedView), its photos show in a session of their own whose media skips the disk cache, and it locks on
+// leaving the page, on Lock, when Verso goes to the background, on signing out, and when the server's unlock expires;
+// locking discards that session with its media and files.
 
-import LocalAuthentication
 import SwiftUI
 
 struct CollectionsLockedFolderPage: View {
@@ -22,24 +20,12 @@ struct CollectionsLockedFolderPage: View {
     /// Each unlock attempt's mark: locking or leaving makes a running attempt stale.
     @State private var generation = UUID()
     @State private var expiryTask: Task<Void, Never>?
+    /// A PIN is kept behind Face ID for this account (LockedFolderFaceID), read as the page opens and after each unlock.
+    @State private var faceIDKept = false
 
-    /// The PIN that unlocked the folder in this run of Verso, per sign-in, so Face ID unlocks it again without typing
-    /// it; kept in memory only, gone when Verso quits, and of no use once signed out, as the next sign-in is another.
-    /// Free Up Space's review uses it too, for hidden photos (FreeUpHiddenGroup).
-    @MainActor static var sessionPINs: [String: String] = [:]
-
-    /// The sign-in the PIN is kept for: the server and the session's token.
-    private var pinKey: String? { Self.pinKey(session.client) }
-
-    static func pinKey(_ client: ImmichClient) -> String? {
-        guard case .accessToken(let token) = client.credential else { return nil }
-        return client.serverURL.absoluteString + "|" + token
-    }
+    /// The account the PIN is kept for: the server and the user.
+    private var faceIDKey: String? { LockedFolderFaceID.key(session.services) }
     private var settingUp: Bool { status?.pinCode == false }
-    /// Face ID or the passcode stands in for the PIN once it was typed in this run, where the app may ask for Face ID.
-    private var canUseDeviceOwner: Bool {
-        pinKey.flatMap { Self.sessionPINs[$0] } != nil && Bundle.main.object(forInfoDictionaryKey: "NSFaceIDUsageDescription") != nil
-    }
 
     var body: some View {
         Group {
@@ -63,7 +49,8 @@ struct CollectionsLockedFolderPage: View {
             guard session.client.exploreSupportsLockedFolder else { return }
             do {
                 status = try await Self.uncached(session.client) { try await $0.exploreAuth() }
-                if canUseDeviceOwner { await unlockWithDeviceOwner() }
+                faceIDKept = status?.pinCode == true && LockedFolderFaceID.canUnlock(faceIDKey)
+                if faceIDKept { await unlockWithFaceID() }
             } catch {
                 session.handle(error)
                 self.error = error.localizedDescription
@@ -96,7 +83,7 @@ struct CollectionsLockedFolderPage: View {
                         .foregroundStyle(.secondary)
                     Text(settingUp ? "Set Up Locked Folder" : "Unlock Locked Folder")
                         .font(.title2.bold())
-                    Text("Locks when you leave the Locked Folder or Verso.")
+                    Text(lockHint)
                         .font(.callout)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -116,15 +103,23 @@ struct CollectionsLockedFolderPage: View {
             Section {
                 Button(settingUp ? "Set PIN and Unlock" : "Unlock") {
                     let code = pin
-                    Task { await unlock(code) }
+                    Task { await unlock(code, typed: true) }
                 }
                 .disabled(!pinIsComplete || busy || status == nil)
-                if canUseDeviceOwner {
-                    Button("Unlock with Face ID") { Task { await unlockWithDeviceOwner() } }
+                if faceIDKept, let name = LockedFolderFaceID.biometryName {
+                    Button("Unlock with \(name)") { Task { await unlockWithFaceID() } }
                         .disabled(busy)
                 }
             }
         }
+    }
+
+    /// Says once that the PIN typed is kept behind Face ID, while it is on and nothing is kept yet.
+    private var lockHint: String {
+        if !faceIDKept, LockedFolderFaceID.isEnabled, let name = LockedFolderFaceID.biometryName {
+            return String(localized: "Locks when you leave the Locked Folder or Verso. Once you type the PIN, \(name) unlocks it on this \(UIDevice.current.model).")
+        }
+        return String(localized: "Locks when you leave the Locked Folder or Verso.")
     }
 
     private var pinIsComplete: Bool {
@@ -138,22 +133,22 @@ struct CollectionsLockedFolderPage: View {
         return try await request(client)
     }
 
-    /// Face ID, or the passcode where Face ID cannot be used, then the PIN kept from this run.
-    private func unlockWithDeviceOwner() async {
-        guard let key = pinKey, let code = Self.sessionPINs[key], !busy else { return }
-        let context = LAContext()
-        do {
-            guard try await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: String(localized: "Unlock the Locked Folder")) else { return }
-        } catch {
-            return // cancelled, or not available: the PIN is there
+    /// Face ID gives the kept PIN; cancelled, the PIN field is there.
+    private func unlockWithFaceID() async {
+        guard let key = faceIDKey, !busy else { return }
+        switch await LockedFolderFaceID.pin(for: key) {
+        case .pin(let code): await unlock(code, typed: false)
+        case .unavailable: faceIDKept = false
+        case .cancelled: break
         }
-        await unlock(code)
     }
 
-    private func unlock(_ code: String) async {
+    /// Unlocks with the PIN; one typed that the server takes is kept behind Face ID.
+    private func unlock(_ code: String, typed: Bool) async {
         guard !busy else { return }
         busy = true
-        let attempt = generation, account = session.client, services = session.services, key = pinKey
+        let attempt = generation, account = session.client, services = session.services, key = faceIDKey
+        let epoch = LockedFolderFaceID.epoch
         defer { busy = false; pin = ""; confirmation = "" }
         do {
             let setup = settingUp
@@ -167,7 +162,11 @@ struct CollectionsLockedFolderPage: View {
             }
             self.status = status
             guard status.isElevated else { throw ImmichError.http(403, String(localized: "The server did not unlock this session.")) }
-            if let key { Self.sessionPINs[key] = code }
+            if typed, let key {
+                do { try LockedFolderFaceID.save(code, for: key, since: epoch) }
+                catch { self.error = error.localizedDescription }
+                faceIDKept = LockedFolderFaceID.canUnlock(key)
+            }
             let media = LockedFolderMedia(account: account)
             media.onRequestFailed = { Task { await verify() } }
             unlocked = LibrarySession(services: services, lockedFolder: media)
@@ -175,7 +174,10 @@ struct CollectionsLockedFolderPage: View {
         } catch {
             guard attempt == generation else { return }
             // A PIN the server turns down is not kept for Face ID.
-            if case ImmichError.http(let httpStatus, _) = error, httpStatus == 400 || httpStatus == 401, let key { Self.sessionPINs[key] = nil }
+            if LockedFolderFaceID.rejectsPIN(error), let key {
+                LockedFolderFaceID.forget(key)
+                faceIDKept = false
+            }
             session.handle(error)
             self.error = error.localizedDescription
         }

@@ -66,6 +66,8 @@ final class AppModel {
             catch ImmichError.unauthorized {
                 #if os(macOS)
                 try LockedFolderTouchID.forget(server: saved.account.serverURL, userID: saved.userID)
+                #elseif os(iOS)
+                LockedFolderFaceID.forget(server: saved.account.serverURL, userID: saved.userID)
                 #endif
                 try AccountVault.forget()
                 ServerTrust.forgetAll()
@@ -148,6 +150,8 @@ final class AppModel {
             userIDForFinder = userID
             #if os(macOS)
             try LockedFolderTouchID.forget(server: services.client.serverURL, userID: userID)
+            #elseif os(iOS)
+            LockedFolderFaceID.forget(server: services.client.serverURL, userID: userID)
             #endif
             try AccountVault.forget()
         } catch { accountError = error.localizedDescription; return }

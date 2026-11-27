@@ -4,7 +4,8 @@
 // trusted for it, and Forget), the account's Immich features, its password, API keys and sessions, Administration for
 // an admin, backing this iPhone up (BackupSettingsSection), what Verso keeps on this device (Verso Drive in the Files
 // app, the app icon, and Look Up Place Names with Apple Maps, Verso Drive and Look Up off until switched on, and the
-// image cache), About Verso, and Sign Out. A list of iOS's own, as Settings has the Apple Account; what each page does
+// image cache), the Locked Folder's Unlock with Face ID (LockedFolderFaceID), on until turned off, About Verso, and
+// Sign Out. A list of iOS's own, as Settings has the Apple Account; what each page does
 // is the Mac's Settings'. The server's notifications and the account are read again as it opens and on a pull.
 
 import ImageIO
@@ -24,6 +25,7 @@ struct AccountSheet: View {
     @State private var cacheSize: Int64 = 0
     /// The viewer's place names from Apple's maps (ViewerPlaceNames), a choice of this device's alone.
     @AppStorage(ViewerPlaceNames.appleMapsKey) private var looksUpPlaceNames = false
+    @AppStorage(LockedFolderFaceID.enabledKey) private var lockedFolderFaceID = true
 
     var body: some View {
         NavigationStack {
@@ -119,6 +121,17 @@ struct AccountSheet: View {
                     Text("On This \(UIDevice.current.model)")
                 } footer: {
                     Text("A photo's title names the landmark or park where it was taken, as Photos does. Verso sends the photo's location to Apple to look it up. Off, places are named from your Immich server alone.")
+                }
+                if let faceID = LockedFolderFaceID.biometryName, services.client.exploreSupportsLockedFolder {
+                    Section {
+                        // Off or on, every kept PIN is forgotten, as on the Mac.
+                        Toggle("Unlock with \(faceID)", isOn: $lockedFolderFaceID)
+                            .onChange(of: lockedFolderFaceID) { LockedFolderFaceID.forgetAll() }
+                    } header: {
+                        Text("Locked Folder")
+                    } footer: {
+                        Text("The PIN you type for the Locked Folder is kept on this \(UIDevice.current.model), behind \(faceID), which opens it from then on. Turned off, or once \(faceID) changes, it is forgotten.")
+                    }
                 }
                 Section {
                     LabeledContent("Image Cache", value: cacheSize.formatted(.byteCount(style: .file)))

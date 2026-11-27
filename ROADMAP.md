@@ -464,7 +464,8 @@ components without our code, which is the main reason to build on them. Nothing 
    device's own (ARCHITECTURE, "Security and privacy").
 5. **Memories full screen,** as stories: progress along the top, glass controls, the next with a tap.
 6. **Search's suggestions as glass chips:** people with their faces, places, recent searches; the filters in a sheet.
-7. **The Locked Folder behind Face ID,** with Immich's PIN once per session.
+7. **The Locked Folder behind Face ID:** Immich's PIN typed once, then kept in the Keychain behind Face ID
+   (ARCHITECTURE, "Kept on the device"), as the Mac keeps it for Touch ID.
 8. **The app icon is the Mac's Icon Composer document** (`AppIcon.icon`), which has the clear and tinted looks iOS
    asks for, and Mist's Night look as its dark appearance; the picture's other designs and the graphite lens are
    alternate icons, chosen in App Icon in the account's sheet (ARCHITECTURE, "The app icon's designs on the Mac, the
@@ -652,6 +653,7 @@ none, not there; *by design*, with the reason, where a group goes without it for
 | Search: smart, filters, text in photos and names | ✓ | smart, with quick chips | ✓ | ✓ |
 | Favorites, Archive | ✓ | ✓, to look at | ✓ | ✓ |
 | Trash, Locked Folder | ✓ | *by design* | ✓ | ✓ |
+| The Locked Folder opened by a face or a finger | ✓ (Face ID) | *by design* | ✓ (Touch ID) | none yet: the PIN is typed each time |
 | Folders, Duplicates | ✓ | none | ✓ | ✓ |
 | Tags | partial: no editing or deleting a tag | *by design* | ✓ | ✓ |
 | Partners | partial: no adding or removing one | follows Immich's setting | ✓ | ✓ |

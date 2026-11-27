@@ -378,8 +378,9 @@ struct FreeUpReviewPage: View {
 
     /// The account's PIN unlocks the session, so Immich answers for the photos in its Locked Folder; then each hidden
     /// photo is checked as the others were.
-    private func unlockHidden(_ code: String) async {
+    private func unlockHidden(_ code: String, typed: Bool = true) async {
         guard let client = center.accountClient else { return }
+        let key = center.lockedFolderKey, epoch = LockedFolderFaceID.epoch
         pinError = nil
         checkingHidden = true
         defer { checkingHidden = false }
@@ -389,16 +390,14 @@ struct FreeUpReviewPage: View {
                 return try await client.exploreAuth()
             }
             guard status.isElevated else { throw ImmichError.http(403, String(localized: "Immich did not unlock this session.")) }
-            if let key = CollectionsLockedFolderPage.pinKey(client) { CollectionsLockedFolderPage.sessionPINs[key] = code }
+            // A PIN typed is kept behind Face ID, as the Locked Folder keeps it.
+            if typed, let key { try? LockedFolderFaceID.save(code, for: key, since: epoch) }
             unlockedHere = true
             askingPIN = false
             pin = ""
         } catch {
             // A PIN Immich turns down is not kept for Face ID.
-            if case ImmichError.http(let status, _) = error, status == 400 || status == 401,
-               let key = CollectionsLockedFolderPage.pinKey(client) {
-                CollectionsLockedFolderPage.sessionPINs[key] = nil
-            }
+            if LockedFolderFaceID.rejectsPIN(error), let key { LockedFolderFaceID.forget(key) }
             pinError = error.localizedDescription
             askingPIN = true
             return
@@ -410,14 +409,14 @@ struct FreeUpReviewPage: View {
         hiddenChecked = true
     }
 
-    /// The PIN typed in this run, behind Face ID or the passcode, as the Locked Folder offers it.
-    private var rememberedPIN: String? {
-        center.accountClient.flatMap(CollectionsLockedFolderPage.pinKey).flatMap { CollectionsLockedFolderPage.sessionPINs[$0] }
+    /// Face ID, where the Locked Folder's PIN is kept behind it, as the Locked Folder offers it.
+    private var faceIDName: String? {
+        LockedFolderFaceID.canUnlock(center.lockedFolderKey) ? LockedFolderFaceID.biometryName : nil
     }
 
-    private func checkWithDeviceOwner() async {
-        guard let code = rememberedPIN, await Self.deviceOwner(String(localized: "Check the hidden photos")) else { return }
-        await unlockHidden(code)
+    private func checkWithFaceID() async {
+        guard let key = center.lockedFolderKey, case .pin(let code) = await LockedFolderFaceID.pin(for: key) else { return }
+        await unlockHidden(code, typed: false)
     }
 
     private func reveal() async {
@@ -464,8 +463,8 @@ struct FreeUpReviewPage: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                     HStack(spacing: 10) {
-                        if rememberedPIN != nil {
-                            Button("Use Face ID") { Task { await checkWithDeviceOwner() } }
+                        if let faceIDName {
+                            Button("Use \(faceIDName)") { Task { await checkWithFaceID() } }
                                 .buttonStyle(.bordered)
                         }
                         Button("Enter PIN") { askingPIN = true }

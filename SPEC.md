@@ -1249,8 +1249,8 @@ Its words name the device as Apple's do: "This iPhone" here reads "This iPad" on
   them), Hidden (off; on and dimmed while Hidden Photos is off, as they are not backed up then) and Albums (the albums
   on this iPhone, ticked).
   - **Hidden photos in the review** are a group of their own above the months: their count and size, "safe in Immich's
-  Locked Folder", staying until checked. **Enter PIN** (and **Use Face ID** where the PIN was typed in this run of
-  Verso) unlocks the session with the account's Locked Folder PIN, and each is checked as the others; **Show** (Face
+  Locked Folder", staying until checked. **Enter PIN** (and **Use Face ID** where the PIN is kept behind Face ID,
+  as the Locked Folder keeps it) unlocks the session with the account's Locked Folder PIN, and each is checked as the others; **Show** (Face
   ID or the passcode) shows their pictures; Keep All or Free All. With an API key's sign-in, which has no session to
   unlock, they stay, and the group says why. The session is locked again as the review closes.
   - **The review:** the photos by month, newest first, all ticked, each month with Keep All or Free All; above them what

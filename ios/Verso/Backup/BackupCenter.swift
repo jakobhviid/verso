@@ -372,6 +372,8 @@ final class BackupCenter {
 
     /// The signed-in account's client, whose session the review unlocks with the account's PIN for hidden photos.
     var accountClient: ImmichClient? { services?.client }
+    /// The account the Locked Folder's PIN is kept for behind Face ID (LockedFolderFaceID).
+    var lockedFolderKey: String? { services.flatMap(LockedFolderFaceID.key) }
 
     func setKeepAlbums(_ albums: [String]) {
         UserDefaults.standard.set(albums, forKey: BackupSettings.Key.keepAlbums)
