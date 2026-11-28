@@ -735,127 +735,19 @@ platform. SPEC.md, "Links to Immich", has the map; the protocol's test links
 
 ## Verso on the Apple TV
 
-A viewer for the living room: the library browsed and watched, nothing changed. It is the iPhone's app in another
-form: the same Rust core through the same Swift bindings, built for tvOS as for iOS, and the iPhone's Swift beside it
-where it applies; one App Store record with the iPhone, the iPad and the Mac (`dev.hviid.Verso`), through TestFlight
-first.
-
-**What it holds,** by priority (not the menu's order): Library, Albums, Search, People, Places, Memories, Favorites and
-Archive. Search is tvOS's own search screen, with its keyboard and the Siri Remote's dictation, answered by Immich's
-smart search. The Library follows the user's partners as Immich has them set ("show in my timeline"), with no setting of
-its own. The Locked Folder opens only from the iPhone, each time (below, "The Locked Folder"). Changing photos is Manage
-Photos, off until the iPhone allows it (below, "Manage Photos"). Left out on purpose: editing, albums, people and tags,
-uploads and backup, Verso Drive, sharing, the trash and administration. No zoom and no pinch between sizes: one grid
-size for the sofa, and the photo fills the screen. The places sit in tvOS's sidebar-style tab view. Places opens at the
-countries, most recently visited first, each opening its cities, as the iPhone groups them by country: a wall of cities
-from around the world says nothing.
-
-**Sign-in, from the iPhone alone.** The TV never asks for a server, a password or an OIDC sign-in, and the user never
-sees an API key:
-- the iPhone's **Set Up Apple TV** makes a key of the TV's own through the phone's sign-in (`POST /api-keys`, which
-  every user may do), named for the TV ("Verso on Apple TV (Living room)") and allowed to read only: view, download
-  the full-size image, search, albums, people, memories and the account's settings for them, the timeline. Not the phone's session passed on: that would
-  sign the TV out with the phone, could not be revoked for the TV alone, and could change and delete, and reach the
-  Locked Folder once the phone's PIN was given. A key never reaches the Locked Folder, which needs a PIN-elevated
-  session.
-- it travels to the TV over the local network with Apple's DeviceDiscoveryUI (tvOS 16 and later): the TV offers
-  "Set Up with iPhone", the iPhone running Verso shows up, the TV says its name, and Verso on the iPhone asks
-  "Set Up “name”?" before it makes the key, named after the TV ("Verso on Apple TV (Living Room)"). Verso listens
-  while it is open and signed in, not on one page, so a tap on the notification iOS shows for the TV's request opens
-  Verso to the question, on the Apple TV page, which opens over whatever was in front; on Immich's demo, which is
-  everyone's, it says no.
-- the TV keeps it in its Keychain. The iPhone's Apple TV page lists the TVs set up, by name and the day each was set
-  up, each with **Forget** (and **Forget All** where there are several), which asks first and deletes its key. A key
-  forgotten there, or deleted in Immich, signs the TV out as soon as any call meets it (Immich's 401, which the
-  client tells of whether the page looks at the error or not), or as the TV comes back to Verso, and Set Up with iPhone
-  says why; any other failure (the server out of reach, no network) keeps the key, so an outage never makes the person
-  pair again. A reinstall keeps it too: the Keychain outlives the app, and tvOS offloads and reinstalls apps by itself
-  when space runs low; the key stays listed on the iPhone until forgotten there.
-
-**The Locked Folder, from the iPhone each time.** Immich opens the Locked Folder only to a session unlocked with the
-PIN: an API key, even one with every permission, is refused ("Elevated permission is required"), so the TV's key never
-can. Locked Folder in the TV's Settings, off until turned on, puts it in Collections, and each visit asks the iPhone:
-- **Unlock with iPhone** (Set Up with iPhone's picker) sends the TV's name and server; Verso on the iPhone asks "Show
-  the Locked Folder on “Living Room”?", with Face ID where it keeps the PIN behind it, or with the PIN typed, makes the
-  TV a session of its own (`POST /sessions`, for an hour, named "Verso on Apple TV (Living Room)"), unlocks it with
-  the PIN through the TV's token (`POST /auth/session/unlock`), and sends the token alone: the TV never learns the PIN.
-  Turned down, with the reason on the TV: an iPhone signed in with an API key, which cannot make sessions; a TV of
-  another server; Immich's demo.
-- the TV opens it only for a session of its own account that the server has unlocked, and only while the folder is
-  still on screen. It keeps the token in memory alone, reads through a connection without a URL cache, keeps the
-  pictures in memory and out of the Top Shelf, asks the server each minute whether the session is still unlocked, and
-  ends it (`POST /auth/logout`) as it leaves the folder or the front or signs out; the server ends it at the hour
-  regardless.
-- the iPhone's Apple TV page lists the TVs with the folder open, each with **Lock**, which deletes the session; the TV
-  sees it within the minute.
-- no encryption of Verso's own: HTTPS and Apple's connection. The cost: a session has no read-only scope, so for its
-  minutes it could change what it reaches, where the TV's key may only look; Verso on the TV changes only what Manage
-  Photos does in the folder. The picker shows each time: DeviceDiscoveryUI offers no way back to an iPhone without it.
-
-**Manage Photos.** Off until turned on in the TV's Settings, through the iPhone, as it gives the TV the right to change
-the library: Turn On with iPhone (the picker) asks "Let “Living Room” change your photos?", and on Allow and Face ID (or
-the passcode) the iPhone makes the TV a second key, "Verso on Apple TV, changes (Living Room)", allowed `asset.update`
-and `asset.delete` alone, beside its read-only key, which stays as it is. A press and hold on a photo, in a grid or the
-viewer, then opens its menu (`ios/TV/TVPhotoActions.swift`): Favorite, Archive or Move to Library, Move to Locked
-Folder (a key may move a photo in without the PIN, but never sees it again: the TV says so first) and Delete (to
-Recently Deleted, asking first); in the open Locked Folder, through its session, Move Out of the Locked Folder and
-Delete. Turning it off on the TV forgets the key there and asks nothing, as taking a right away needs no check; a key may
-not delete itself in Immich, so the iPhone's Apple TV page lists the TV with "Can change photos" and **Read Only**,
-which deletes it, as Forget does with both keys. A 401 for the second key, Read Only having run, turns Manage Photos off
-on the TV and says why; it never signs the TV out. Not chosen: widening the one key, which would need the iPhone to
-narrow it again and would keep the everyday key able to write.
-
-**Built** (`ios/TV/`, the `VersoTV` target of the iOS project, with the core's bindings as `VersoCoreTV`): the core for
-tvOS (`mac/build-rust.sh --tvos`), the eight places in tvOS's sidebar-style tab view drawn as the iPhone's pages
-(DESIGN.md, "The apps' interfaces", "On the Apple TV"), sharing the iPhone's files where tvOS compiles them
-(`ios/project.yml`, the `VersoTV` sources: the cards of people, places and memories, the search chips, the Library
-modes, the albums', places' and people's arrangement by the shared core), the viewer (out of its tile and back into it,
-the photos sliding as they step; the preview, then the full-size image; title capsule on a click; the Live Photo sign
-and its movie; a video playing at once, a click or up bringing tvOS's own controls over it as it plays, Menu leaving
-them, play/pause pausing it; the TV held in HDR once a video is HDR, until the viewer closes), the Filter menu
-(favorites from the timeline, the account's own; videos from a search), the photo grids on UIKit's collection view
-(`TVPhotoGrid`: with hundreds of focusable tiles a SwiftUI lazy grid leaves tvOS's focus engine to work out which tile
-covers which on every move, which stalled the Apple TV 4K of the 2nd generation, and it cannot draw the focused tile
-above the neighbours drawn after it; each cell holds the SwiftUI tile, decoded at its own size, 640 pixels, not the 1440
-the server sends), the simpler interface for the older boxes (`TVDevice`: the Apple TV 4K of the 1st and 2nd generation
-and the Apple TV HD, by model, else by less than 4 GB: no lift, no zoom or slide in the viewer, a smaller picture cache
-and fewer pictures loading at once; and as the 1st generation's specifications list HDR10 and Dolby Vision 5 but no HLG,
-which an iPhone records its HDR in, an HLG video plays there through a composition that renders it in SDR, at most 30
-fps (HDR above 30 fps came with the 2nd generation) and 1920 wide, and as recorded should the box refuse that: the
-Simulator plays no composition at all, so the conversion is checked on the box), memories as stories, the TV's key in
-its Keychain, the iPhone's **Set Up Apple TV** (Account) and the TV's **Set Up with iPhone** (DeviceDiscoveryUI's
-picker); **Settings** at the sidebar's foot (the Top Shelf's rows, the Locked Folder's switch, the account, with Sign
-Out; About, with the non-affiliation notice); the **Top Shelf** (`ios/TVTopShelf`, the `VersoTVTopShelf` extension): the
-rows Settings chooses, in this order: today's memories and the newest photos until turned off, the albums with the
-newest photos first (the shared core's Most Recent Photo, the order the Albums page runs in, so the latest trip's albums
-lead), the newest favorites and the people People shows, in its order, once turned on. The app writes them into the App
-Group it shares with the extension each time it starts signed in and as the rows change, so the extension needs no key
-and no network, each opening the app at that memory, photo, album or person (`verso://memory/<id>`,
-`verso://photo/<id>`, `verso://album/<id>`, `verso://person/<id>`); it runs in the tvOS Simulator against a server, and
-on a real Apple TV from TestFlight; **the Locked Folder, from the iPhone each time** (`ios/TV/TVLockedFolder.swift`, the
-iPhone's side in `AppleTVSetup`, above). A development build takes launch arguments to open at a place (`-tvPlace`,
-`-tvLibraryMode`, `-tvSearch`, `-tvOpenPhoto`), for looking, to open the Locked Folder with a session's token
-(`-tvLockedFolderToken`), to open at the newest videos (`-tvOpenVideo`), to filter All Photos to videos
-(`-tvFilterVideos`), to have Manage Photos on with a key never used (`-tvChangeKey`), to take the simpler interface or
-not (`-tvSimpler YES`), to play as a box without HLG (`-tvPlaysHLG NO`), to slow the viewer's zoom for stills of it
-(`-tvZoomSeconds`), and to step the viewer by itself (`-tvViewerSteps left,right,close`), as the Simulator has no
-remote, for a recording of its slides. The remote itself is driven by `ios/TVUITests` (XCUIRemote, the `VersoTVUITests`
-target): a video opened from the grid and playing, paused and played on, its controls brought up with a click beside its
-menu and with up, scrubbed, its panels, Menu back to the video playing on, and right to the next; the grid moved
-through, up to the Filter menu, a photo opened and closed onto its tile; every combination of the filters, none failing.
-Not as the iPhone has them, because a remote has no pinch and no drag: the grid's zoom and the date scroller, a card's
-menu and Select, the filters sheet in Search, tags, and a memory's New mark going away once played, which needs a key
-that may write; the Library opens at its newest photos at the top rather than at the bottom. **Left:** 1. **The Night
-icon as the app's alternate,** which Settings offers as App Icon, Day or Night, once the app carries it
-(`TVAppIcon.offered`): the asset catalog registers a tvOS alternate only as an image stack beside the brand assets
-(`AppIconNight`, which `make-tv-icons.py` writes), and App Store validation then turns the build down, "Missing the
-Alternate Icon asset", as it carries no App Store size (1280 × 768); in brand assets of its own, with that size,    the
-asset catalog does not find it at all. Open: how a tvOS alternate carries its App Store size. 2. **A walk of the
-remote's focus**: left and right in the viewer, the story, Years to Months to All Photos at a photo,    the lift of a
-tile under focus. The Simulator has no remote's keys under `simctl`, and the TV has no UI test target    yet, so these
-are for a real Apple TV or for such a target.
-
-Thumbnails live in the cache, which tvOS may empty when space runs low; they are fetched again.
+Built (ARCHITECTURE.md, "Verso on the Apple TV"; DESIGN.md, "On the Apple TV"): the eight places and Settings in tvOS's
+sidebar, the viewer with its videos, the filters, sign-in and the Locked Folder from the iPhone, Manage Photos, the Top
+Shelf, and the simpler interface and the video fallbacks for the older boxes. **Left:**
+1. **The Night icon as the app's alternate,** which Settings offers as App Icon, Day or Night, once the app carries it
+   (`TVAppIcon.offered`): the asset catalog registers a tvOS alternate only as an image stack beside the brand assets
+   (`AppIconNight`, which `make-tv-icons.py` writes), and App Store validation then turns the build down, "Missing the
+   Alternate Icon asset", as it carries no App Store size (1280 × 768); in brand assets of its own, with that size, the
+   asset catalog does not find it at all. Open: how a tvOS alternate carries its App Store size.
+2. **More walks of the remote** in `ios/TVUITests`: a memory's story, and Years to Months to All Photos keeping the
+   photo in view.
+3. **The older box's videos, on the box:** whether the Apple TV 4K (1st generation) plays an iPhone's HDR video through
+   the SDR conversion, and the original where the server's version is AV1. The Simulator plays no video composition,
+   so only the box can say.
 
 ## Linux, to match the Mac
 

@@ -1,6 +1,7 @@
 import AVKit
 import os
 import SwiftUI
+import VideoToolbox
 
 // The viewer on the TV, as the iPhone's (ios/Verso/Viewer/PhotoViewer.swift) where a remote can have it: a photo filling
 // the screen, the preview first and then the full-size image a 4K screen wants; left and right slide to the photo beside
@@ -311,8 +312,21 @@ struct TVViewer: View {
             try? await Task.sleep(for: .milliseconds(350))
             guard !Task.isCancelled else { return }
         }
-        let asset = client.videoAsset(item.id)
-        let format = await Self.format(of: asset)
+        var asset = client.videoAsset(item.id)
+        var format = await Self.format(of: asset)
+        var source = String(localized: "the server's version for playback")
+        // The server's version in a codec this box has no decoder for (an Immich that encodes its videos in AV1, on an
+        // Apple TV before AV1): its sound plays and its picture never comes, with no error. The original instead, where
+        // the box can decode that.
+        if let codec = format?.codec, !TVDevice.decodes(codec) {
+            let original = client.videoAsset(item.id, original: true)
+            if let read = await Self.format(of: original), TVDevice.decodes(read.codec) {
+                videoLog.notice("the server's \(format?.summary ?? "", privacy: .public) has no decoder here: the original instead")
+                source = String(localized: "the original, as this Apple TV cannot decode the server's \(format?.summary ?? "")")
+                asset = original
+                format = read
+            }
+        }
         let hlg = format?.hlg ?? false
         guard !Task.isCancelled else { return }
         // On a box without HLG (TVDevice), an iPhone's HDR video plays converted to SDR; should the box refuse that, as
@@ -336,12 +350,12 @@ struct TVViewer: View {
         // The sound can play while the picture never comes, which AVFoundation reports as no error: after three
         // seconds of sound with no frame drawn, the viewer says so, with what the video is and how it was played.
         let described = format?.summary ?? String(localized: "a video of an unknown format")
-        videoLog.notice("a video plays: \(described, privacy: .public), \(how, privacy: .public)")
+        videoLog.notice("a video plays: \(described, privacy: .public), \(source, privacy: .public), \(how, privacy: .public)")
         Task {
             try? await Task.sleep(for: .seconds(3))
             guard self.player === player, videoFailure == nil, pictureCame != ObjectIdentifier(player),
                   player.currentTime().seconds > 1 else { return }
-            videoFailure = String(localized: "The sound plays, but no picture has come. The video: \(described), played \(how).")
+            videoFailure = String(localized: "The sound plays, but no picture has come. The video: \(described), \(source), played \(how).")
             videoLog.error("no picture: \(described, privacy: .public), played \(how, privacy: .public); presentation size \(playing.presentationSize.debugDescription, privacy: .public)")
         }
         // The TV goes to HDR for a video in HDR, but not to an HLG the box cannot give it.
@@ -396,6 +410,7 @@ struct TVViewer: View {
     /// What the viewer knows of a video's picture: whether it is HLG, as an iPhone records its HDR (Dolby Vision 8.4 over
     /// an HLG base), its frame rate, and a line saying what it is, for the notice where its picture never comes.
     private struct VideoFormat {
+        var codec: FourCharCode
         var hlg: Bool
         var framesPerSecond: Float
         var summary: String
@@ -418,7 +433,7 @@ struct TVViewer: View {
         }
         parts.append(hlg ? "HLG" : transfer == kCMFormatDescriptionTransferFunction_SMPTE_ST_2084_PQ as String ? "PQ" : "SDR")
         if !atoms.keys.filter({ ["dvcC", "dvvC", "dvwC"].contains($0) }).isEmpty { parts.append("Dolby Vision") }
-        return VideoFormat(hlg: hlg, framesPerSecond: framesPerSecond, summary: parts.joined(separator: ", "))
+        return VideoFormat(codec: codec, hlg: hlg, framesPerSecond: framesPerSecond, summary: parts.joined(separator: ", "))
     }
 
     /// The video through a composition that renders it in SDR, Rec. 709, at most 1920 wide and 30 frames a second, so a
@@ -436,7 +451,9 @@ struct TVViewer: View {
         let playing = AVPlayerItem(asset: asset)
         playing.videoComposition = AVVideoComposition(configuration: configuration)
         let rate = configuration.frameDuration.seconds > 0 ? Int((1 / configuration.frameDuration.seconds).rounded()) : 0
-        let how = String(localized: "converted to SDR at \(Int((width * CGFloat(configuration.renderScale)).rounded())) wide, \(rate) fps")
+        // Plain numbers, without the grouping a localized number takes ("1.920").
+        let wide = String(Int((width * CGFloat(configuration.renderScale)).rounded()))
+        let how = String(localized: "converted to SDR at \(wide) wide, \(String(rate)) fps")
         videoLog.notice("an HLG video plays \(how, privacy: .public)")
         return (playing, how)
     }

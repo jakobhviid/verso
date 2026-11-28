@@ -1,7 +1,7 @@
-// Verso on the Apple TV's Top Shelf (ROADMAP.md, "Verso on the Apple TV"): with Verso in the Home Screen's top row, the
-// shelf above it shows the rows chosen in the app's Settings (today's memories and the library's newest photos until
-// changed; albums, favorites and people once turned on), as the app last wrote them (TVShelfData); a click opens the
-// app there. With nothing written yet, or signed out, the static Top Shelf image shows instead.
+// Verso on the Apple TV's Top Shelf (ARCHITECTURE.md, "Verso on the Apple TV"): with Verso in the Home Screen's top
+// row, the shelf above it shows the rows chosen in the app's Settings (today's memories and the library's newest photos
+// until changed; albums, favorites and people once turned on), as the app last wrote them (TVShelfData); a click opens
+// the app there. With nothing written yet, or signed out, the static Top Shelf image shows instead.
 
 import TVServices
 

@@ -696,6 +696,8 @@ extension ImmichClient {
     }
 
     func videoURL(_ id: String) -> URL { url("assets/\(id)/video/playback") }
+    /// The video as it was uploaded, where a device cannot decode the version the server encoded for playback.
+    func originalVideoURL(_ id: String) -> URL { url("assets/\(id)/original") }
 }
 
 /// The sessions ImmichClient.close ended, which take no new request.

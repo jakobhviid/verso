@@ -1,5 +1,6 @@
-// Verso on the Apple TV (ROADMAP.md, "Verso on the Apple TV"): a viewer for the living room, on the iPhone's API layer
-// and the same Rust core. It signs in from the iPhone alone, with a read-only key of its own the person never sees.
+// Verso on the Apple TV (ARCHITECTURE.md, "Verso on the Apple TV"): a viewer for the living room, on the iPhone's API
+// layer and the same Rust core. It signs in from the iPhone alone, with a read-only key of its own the person never
+// sees.
 
 import SwiftUI
 
@@ -18,8 +19,8 @@ struct VersoTVApp: App {
                 .environment(model)
                 // A Top Shelf item: a memory or a photo (TVShelfData).
                 .onOpenURL { model.open($0) }
-                // Each time the TV comes back to Verso: a key forgotten on the iPhone, or deleted in Immich, signs it out.
-                // Leaving the front locks the Locked Folder.
+                // Each time the TV comes back to Verso: a key forgotten on the iPhone, or deleted in Immich, signs it
+                // out. Leaving the front locks the Locked Folder.
                 .task(id: phase) {
                     if phase == .active { await model.checkKey() } else { model.lockFolder() }
                 }
@@ -53,14 +54,15 @@ final class TVModel {
     /// Why Manage Photos turned itself off, said on its page.
     var changesReason: String?
     @ObservationIgnored private var account: TVAccount?
-    /// The TV's own model, for the Locked Folder's, whose photos are changed through its session but only where the TV's
-    /// Manage Photos is on.
+    /// The TV's own model, for the Locked Folder's, whose photos are changed through its session but only where the
+    /// TV's Manage Photos is on.
     @ObservationIgnored private(set) weak var owner: TVModel?
 
     /// The TV's own model: this, or the one a Locked Folder's model belongs to.
     var root: TVModel { owner ?? self }
 
-    /// The Locked Folder's model: its session's client and pictures, which its grid and viewer read in place of the TV's.
+    /// The Locked Folder's model: its session's client and pictures, which its grid and viewer read in place of the
+    /// TV's.
     init(lockedFolder client: ImmichClient, images: ImagePipeline, owner: TVModel) {
         self.client = client
         self.images = images
@@ -128,8 +130,8 @@ final class TVModel {
         TVTopShelf.clear()
     }
 
-    /// Asks Immich about the key as the TV comes back to Verso. A key turned down signs it out (`keyRejected`, which the
-    /// client tells of too, from any call); any other failure (the server out of reach, no network) keeps it, so an
+    /// Asks Immich about the key as the TV comes back to Verso. A key turned down signs it out (`keyRejected`, which
+    /// the client tells of too, from any call); any other failure (the server out of reach, no network) keeps it, so an
     /// outage never makes the person pair again. A reinstall keeps the key as well: the Keychain outlives the app, and
     /// tvOS offloads and reinstalls apps by itself when space runs low.
     func checkKey() async {
@@ -210,8 +212,8 @@ final class TVModel {
     }
 
     #if DEBUG
-    /// A development build signs in from its launch arguments (`-signInServer URL -signInAPIKey KEY`), as Verso Dev does
-    /// on the iPhone and the Mac, until the iPhone's Set Up Apple TV hands the key over.
+    /// A development build signs in from its launch arguments (`-signInServer URL -signInAPIKey KEY`), as Verso Dev
+    /// does on the iPhone and the Mac, until the iPhone's Set Up Apple TV hands the key over.
     private func followLaunchArguments() {
         let defaults = UserDefaults.standard
         guard let server = defaults.string(forKey: "signInServer"), let url = URL(string: server) else { return }

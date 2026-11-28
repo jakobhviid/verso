@@ -384,11 +384,11 @@ sections, the pages, the viewer's info), drawn with each platform's own toolkit:
   Info with a close button, in the background colour with rounded corners and a soft shadow, the cards the iPhone's.
   Under the pointer, cards lift and Collections' rows and headers light up. A window narrower than a regular width is
   laid out as an iPhone.
-- **On the Apple TV,** the iPhone's pages at a sofa's distance (ROADMAP.md, "Verso on the Apple TV"): the same type,
-  colours and cards, each shared from the iPhone's files where tvOS compiles them and drawn after them where it does
-  not; a page's title large and bold at the leading edge with its line under it, scrolling away with the page. Focus
-  takes the place of a finger as a quiet lift: the focused tile or card grows a little, with a soft shadow beneath and
-  its corners rounding, never tvOS's platter with its wide spacing; cards that lie edge to edge in a card (a month's
+- **On the Apple TV,** the iPhone's pages at a sofa's distance (ARCHITECTURE.md, "Verso on the Apple TV"): the same
+  type, colours and cards, each shared from the iPhone's files where tvOS compiles them and drawn after them where it
+  does not; a page's title large and bold at the leading edge with its line under it, scrolling away with the page.
+  Focus takes the place of a finger as a quiet lift: the focused tile or card grows a little, with a soft shadow beneath
+  and its corners rounding, never tvOS's platter with its wide spacing; cards that lie edge to edge in a card (a month's
   mosaic) are ringed in white instead. The Library has Years, Months and All Photos in a menu beside its title (its
   button names the one shown; a segmented control changed the page as the focus crossed it to the Filter menu), opening
   on All Photos: Years are a card for each year, Months each month's name over a mosaic of photos from different days

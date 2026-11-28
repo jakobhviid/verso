@@ -3,7 +3,7 @@ import Network
 import SwiftUI
 import UIKit
 
-// Manage Photos on the Apple TV (ROADMAP.md, "Verso on the Apple TV"), off until Settings turns it on through the
+// Manage Photos on the Apple TV (ARCHITECTURE.md, "Verso on the Apple TV"), off until Settings turns it on through the
 // iPhone: a press and hold on a photo, in a grid or the viewer, opens its menu in the iPhone's order (PhotoActionsMenu):
 // Favorite, Add to Album (the albums as Albums orders them, TVAlbumPicker), Archive (Move to Library in the Archive),
 // Move to Locked Folder, and Delete at the foot; in the Locked

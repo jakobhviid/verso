@@ -2,13 +2,13 @@ import LocalAuthentication
 import Network
 import SwiftUI
 
-/// Set Up Apple TV (ROADMAP.md, "Verso on the Apple TV"): while Verso is open and signed in, the iPhone can be found by
-/// Verso on an Apple TV nearby, through Apple's DeviceDiscoveryUI, and a tap on the notification iOS shows for the TV's
-/// request opens Verso, already listening (AppleTVSetup.shared, which the window starts). The TV that connects says its
-/// name, and Verso opens this page wherever it was and asks here whether
-/// to set it up: only on Allow does the iPhone make the TV a key of its own, allowed to read only, named after the TV,
-/// and send it with the server's address. The person never sees the key. The TVs set up are listed by their names, each
-/// with Forget, which deletes its key and so signs it out, and Forget All where there are several; each asks first.
+/// Set Up Apple TV (ARCHITECTURE.md, "Verso on the Apple TV"): while Verso is open and signed in, the iPhone can be
+/// found by Verso on an Apple TV nearby, through Apple's DeviceDiscoveryUI, and a tap on the notification iOS shows for
+/// the TV's request opens Verso, already listening (AppleTVSetup.shared, which the window starts). The TV that connects
+/// says its name, and Verso opens this page wherever it was and asks here whether to set it up: only on Allow does the
+/// iPhone make the TV a key of its own, allowed to read only, named after the TV, and send it with the server's
+/// address. The person never sees the key. The TVs set up are listed by their names, each with Forget, which deletes
+/// its key and so signs it out, and Forget All where there are several; each asks first.
 ///
 /// A TV with the Locked Folder on in its Settings asks the same way each time it opens the folder: here the person
 /// allows it, with Face ID where the PIN is kept behind it (LockedFolderFaceID) or with the PIN typed, and the iPhone
@@ -213,7 +213,8 @@ final class AppleTVSetup {
     private(set) var askingLockedFolder: String?
     /// The TV asking to change photos (Manage Photos), by the name it gave.
     private(set) var askingChanges: String?
-    /// The PIN is kept behind Face ID for the account, so allowing the TV's Locked Folder asks for Face ID, not the PIN.
+    /// The PIN is kept behind Face ID for the account, so allowing the TV's Locked Folder asks for Face ID, not the
+    /// PIN.
     private(set) var lockedFolderKept = false
     private var listener: NWListener?
     private var waiting: (connection: NWConnection, name: String, client: ImmichClient)?
@@ -377,8 +378,8 @@ final class AppleTVSetup {
         }
     }
 
-    /// Manage Photos for the TV waiting: Allow, then Face ID or the passcode, as it gives the TV the right to change the
-    /// library; then the TV's second key, allowed to change and delete photos alone.
+    /// Manage Photos for the TV waiting: Allow, then Face ID or the passcode, as it gives the TV the right to change
+    /// the library; then the TV's second key, allowed to change and delete photos alone.
     func answerChanges(_ allowed: Bool) {
         guard let (connection, name, client) = waiting, askingChanges != nil else { return }
         askingChanges = nil

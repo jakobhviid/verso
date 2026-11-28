@@ -1,4 +1,5 @@
 import Foundation
+import VideoToolbox
 
 /// Which Apple TV this is, as far as the TV's interface needs to know: an older box (the Apple TV 4K of the 1st and 2nd
 /// generation, A10X and A12 with 3 GB, and the Apple TV HD) gets the simpler interface, which leaves out what costs it
@@ -37,6 +38,20 @@ enum TVDevice {
         #endif
         return !["AppleTV5,3", "AppleTV6,2"].contains(model)
     }()
+
+    /// Whether the box decodes a video codec: AV1 and VP9, which Immich can encode its videos in, only where the chip
+    /// has a decoder for them (VideoToolbox says), which no Apple TV before AV1 hardware has; every other codec an
+    /// Apple TV plays (H.264, HEVC) is taken as decoded. A development build takes `-tvDecodesAV1 NO` to look at a box
+    /// without.
+    static func decodes(_ codec: FourCharCode) -> Bool {
+        guard codec == kCMVideoCodecType_AV1 || codec == kCMVideoCodecType_VP9 else { return true }
+        #if DEBUG
+        if codec == kCMVideoCodecType_AV1, UserDefaults.standard.object(forKey: "tvDecodesAV1") != nil {
+            return UserDefaults.standard.bool(forKey: "tvDecodesAV1")
+        }
+        #endif
+        return VTIsHardwareDecodeSupported(codec)
+    }
 
     /// How much of the decoded pictures to keep in memory, and how many to load at once.
     static var pictureCache: Int { simpler ? 160 << 20 : 512 << 20 }

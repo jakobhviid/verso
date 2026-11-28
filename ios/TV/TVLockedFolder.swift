@@ -3,13 +3,14 @@ import Network
 import SwiftUI
 import UIKit
 
-// The Locked Folder on the Apple TV (ROADMAP.md, "Verso on the Apple TV"), in Collections once Settings shows it. The
-// TV's own key never opens it: Immich opens the folder only to a session unlocked with the PIN. So each visit asks the
-// iPhone (Unlock with iPhone, DeviceDiscoveryUI's picker, as Set Up with iPhone): Verso there asks the person, with
+// The Locked Folder on the Apple TV (ARCHITECTURE.md, "Verso on the Apple TV"), in Collections once Settings shows it.
+// The TV's own key never opens it: Immich opens the folder only to a session unlocked with the PIN. So each visit asks
+// the iPhone (Unlock with iPhone, DeviceDiscoveryUI's picker, as Set Up with iPhone): Verso there asks the person, with
 // Face ID or the PIN, makes this TV a session of its own for an hour at most, unlocks it with the PIN and sends its
-// token alone, never the PIN (AppleTVSetup on the iPhone). The TV keeps the token in memory, shows the folder through
-// a connection without a URL cache and pictures in memory alone, never in the Top Shelf, and ends the session as it
-// leaves the folder, leaves the front, signs out, or the server's unlock runs out; the next visit asks the iPhone again.
+// token alone, never the PIN (AppleTVSetup on the iPhone). The TV keeps the token in memory, shows the folder through a
+// connection without a URL cache and pictures in memory alone, never in the Top Shelf, and ends the session as it
+// leaves the folder, leaves the front, signs out, or the server's unlock runs out; the next visit asks the iPhone
+// again.
 
 /// Settings' switch for the Locked Folder in Collections, off until turned on.
 enum TVLockedFolderSetting {

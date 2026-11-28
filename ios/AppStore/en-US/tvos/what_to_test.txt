@@ -1,4 +1,4 @@
-- Videos on an Apple TV 4K (1st generation): an iPhone's HDR video now plays converted to SDR at 30 frames a second, which that box should manage. If the sound plays but no picture comes, the viewer now says so after three seconds, with what the video is and how it was played: please send that text.
+- Videos on an older Apple TV: where the server keeps its videos in AV1, which only a newer Apple TV decodes, Verso plays the original instead, so the picture comes with the sound. An iPhone's HDR original then plays converted to SDR at 30 frames a second on the Apple TV 4K (1st generation). If the sound still plays with no picture, the viewer says so after three seconds: please send that text.
 - Settings: every row's title is white, the Top Shelf page's too, and Sign Out is white like the rest.
 - Stepping from a video to the next with left or right: its picture slides in, and the video starts once it lies still.
 - A video plays at once in the viewer. A click or up brings tvOS's own controls over it, still playing. Menu hides them again and the video plays on. Play/pause pauses and plays on.

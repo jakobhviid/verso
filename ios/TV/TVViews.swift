@@ -1,9 +1,10 @@
 import SwiftUI
 
-// The TV's places, by priority (ROADMAP.md, "Verso on the Apple TV"): Library, Albums, Search, People, Places, Memories,
-// Favorites and Archive, the Locked Folder where Settings shows it (TVLockedFolder), and Settings at the foot, in tvOS's sidebar-style tab view, each drawn as the iPhone draws its own (DESIGN.md, "The
-// apps' interfaces"); one grid size for the sofa, and the photo fills the screen. Nothing here changes the library: the
-// TV's key may only read.
+// The TV's places, by priority (ARCHITECTURE.md, "Verso on the Apple TV"): Library, Albums, Search, People, Places,
+// Memories, Favorites and Archive, the Locked Folder where Settings shows it (TVLockedFolder), and Settings at the
+// foot, in tvOS's sidebar-style tab view, each drawn as the iPhone draws its own (DESIGN.md, "The apps' interfaces");
+// one grid size for the sofa, and the photo fills the screen. Nothing here changes the library: the TV's key may only
+// read.
 
 struct TVRootView: View {
     @Environment(TVModel.self) private var model

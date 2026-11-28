@@ -12,9 +12,10 @@ import UniformTypeIdentifiers
 
 extension ImmichClient {
     /// The video's stream for AVPlayer, with the account's credential: through `VideoStream` where a certificate of
-    /// the server's own is trusted for the server, straight from it otherwise.
-    func videoAsset(_ id: String) -> AVURLAsset {
-        let url = videoURL(id)
+    /// the server's own is trusted for the server, straight from it otherwise. The server's version for playback, or
+    /// the original as uploaded.
+    func videoAsset(_ id: String, original: Bool = false) -> AVURLAsset {
+        let url = original ? originalVideoURL(id) : videoURL(id)
         let headers = credential?.headers ?? [:]
         guard ServerTrust.certificate(for: url) != nil else {
             return AVURLAsset(url: url, options: ["AVURLAssetHTTPHeaderFieldsKey": headers])
