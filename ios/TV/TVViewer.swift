@@ -30,6 +30,8 @@ struct TVViewer: View {
     @State private var videoPaused = false
     /// Why the video shown cannot play.
     @State private var videoFailure: String?
+    /// The player whose picture has come: its first frame drawn.
+    @State private var pictureCame: ObjectIdentifier?
     /// A photo has been shown: the next comes by a step, sliding in.
     @State private var shownOne = false
     @State private var details: AssetResponse?
@@ -125,7 +127,7 @@ struct TVViewer: View {
                 // Above the black, or the photo leaving is drawn under it and vanishes rather than sliding away.
                 TVViewerPage(item: item, player: playerItemID == item.id ? player : nil,
                              tile: expanded ? nil : frames?.frame(item.id), paused: videoPaused,
-                             failure: videoFailure)
+                             failure: videoFailure, pictureCame: { pictureCame = ObjectIdentifier($0) })
                     .id(item.id)
                     .zIndex(1)
                     .transition(TVDevice.simpler ? .identity : .asymmetric(
@@ -310,22 +312,38 @@ struct TVViewer: View {
             guard !Task.isCancelled else { return }
         }
         let asset = client.videoAsset(item.id)
-        let hlg = await Self.isHLG(asset)
+        let format = await Self.format(of: asset)
+        let hlg = format?.hlg ?? false
         guard !Task.isCancelled else { return }
         // On a box without HLG (TVDevice), an iPhone's HDR video plays converted to SDR; should the box refuse that, as
         // recorded, and only then does the viewer say why.
         var playing: AVPlayerItem?
-        if hlg, !TVDevice.playsHLG, let converted = await Self.convertedToSDR(asset) {
-            playing = await play(converted, of: item)
+        var how = String(localized: "as recorded")
+        if hlg, !TVDevice.playsHLG, let converted = await Self.convertedToSDR(asset, framesPerSecond: format?.framesPerSecond) {
+            playing = await play(converted.item, of: item)
             if playing == nil, !Task.isCancelled, self.item?.id == item.id {
                 videoLog.error("the video converted to SDR cannot play: \(videoFailure ?? "", privacy: .public); playing it as recorded")
+                how = String(localized: "as recorded, the conversion to SDR refused: \(videoFailure ?? "")")
                 videoFailure = nil
+            } else {
+                how = converted.how
             }
         }
         if playing == nil, !Task.isCancelled, self.item?.id == item.id {
             playing = await play(AVPlayerItem(asset: asset), of: item)
         }
-        guard let playing, !Task.isCancelled, self.item?.id == item.id else { return }
+        guard let playing, !Task.isCancelled, self.item?.id == item.id, let player else { return }
+        // The sound can play while the picture never comes, which AVFoundation reports as no error: after three
+        // seconds of sound with no frame drawn, the viewer says so, with what the video is and how it was played.
+        let described = format?.summary ?? String(localized: "a video of an unknown format")
+        videoLog.notice("a video plays: \(described, privacy: .public), \(how, privacy: .public)")
+        Task {
+            try? await Task.sleep(for: .seconds(3))
+            guard self.player === player, videoFailure == nil, pictureCame != ObjectIdentifier(player),
+                  player.currentTime().seconds > 1 else { return }
+            videoFailure = String(localized: "The sound plays, but no picture has come. The video: \(described), played \(how).")
+            videoLog.error("no picture: \(described, privacy: .public), played \(how, privacy: .public); presentation size \(playing.presentationSize.debugDescription, privacy: .public)")
+        }
         // The TV goes to HDR for a video in HDR, but not to an HLG the box cannot give it.
         if !hlg || TVDevice.playsHLG { await TVDisplayMode.holdHDR(for: asset) }
         let read: AssetResponse? = try? await client.get("assets/\(item.id)")
@@ -375,28 +393,52 @@ struct TVViewer: View {
         return playing
     }
 
-    /// Whether the video is in HLG, as an iPhone records its HDR (Dolby Vision 8.4 over an HLG base).
-    private static func isHLG(_ asset: AVAsset) async -> Bool {
-        guard let track = try? await asset.loadTracks(withMediaType: .video).first,
-              let format = try? await track.load(.formatDescriptions).first else { return false }
-        return CMFormatDescriptionGetExtension(format, extensionKey: kCMFormatDescriptionExtension_TransferFunction)
-            as? String == kCMFormatDescriptionTransferFunction_ITU_R_2100_HLG as String
+    /// What the viewer knows of a video's picture: whether it is HLG, as an iPhone records its HDR (Dolby Vision 8.4 over
+    /// an HLG base), its frame rate, and a line saying what it is, for the notice where its picture never comes.
+    private struct VideoFormat {
+        var hlg: Bool
+        var framesPerSecond: Float
+        var summary: String
     }
 
-    /// The video through a composition that renders it in SDR, Rec. 709, at most 1920 wide, so a box without HLG has
-    /// only to decode it: its decoder takes HEVC Main 10, the HDR it cannot give. The Simulator plays no composition at
-    /// all (AVFoundation -11800, -19230, an H.264 video in SDR too), so this is checked on the box itself.
-    private static func convertedToSDR(_ asset: AVAsset) async -> AVPlayerItem? {
+    private static func format(of asset: AVAsset) async -> VideoFormat? {
+        guard let track = try? await asset.loadTracks(withMediaType: .video).first,
+              let format = try? await track.load(.formatDescriptions).first else { return nil }
+        let framesPerSecond = (try? await track.load(.nominalFrameRate)) ?? 0
+        let transfer = CMFormatDescriptionGetExtension(format, extensionKey: kCMFormatDescriptionExtension_TransferFunction) as? String
+        let hlg = transfer == kCMFormatDescriptionTransferFunction_ITU_R_2100_HLG as String
+        let atoms = CMFormatDescriptionGetExtension(format, extensionKey: kCMFormatDescriptionExtension_SampleDescriptionExtensionAtoms)
+            as? [String: Any] ?? [:]
+        let codec = CMFormatDescriptionGetMediaSubType(format)
+        let codecName = String(decoding: [24, 16, 8, 0].map { UInt8((codec >> $0) & 0xFF) }, as: UTF8.self)
+        let size = CMVideoFormatDescriptionGetDimensions(format)
+        var parts = [codecName, "\(size.width)×\(size.height)", "\(Int(framesPerSecond.rounded())) fps"]
+        if let bits = CMFormatDescriptionGetExtension(format, extensionKey: kCMFormatDescriptionExtension_BitsPerComponent) as? Int {
+            parts.append("\(bits)-bit")
+        }
+        parts.append(hlg ? "HLG" : transfer == kCMFormatDescriptionTransferFunction_SMPTE_ST_2084_PQ as String ? "PQ" : "SDR")
+        if !atoms.keys.filter({ ["dvcC", "dvvC", "dvwC"].contains($0) }).isEmpty { parts.append("Dolby Vision") }
+        return VideoFormat(hlg: hlg, framesPerSecond: framesPerSecond, summary: parts.joined(separator: ", "))
+    }
+
+    /// The video through a composition that renders it in SDR, Rec. 709, at most 1920 wide and 30 frames a second, so a
+    /// box without HLG gives it as the SDR its specifications list (2160p at 60 fps, Main 10), not as the HDR at 60 fps
+    /// it lacks. The Simulator plays no composition at all (AVFoundation -11800, -19230, an H.264 video in SDR too), so
+    /// this is checked on the box itself.
+    private static func convertedToSDR(_ asset: AVAsset, framesPerSecond: Float?) async -> (item: AVPlayerItem, how: String)? {
         guard var configuration = try? await AVVideoComposition.Configuration(for: asset) else { return nil }
         configuration.colorPrimaries = AVVideoColorPrimaries_ITU_R_709_2
         configuration.colorTransferFunction = AVVideoTransferFunction_ITU_R_709_2
         configuration.colorYCbCrMatrix = AVVideoYCbCrMatrix_ITU_R_709_2
         let width = max(configuration.renderSize.width, configuration.renderSize.height)
         if width > 1920 { configuration.renderScale = Float(1920 / width) }
+        if let framesPerSecond, framesPerSecond > 30 { configuration.frameDuration = CMTime(value: 1, timescale: 30) }
         let playing = AVPlayerItem(asset: asset)
         playing.videoComposition = AVVideoComposition(configuration: configuration)
-        videoLog.notice("an HLG video plays converted to SDR, at \(configuration.renderScale) of its size")
-        return playing
+        let rate = configuration.frameDuration.seconds > 0 ? Int((1 / configuration.frameDuration.seconds).rounded()) : 0
+        let how = String(localized: "converted to SDR at \(Int((width * CGFloat(configuration.renderScale)).rounded())) wide, \(rate) fps")
+        videoLog.notice("an HLG video plays \(how, privacy: .public)")
+        return (playing, how)
     }
 
     /// Why a video cannot play, as the system says it, with its error's domain and code for a report.
@@ -486,6 +528,7 @@ private struct TVViewerPage: View {
     let tile: CGRect?
     var paused = false
     var failure: String?
+    var pictureCame: (AVPlayer) -> Void = { _ in }
     @Environment(TVModel.self) private var model
     @State private var image: CGImage?
 
@@ -512,7 +555,7 @@ private struct TVViewerPage: View {
                 }
             }
             if tile == nil, let player {
-                TVPlayerView(player: player)
+                TVPlayerView(player: player, pictureCame: pictureCame)
                     .accessibilityIdentifier(item.isVideo ? "Playing Video" : "Live Photo Movie")
             }
             if tile == nil, item.isVideo, let failure {
@@ -684,22 +727,27 @@ struct TVTitleCapsule: View {
 /// A movie filling the screen as its photo would, without the player's controls: a Live Photo's, and a story's video.
 struct TVPlayerView: UIViewRepresentable {
     let player: AVPlayer
+    /// Told once the player's first frame is drawn.
+    var pictureCame: (AVPlayer) -> Void = { _ in }
 
     func makeUIView(context: Context) -> PlayerView {
         let view = PlayerView()
         view.playerLayer.videoGravity = .resizeAspect
         view.playerLayer.player = player
+        view.pictureCame = pictureCame
         return view
     }
 
     func updateUIView(_ view: PlayerView, context: Context) {
         if view.playerLayer.player !== player { view.playerLayer.player = player }
+        view.pictureCame = pictureCame
     }
 
     /// The player's layer, hidden until it has a frame, so the picture under it shows until the movie takes over.
     final class PlayerView: UIView {
         override static var layerClass: AnyClass { AVPlayerLayer.self }
         var playerLayer: AVPlayerLayer { layer as! AVPlayerLayer }
+        var pictureCame: (AVPlayer) -> Void = { _ in }
         private var readiness: NSKeyValueObservation?
 
         override init(frame: CGRect) {
@@ -707,7 +755,11 @@ struct TVPlayerView: UIViewRepresentable {
             playerLayer.opacity = 0
             readiness = playerLayer.observe(\.isReadyForDisplay, options: [.new]) { [weak self] layer, _ in
                 let ready = layer.isReadyForDisplay
-                DispatchQueue.main.async { self?.playerLayer.opacity = ready ? 1 : 0 }
+                DispatchQueue.main.async {
+                    guard let self else { return }
+                    self.playerLayer.opacity = ready ? 1 : 0
+                    if ready, let player = self.playerLayer.player { self.pictureCame(player) }
+                }
             }
         }
 

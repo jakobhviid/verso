@@ -1,5 +1,4 @@
-- Videos on an Apple TV 4K (1st generation): they should play now. That box has no HLG, the HDR an iPhone records in, so Verso plays those videos converted to SDR. If one still doesn't play, the viewer now says why: please send that text.
-- Stepping from a video to the next with left or right: its picture slides in, and the video starts once it lies still, with no player standing in the middle while the picture slides.
-- A video plays at once in the viewer. Left and right step to the photo or video beside it, also while it plays. A click or up brings tvOS's own controls over it, still playing: swipe or press left and right to scrub, up for audio and subtitles. Menu hides them again and the video plays on. Play/pause pauses and plays on.
-- Moving around the photos, on an older Apple TV 4K above all, and the white, square outline on the focused tile.
-- Library: Years, Months and All Photos are a menu. Filter: every combination keeps its photos, Videos in the Locked Folder too.
+- Videos on an Apple TV 4K (1st generation): an iPhone's HDR video now plays converted to SDR at 30 frames a second, which that box should manage. If the sound plays but no picture comes, the viewer now says so after three seconds, with what the video is and how it was played: please send that text.
+- Settings: every row's title is white, the Top Shelf page's too, and Sign Out is white like the rest.
+- Stepping from a video to the next with left or right: its picture slides in, and the video starts once it lies still.
+- A video plays at once in the viewer. A click or up brings tvOS's own controls over it, still playing. Menu hides them again and the video plays on. Play/pause pauses and plays on.

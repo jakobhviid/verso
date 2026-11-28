@@ -38,10 +38,7 @@ struct TVSettings: View {
             Form {
                 Section {
                     NavigationLink { TVTopShelfSettings() } label: { LabeledContent("Top Shelf", value: shelf) }
-                    Toggle(isOn: $showsLockedFolder) {
-                        // tvOS tints a switch's label; the rows around it are in the text's own colour.
-                        Text("Show Locked Folder in Collections").foregroundStyle(.primary)
-                    }
+                    Toggle("Show Locked Folder in Collections", isOn: $showsLockedFolder)
                     NavigationLink { TVManagePhotos() } label: {
                         LabeledContent("Manage Photos", value: tv.changes == nil ? String(localized: "Off") : String(localized: "On"))
                     }
@@ -62,7 +59,8 @@ struct TVSettings: View {
                     }
                     LabeledContent("Server", value: tv.client?.serverURL.host() ?? "")
                     LabeledContent("This Apple TV", value: tv.changes == nil ? String(localized: "Can view") : String(localized: "Can view and change"))
-                    Button("Sign Out", role: .destructive) { confirmingSignOut = true }
+                    // White as the rows around it, as in tvOS's own Settings; the question it asks is the destructive one.
+                    Button("Sign Out") { confirmingSignOut = true }
                 } header: {
                     Text("Account")
                 } footer: {
@@ -74,6 +72,9 @@ struct TVSettings: View {
             }
             // A row grows under the focus, past the list's edge: drawn whole, not cut off there.
             .scrollClipDisabled()
+            // tvOS draws a switch's and a link's title in the accent, the system blue the TV's asset catalog sets; the
+            // rows are in the text's own colour, as in tvOS's own Settings.
+            .tint(.primary)
         }
         .task { user = try? await tv.client?.currentUser() }
         .onAppear { shelf = TVTopShelf.summary }
@@ -114,6 +115,8 @@ private struct TVTopShelfSettings: View {
             }
         }
         .scrollClipDisabled()
+        // Its switches' titles in the text's colour, as on the Settings page.
+        .tint(.primary)
         .frame(maxWidth: 1200)
         .navigationTitle("Top Shelf")
     }
@@ -175,7 +178,7 @@ private struct TVTopShelfRowSwitch: View {
     }
 
     var body: some View {
-        Toggle(isOn: $shown) { Text(row.title).foregroundStyle(.primary) }
+        Toggle(row.title, isOn: $shown)
             .onChange(of: shown) { changed() }
     }
 }

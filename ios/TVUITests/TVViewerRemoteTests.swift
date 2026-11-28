@@ -155,4 +155,25 @@ final class TVViewerRemoteTests: XCTestCase {
             XCTAssertFalse(application.staticTexts["Can't Load Photos"].exists, "no failure with \(step.name)")
         }
     }
+
+    /// Settings' rows with the focus among them: every row's title in the text's colour, as tvOS's own Settings has
+    /// them, not the accent's blue. Seen in the screenshots.
+    func testSettingsRowsAreInTheTextsColour() throws {
+        let application = XCUIApplication()
+        application.launchArguments = ["-signInServer", "https://demo.immich.app", "-signInAccessToken", try demoToken(),
+                                       "-tvPlace", "settings", "-tvChangeKey", "unused"]
+        application.launch()
+        XCTAssert(application.staticTexts["Top Shelf"].waitForExistence(timeout: 60), "Settings")
+        Thread.sleep(forTimeInterval: 3)
+        press(.right, "s1 right, onto the first row")
+        // The Top Shelf's page, its switches, and back.
+        press(.select, "s2 the Top Shelf's switches", settle: 2)
+        press(.down, "s3 down, a switch focused")
+        press(.menu, "s4 back to Settings", settle: 2)
+        press(.down, "s5 down, the Locked Folder's switch focused")
+        press(.down, "s6 down, Manage Photos focused")
+        for _ in 0..<5 { XCUIRemote.shared.press(.down) }
+        Thread.sleep(forTimeInterval: 1.5)
+        keep("s7 down to the foot: Sign Out and About")
+    }
 }

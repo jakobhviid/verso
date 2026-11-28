@@ -417,24 +417,25 @@ sections, the pages, the viewer's info), drawn with each platform's own toolkit:
   in the viewer; play/pause pauses it, with a large play sign and its length, and plays on, and a video played to its
   end waits at its start with the sign. A video stepped to slides in as its picture, as a photo does, and starts once it
   lies still, the movie taking over from the picture at its first frame; a video that cannot play says so over its
-  picture, with the system's reason. Once a video in HDR has put the TV in HDR, the TV stays there until the viewer
-  closes, where Match Dynamic Range is on: going back to SDR for each photo,
-  and to HDR for the next video, blacks the screen out each time. The accent is the system blue, as the iPhone's, set in
-  the TV's asset catalog because tvOS's own is white. Settings, at the sidebar's foot in a section of its own, is laid
-  out as tvOS's own Settings: the app's icon large on the left with its name and version, and on the right a list a row
-  at a time, each with its value, opening a page where it holds more than a switch. Library: Top Shelf ("Memories,
-  Recent", a switch for each row on its page), Show Locked Folder in Collections, Manage Photos (On or Off, its page
-  with Turn On with iPhone, or Turn Off). Appearance: App Icon, where the app carries its Night icon (the Day and Night
-  icons as cards, each with its name and a tick under the one on the Home Screen). Account: the name, email and server,
-  what this Apple TV may do ("Can view", "Can view and change") and Sign Out in red. About Verso, on its page. With
-  Manage Photos on, a press and hold on a photo, in a grid or full screen, opens its menu in the iPhone's order:
-  Favorite, Add to Album… (the albums in a sheet, in Albums' order and sections, each with its count), Archive (Move to
-  Library in the Archive), Move to Locked Folder and Delete in red, the last two asking first; in the Locked Folder,
-  Move Out of the Locked Folder and Delete. The Locked Folder, until the iPhone opens it, is a lock over its name, a
-  line on how it opens and Unlock with iPhone, the system's picker, as Set Up with iPhone is; open, it is the grid under
-  its name, as Favorites. The Top Shelf shows the rows Settings chooses, Memories, Recent, Albums, Favorites and People
-  in that order, as rows of wide pictures (People's square), each with its title (the memory's, the album's, the
-  person's name, or the day the photo was taken).
+  picture, with the system's reason, as does one whose sound plays with no picture for three seconds, with what the
+  video is (codec, size, frame rate, HDR) and how it was played. Once a video in HDR has put the TV in HDR, the TV stays
+  there until the viewer closes, where Match Dynamic Range is on: going back to SDR for each photo, and to HDR for the
+  next video, blacks the screen out each time. The accent is the system blue, as the iPhone's, set in the TV's asset
+  catalog because tvOS's own is white. Settings, at the sidebar's foot in a section of its own, is laid out as tvOS's
+  own Settings: the app's icon large on the left with its name and version, and on the right a list a row at a time,
+  each with its value, opening a page where it holds more than a switch, every title white as the text is, not in the
+  accent. Library: Top Shelf ("Memories, Recent", a switch for each row on its page), Show Locked Folder in Collections,
+  Manage Photos (On or Off, its page with Turn On with iPhone, or Turn Off). Appearance: App Icon, where the app carries
+  its Night icon (the Day and Night icons as cards, each with its name and a tick under the one on the Home Screen).
+  Account: the name, email and server, what this Apple TV may do ("Can view", "Can view and change") and Sign Out, its
+  question's button red. About Verso, on its page. With Manage Photos on, a press and hold on a photo, in a grid or full
+  screen, opens its menu in the iPhone's order: Favorite, Add to Album… (the albums in a sheet, in Albums' order and
+  sections, each with its count), Archive (Move to Library in the Archive), Move to Locked Folder and Delete in red, the
+  last two asking first; in the Locked Folder, Move Out of the Locked Folder and Delete. The Locked Folder, until the
+  iPhone opens it, is a lock over its name, a line on how it opens and Unlock with iPhone, the system's picker, as Set
+  Up with iPhone is; open, it is the grid under its name, as Favorites. The Top Shelf shows the rows Settings chooses,
+  Memories, Recent, Albums, Favorites and People in that order, as rows of wide pictures (People's square), each with
+  its title (the memory's, the album's, the person's name, or the day the photo was taken).
 - **The Backup page** is backing up's one page on the iPhone and the iPad: a list of iOS's own whose top is the page's
   status, centred, as Settings' feature pages have theirs: a cloud symbol (the accent while it works, and only then
   pulsing with the system's variable colour; green with a tick when backed up; grey while it waits; orange when the
